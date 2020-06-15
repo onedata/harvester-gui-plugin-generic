@@ -1,0 +1,12 @@
+{
+  "onedata": {
+    "version": "0.0.1",
+    "defaultGuiConfiguration": {},
+    "indices": [
+      {
+        "name": "generic-index",
+        "schema": {}
+      }
+    ]
+  }
+}

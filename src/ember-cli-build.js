@@ -1,9 +1,10 @@
 'use strict';
 
 const EmberApp = require('ember-cli/lib/broccoli/ember-app');
+const fs = require('fs');
 
-module.exports = function(defaults) {
-  let app = new EmberApp(defaults, {
+module.exports = function (defaults) {
+  const app = new EmberApp(defaults, {
     // Add options here
   });
 
@@ -19,6 +20,8 @@ module.exports = function(defaults) {
   // modules that you would like to import into your application
   // please specify an object with the list of modules as keys
   // along with the exports of each module as its value.
+
+  fs.copyFileSync('app/manifest.json', 'public/manifest.json');
 
   return app.toTree();
 };
