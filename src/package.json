@@ -43,12 +43,14 @@
     "ember-maybe-import-regenerator": "0.1.6",
     "ember-mocha": "0.16.2",
     "ember-resolver": "7.0.0",
+    "ember-sinon": "5.0.0",
     "ember-source": "3.16.0",
     "ember-welcome-page": "4.0.0",
     "eslint-plugin-ember": "7.7.2",
     "eslint-plugin-node": "11.0.0",
     "eslint-plugin-promise": "4.2.1",
-    "loader.js": "4.7.0"
+    "loader.js": "4.7.0",
+    "sinon-chai": "3.5.0"
   },
   "engines": {
     "node": "10.* || >= 12"
