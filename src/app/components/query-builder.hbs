@@ -1,0 +1,8 @@
+<input
+  type="text"
+  value={{this.query}}
+  {{on "input" this.queryChanged}}
+  {{on "keydown" (invoke-on-enter @performQuery)}}
+>
+<button {{on "click" @performQuery}}>Query</button>
+{{yield}}

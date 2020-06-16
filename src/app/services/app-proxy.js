@@ -9,14 +9,16 @@
 
 import Service from '@ember/service';
 import { get } from '@ember/object';
+import { reads } from '@ember/object/computed';
 import { Promise, resolve } from 'rsvp';
 import { later } from '@ember/runloop';
+import { tracked } from '@glimmer/tracking';
 
 export default class AppProxyService extends Service {
   /**
    * @type {Object}
    */
-  appProxy = null;
+  @tracked appProxy = null;
 
   /**
    * @type {Promise}
@@ -32,18 +34,14 @@ export default class AppProxyService extends Service {
    * @param {String|undefined} params.body request body
    * @returns {Promise<any>} request result
    */
-  get dataRequest() {
-    return (this.appProxy || {}).dataRequest;
-  }
+  @reads('appProxy.dataRequest') dataRequest;
 
   /**
    * Fetches injected GUI plugin configuration
    * @type {Function}
    * @returns {Promise<Object>}
    */
-  get configRequest() {
-    return (this.appProxy || {}).configRequest;
-  }
+  @reads('appProxy.configRequest') configRequest;
 
   constructor() {
     super(...arguments);

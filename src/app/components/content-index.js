@@ -1,17 +1,24 @@
 import Component from '@glimmer/component';
 import { inject as service } from '@ember/service';
+import { tracked } from '@glimmer/tracking';
+import { action } from '@ember/object';
 
 export default class ContentIndexComponent extends Component {
   @service elasticsearch;
 
-  constructor() {
-    super(...arguments);
+  @tracked query = '';
 
+  @action
+  queryChanged(query) {
+    this.query = query;
+  }
+
+  @action
+  performQuery() {
     this.elasticsearch.post('generic-index', '_search', {
         query: {
           multi_match: {
-            query: 'efgh',
-            type: 'phrase_prefix',
+            query: this.query,
           },
         },
       })
