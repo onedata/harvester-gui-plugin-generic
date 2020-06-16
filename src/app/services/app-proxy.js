@@ -43,6 +43,14 @@ export default class AppProxyService extends Service {
    */
   @reads('appProxy.configRequest') configRequest;
 
+  /**
+   * Generates URL, which redirects to file browser with specified file selected
+   * @type {Function}
+   * @param {String} fileId file ID (CDMI Object ID)
+   * @returns {Promise<Object>}
+   */
+  @reads('appProxy.fileBrowserUrlRequest') fileBrowserUrlRequest;
+
   constructor() {
     super(...arguments);
 

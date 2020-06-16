@@ -1,12 +1,16 @@
 import Component from '@glimmer/component';
 import { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
-import { action } from '@ember/object';
+import { action, trySet } from '@ember/object';
+import QueryResults from 'harvester-gui-plugin-generic/utils/query-results';
 
 export default class ContentIndexComponent extends Component {
   @service elasticsearch;
+  @service appProxy;
 
   @tracked query = '';
+
+  @tracked queryResults = null;
 
   @action
   queryChanged(query) {
@@ -22,6 +26,12 @@ export default class ContentIndexComponent extends Component {
           },
         },
       })
-      .then(result => console.log(result.hits.hits));
+      .then(results => trySet(this, 'queryResults', this.parseQueryResults(results)));
+  }
+
+  parseQueryResults(rawQueryResults) {
+    return new QueryResults(rawQueryResults, {
+      fileBrowserUrlRequest: this.appProxy.fileBrowserUrlRequest,
+    });
   }
 }

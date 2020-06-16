@@ -11,6 +11,7 @@ describe('Unit | Service | app-proxy', function () {
     const appProxy = {
       dataRequest: () => {},
       configRequest: () => {},
+      fileBrowserUrlRequest: () => {},
     };
     const windowMock = {
       frameElement: {
@@ -49,6 +50,7 @@ describe('Unit | Service | app-proxy', function () {
   [
     'dataRequest',
     'configRequest',
+    'fileBrowserUrlRequest',
   ].forEach(injectedPropName => {
     it(
       `loads ${injectedPropName} from appProxy to the ${injectedPropName} field`,
