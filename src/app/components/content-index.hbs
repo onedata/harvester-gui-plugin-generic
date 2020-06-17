@@ -3,5 +3,9 @@
   @queryChanged={{this.queryChanged}}
   @performQuery={{this.performQuery}}
 />
+Fields:
+{{#each indexPropertiesPaths as |path|}}
+  {{path}}<br/>
+{{/each}}
 <QueryResults @queryResults={{this.queryResults}}/>
 {{yield}}

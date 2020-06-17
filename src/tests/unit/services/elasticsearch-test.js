@@ -56,4 +56,38 @@ describe('Unit | Service | elasticsearch', function () {
         expect(dataRequestStub).to.be.calledOnce;
       });
   });
+
+  it('performs _search index request on search() call', function () {
+    const service = this.owner.lookup('service:elasticsearch');
+    const dataRequestStub = this.get('dataRequestStub');
+
+    return service.search('someIndex', { a: 'b' })
+      .then(result => {
+        expect(result).to.equal('result');
+        expect(dataRequestStub).to.be.calledWith(sinon.match({
+          method: 'post',
+          indexName: 'someIndex',
+          path: '_search',
+          body: '{"a":"b"}',
+        }));
+        expect(dataRequestStub).to.be.calledOnce;
+      });
+  });
+
+  it('performs _mapping index request on getMapping() call', function () {
+    const service = this.owner.lookup('service:elasticsearch');
+    const dataRequestStub = this.get('dataRequestStub');
+
+    return service.getMapping('someIndex')
+      .then(result => {
+        expect(result).to.equal('result');
+        expect(dataRequestStub).to.be.calledWith(sinon.match({
+          method: 'get',
+          indexName: 'someIndex',
+          path: '_mapping',
+          body: undefined,
+        }));
+        expect(dataRequestStub).to.be.calledOnce;
+      });
+  });
 });

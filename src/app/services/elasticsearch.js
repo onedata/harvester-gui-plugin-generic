@@ -51,4 +51,23 @@ export default class ElasticsearchService extends Service {
   post(indexName, path, body) {
     return this.request('post', indexName, path, body);
   }
+
+  /**
+   * Makes a _search POST request to the index
+   * @param {String} indexName
+   * @param {any} body
+   * @returns {Promise<any>}
+   */
+  search(indexName, body) {
+    return this.post(indexName, '_search', body);
+  }
+
+  /**
+   * Makes a _mapping GET request to the index
+   * @param {String} indexName
+   * @returns {Promise<any>}
+   */
+  getMapping(indexName) {
+    return this.fetch(indexName, '_mapping');
+  }
 }
