@@ -1,6 +1,6 @@
 <ul>
   {{#each @queryResults.results as |queryResult|}}
-    <li>{{queryResult.stringifiedJson}} <a href={{queryResult.fileBrowserUrl}} target="_blank">Go to file</a></li>
+    <li><samp>{{{queryResult.simplyFormattedJson}}}</samp> <a href={{queryResult.fileBrowserUrl}} target="_blank">Go to file</a></li>
   {{/each}}
 </ul>
 {{yield}}

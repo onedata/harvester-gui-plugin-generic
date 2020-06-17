@@ -5,7 +5,10 @@ const fs = require('fs');
 
 module.exports = function (defaults) {
   const app = new EmberApp(defaults, {
-    // Add options here
+    'ember-bootstrap': {
+      bootstrapVersion: 4,
+      importBootstrapCSS: false,
+    },
   });
 
   // Use `app.import` to add additional libraries to the generated

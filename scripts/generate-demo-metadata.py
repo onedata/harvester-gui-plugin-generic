@@ -58,7 +58,8 @@ for i in range(files_no):
   keywords = ', '.join(['"' + words[random.randint(0, len(words) - 1)] + '"' for i in range(random.randint(1, 8))])
   status = random.choice(statuses)
   prev_status = random.choice(statuses)
-  metadata = '{{"id": {0}, "creator": "{1}", "status": {{"now": "{2}", "prev": "{3}" }}, "keywords": [{4}] }}'.format(entry_id, rand_name, status, prev_status, keywords)
+  html = '<b>no content</b>'
+  metadata = '{{"id": {0}, "creator": "{1}", "status": {{"now": "{2}", "prev": "{3}" }}, "keywords": [{4}], "html": "{5}" }}'.format(entry_id, rand_name, status, prev_status, keywords, html)
 
   curl = [
     'curl',
