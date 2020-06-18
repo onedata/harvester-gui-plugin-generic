@@ -4,5 +4,8 @@
   {{on "input" this.queryChanged}}
   {{on "keydown" (invoke-on-enter @performQuery)}}
 >
-<button {{on "click" @performQuery}}>Query</button>
+<button {{on "click" @performQuery}}>Query
+  {{!-- <AttachPopover @showOn="click" @hideOn="clickout" @arrow={{true}} class="ember-attacher-popper">Popover!</AttachPopover> --}}
+</button>
+<QueryBuilder::BlockSelector/>
 {{yield}}

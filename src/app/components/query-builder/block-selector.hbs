@@ -1,0 +1,18 @@
+<div class="query-builder-block-selector">
+  <ul class="operators-list">
+    {{#each (array "and" "or" "not") as |operator|}}
+      <li>
+        <BsButton
+          class="operator operator-{{operator}}"
+          @type="light"
+          @size="sm"
+          @onClick={{fn this.onOperatorAdd operator}}
+        >
+          {{tt this (concat "operators." operator)}}
+        </BsButton>
+      </li>
+    {{/each}}
+  </ul>
+</div>
+
+{{yield}}
