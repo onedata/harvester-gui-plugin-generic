@@ -1,0 +1,13 @@
+.query-builder-block-adder {
+  .add-trigger {
+    background-color: transparent;
+    border: 1px solid rgba(black, 0.3);
+    color: black;
+    line-height: 1;
+    font-weight: bold;
+
+    &:hover {
+      background-color: rgba(black, 0.1)
+    }
+  }
+}

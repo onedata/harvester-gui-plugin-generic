@@ -1,6 +1,9 @@
 
 @import "ember-bootstrap/bootstrap";
+@import "./bootstrap-variables.scss";
+@import "./ember-attacher-overrides";
 
 @import "./layout";
+@import "./components/query-builder/block-adder";
 @import "./components/query-builder/block-selector";
 @import "./components/query-results";

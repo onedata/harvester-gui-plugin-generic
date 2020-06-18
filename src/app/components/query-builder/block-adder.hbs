@@ -1,0 +1,15 @@
+<div class="query-builder-block-adder">
+  <BsButton class="add-trigger" @size="sm">
+    +
+    <AttachPopover
+      @showOn="click"
+      @hideOn="clickout"
+      @arrow={{true}}
+      @placement="auto"
+      @lazyRender={{true}}
+    >
+      <QueryBuilder::BlockSelector/>
+    </AttachPopover>
+  </BsButton>
+  {{yield}}
+</div>

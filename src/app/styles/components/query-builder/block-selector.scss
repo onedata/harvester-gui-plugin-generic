@@ -1,8 +1,12 @@
 .query-builder-block-selector {
+  background-color: white;
+  padding: $spacer * 0.5;
+
   .operators-list {
-    padding: 0;
-    list-style-type: none;
     display: flex;
+    padding: 0;
+    margin: 0;
+    list-style-type: none;
   }
 
   .operator {
