@@ -1,0 +1,11 @@
+<div class="query-builder-block query-builder-single-slot-block" ...attributes>
+  {{#if @queryBlock.operator}}
+    <div class="block-label block-prefix-label">{{tt this (concat "operators." @queryBlock.operator)}}</div>
+  {{/if}}
+  {{#if @queryBlock.slot}}
+    <QueryBuilder::BlockVisualiser @queryBlock={{@queryBlock.slot}}/>
+  {{else}}
+    <QueryBuilder::BlockAdder @onBlockAdd={{this.addBlock}}/>
+  {{/if}}
+  {{yield}}
+</div>

@@ -13,4 +13,9 @@ describe('Unit | Utility | query-builder/single-slot-query-block', function () {
     const result = new SingleSlotQueryBlock('not');
     expect(result.operator).to.equal('not');
   });
+
+  it('has "renderer" field set to "single-slot-block', function () {
+    const result = new SingleSlotQueryBlock();
+    expect(result.renderer).to.equal('single-slot-block');
+  });
 });

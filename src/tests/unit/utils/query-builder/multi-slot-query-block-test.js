@@ -13,4 +13,9 @@ describe('Unit | Utility | query-builder/multi-slot-query-block', function () {
     const result = new MultiSlotQueryBlock('and');
     expect(result.operator).to.equal('and');
   });
+
+  it('has "renderer" field set to "multi-slot-block', function () {
+    const result = new MultiSlotQueryBlock();
+    expect(result.renderer).to.equal('multi-slot-block');
+  });
 });

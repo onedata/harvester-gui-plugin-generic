@@ -1,0 +1,17 @@
+.query-builder {
+  display: flex;
+  height: auto;
+
+  .query-builder-block {
+    display: flex;
+    align-items: center;
+  }
+
+  .block-label {
+    font-size: 80%;
+  }
+
+  .block-prefix-label {
+    margin-right: $spacer * 0.2;
+  }
+}

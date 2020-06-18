@@ -5,7 +5,7 @@
   {{on "keydown" (invoke-on-enter @performQuery)}}
 >
 <button {{on "click" @performQuery}}>Query</button>
-<div class="form-control">
-  <QueryBuilder::BlockAdder/>
+<div class="form-control query-builder">
+  <QueryBuilder::SingleSlotBlock @queryBlock={{this.rootQueryBlock}} class="root-block"/>
 </div>
 {{yield}}
