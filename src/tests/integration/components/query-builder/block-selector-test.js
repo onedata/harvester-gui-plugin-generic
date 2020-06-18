@@ -5,8 +5,15 @@ import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import sinon from 'sinon';
 import { click } from '@ember/test-helpers';
+import SingleSlotQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/single-slot-query-block';
+import MultiSlotQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/multi-slot-query-block';
 
 const operatorsList = ['and', 'or', 'not'];
+const operatorBlockClasses = {
+  and: MultiSlotQueryBlock,
+  or: MultiSlotQueryBlock,
+  not: SingleSlotQueryBlock,
+};
 
 describe('Integration | Component | query-builder/block-selector', function () {
   setupRenderingTest();
@@ -33,7 +40,9 @@ describe('Integration | Component | query-builder/block-selector', function () {
 
         expect(addSpy).to.not.be.called;
         await click(`.operator-${operatorName}`);
-        expect(addSpy).to.be.calledOnce.and.to.be.calledWith(operatorName);
+        const blockMatcher = sinon.match.instanceOf(operatorBlockClasses[operatorName])
+          .and(sinon.match.has('operator', operatorName));
+        expect(addSpy).to.be.calledOnce.and.to.be.calledWith(blockMatcher);
       }
     );
   });

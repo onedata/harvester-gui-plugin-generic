@@ -3,12 +3,14 @@
     +
     <AttachPopover
       @showOn="click"
-      @hideOn="clickout"
+      @hideOn="click clickout"
       @arrow={{true}}
       @placement="auto"
       @lazyRender={{true}}
     >
-      <QueryBuilder::BlockSelector/>
+      <QueryBuilder::BlockSelector
+        @onOperatorAdd={{@onBlockAdd}}
+      />
     </AttachPopover>
   </BsButton>
   {{yield}}

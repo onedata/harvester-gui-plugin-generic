@@ -5,6 +5,8 @@ import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { click } from '@ember/test-helpers';
 import { isVisible } from 'ember-attacher';
+import sinon from 'sinon';
+import MultiSlotQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/multi-slot-query-block';
 
 describe('Integration | Component | query-builder/block-adder', function () {
   setupRenderingTest();
@@ -22,5 +24,16 @@ describe('Integration | Component | query-builder/block-adder', function () {
     expect(isVisible('.ember-attacher')).to.be.true;
     expect(this.element.querySelector('.ember-attacher .query-builder-block-selector'))
       .to.exist;
+  });
+
+  it('passess through information about selected operator', async function () {
+    const addSpy = this.set('addSpy', sinon.spy());
+
+    await render(hbs `<QueryBuilder::BlockAdder @onBlockAdd={{this.addSpy}} />`);
+    await click('.add-trigger');
+    await click('.ember-attacher .operator-and');
+
+    expect(addSpy).to.be.calledOnce
+      .and.to.be.calledWith(sinon.match.instanceOf(MultiSlotQueryBlock));
   });
 });
