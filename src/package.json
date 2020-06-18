@@ -42,6 +42,7 @@
     "ember-data": "3.16.0",
     "ember-export-application-global": "2.0.1",
     "ember-fetch": "7.0.0",
+    "ember-intl": "^5.2.0",
     "ember-load-initializers": "2.1.1",
     "ember-lodash": "4.19.5",
     "ember-maybe-import-regenerator": "0.1.6",

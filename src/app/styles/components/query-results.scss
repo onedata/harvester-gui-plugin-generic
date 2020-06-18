@@ -1,0 +1,17 @@
+.query-results {
+  .results-list {
+    padding: 0;
+  }
+
+  .result {
+    + .result {
+      margin-top: $spacer * .5;
+    }
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: flex-end;
+    font-size: 90%;
+  }
+}
