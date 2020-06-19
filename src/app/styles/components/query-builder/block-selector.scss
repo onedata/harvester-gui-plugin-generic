@@ -13,4 +13,14 @@
     margin-right: $spacer * 0.25;
     text-transform: uppercase;
   }
+
+  .ember-basic-dropdown {
+    font-size: 75%;
+  }
+
+  .ember-power-select-option {
+    word-wrap: break-word;
+    padding: $spacer * 0.2;
+    line-height: 1;
+  }
 }

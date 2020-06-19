@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { describe, it } from 'mocha';
+import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
 import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
@@ -7,6 +7,7 @@ import sinon from 'sinon';
 import { click } from '@ember/test-helpers';
 import SingleSlotQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/single-slot-query-block';
 import MultiSlotQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/multi-slot-query-block';
+import { typeInSearch, clickTrigger, selectChoose } from 'ember-power-select/test-support/helpers';
 
 const operatorsList = ['and', 'or', 'not'];
 const operatorBlockClasses = {
@@ -17,6 +18,15 @@ const operatorBlockClasses = {
 
 describe('Integration | Component | query-builder/block-selector', function () {
   setupRenderingTest();
+
+  beforeEach(function () {
+    this.set('indexProperties', [{
+      path: 'a.b',
+      type: 'boolean',
+    }, {
+      path: 'c.d',
+    }]);
+  });
 
   it('renders three operators: AND, OR and NOT', async function () {
     await render(hbs `<QueryBuilder::BlockSelector />`);
@@ -46,4 +56,79 @@ describe('Integration | Component | query-builder/block-selector', function () {
       }
     );
   });
+
+  it('lists index properties in dropdown', async function () {
+    await render(hbs `
+      <QueryBuilder::BlockSelector @indexProperties={{this.indexProperties}}/>
+    `);
+    await clickTrigger('.property-selector');
+
+    const options = this.element.querySelectorAll('.ember-power-select-option');
+    expect(options).to.have.length(2);
+    expect(options[0].textContent.trim()).to.equal('a.b');
+    expect(options[1].textContent.trim()).to.equal('c.d');
+  });
+
+  it('filters index properties in dropdown', async function () {
+    await render(hbs `
+      <QueryBuilder::BlockSelector @indexProperties={{this.indexProperties}}/>
+    `);
+    await clickTrigger('.property-selector');
+    await typeInSearch('a');
+
+    const options = this.element.querySelectorAll('.ember-power-select-option');
+    expect(options).to.have.length(1);
+    expect(options[0].textContent.trim()).to.equal('a.b');
+  });
+
+  it('does not show comparator selector on init', async function () {
+    await render(hbs `
+      <QueryBuilder::BlockSelector @indexProperties={{this.indexProperties}}/>
+    `);
+
+    expect(this.element.querySelector('.comparator-selector')).to.not.exist;
+  });
+
+  it('shows comparator selector when propery is selected', async function () {
+    await render(hbs `
+      <QueryBuilder::BlockSelector @indexProperties={{this.indexProperties}}/>
+    `);
+    await selectChoose('.property-selector', 'a.b');
+
+    expect(this.element.querySelector('.comparator-selector')).to.exist;
+  });
+
+  it('shows only "is" comparator for boolean property', async function () {
+    await render(hbs `
+      <QueryBuilder::BlockSelector @indexProperties={{this.indexProperties}}/>
+    `);
+    await selectChoose('.property-selector', 'a.b');
+    await clickTrigger('.comparator-selector');
+
+    const options = this.element.querySelectorAll('.ember-power-select-option');
+    expect(options).to.have.length(1);
+    expect(options[0].textContent.trim()).to.equal('is');
+    expect(this.element.querySelector(
+      '.comparator-selector .ember-power-select-selected-item'
+    ).textContent.trim()).to.equal('is');
+  });
+
+  it(
+    'shows true/false dropdown for "is" comparator for boolean property',
+    async function () {
+      await render(hbs `
+        <QueryBuilder::BlockSelector @indexProperties={{this.indexProperties}}/>
+      `);
+      await selectChoose('.property-selector', 'a.b');
+      await clickTrigger('.comparator-value-selector');
+
+      const options = this.element.querySelectorAll('.ember-power-select-option');
+      expect(options).to.have.length(2);
+      expect(options[0].textContent.trim()).to.equal('true');
+      expect(options[1].textContent.trim()).to.equal('false');
+      expect(this.element.querySelector(
+        '.comparator-value-selector .ember-power-select-selected-item'
+      ).textContent.trim()).to.equal('true');
+    }
+  );
 });

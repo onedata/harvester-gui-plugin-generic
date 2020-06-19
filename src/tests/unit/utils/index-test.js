@@ -48,21 +48,20 @@ describe('Unit | Utility | index', function () {
   });
 
   it(
-    'returns flattened list properties (array of {propertyPath, property}) on getFlattenedProperties call',
+    'returns flattened list properties on getFlattenedProperties call',
     function () {
       const index = new Index(Object.freeze(this.rawMapping));
 
       const flattened = index.getFlattenedProperties();
       expect(flattened).to.have.length(3);
       [
-        ['a', 'a'],
-        ['b', 'b'],
-        ['ba', 'b.ba'],
-      ].forEach(([propertyName, propertyPath], index) => {
+        'a',
+        'b',
+        'b.ba',
+      ].forEach((propertyPath, index) => {
         const flattenedProperty = flattened[index];
-        expect(flattenedProperty.propertyPath).to.equal(propertyPath);
-        expect(flattenedProperty.property).to.be.an.instanceOf(IndexProperty);
-        expect(flattenedProperty.property.name).to.equal(propertyName);
+        expect(flattenedProperty).to.be.an.instanceOf(IndexProperty);
+        expect(flattenedProperty.path).to.equal(propertyPath);
       });
     }
   );

@@ -3,9 +3,15 @@
     <div class="block-label block-prefix-label">{{tt this (concat "operators." @queryBlock.operator)}}</div>
   {{/if}}
   {{#if @queryBlock.slot}}
-    <QueryBuilder::BlockVisualiser @queryBlock={{@queryBlock.slot}}/>
+    <QueryBuilder::BlockVisualiser
+      @queryBlock={{@queryBlock.slot}}
+      @indexProperties={{@indexProperties}}
+    />
   {{else}}
-    <QueryBuilder::BlockAdder @onBlockAdd={{this.addBlock}}/>
+    <QueryBuilder::BlockAdder
+      @onBlockAdd={{this.addBlock}}
+      @indexProperties={{@indexProperties}}
+    />
   {{/if}}
   {{yield}}
 </div>

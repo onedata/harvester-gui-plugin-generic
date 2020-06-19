@@ -32,13 +32,7 @@ export default class Index extends IndexPropertyCollection {
 
     const flattenedProperties = [];
     propertiesToFlatten.forEach(property => {
-      let propertyAncestor = property.parentProperty;
-      let propertyPath = property.name;
-      while (propertyAncestor) {
-        propertyPath = `${propertyAncestor.name}.${propertyPath}`;
-        propertyAncestor = propertyAncestor.parentProperty;
-      }
-      flattenedProperties.push({ propertyPath, property },
+      flattenedProperties.push(property,
         ...this.getFlattenedProperties(Object.values(property.properties))
       );
     });

@@ -13,6 +13,44 @@
       </li>
     {{/each}}
   </ul>
+  <div class="condition-creator">
+    <PowerSelect
+      @options={{@indexProperties}}
+      @selected={{this.selectedConditionProperty}}
+      @onChange={{this.conditionPropertyChanged}}
+      @searchEnabled={{true}}
+      @searchField="path"
+      @renderInPlace={{true}}
+      class="property-selector"
+      as |indexProperty|
+    >
+      {{indexProperty.path}}
+    </PowerSelect>
+    {{#if this.comparators.length}}
+      <PowerSelect
+        @options={{this.comparators}}
+        @selected={{this.selectedConditionComparator}}
+        @onChange={{this.conditionComparatorChanged}}
+        @renderInPlace={{true}}
+        class="comparator-selector"
+        as |comparator|
+      >
+        {{tt this (concat "comparators." comparator)}}
+      </PowerSelect>
+    {{/if}}
+    {{#if (eq this.comparatorEditor.type "dropdown")}}
+      <PowerSelect
+        @options={{this.comparatorEditor.values}}
+        @selected={{this.conditionComparatorValue}}
+        @onChange={{this.conditionComparatorValueChanged}}
+        @renderInPlace={{true}}
+        class="comparator-value-selector"
+        as |value|
+      >
+        {{value}}
+      </PowerSelect>
+    {{/if}}
+  </div>
 </div>
 
 {{yield}}

@@ -3,13 +3,15 @@
     +
     <AttachPopover
       @showOn="click"
-      @hideOn="click clickout"
+      @hideOn="clickout"
+      @interactive={{true}}
       @arrow={{true}}
       @placement="auto"
       @lazyRender={{true}}
       as |popover|
     >
       <QueryBuilder::BlockSelector
+        @indexProperties={{@indexProperties}}
         @onOperatorAdd={{fn this.onBlockAdd popover.hide}}
       />
     </AttachPopover>

@@ -2,3 +2,6 @@ operators:
   and: 'and'
   or: 'or'
   not: 'not'
+comparators:
+  boolean:
+    is: 'is'

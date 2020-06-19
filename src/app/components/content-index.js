@@ -15,6 +15,10 @@ export default class ContentIndexComponent extends Component {
 
   @tracked index = null;
 
+  get indexProperties() {
+    return this.index ? this.index.getFlattenedProperties() : [];
+  }
+
   constructor() {
     super(...arguments);
     this.elasticsearch.getMapping('generic-index')

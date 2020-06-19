@@ -7,6 +7,11 @@ export default class IndexProperty extends IndexPropertyCollection {
   isField = false;
   type = 'object';
 
+  get path() {
+    const parentPath = (this.parentProperty && this.parentProperty.path) || '';
+    return (parentPath ? `${parentPath}.` : '') + this.name;
+  }
+
   constructor(parentProperty, name, rawMapping, isField = false) {
     super(...arguments);
 
