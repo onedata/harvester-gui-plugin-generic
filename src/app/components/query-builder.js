@@ -10,4 +10,13 @@ export default class QueryBuilderComponent extends Component {
   queryChanged(event) {
     this.args.queryChanged(event.target.value);
   }
+
+  @action
+  performQuery() {
+    if (!this.args.onPerformQuery) {
+      return;
+    }
+
+    this.args.onPerformQuery(this.rootQueryBlock);
+  }
 }

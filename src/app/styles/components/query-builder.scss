@@ -1,6 +1,8 @@
 .query-builder {
-  display: flex;
-  height: auto;
+  .query-builder-input {
+    display: flex;
+    height: auto;
+  }
 
   .query-builder-block {
     display: flex;

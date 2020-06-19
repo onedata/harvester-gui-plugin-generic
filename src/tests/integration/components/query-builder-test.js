@@ -1,27 +1,44 @@
-// import { expect } from 'chai';
-import { describe, it } from 'mocha';
+import { expect } from 'chai';
+import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-// import { render } from '@ember/test-helpers';
-// import hbs from 'htmlbars-inline-precompile';
+import { render } from '@ember/test-helpers';
+import hbs from 'htmlbars-inline-precompile';
+import sinon from 'sinon';
+import { click } from '@ember/test-helpers';
+import { selectChoose } from 'ember-power-select/test-support/helpers';
+import SingleSlotQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/single-slot-query-block';
+import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/condition-query-block';
 
 describe('Integration | Component | query-builder', function () {
   setupRenderingTest();
 
-  it('renders', async function () {
-    // Set any properties with this.set('myProperty', 'value');
-    // Handle any actions with this.set('myAction', function(val) { ... });
+  beforeEach(function () {
+    this.set('indexProperties', [{
+      path: 'a.b',
+      type: 'boolean',
+    }]);
+  });
 
-    // await render(hbs`<QueryBuilder />`);
+  it('has class "query-builder', async function () {
+    await render(hbs `<QueryBuilder />`);
 
-    // expect(this.element.textContent.trim()).to.equal('');
+    expect(this.element.querySelector('.query-builder'));
+  });
 
-    // // Template block usage:
-    // await render(hbs`
-    //   <QueryBuilder>
-    //     template block text
-    //   </QueryBuilder>
-    // `);
+  it('calls "onPerformQuery" after submit button press', async function () {
+    const submitSpy = this.set('submitSpy', sinon.spy());
 
-    // expect(this.element.textContent.trim()).to.equal('template block text');
+    await render(hbs `<QueryBuilder
+      @onPerformQuery={{this.submitSpy}}
+      @indexProperties={{this.indexProperties}}
+    />`);
+    await click('.add-trigger');
+    await selectChoose('.property-selector', 'a.b');
+    await click('.accept-condition');
+    await click('.submit-query');
+
+    const queryMatcher = sinon.match.instanceOf(SingleSlotQueryBlock)
+      .and(sinon.match.has('slot', sinon.match.instanceOf(ConditionQueryBlock)));
+    expect(submitSpy).to.be.calledOnce.and.be.calledWith(queryMatcher);
   });
 });
