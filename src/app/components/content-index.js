@@ -13,11 +13,7 @@ export default class ContentIndexComponent extends Component {
 
   @tracked queryResults = null;
 
-  @tracked index = {};
-
-  get indexPropertiesPaths() {
-    return extractIndexPropertiesPaths(Object.values(this.index.properties || {}));
-  }
+  @tracked index = null;
 
   constructor() {
     super(...arguments);
@@ -47,21 +43,4 @@ export default class ContentIndexComponent extends Component {
       fileBrowserUrlRequest: this.appProxy.fileBrowserUrlRequest,
     });
   }
-}
-
-function extractIndexPropertiesPaths(properties) {
-  const paths = [];
-  properties.forEach(property => {
-    let propertyAncestor = property.parentProperty;
-    let path = property.name;
-    while (propertyAncestor) {
-      path = `${propertyAncestor.name}.${path}`;
-      propertyAncestor = propertyAncestor.parentProperty;
-    }
-    paths.push(
-      path,
-      ...extractIndexPropertiesPaths(Object.values(property.properties))
-    );
-  });
-  return paths;
 }
