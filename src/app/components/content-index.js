@@ -4,6 +4,7 @@ import { tracked } from '@glimmer/tracking';
 import { action, trySet } from '@ember/object';
 import QueryResults from 'harvester-gui-plugin-generic/utils/query-results';
 import Index from 'harvester-gui-plugin-generic/utils/index';
+import ElasticsearchQueryConstructor from 'harvester-gui-plugin-generic/utils/elasticsearch-query-constructor';
 
 export default class ContentIndexComponent extends Component {
   @service elasticsearch;
@@ -31,15 +32,12 @@ export default class ContentIndexComponent extends Component {
   }
 
   @action
-  performQuery() {
-    this.elasticsearch.search('generic-index', {
-        query: {
-          multi_match: {
-            query: this.query,
-          },
-        },
-      })
-      .then(results => trySet(this, 'queryResults', this.parseQueryResults(results)));
+  performQuery(rootBlock) {
+    const queryConstructor = new ElasticsearchQueryConstructor;
+    this.elasticsearch.search(
+      'generic-index',
+      queryConstructor.constructQuery(rootBlock.slot)
+    ).then(results => trySet(this, 'queryResults', this.parseQueryResults(results)));
   }
 
   parseQueryResults(rawQueryResults) {
