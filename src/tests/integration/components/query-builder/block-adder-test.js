@@ -3,7 +3,7 @@ import { describe, it } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
 import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
-import { click } from '@ember/test-helpers';
+import { click, waitUntil } from '@ember/test-helpers';
 import { isVisible } from 'ember-attacher';
 import sinon from 'sinon';
 import MultiSlotQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/multi-slot-query-block';
@@ -35,5 +35,21 @@ describe('Integration | Component | query-builder/block-adder', function () {
 
     expect(addSpy).to.be.calledOnce
       .and.to.be.calledWith(sinon.match.instanceOf(MultiSlotQueryBlock));
+  });
+
+  it('disables adder button when "disabled" is true', async function () {
+    await render(hbs `<QueryBuilder::BlockAdder @disabled={{true}}/>`);
+
+    await click('.add-trigger');
+    expect(this.element.querySelector('.ember-attacher')).to.not.exist;
+    expect(this.element.querySelector('.add-trigger')).to.have.attr('disabled');
+  });
+
+  it('closes block selector when operator has been choosen', async function () {
+    await render(hbs `<QueryBuilder::BlockAdder />`);
+    await click('.add-trigger');
+    await click('.ember-attacher .operator-and');
+    await waitUntil(() => !isVisible('.ember-attacher'), { timeout: 1000 });
+    expect(isVisible('.ember-attacher')).to.be.false;
   });
 });

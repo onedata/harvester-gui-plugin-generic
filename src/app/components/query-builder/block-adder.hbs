@@ -1,5 +1,5 @@
 <div class="query-builder-block-adder">
-  <BsButton class="add-trigger" @size="sm">
+  <BsButton class="add-trigger" @size="sm" disabled={{@disabled}}>
     +
     <AttachPopover
       @showOn="click"
@@ -7,9 +7,10 @@
       @arrow={{true}}
       @placement="auto"
       @lazyRender={{true}}
+      as |popover|
     >
       <QueryBuilder::BlockSelector
-        @onOperatorAdd={{@onBlockAdd}}
+        @onOperatorAdd={{fn this.onBlockAdd popover.hide}}
       />
     </AttachPopover>
   </BsButton>

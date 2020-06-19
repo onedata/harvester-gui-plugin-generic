@@ -1,3 +1,23 @@
 <div class="query-builder-block query-builder-multi-slot-block" ...attributes>
+  {{#each @queryBlock.slots as |slotBlock|}}
+    <QueryBuilder::BlockVisualiser @queryBlock={{slotBlock}}/>
+    {{#if @queryBlock.operator}}
+      <div class="block-label block-infix-label">
+        {{tt this (concat "operators." @queryBlock.operator)}}
+      </div>
+    {{/if}}
+  {{else}}
+    <QueryBuilder::BlockAdder @onBlockAdd={{this.addBlock}}/>
+    {{#if @queryBlock.operator}}
+      <div class="block-label block-infix-label">
+        {{tt this (concat "operators." @queryBlock.operator)}}
+      </div>
+    {{/if}}
+  {{/each}}
+  <QueryBuilder::BlockAdder
+    @onBlockAdd={{this.addBlock}}
+    @disabled={{eq @queryBlock.slots.length 0}}
+  />
+
   {{yield}}
 </div>
