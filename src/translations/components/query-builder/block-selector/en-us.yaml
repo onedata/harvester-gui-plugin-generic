@@ -5,3 +5,4 @@ operators:
 comparators:
   boolean:
     is: 'is'
+acceptCondition: 'Add'

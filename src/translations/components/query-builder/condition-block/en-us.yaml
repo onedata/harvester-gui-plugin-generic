@@ -1,0 +1,3 @@
+comparators:
+  boolean:
+    is: 'is'

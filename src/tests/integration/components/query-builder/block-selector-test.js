@@ -7,6 +7,7 @@ import sinon from 'sinon';
 import { click } from '@ember/test-helpers';
 import SingleSlotQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/single-slot-query-block';
 import MultiSlotQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/multi-slot-query-block';
+import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/condition-query-block';
 import { typeInSearch, clickTrigger, selectChoose } from 'ember-power-select/test-support/helpers';
 
 const operatorsList = ['and', 'or', 'not'];
@@ -129,6 +130,28 @@ describe('Integration | Component | query-builder/block-selector', function () {
       expect(this.element.querySelector(
         '.comparator-value-selector .ember-power-select-selected-item'
       ).textContent.trim()).to.equal('true');
+    }
+  );
+
+  it(
+    'calls "onConditionAdd" callback, when property condition has been accepted',
+    async function () {
+      const addSpy = this.set('addSpy', sinon.spy());
+
+      await render(hbs `<QueryBuilder::BlockSelector
+        @onConditionAdd={{this.addSpy}}
+        @indexProperties={{this.indexProperties}}
+      />`);
+
+      await selectChoose('.property-selector', 'a.b');
+      await selectChoose('.comparator-value-selector', 'false');
+      await click('.accept-condition');
+
+      const blockMatcher = sinon.match.instanceOf(ConditionQueryBlock)
+        .and(sinon.match.hasNested('property.path', 'a.b'))
+        .and(sinon.match.has('comparator', 'boolean.is'))
+        .and(sinon.match.hasNested('comparatorValue', 'false'));
+      expect(addSpy).to.be.calledOnce.and.to.be.calledWith(blockMatcher);
     }
   );
 });

@@ -1,0 +1,6 @@
+<div class="query-builder-block query-builder-condition-block">
+  <code class="property-path">{{@queryBlock.property.path}}</code>
+  <span class="comparator">{{tt this (concat "comparators." @queryBlock.comparator)}}</span>
+  <samp class="comparator-value">{{@queryBlock.comparatorValue}}</samp>
+  {{yield}}
+</div>

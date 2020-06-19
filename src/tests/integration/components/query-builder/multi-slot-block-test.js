@@ -22,7 +22,7 @@ describe('Integration | Component | query-builder/multi-slot-block', function ()
   );
 
   it(
-    'two block-adders (only first enabled) and no block when it represents empty block',
+    'has two block-adders (only first enabled) and no block when it represents empty block',
     async function () {
       this.set('queryBlock', new MultiSlotQueryBlock());
 
@@ -66,7 +66,7 @@ describe('Integration | Component | query-builder/multi-slot-block', function ()
     }
   );
 
-  it('allows to add operator block using block-adder', async function () {
+  it('allows to add block using block-adder', async function () {
     const block = new MultiSlotQueryBlock();
     this.set('queryBlock', block);
 

@@ -50,6 +50,14 @@
         {{value}}
       </PowerSelect>
     {{/if}}
+    <BsButton
+      class="accept-condition"
+      @type="light"
+      @size="sm"
+      @onClick={{this.onConditionAdd}}
+    >
+      {{tt this "acceptCondition"}}
+    </BsButton>
   </div>
 </div>
 

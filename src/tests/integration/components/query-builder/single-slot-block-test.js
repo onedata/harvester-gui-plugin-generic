@@ -57,7 +57,7 @@ describe('Integration | Component | query-builder/single-slot-block', function (
     }
   );
 
-  it('allows to add operator block using block-adder', async function () {
+  it('allows to add block using block-adder', async function () {
     const block = new SingleSlotQueryBlock();
     this.set('queryBlock', block);
 

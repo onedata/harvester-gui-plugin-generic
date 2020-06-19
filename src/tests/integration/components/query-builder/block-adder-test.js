@@ -6,7 +6,9 @@ import hbs from 'htmlbars-inline-precompile';
 import { click, waitUntil } from '@ember/test-helpers';
 import { isVisible } from 'ember-attacher';
 import sinon from 'sinon';
+import { selectChoose } from 'ember-power-select/test-support/helpers';
 import MultiSlotQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/multi-slot-query-block';
+import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/condition-query-block';
 
 describe('Integration | Component | query-builder/block-adder', function () {
   setupRenderingTest();
@@ -35,6 +37,26 @@ describe('Integration | Component | query-builder/block-adder', function () {
 
     expect(addSpy).to.be.calledOnce
       .and.to.be.calledWith(sinon.match.instanceOf(MultiSlotQueryBlock));
+  });
+
+  it('passess through information about new condition', async function () {
+    this.set('indexProperties', [{
+      path: 'a.b',
+      type: 'boolean',
+    }]);
+    const addSpy = this.set('addSpy', sinon.spy());
+
+    await render(hbs `<QueryBuilder::BlockAdder
+      @indexProperties={{this.indexProperties}}
+      @onBlockAdd={{this.addSpy}}
+    />`);
+    await click('.add-trigger');
+    await selectChoose('.property-selector', 'a.b');
+    await selectChoose('.comparator-value-selector', 'false');
+    await click('.accept-condition');
+
+    expect(addSpy).to.be.calledOnce
+      .and.to.be.calledWith(sinon.match.instanceOf(ConditionQueryBlock));
   });
 
   it('disables adder button when "disabled" is true', async function () {

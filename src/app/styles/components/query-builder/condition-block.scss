@@ -1,0 +1,11 @@
+.query-builder-condition-block {
+  font-size: 80%;
+
+  .property-path {
+    font-size: inherit;
+  }
+
+  .comparator {
+    margin: 0 $spacer * 0.2;
+  }
+}

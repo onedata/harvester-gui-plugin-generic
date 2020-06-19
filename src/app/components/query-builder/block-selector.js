@@ -3,6 +3,7 @@ import { action, get } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 import SingleSlotQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/single-slot-query-block';
 import MultiSlotQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/multi-slot-query-block';
+import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/condition-query-block';
 
 const defaultComparators = {
   boolean: ['boolean.is'],
@@ -82,5 +83,19 @@ export default class QueryBuilderBlockSelectorComponent extends Component {
   @action
   conditionComparatorValueChanged(value) {
     this.conditionComparatorValue = value;
+  }
+
+  @action
+  onConditionAdd() {
+    if (!this.args.onConditionAdd) {
+      return;
+    }
+
+    const condition = new ConditionQueryBlock(
+      this.selectedConditionProperty,
+      this.selectedConditionComparator,
+      this.conditionComparatorValue
+    );
+    this.args.onConditionAdd(condition);
   }
 }
