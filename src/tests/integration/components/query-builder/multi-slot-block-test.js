@@ -120,4 +120,33 @@ describe('Integration | Component | query-builder/multi-slot-block', function ()
     expect(labels).to.have.length(2);
     labels.forEach(label => expect(label.textContent.trim()).to.equal('or'));
   });
+
+  it('yields', async function () {
+    this.set('queryBlock', new MultiSlotQueryBlock('or'));
+
+    await render(hbs `
+      <QueryBuilder::MultiSlotBlock @queryBlock={{this.queryBlock}}>
+        <span class="test-element"></span>
+      </QueryBuilder::MultiSlotBlock>
+    `);
+
+    expect(this.element.querySelector('.test-element')).to.exist;
+  });
+
+  it('allows to remove nested block', async function () {
+    this.set('queryBlock', new MultiSlotQueryBlock('or'));
+
+    await render(hbs `
+      <QueryBuilder::MultiSlotBlock @queryBlock={{this.queryBlock}} />
+    `);
+    await click('.add-trigger');
+    await click('.ember-attacher .operator-not');
+    await click('.remove-block');
+
+    expect(this.element.querySelectorAll(
+      '.query-builder-block .query-builder-block'
+    )).to.not.exist;
+    expect(this.element.querySelectorAll('.query-builder-block-adder'))
+      .to.have.length(2);
+  });
 });

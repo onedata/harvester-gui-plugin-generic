@@ -8,4 +8,9 @@ export default class QueryBuilderMultiSlotBlockComponent extends Component {
   addBlock(queryBlock) {
     this.args.queryBlock.slots.pushObject(queryBlock);
   }
+
+  @action
+  removeBlock(queryBlock) {
+    this.args.queryBlock.slots.removeObject(queryBlock);
+  }
 }

@@ -1,5 +1,17 @@
-{{component (concat "query-builder/" @queryBlock.renderer)
-  queryBlock=@queryBlock
-  indexProperties=@indexProperties
-}}
-{{yield}}
+<div
+  class="query-builder-block-visualiser {{if isDirectlyHovered "directly-hovered"}}"
+  {{closest-hovered selector=".query-builder-block-visualiser" handler=this.directlyHovered}}
+>
+  {{#component (concat "query-builder/" @queryBlock.renderer)
+    queryBlock=@queryBlock
+    indexProperties=@indexProperties
+  }}
+    <BsButton
+      @onClick={{@onRemoveBlock}}
+      @type="danger"
+      class="remove-block"
+    >
+      <FaIcon @icon="times" />
+    </BsButton>
+  {{/component}}
+</div>

@@ -55,4 +55,16 @@ describe('Integration | Component | query-builder/condition-block', function () 
         .to.equal('a | b');
     }
   );
+
+  it('yields', async function () {
+    this.set('block', new ConditionQueryBlock({ path: 'a.b' }, 'boolean.is', 'false'));
+
+    await render(hbs `
+      <QueryBuilder::ConditionBlock @queryBlock={{this.block}}>
+        <span class="test-element"></span>
+      </QueryBuilder::ConditionBlock>
+    `);
+
+    expect(this.element.querySelector('.test-element')).to.exist;
+  });
 });

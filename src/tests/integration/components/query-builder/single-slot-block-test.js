@@ -97,4 +97,33 @@ describe('Integration | Component | query-builder/single-slot-block', function (
     expect(this.element.querySelector('.block-prefix-label').textContent.trim())
       .to.equal('not');
   });
+
+  it('yields', async function () {
+    this.set('queryBlock', new SingleSlotQueryBlock('not'));
+
+    await render(hbs `
+      <QueryBuilder::SingleSlotBlock @queryBlock={{this.queryBlock}}>
+        <span class="test-element"></span>
+      </QueryBuilder::SingleSlotBlock>
+    `);
+
+    expect(this.element.querySelector('.test-element')).to.exist;
+  });
+
+  it('allows to remove nested block', async function () {
+    this.set('queryBlock', new SingleSlotQueryBlock('not'));
+
+    await render(hbs `
+      <QueryBuilder::SingleSlotBlock @queryBlock={{this.queryBlock}} />
+    `);
+    await click('.add-trigger');
+    await click('.ember-attacher .operator-not');
+    await click('.remove-block');
+
+    expect(this.element.querySelectorAll(
+      '.query-builder-block .query-builder-block'
+    )).to.not.exist;
+    expect(this.element.querySelectorAll('.query-builder-block-adder'))
+      .to.have.length(1);
+  });
 });
