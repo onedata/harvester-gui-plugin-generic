@@ -49,6 +49,13 @@
       >
         {{value}}
       </PowerSelect>
+    {{else if (eq this.comparatorEditor.type "text")}}
+      <input
+        type="text"
+        value={{this.conditionComparatorValue}}
+        {{on "input" this.conditionComparatorValueChanged}}
+        class="comparator-value-input"
+      >
     {{/if}}
     <BsButton
       class="accept-condition"

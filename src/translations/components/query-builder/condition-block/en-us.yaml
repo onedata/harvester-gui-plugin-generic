@@ -1,3 +1,5 @@
 comparators:
   boolean:
     is: 'is'
+  text:
+    contains: 'contains'

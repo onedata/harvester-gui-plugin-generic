@@ -34,6 +34,8 @@ export default class ElasticsearchQueryConstructor {
       switch (block.comparator) {
         case 'boolean.is':
           return this.convertBooleanCondition(block);
+        case 'text.contains':
+          return this.convertSimpleQueryStringCondition(block);
         default:
           return undefined;
       }
@@ -46,6 +48,16 @@ export default class ElasticsearchQueryConstructor {
         [conditionBlock.property.path]: {
           value: conditionBlock.comparatorValue,
         },
+      },
+    };
+  }
+
+  convertSimpleQueryStringCondition(conditionBlock) {
+    return {
+      simple_query_string: {
+        query: conditionBlock.comparatorValue,
+        fields: [conditionBlock.property.path],
+        default_operator: 'and',
       },
     };
   }

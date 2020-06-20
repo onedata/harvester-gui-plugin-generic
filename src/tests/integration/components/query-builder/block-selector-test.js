@@ -4,7 +4,7 @@ import { setupRenderingTest } from 'ember-mocha';
 import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import sinon from 'sinon';
-import { click } from '@ember/test-helpers';
+import { click, fillIn } from '@ember/test-helpers';
 import SingleSlotQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/single-slot-query-block';
 import MultiSlotQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/multi-slot-query-block';
 import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/condition-query-block';
@@ -22,10 +22,11 @@ describe('Integration | Component | query-builder/block-selector', function () {
 
   beforeEach(function () {
     this.set('indexProperties', [{
-      path: 'a.b',
+      path: 'boolProp',
       type: 'boolean',
     }, {
-      path: 'c.d',
+      path: 'textProp',
+      type: 'text',
     }]);
   });
 
@@ -66,8 +67,8 @@ describe('Integration | Component | query-builder/block-selector', function () {
 
     const options = this.element.querySelectorAll('.ember-power-select-option');
     expect(options).to.have.length(2);
-    expect(options[0].textContent.trim()).to.equal('a.b');
-    expect(options[1].textContent.trim()).to.equal('c.d');
+    expect(options[0].textContent.trim()).to.equal('boolProp');
+    expect(options[1].textContent.trim()).to.equal('textProp');
   });
 
   it('filters index properties in dropdown', async function () {
@@ -75,11 +76,11 @@ describe('Integration | Component | query-builder/block-selector', function () {
       <QueryBuilder::BlockSelector @indexProperties={{this.indexProperties}}/>
     `);
     await clickTrigger('.property-selector');
-    await typeInSearch('a');
+    await typeInSearch('bool');
 
     const options = this.element.querySelectorAll('.ember-power-select-option');
     expect(options).to.have.length(1);
-    expect(options[0].textContent.trim()).to.equal('a.b');
+    expect(options[0].textContent.trim()).to.equal('boolProp');
   });
 
   it('does not show comparator selector on init', async function () {
@@ -94,7 +95,7 @@ describe('Integration | Component | query-builder/block-selector', function () {
     await render(hbs `
       <QueryBuilder::BlockSelector @indexProperties={{this.indexProperties}}/>
     `);
-    await selectChoose('.property-selector', 'a.b');
+    await selectChoose('.property-selector', 'boolProp');
 
     expect(this.element.querySelector('.comparator-selector')).to.exist;
   });
@@ -103,7 +104,7 @@ describe('Integration | Component | query-builder/block-selector', function () {
     await render(hbs `
       <QueryBuilder::BlockSelector @indexProperties={{this.indexProperties}}/>
     `);
-    await selectChoose('.property-selector', 'a.b');
+    await selectChoose('.property-selector', 'boolProp');
     await clickTrigger('.comparator-selector');
 
     const options = this.element.querySelectorAll('.ember-power-select-option');
@@ -120,7 +121,7 @@ describe('Integration | Component | query-builder/block-selector', function () {
       await render(hbs `
         <QueryBuilder::BlockSelector @indexProperties={{this.indexProperties}}/>
       `);
-      await selectChoose('.property-selector', 'a.b');
+      await selectChoose('.property-selector', 'boolProp');
       await clickTrigger('.comparator-value-selector');
 
       const options = this.element.querySelectorAll('.ember-power-select-option');
@@ -134,7 +135,7 @@ describe('Integration | Component | query-builder/block-selector', function () {
   );
 
   it(
-    'calls "onConditionAdd" callback, when property condition has been accepted',
+    'calls "onConditionAdd" callback, when boolean property "is" condition has been accepted',
     async function () {
       const addSpy = this.set('addSpy', sinon.spy());
 
@@ -143,14 +144,64 @@ describe('Integration | Component | query-builder/block-selector', function () {
         @indexProperties={{this.indexProperties}}
       />`);
 
-      await selectChoose('.property-selector', 'a.b');
+      await selectChoose('.property-selector', 'boolProp');
       await selectChoose('.comparator-value-selector', 'false');
       await click('.accept-condition');
 
       const blockMatcher = sinon.match.instanceOf(ConditionQueryBlock)
-        .and(sinon.match.hasNested('property.path', 'a.b'))
+        .and(sinon.match.hasNested('property.path', 'boolProp'))
         .and(sinon.match.has('comparator', 'boolean.is'))
         .and(sinon.match.hasNested('comparatorValue', 'false'));
+      expect(addSpy).to.be.calledOnce.and.to.be.calledWith(blockMatcher);
+    }
+  );
+
+  it('shows only "contains" comparator for text property', async function () {
+    await render(hbs `
+      <QueryBuilder::BlockSelector @indexProperties={{this.indexProperties}}/>
+    `);
+    await selectChoose('.property-selector', 'textProp');
+    await clickTrigger('.comparator-selector');
+
+    const options = this.element.querySelectorAll('.ember-power-select-option');
+    expect(options).to.have.length(1);
+    expect(options[0].textContent.trim()).to.equal('contains');
+    expect(this.element.querySelector(
+      '.comparator-selector .ember-power-select-selected-item'
+    ).textContent.trim()).to.equal('contains');
+  });
+
+  it(
+    'shows text input for "contains" comparator for text property',
+    async function () {
+      await render(hbs `
+        <QueryBuilder::BlockSelector @indexProperties={{this.indexProperties}}/>
+      `);
+      await selectChoose('.property-selector', 'textProp');
+
+      expect(this.element.querySelector('input[type="text"].comparator-value-input'))
+        .to.exist;
+    }
+  );
+
+  it(
+    'calls "onConditionAdd" callback, when text property "contains" condition has been accepted',
+    async function () {
+      const addSpy = this.set('addSpy', sinon.spy());
+
+      await render(hbs `<QueryBuilder::BlockSelector
+        @onConditionAdd={{this.addSpy}}
+        @indexProperties={{this.indexProperties}}
+      />`);
+
+      await selectChoose('.property-selector', 'textProp');
+      await fillIn('.comparator-value-input', 'a | b');
+      await click('.accept-condition');
+
+      const blockMatcher = sinon.match.instanceOf(ConditionQueryBlock)
+        .and(sinon.match.hasNested('property.path', 'textProp'))
+        .and(sinon.match.has('comparator', 'text.contains'))
+        .and(sinon.match.hasNested('comparatorValue', 'a | b'));
       expect(addSpy).to.be.calledOnce.and.to.be.calledWith(blockMatcher);
     }
   );

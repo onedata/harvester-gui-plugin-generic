@@ -22,7 +22,7 @@ describe('Integration | Component | query-builder/condition-block', function () 
   );
 
   it(
-    'shows property path, comparator and comparator value for boolean condition',
+    'shows property path, comparator and comparator value for boolean "is" condition',
     async function () {
       this.set('block', new ConditionQueryBlock({ path: 'a.b' }, 'boolean.is', 'false'));
 
@@ -34,6 +34,25 @@ describe('Integration | Component | query-builder/condition-block', function () 
         .to.equal('is');
       expect(this.element.querySelector('.comparator-value').textContent.trim())
         .to.equal('false');
+    }
+  );
+
+  it(
+    'shows property path, comparator and comparator value for text "contains" condition',
+    async function () {
+      this.set('block', new ConditionQueryBlock({ path: 'a.b' },
+        'text.contains',
+        'a | b'
+      ));
+
+      await render(hbs `<QueryBuilder::ConditionBlock @queryBlock={{this.block}} />`);
+
+      expect(this.element.querySelector('.property-path').textContent.trim())
+        .to.equal('a.b');
+      expect(this.element.querySelector('.comparator').textContent.trim())
+        .to.equal('contains');
+      expect(this.element.querySelector('.comparator-value').textContent.trim())
+        .to.equal('a | b');
     }
   );
 });

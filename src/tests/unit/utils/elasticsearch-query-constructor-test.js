@@ -32,6 +32,19 @@ const exampleBooleanConditionQuery2 = {
   },
 };
 
+const exampleTextContainsConditionBlock = new ConditionQueryBlock(
+  new IndexProperty(new IndexProperty(null, 'e'), 'f'),
+  'text.contains',
+  'a | b'
+);
+const exampleTextContainsConditionQuery = {
+  simple_query_string: {
+    query: 'a | b',
+    fields: ['e.f'],
+    default_operator: 'and',
+  },
+};
+
 const exampleNotOperatorBlock = new SingleSlotQueryBlock('not');
 exampleNotOperatorBlock.slot = exampleBooleanConditionBlock1;
 const exampleNotOperatorQuery = {
@@ -57,13 +70,13 @@ const exampleAndOperatorQuery = {
 const exampleOrOperatorBlock = new MultiSlotQueryBlock('or');
 exampleOrOperatorBlock.slots.pushObjects([
   exampleBooleanConditionBlock2,
-  exampleBooleanConditionBlock1,
+  exampleTextContainsConditionBlock,
 ]);
 const exampleOrOperatorQuery = {
   bool: {
     should: [
       exampleBooleanConditionQuery2,
-      exampleBooleanConditionQuery1,
+      exampleTextContainsConditionQuery,
     ],
   },
 };
@@ -85,12 +98,22 @@ const exampleNestedOperatorsQuery = {
 };
 
 describe('Unit | Utility | elasticsearch-query-constructor', function () {
-  it('converts boolean condition in "convertBooleanCondition" method', function () {
+  it('converts boolean "is" condition in "convertBooleanCondition" method', function () {
     const esQueryConstructor = new ElasticsearchQueryConstructor();
     const result = esQueryConstructor
       .convertBooleanCondition(exampleBooleanConditionBlock1);
     expect(result).to.deep.equal(exampleBooleanConditionQuery1);
   });
+
+  it(
+    'converts text "contains" condition in "convertSimpleQueryStringCondition" method',
+    function () {
+      const esQueryConstructor = new ElasticsearchQueryConstructor();
+      const result = esQueryConstructor
+        .convertSimpleQueryStringCondition(exampleTextContainsConditionBlock);
+      expect(result).to.deep.equal(exampleTextContainsConditionQuery);
+    }
+  );
 
   it('converts NOT operator in "convertNotOperator" method', function () {
     const esQueryConstructor = new ElasticsearchQueryConstructor();
