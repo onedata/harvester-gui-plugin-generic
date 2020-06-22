@@ -9,9 +9,10 @@ const defaultComparators = {
   boolean: ['boolean.is'],
   text: ['text.contains'],
   number: ['number.eq', 'number.lt', 'number.lte', 'number.gt', 'number.gte'],
+  keyword: ['keyword.is'],
 };
 
-const booleanComparatorEditor = {
+const booleanEditor = {
   type: 'dropdown',
   values: ['true', 'false'],
   defaultValue: 'true',
@@ -36,14 +37,23 @@ const numberBasicEditor = {
   },
 };
 
+const keywordIsEditor = {
+  type: 'text',
+  defaultValue: '',
+  isValidValue(value) {
+    return typeof value === 'string';
+  },
+};
+
 const defaultComparatorEditors = {
-  'boolean.is': booleanComparatorEditor,
+  'boolean.is': booleanEditor,
   'text.contains': textContainsEditor,
   'number.eq': numberBasicEditor,
   'number.lt': numberBasicEditor,
   'number.lte': numberBasicEditor,
   'number.gt': numberBasicEditor,
   'number.gte': numberBasicEditor,
+  'keyword.is': keywordIsEditor,
 };
 
 export default class QueryBuilderBlockSelectorComponent extends Component {

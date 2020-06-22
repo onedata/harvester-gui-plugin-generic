@@ -9,3 +9,5 @@ comparators:
     lte: '≤'
     gt: '&gt;'
     gte: '≥'
+  keyword:
+    is: 'is'

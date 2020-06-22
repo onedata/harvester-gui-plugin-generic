@@ -6,28 +6,15 @@ import MultiSlotQueryBlock from 'harvester-gui-plugin-generic/utils/query-builde
 import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/condition-query-block';
 import IndexProperty from 'harvester-gui-plugin-generic/utils/index-property';
 
-const exampleBooleanConditionBlock1 = new ConditionQueryBlock(
+const exampleBooleanConditionBlock = new ConditionQueryBlock(
   new IndexProperty(new IndexProperty(null, 'a'), 'b'),
   'boolean.is',
   'true'
 );
-const exampleBooleanConditionQuery1 = {
+const exampleBooleanConditionQuery = {
   term: {
     'a.b': {
       value: 'true',
-    },
-  },
-};
-
-const exampleBooleanConditionBlock2 = new ConditionQueryBlock(
-  new IndexProperty(new IndexProperty(null, 'c'), 'd'),
-  'boolean.is',
-  'false'
-);
-const exampleBooleanConditionQuery2 = {
-  term: {
-    'c.d': {
-      value: 'false',
     },
   },
 };
@@ -59,23 +46,36 @@ const exampleNumberEqualsConditionQuery = {
   },
 };
 
+const exampleKeywordIsConditionBlock = new ConditionQueryBlock(
+  new IndexProperty(new IndexProperty(null, 'i'), 'j'),
+  'keyword.is',
+  'abc'
+);
+const exampleKeywordIsConditionQuery = {
+  term: {
+    'i.j': {
+      value: 'abc',
+    },
+  },
+};
+
 const exampleNotOperatorBlock = new SingleSlotQueryBlock('not');
-exampleNotOperatorBlock.slot = exampleBooleanConditionBlock1;
+exampleNotOperatorBlock.slot = exampleBooleanConditionBlock;
 const exampleNotOperatorQuery = {
   bool: {
-    must_not: [exampleBooleanConditionQuery1],
+    must_not: [exampleBooleanConditionQuery],
   },
 };
 
 const exampleAndOperatorBlock = new MultiSlotQueryBlock('and');
 exampleAndOperatorBlock.slots.pushObjects([
-  exampleBooleanConditionBlock1,
+  exampleBooleanConditionBlock,
   exampleNumberEqualsConditionBlock,
 ]);
 const exampleAndOperatorQuery = {
   bool: {
     must: [
-      exampleBooleanConditionQuery1,
+      exampleBooleanConditionQuery,
       exampleNumberEqualsConditionQuery,
     ],
   },
@@ -83,14 +83,14 @@ const exampleAndOperatorQuery = {
 
 const exampleOrOperatorBlock = new MultiSlotQueryBlock('or');
 exampleOrOperatorBlock.slots.pushObjects([
-  exampleBooleanConditionBlock2,
   exampleTextContainsConditionBlock,
+  exampleKeywordIsConditionBlock,
 ]);
 const exampleOrOperatorQuery = {
   bool: {
     should: [
-      exampleBooleanConditionQuery2,
       exampleTextContainsConditionQuery,
+      exampleKeywordIsConditionQuery,
     ],
   },
 };
@@ -115,8 +115,8 @@ describe('Unit | Utility | elasticsearch-query-constructor', function () {
   it('converts boolean "is" condition in "convertBooleanCondition" method', function () {
     const esQueryConstructor = new ElasticsearchQueryConstructor();
     const result = esQueryConstructor
-      .convertBooleanCondition(exampleBooleanConditionBlock1);
-    expect(result).to.deep.equal(exampleBooleanConditionQuery1);
+      .convertBooleanCondition(exampleBooleanConditionBlock);
+    expect(result).to.deep.equal(exampleBooleanConditionQuery);
   });
 
   it(
@@ -173,6 +173,16 @@ describe('Unit | Utility | elasticsearch-query-constructor', function () {
       }
     );
   });
+
+  it(
+    'converts keyword "is" condition in "convertKeywordIsCondition" method',
+    function () {
+      const esQueryConstructor = new ElasticsearchQueryConstructor();
+      const result = esQueryConstructor
+        .convertKeywordIsCondition(exampleKeywordIsConditionBlock);
+      expect(result).to.deep.equal(exampleKeywordIsConditionQuery);
+    }
+  );
 
   it('converts NOT operator in "convertNotOperator" method', function () {
     const esQueryConstructor = new ElasticsearchQueryConstructor();

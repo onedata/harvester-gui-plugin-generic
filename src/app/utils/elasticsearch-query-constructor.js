@@ -42,6 +42,8 @@ export default class ElasticsearchQueryConstructor {
         case 'number.gt':
         case 'number.gte':
           return this.convertNumberRangeCondition(block);
+        case 'keyword.is':
+          return this.convertKeywordIsCondition(block);
         default:
           return undefined;
       }
@@ -83,6 +85,16 @@ export default class ElasticsearchQueryConstructor {
     return {
       range: {
         [conditionBlock.property.path]: rangeConditionsObj,
+      },
+    };
+  }
+
+  convertKeywordIsCondition(conditionBlock) {
+    return {
+      term: {
+        [conditionBlock.property.path]: {
+          value: conditionBlock.comparatorValue,
+        },
       },
     };
   }

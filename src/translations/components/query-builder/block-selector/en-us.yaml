@@ -13,4 +13,6 @@ comparators:
     lte: '≤'
     gt: '&gt;'
     gte: '≥'
+  keyword:
+    is: 'is'
 acceptCondition: 'Add'
