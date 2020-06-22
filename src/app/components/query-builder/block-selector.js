@@ -8,6 +8,7 @@ import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builde
 const defaultComparators = {
   boolean: ['boolean.is'],
   text: ['text.contains'],
+  number: ['number.eq', 'number.lt', 'number.lte', 'number.gt', 'number.gte'],
 };
 
 const booleanComparatorEditor = {
@@ -27,9 +28,22 @@ const textContainsEditor = {
   },
 };
 
+const numberBasicEditor = {
+  type: 'text',
+  defaultValue: '',
+  isValidValue(value) {
+    return typeof value === 'string' && !isNaN(parseFloat(value));
+  },
+};
+
 const defaultComparatorEditors = {
   'boolean.is': booleanComparatorEditor,
   'text.contains': textContainsEditor,
+  'number.eq': numberBasicEditor,
+  'number.lt': numberBasicEditor,
+  'number.lte': numberBasicEditor,
+  'number.gt': numberBasicEditor,
+  'number.gte': numberBasicEditor,
 };
 
 export default class QueryBuilderBlockSelectorComponent extends Component {

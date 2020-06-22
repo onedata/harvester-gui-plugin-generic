@@ -37,6 +37,24 @@ describe('Unit | Utility | index-property', function () {
     expect(property.type).to.equal('object');
   });
 
+  [
+    'long',
+    'integer',
+    'short',
+    'byte',
+    'double',
+    'float',
+    'half_float',
+    'scaled_float',
+  ].forEach(type =>
+    it(`sets type to "number" when type in rawMapping equals "${type}"`, function () {
+      this.rawMapping.type = type;
+
+      const property = new IndexProperty(null, 'myfield', Object.freeze(this.rawMapping));
+      expect(property.type).to.equal('number');
+    })
+  );
+
   it('extracts subproperties', function () {
     const property = new IndexProperty(null, 'myfield', Object.freeze(this.rawMapping));
 

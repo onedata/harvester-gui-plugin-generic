@@ -36,6 +36,12 @@ export default class ElasticsearchQueryConstructor {
           return this.convertBooleanCondition(block);
         case 'text.contains':
           return this.convertSimpleQueryStringCondition(block);
+        case 'number.eq':
+        case 'number.lt':
+        case 'number.lte':
+        case 'number.gt':
+        case 'number.gte':
+          return this.convertNumberRangeCondition(block);
         default:
           return undefined;
       }
@@ -58,6 +64,25 @@ export default class ElasticsearchQueryConstructor {
         query: conditionBlock.comparatorValue,
         fields: [conditionBlock.property.path],
         default_operator: 'and',
+      },
+    };
+  }
+
+  convertNumberRangeCondition(conditionBlock) {
+    const rangeConditionsObj = {};
+    const comparatorValue = parseFloat(conditionBlock.comparatorValue);
+
+    if (conditionBlock.comparator === 'number.eq') {
+      rangeConditionsObj.lte = comparatorValue;
+      rangeConditionsObj.gte = comparatorValue;
+    } else {
+      const esComparator = conditionBlock.comparator.split('.')[1];
+      rangeConditionsObj[esComparator] = comparatorValue;
+    }
+
+    return {
+      range: {
+        [conditionBlock.property.path]: rangeConditionsObj,
       },
     };
   }

@@ -45,6 +45,20 @@ const exampleTextContainsConditionQuery = {
   },
 };
 
+const exampleNumberEqualsConditionBlock = new ConditionQueryBlock(
+  new IndexProperty(new IndexProperty(null, 'g'), 'h'),
+  'number.eq',
+  '2'
+);
+const exampleNumberEqualsConditionQuery = {
+  range: {
+    'g.h': {
+      lte: 2,
+      gte: 2,
+    },
+  },
+};
+
 const exampleNotOperatorBlock = new SingleSlotQueryBlock('not');
 exampleNotOperatorBlock.slot = exampleBooleanConditionBlock1;
 const exampleNotOperatorQuery = {
@@ -56,13 +70,13 @@ const exampleNotOperatorQuery = {
 const exampleAndOperatorBlock = new MultiSlotQueryBlock('and');
 exampleAndOperatorBlock.slots.pushObjects([
   exampleBooleanConditionBlock1,
-  exampleBooleanConditionBlock2,
+  exampleNumberEqualsConditionBlock,
 ]);
 const exampleAndOperatorQuery = {
   bool: {
     must: [
       exampleBooleanConditionQuery1,
-      exampleBooleanConditionQuery2,
+      exampleNumberEqualsConditionQuery,
     ],
   },
 };
@@ -114,6 +128,51 @@ describe('Unit | Utility | elasticsearch-query-constructor', function () {
       expect(result).to.deep.equal(exampleTextContainsConditionQuery);
     }
   );
+
+  it(
+    'converts number "=" condition in "convertNumberRangeCondition" method',
+    function () {
+      const esQueryConstructor = new ElasticsearchQueryConstructor();
+      const result = esQueryConstructor
+        .convertNumberRangeCondition(exampleNumberEqualsConditionBlock);
+      expect(result).to.deep.equal(exampleNumberEqualsConditionQuery);
+    }
+  );
+
+  [{
+    name: 'lt',
+    symbol: '<',
+  }, {
+    name: 'lte',
+    symbol: '≤',
+  }, {
+    name: 'gt',
+    symbol: '>',
+  }, {
+    name: 'gte',
+    symbol: '≥',
+  }].forEach(({ name, symbol }) => {
+    it(
+      `converts number "${symbol}" condition in "convertNumberRangeCondition" method`,
+      function () {
+        const esQueryConstructor = new ElasticsearchQueryConstructor();
+        const conditionBlock = new ConditionQueryBlock(
+          new IndexProperty(new IndexProperty(null, 'a'), 'b'),
+          `number.${name}`,
+          '2'
+        );
+        const result = esQueryConstructor
+          .convertNumberRangeCondition(conditionBlock);
+        expect(result).to.deep.equal({
+          range: {
+            'a.b': {
+              [name]: 2,
+            },
+          },
+        });
+      }
+    );
+  });
 
   it('converts NOT operator in "convertNotOperator" method', function () {
     const esQueryConstructor = new ElasticsearchQueryConstructor();

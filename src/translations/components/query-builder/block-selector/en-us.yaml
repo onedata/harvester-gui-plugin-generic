@@ -7,4 +7,10 @@ comparators:
     is: 'is'
   text:
     contains: 'contains'
+  number:
+    eq: '='
+    lt: '&lt;'
+    lte: '≤'
+    gt: '&gt;'
+    gte: '≥'
 acceptCondition: 'Add'

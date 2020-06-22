@@ -1,5 +1,16 @@
 import IndexPropertyCollection from 'harvester-gui-plugin-generic/utils/index-property-collection';
 
+const numberTypes = [
+  'long',
+  'integer',
+  'short',
+  'byte',
+  'double',
+  'float',
+  'half_float',
+  'scaled_float',
+];
+
 export default class IndexProperty extends IndexPropertyCollection {
   parentProperty = undefined;
   name = undefined;
@@ -27,7 +38,8 @@ export default class IndexProperty extends IndexPropertyCollection {
   }
 
   extractType() {
-    this.type = this.rawMapping.type || 'object';
+    const type = this.rawMapping.type || 'object';
+    this.type = numberTypes.includes(type) ? 'number' : type;
   }
 
   constructProperty(name, rawPropertyMapping, isField) {

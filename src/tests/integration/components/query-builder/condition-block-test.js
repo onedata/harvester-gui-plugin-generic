@@ -3,6 +3,7 @@ import { describe, it } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
 import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
+import _ from 'lodash';
 import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/condition-query-block';
 
 describe('Integration | Component | query-builder/condition-block', function () {
@@ -55,6 +56,42 @@ describe('Integration | Component | query-builder/condition-block', function () 
         .to.equal('a | b');
     }
   );
+
+  [{
+    name: 'eq',
+    symbol: '=',
+  }, {
+    name: 'lt',
+    symbol: '<',
+  }, {
+    name: 'lte',
+    symbol: '≤',
+  }, {
+    name: 'gt',
+    symbol: '>',
+  }, {
+    name: 'gte',
+    symbol: '≥',
+  }].forEach(({ name, symbol }) => {
+    it(
+      `shows property path, comparator and comparator value for number "${symbol}" condition`,
+      async function () {
+        this.set('block', new ConditionQueryBlock({ path: 'a.b' },
+          `number.${name}`,
+          '2'
+        ));
+
+        await render(hbs `<QueryBuilder::ConditionBlock @queryBlock={{this.block}} />`);
+
+        expect(this.element.querySelector('.property-path').textContent.trim())
+          .to.equal('a.b');
+        expect(this.element.querySelector('.comparator').textContent.trim())
+          .to.equal(_.escape(symbol));
+        expect(this.element.querySelector('.comparator-value').textContent.trim())
+          .to.equal('2');
+      }
+    );
+  });
 
   it('yields', async function () {
     this.set('block', new ConditionQueryBlock({ path: 'a.b' }, 'boolean.is', 'false'));

@@ -9,6 +9,7 @@ import SingleSlotQueryBlock from 'harvester-gui-plugin-generic/utils/query-build
 import MultiSlotQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/multi-slot-query-block';
 import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/condition-query-block';
 import { typeInSearch, clickTrigger, selectChoose } from 'ember-power-select/test-support/helpers';
+import _ from 'lodash';
 
 const operatorsList = ['and', 'or', 'not'];
 const operatorBlockClasses = {
@@ -16,6 +17,22 @@ const operatorBlockClasses = {
   or: MultiSlotQueryBlock,
   not: SingleSlotQueryBlock,
 };
+const numberComparators = [{
+  name: 'eq',
+  symbol: '=',
+}, {
+  name: 'lt',
+  symbol: '<',
+}, {
+  name: 'lte',
+  symbol: '≤',
+}, {
+  name: 'gt',
+  symbol: '>',
+}, {
+  name: 'gte',
+  symbol: '≥',
+}];
 
 describe('Integration | Component | query-builder/block-selector', function () {
   setupRenderingTest();
@@ -27,6 +44,9 @@ describe('Integration | Component | query-builder/block-selector', function () {
     }, {
       path: 'textProp',
       type: 'text',
+    }, {
+      path: 'numberProp',
+      type: 'number',
     }]);
   });
 
@@ -66,9 +86,10 @@ describe('Integration | Component | query-builder/block-selector', function () {
     await clickTrigger('.property-selector');
 
     const options = this.element.querySelectorAll('.ember-power-select-option');
-    expect(options).to.have.length(2);
+    expect(options).to.have.length(3);
     expect(options[0].textContent.trim()).to.equal('boolProp');
     expect(options[1].textContent.trim()).to.equal('textProp');
+    expect(options[2].textContent.trim()).to.equal('numberProp');
   });
 
   it('filters index properties in dropdown', async function () {
@@ -205,4 +226,60 @@ describe('Integration | Component | query-builder/block-selector', function () {
       expect(addSpy).to.be.calledOnce.and.to.be.calledWith(blockMatcher);
     }
   );
+
+  it('shows number comparators for number property', async function () {
+    await render(hbs `
+      <QueryBuilder::BlockSelector @indexProperties={{this.indexProperties}}/>
+    `);
+    await selectChoose('.property-selector', 'numberProp');
+    await clickTrigger('.comparator-selector');
+
+    const options = this.element.querySelectorAll('.ember-power-select-option');
+    expect(options).to.have.length(5);
+    numberComparators.mapBy('symbol').forEach((comparator, index) =>
+      expect(options[index].textContent.trim()).to.equal(_.escape(comparator))
+    );
+    expect(this.element.querySelector(
+      '.comparator-selector .ember-power-select-selected-item'
+    ).textContent.trim()).to.equal('=');
+  });
+
+  numberComparators.forEach(({ name, symbol }) => {
+    it(
+      `shows text input for "${symbol}" comparator for number property`,
+      async function () {
+        await render(hbs `
+          <QueryBuilder::BlockSelector @indexProperties={{this.indexProperties}}/>
+        `);
+        await selectChoose('.property-selector', 'numberProp');
+        await selectChoose('.comparator-selector', _.escape(symbol));
+
+        expect(this.element.querySelector('input[type="text"].comparator-value-input'))
+          .to.exist;
+      }
+    );
+
+    it(
+      `calls "onConditionAdd" callback, when number property "${symbol}" condition has been accepted`,
+      async function () {
+        const addSpy = this.set('addSpy', sinon.spy());
+
+        await render(hbs `<QueryBuilder::BlockSelector
+          @onConditionAdd={{this.addSpy}}
+          @indexProperties={{this.indexProperties}}
+        />`);
+
+        await selectChoose('.property-selector', 'numberProp');
+        await selectChoose('.comparator-selector', _.escape(symbol));
+        await fillIn('.comparator-value-input', '2');
+        await click('.accept-condition');
+
+        const blockMatcher = sinon.match.instanceOf(ConditionQueryBlock)
+          .and(sinon.match.hasNested('property.path', 'numberProp'))
+          .and(sinon.match.has('comparator', `number.${name}`))
+          .and(sinon.match.hasNested('comparatorValue', '2'));
+        expect(addSpy).to.be.calledOnce.and.to.be.calledWith(blockMatcher);
+      }
+    );
+  });
 });
