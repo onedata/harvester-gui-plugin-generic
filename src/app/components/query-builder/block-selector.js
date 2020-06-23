@@ -1,6 +1,7 @@
 import Component from '@glimmer/component';
 import { action, get } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
+import moment from 'moment';
 import SingleSlotQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/single-slot-query-block';
 import MultiSlotQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/multi-slot-query-block';
 import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/condition-query-block';
@@ -10,12 +11,13 @@ const defaultComparators = {
   text: ['text.contains'],
   number: ['number.eq', 'number.lt', 'number.lte', 'number.gt', 'number.gte'],
   keyword: ['keyword.is'],
+  date: ['date.eq', 'date.lt', 'date.lte', 'date.gt', 'date.gte'],
 };
 
 const booleanEditor = {
   type: 'dropdown',
   values: ['true', 'false'],
-  defaultValue: 'true',
+  defaultValue: () => 'true',
   isValidValue(value) {
     return ['true', 'false'].includes(String(value).trim());
   },
@@ -23,7 +25,7 @@ const booleanEditor = {
 
 const textContainsEditor = {
   type: 'text',
-  defaultValue: '',
+  defaultValue: () => '',
   isValidValue(value) {
     return typeof value === 'string';
   },
@@ -31,7 +33,7 @@ const textContainsEditor = {
 
 const numberBasicEditor = {
   type: 'text',
-  defaultValue: '',
+  defaultValue: () => '',
   isValidValue(value) {
     return typeof value === 'string' && !isNaN(parseFloat(value));
   },
@@ -39,9 +41,20 @@ const numberBasicEditor = {
 
 const keywordIsEditor = {
   type: 'text',
-  defaultValue: '',
+  defaultValue: () => '',
   isValidValue(value) {
     return typeof value === 'string';
+  },
+};
+
+const dateEditor = {
+  type: 'date',
+  defaultValue: () => ({
+    timeEnabled: false,
+    datetime: moment().startOf('day').toDate(),
+  }),
+  isValidValue(value) {
+    return typeof value === 'object' && value && value.datetime;
   },
 };
 
@@ -54,6 +67,11 @@ const defaultComparatorEditors = {
   'number.gt': numberBasicEditor,
   'number.gte': numberBasicEditor,
   'keyword.is': keywordIsEditor,
+  'date.eq': dateEditor,
+  'date.lt': dateEditor,
+  'date.lte': dateEditor,
+  'date.gt': dateEditor,
+  'date.gte': dateEditor,
 };
 
 export default class QueryBuilderBlockSelectorComponent extends Component {
@@ -110,14 +128,26 @@ export default class QueryBuilderBlockSelectorComponent extends Component {
     this.selectedConditionComparator = comparator;
 
     if (!this.comparatorEditor.isValidValue(this.conditionComparatorValue)) {
-      this.conditionComparatorValueChanged(this.comparatorEditor.defaultValue);
+      this.conditionComparatorValueChanged(this.comparatorEditor.defaultValue());
     }
   }
 
   @action
   conditionComparatorValueChanged(value) {
     let newComparatorValue = value;
-    if (newComparatorValue instanceof Event) {
+
+    if (this.comparatorEditor.type === 'date') {
+      // time-enabled checkbox change
+      if (newComparatorValue instanceof Event) {
+        newComparatorValue = Object.assign({},
+          this.conditionComparatorValue, { timeEnabled: value.target.checked }
+        );
+      } else if (newComparatorValue[0] && newComparatorValue[0] instanceof Date) {
+        newComparatorValue = Object.assign({},
+          this.conditionComparatorValue, { datetime: newComparatorValue[0] }
+        );
+      }
+    } else if (newComparatorValue instanceof Event) {
       newComparatorValue = value.target.value;
     }
 

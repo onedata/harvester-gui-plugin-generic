@@ -5,6 +5,8 @@ import json
 import math
 import urllib.request
 import random
+import time
+from datetime import datetime
 
 provider = sys.argv[1]
 space = sys.argv[2]
@@ -60,7 +62,8 @@ for i in range(files_no):
   prev_status = random.choice(statuses)
   enabled = 'true' if random.random() > 0.5 else 'false'
   html = '<b>no content</b>'
-  metadata = '{{"id": {0}, "creator": "{1}", "status": {{"now": "{2}", "prev": "{3}" }}, "keywords": [{4}], "enabled": {5}, "html": "{6}" }}'.format(entry_id, rand_name, status, prev_status, keywords, enabled, html)
+  creation_time = datetime.fromtimestamp(int(time.time()) - i * 7200).strftime('%Y/%m/%d %H:%M:%S')
+  metadata = '{{"id": {0}, "creator": "{1}", "status": {{"now": "{2}", "prev": "{3}" }}, "keywords": [{4}], "enabled": {5}, "html": "{6}", "editionTime": "{7}" }}'.format(entry_id, rand_name, status, prev_status, keywords, enabled, html, creation_time)
 
   curl = [
     'curl',

@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { describe, it, beforeEach } from 'mocha';
+import { describe, it, beforeEach, afterEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
 import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
@@ -9,6 +9,8 @@ import SingleSlotQueryBlock from 'harvester-gui-plugin-generic/utils/query-build
 import MultiSlotQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/multi-slot-query-block';
 import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/condition-query-block';
 import { typeInSearch, clickTrigger, selectChoose } from 'ember-power-select/test-support/helpers';
+import { setFlatpickrDate } from 'ember-flatpickr/test-support/helpers';
+import moment from 'moment';
 
 const operatorsList = ['and', 'or', 'not'];
 const operatorBlockClasses = {
@@ -32,6 +34,8 @@ const numberComparators = [{
   name: 'gte',
   symbol: '≥',
 }];
+const dateComparators = numberComparators;
+let fakeClock;
 
 describe('Integration | Component | query-builder/block-selector', function () {
   setupRenderingTest();
@@ -49,7 +53,19 @@ describe('Integration | Component | query-builder/block-selector', function () {
     }, {
       path: 'keywordProp',
       type: 'keyword',
+    }, {
+      path: 'dateProp',
+      type: 'date',
     }]);
+
+    fakeClock = sinon.useFakeTimers({
+      now: moment('2020-05-04 12:00').valueOf(),
+      shouldAdvanceTime: true,
+    });
+  });
+
+  afterEach(function () {
+    fakeClock.restore();
   });
 
   it('renders three operators: AND, OR and NOT', async function () {
@@ -335,4 +351,84 @@ describe('Integration | Component | query-builder/block-selector', function () {
       expect(addSpy).to.be.calledOnce.and.to.be.calledWith(blockMatcher);
     }
   );
+
+  it('shows date comparators for date property', async function () {
+    await render(hbs `
+      <QueryBuilder::BlockSelector @indexProperties={{this.indexProperties}}/>
+    `);
+    await selectChoose('.property-selector', 'dateProp');
+    await clickTrigger('.comparator-selector');
+
+    const options = this.element.querySelectorAll('.ember-power-select-option');
+    expect(options).to.have.length(5);
+    dateComparators.mapBy('symbol').forEach((comparator, index) =>
+      expect(options[index].textContent.trim()).to.equal(comparator)
+    );
+    expect(this.element.querySelector(
+      '.comparator-selector .ember-power-select-selected-item'
+    ).textContent.trim()).to.equal('=');
+  });
+
+  numberComparators.forEach(({ name, symbol }) => {
+    it(
+      `shows flatpickr input without time for "${symbol}" comparator for date property`,
+      async function () {
+        await render(hbs `
+          <QueryBuilder::BlockSelector @indexProperties={{this.indexProperties}}/>
+        `);
+        await selectChoose('.property-selector', 'dateProp');
+        await selectChoose('.comparator-selector', symbol);
+
+        expect(this.element.querySelector('input[type="text"].flatpickr-input'))
+          .to.exist.and.to.have.value('2020-05-04');
+        expect(this.element.querySelector('.flatpickr-calendar')).to.exist;
+        expect(this.element.querySelector('.flatpickr-time.hasSeconds')).to.not.exist;
+      }
+    );
+
+    it(
+      `allows to enable time flatpickr input for "${symbol}" comparator for date property`,
+      async function () {
+        await render(hbs `
+          <QueryBuilder::BlockSelector @indexProperties={{this.indexProperties}}/>
+        `);
+        await selectChoose('.property-selector', 'dateProp');
+        await selectChoose('.comparator-selector', symbol);
+        await click('.include-time');
+
+        expect(this.element.querySelector('input[type="text"].flatpickr-input'))
+          .to.have.value('2020-05-04 00:00:00');
+        expect(this.element.querySelector('.flatpickr-time.hasSeconds')).to.exist;
+      }
+    );
+
+    it(
+      `calls "onConditionAdd" callback, when date property "${symbol}" condition has been accepted`,
+      async function () {
+        const addSpy = this.set('addSpy', sinon.spy());
+
+        await render(hbs `<QueryBuilder::BlockSelector
+          @onConditionAdd={{this.addSpy}}
+          @indexProperties={{this.indexProperties}}
+        />`);
+
+        await selectChoose('.property-selector', 'dateProp');
+        await selectChoose('.comparator-selector', symbol);
+        await click('.include-time');
+        await setFlatpickrDate('.flatpickr-input', new Date(2020, 0, 2, 13, 10, 15));
+        await click('.accept-condition');
+
+        const blockMatcher = sinon.match.instanceOf(ConditionQueryBlock)
+          .and(sinon.match.hasNested('property.path', 'dateProp'))
+          .and(sinon.match.has('comparator', `date.${name}`))
+          .and(sinon.match.hasNested('comparatorValue.datetime', sinon.match.date))
+          .and(sinon.match.hasNested('comparatorValue.timeEnabled', true));
+        expect(addSpy).to.be.calledOnce.and.to.be.calledWith(blockMatcher);
+        expect(
+          moment(addSpy.lastCall.args[0].comparatorValue.datetime)
+          .format('YYYY-MM-DD HH:mm:ss')
+        ).to.equal('2020-01-02 13:10:15');
+      }
+    );
+  });
 });

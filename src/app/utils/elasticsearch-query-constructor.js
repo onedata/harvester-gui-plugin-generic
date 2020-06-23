@@ -1,6 +1,7 @@
 import SingleSlotQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/single-slot-query-block';
 import MultiSlotQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/multi-slot-query-block';
 import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/condition-query-block';
+import moment from 'moment';
 
 export default class ElasticsearchQueryConstructor {
   constructQuery(rootBlock) {
@@ -44,6 +45,12 @@ export default class ElasticsearchQueryConstructor {
           return this.convertNumberRangeCondition(block);
         case 'keyword.is':
           return this.convertKeywordIsCondition(block);
+        case 'date.eq':
+        case 'date.lt':
+        case 'date.lte':
+        case 'date.gt':
+        case 'date.gte':
+          return this.convertDateRangeCondition(block);
         default:
           return undefined;
       }
@@ -99,6 +106,56 @@ export default class ElasticsearchQueryConstructor {
     };
   }
 
+  convertDateRangeCondition(conditionBlock) {
+    const {
+      datetime,
+      timeEnabled,
+    } = conditionBlock.comparatorValue;
+
+    const lastMs = {
+      time: momentToUtcMs(moment(datetime).endOf('second')),
+      date: momentToUtcMs(moment(datetime).endOf('day')),
+    };
+    const firstMs = {
+      time: momentToUtcMs(moment(datetime).startOf('second')),
+      date: momentToUtcMs(moment(datetime).startOf('day')),
+    };
+
+    const comparison = {};
+    if (conditionBlock.comparator === 'date.eq') {
+      comparison.lte = lastMs;
+      comparison.gte = firstMs;
+    } else {
+      switch (conditionBlock.comparator) {
+        case 'date.lt':
+          comparison.lt = firstMs;
+          break;
+        case 'date.lte':
+          comparison.lte = lastMs;
+          break;
+        case 'date.gt':
+          comparison.gt = lastMs;
+          break;
+        case 'date.gte':
+          comparison.gte = firstMs;
+          break;
+      }
+    }
+
+    // prepare version for time or date depending on timeEnabled value
+    Object.keys(comparison).forEach(key => {
+      comparison[key] = comparison[key][timeEnabled ? 'time' : 'date'];
+    });
+
+    return {
+      range: {
+        [conditionBlock.property.path]: Object.assign({ format: 'epoch_millis' },
+          comparison
+        ),
+      },
+    };
+  }
+
   convertNotOperator(singleSlotBlock) {
     return {
       bool: {
@@ -123,4 +180,8 @@ export default class ElasticsearchQueryConstructor {
       },
     };
   }
+}
+
+function momentToUtcMs(momenObj) {
+  return momenObj.valueOf() + momenObj.utcOffset() * 60000;
 }

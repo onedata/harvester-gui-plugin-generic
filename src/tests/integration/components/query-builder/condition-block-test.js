@@ -90,6 +90,42 @@ describe('Integration | Component | query-builder/condition-block', function () 
           .to.equal('2');
       }
     );
+
+    it(
+      `shows property path, comparator and comparator value for date "${symbol}" condition`,
+      async function () {
+        this.set('block', new ConditionQueryBlock({ path: 'a.b' },
+          `date.${name}`, { timeEnabled: false, datetime: new Date(2020, 0, 2) }
+        ));
+
+        await render(hbs `<QueryBuilder::ConditionBlock @queryBlock={{this.block}} />`);
+
+        expect(this.element.querySelector('.property-path').textContent.trim())
+          .to.equal('a.b');
+        expect(this.element.querySelector('.comparator').textContent.trim())
+          .to.equal(symbol);
+        expect(this.element.querySelector('.comparator-value').textContent.trim())
+          .to.equal('2020-01-02');
+      }
+    );
+
+    it(
+      `shows property path, comparator and comparator value for date "${symbol}" condition with truthy timeEnabled`,
+      async function () {
+        this.set('block', new ConditionQueryBlock({ path: 'a.b' },
+          `date.${name}`, { timeEnabled: true, datetime: new Date(2020, 0, 2, 12, 5, 40) }
+        ));
+
+        await render(hbs `<QueryBuilder::ConditionBlock @queryBlock={{this.block}} />`);
+
+        expect(this.element.querySelector('.property-path').textContent.trim())
+          .to.equal('a.b');
+        expect(this.element.querySelector('.comparator').textContent.trim())
+          .to.equal(symbol);
+        expect(this.element.querySelector('.comparator-value').textContent.trim())
+          .to.equal('2020-01-02 12:05:40');
+      }
+    );
   });
 
   it(

@@ -56,6 +56,29 @@
         {{on "input" this.conditionComparatorValueChanged}}
         class="comparator-value-input"
       >
+    {{else if (eq this.comparatorEditor.type "date")}}
+      <input
+        type="checkbox"
+        checked={{this.conditionComparatorValue.timeEnabled}}
+        class="include-time"
+        {{on "change" this.conditionComparatorValueChanged}}
+      >
+      {{#if this.conditionComparatorValue.timeEnabled}}
+        <EmberFlatpickr
+          @date={{readonly this.conditionComparatorValue.datetime}}
+          @onChange={{this.conditionComparatorValueChanged}}
+          @static={{true}}
+          @enableTime={{true}}
+          @time_24hr={{true}}
+          @enableSeconds={{true}}
+        />
+      {{else}}
+        <EmberFlatpickr
+          @date={{readonly this.conditionComparatorValue.datetime}}
+          @onChange={{this.conditionComparatorValueChanged}}
+          @static={{true}}
+        />
+      {{/if}}
     {{/if}}
     <BsButton
       class="accept-condition"

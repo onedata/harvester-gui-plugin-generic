@@ -59,6 +59,22 @@ const exampleKeywordIsConditionQuery = {
   },
 };
 
+const exampleDateLteConditionBlock = new ConditionQueryBlock(
+  new IndexProperty(new IndexProperty(null, 'k'), 'l'),
+  'date.lte', {
+    timeEnabled: true,
+    datetime: new Date(2020, 0, 2, 12, 10, 40),
+  }
+);
+const exampleDateLteConditionQuery = {
+  range: {
+    'k.l': {
+      format: 'epoch_millis',
+      lte: 1577967040999,
+    },
+  },
+};
+
 const exampleNotOperatorBlock = new SingleSlotQueryBlock('not');
 exampleNotOperatorBlock.slot = exampleBooleanConditionBlock;
 const exampleNotOperatorQuery = {
@@ -71,12 +87,14 @@ const exampleAndOperatorBlock = new MultiSlotQueryBlock('and');
 exampleAndOperatorBlock.slots.pushObjects([
   exampleBooleanConditionBlock,
   exampleNumberEqualsConditionBlock,
+  exampleDateLteConditionBlock,
 ]);
 const exampleAndOperatorQuery = {
   bool: {
     must: [
       exampleBooleanConditionQuery,
       exampleNumberEqualsConditionQuery,
+      exampleDateLteConditionQuery,
     ],
   },
 };
@@ -183,6 +201,93 @@ describe('Unit | Utility | elasticsearch-query-constructor', function () {
       expect(result).to.deep.equal(exampleKeywordIsConditionQuery);
     }
   );
+
+  [{
+    name: 'eq',
+    symbol: '=',
+    timeDisabledCompare: {
+      // lower than or equal to the last millisecond of the compared date
+      lte: 1578009599999,
+      // greater than or equal to the first millisecond of the compared date
+      gte: 1577923200000,
+    },
+    timeEnabledCompare: {
+      // lower than or equal to the last millisecond of the compared datetime
+      lte: 1577967040999,
+      // greater than or equal the first millisecond of the compared datetime
+      gte: 1577967040000,
+    },
+  }, {
+    name: 'lt',
+    symbol: '<',
+    timeDisabledCompare: {
+      // lower than the first millisecond of the compared date
+      lt: 1577923200000,
+    },
+    timeEnabledCompare: {
+      // lower than the first millisecond of the compared datetime
+      lt: 1577967040000,
+    },
+  }, {
+    name: 'lte',
+    symbol: '≤',
+    timeDisabledCompare: {
+      // lower than or equal to the last millisecond of the compared date
+      lte: 1578009599999,
+    },
+    timeEnabledCompare: {
+      // lower than or equal to the last millisecond of the compared datetime
+      lte: 1577967040999,
+    },
+  }, {
+    name: 'gt',
+    symbol: '>',
+    timeDisabledCompare: {
+      // greater than the last millisecond of the compared date
+      gt: 1578009599999,
+    },
+    timeEnabledCompare: {
+      // greater than the last millisecond of the compared datetime
+      gt: 1577967040999,
+    },
+  }, {
+    name: 'gte',
+    symbol: '≥',
+    timeDisabledCompare: {
+      // greater than or equal to the first millisecond of the compared date
+      gte: 1577923200000,
+    },
+    timeEnabledCompare: {
+      // greater than or equal the first millisecond of the compared datetime
+      gte: 1577967040000,
+    },
+  }].forEach(({ name, symbol, timeDisabledCompare, timeEnabledCompare }) => {
+    [true, false].forEach(timeEnabled => {
+      it(
+        `converts date "${symbol}" condition (timeEnabled ${timeEnabled}) in "convertDateRangeCondition" method`,
+        function () {
+          const esQueryConstructor = new ElasticsearchQueryConstructor();
+          const conditionBlock = new ConditionQueryBlock(
+            new IndexProperty(new IndexProperty(null, 'a'), 'b'),
+            `date.${name}`, {
+              timeEnabled,
+              datetime: new Date(2020, 0, 2, 12, 10, 40),
+            }
+          );
+          const result = esQueryConstructor
+            .convertDateRangeCondition(conditionBlock);
+
+          expect(result).to.deep.equal({
+            range: {
+              'a.b': Object.assign({ format: 'epoch_millis' },
+                timeEnabled ? timeEnabledCompare : timeDisabledCompare
+              ),
+            },
+          });
+        }
+      );
+    });
+  });
 
   it('converts NOT operator in "convertNotOperator" method', function () {
     const esQueryConstructor = new ElasticsearchQueryConstructor();

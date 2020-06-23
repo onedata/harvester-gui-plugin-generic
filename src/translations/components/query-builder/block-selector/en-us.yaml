@@ -15,4 +15,10 @@ comparators:
     gte: '≥'
   keyword:
     is: 'is'
+  date:
+    eq: '='
+    lt: '&lt;'
+    lte: '≤'
+    gt: '&gt;'
+    gte: '≥'
 acceptCondition: 'Add'
