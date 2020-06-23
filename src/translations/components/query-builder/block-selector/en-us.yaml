@@ -1,7 +1,10 @@
+operatorsHeader: 'Operator'
+conditionHeader: 'Condition'
 operators:
   and: 'and'
   or: 'or'
   not: 'not'
+propertySelectorPlaceholder: 'Choose property...'
 comparators:
   boolean:
     is: 'is'
@@ -21,4 +24,5 @@ comparators:
     lte: '≤'
     gt: '&gt;'
     gte: '≥'
+includeTimeInDate: 'Include time'
 acceptCondition: 'Add'

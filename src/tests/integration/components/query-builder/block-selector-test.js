@@ -379,7 +379,7 @@ describe('Integration | Component | query-builder/block-selector', function () {
         await selectChoose('.property-selector', 'dateProp');
         await selectChoose('.comparator-selector', symbol);
 
-        expect(this.element.querySelector('input[type="text"].flatpickr-input'))
+        expect(this.element.querySelector('.comparator-value-input'))
           .to.exist.and.to.have.value('2020-05-04');
         expect(this.element.querySelector('.flatpickr-calendar')).to.exist;
         expect(this.element.querySelector('.flatpickr-time.hasSeconds')).to.not.exist;
@@ -396,7 +396,7 @@ describe('Integration | Component | query-builder/block-selector', function () {
         await selectChoose('.comparator-selector', symbol);
         await click('.include-time');
 
-        expect(this.element.querySelector('input[type="text"].flatpickr-input'))
+        expect(this.element.querySelector('.comparator-value-input'))
           .to.have.value('2020-05-04 00:00:00');
         expect(this.element.querySelector('.flatpickr-time.hasSeconds')).to.exist;
       }

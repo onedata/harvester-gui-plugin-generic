@@ -1,7 +1,8 @@
-
-@import "ember-power-select";
 @import "ember-bootstrap/bootstrap";
 @import "./bootstrap-variables.scss";
+@import "ember-power-select/themes/bootstrap";
+@import "./ember-power-select-overrides";
+@import "ember-power-select";
 @import "./ember-attacher-overrides";
 
 @import "./layout";

@@ -1,5 +1,6 @@
 import Component from '@glimmer/component';
 import { action, get } from '@ember/object';
+import { guidFor } from '@ember/object/internals';
 import { tracked } from '@glimmer/tracking';
 import moment from 'moment';
 import SingleSlotQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/single-slot-query-block';
@@ -82,6 +83,10 @@ export default class QueryBuilderBlockSelectorComponent extends Component {
 
   @tracked comparatorsSet = defaultComparators;
   @tracked comparatorEditorsSet = defaultComparatorEditors;
+
+  get guid() {
+    return guidFor(this);
+  }
 
   get comparators() {
     const propertyType = get(this, 'selectedConditionProperty.type');

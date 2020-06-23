@@ -1,6 +1,24 @@
 .query-builder-block-selector {
   background-color: white;
   padding: $spacer * 0.5;
+  font-size: 80%;
+  width: 280px;
+
+  h1 {
+    font-size: 100%;
+    text-transform: uppercase;
+    font-weight: bold;
+  }
+
+  .btn, .form-control {
+    font-size: inherit;
+  }
+
+  .operators-section {
+    margin-bottom: $spacer * 0.5;
+    padding-bottom: $spacer * 0.5;
+    border-bottom: 1px solid $input-border-color;
+  }
 
   .operators-list {
     display: flex;
@@ -14,13 +32,46 @@
     text-transform: uppercase;
   }
 
-  .ember-basic-dropdown {
-    font-size: 75%;
+  .ember-power-select-trigger {
+    line-height: 2.2;
   }
 
   .ember-power-select-option {
     word-wrap: break-word;
-    padding: $spacer * 0.2;
-    line-height: 1;
+  }
+
+  .ember-basic-dropdown {
+    flex-grow: 1;
+  }
+
+  .form-group {
+    margin-bottom: $spacer * 0.5;
+  }
+
+  .form-group-full-line {
+    flex-basis: 100%;
+    justify-content: flex-start;
+  }
+
+  .form-group-fill-line {
+    margin-left: $spacer * 0.5;
+    flex-grow: 1;
+    justify-content: flex-start;
+  }
+  
+  .flatpickr-wrapper, .form-group input:not([type="checkbox"]) {
+    width: 100%;
+  }
+
+  .comparator-value-input[readonly] {
+    background-color: $input-bg;
+  }
+
+  .form-check-input {
+    margin-top: 0;
+  }
+
+  .accept-condition {
+    display: block;
   }
 }
