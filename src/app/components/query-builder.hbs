@@ -1,10 +1,3 @@
-{{!-- <input
-  type="text"
-  value={{this.query}}
-  {{on "input" this.queryChanged}}
-  {{on "keydown" (invoke-on-enter @performQuery)}}
->
-<button {{on "click" @performQuery}}>Query</button> --}}
 <div class="query-builder">
   <div class="form-control query-builder-input">
     <QueryBuilder::SingleSlotBlock
@@ -12,6 +5,12 @@
       @indexProperties={{@indexProperties}}
       class="root-block"/>
   </div>
-  <button {{on "click" this.performQuery}} class="submit-query">Query</button>
+  <BsButton
+    @type="primary"
+    @onClick={{this.performQuery}}
+    class="submit-query"
+  >
+    {{tt this "performQueryButton"}}
+  </BsButton>
   {{yield}}
 </div>

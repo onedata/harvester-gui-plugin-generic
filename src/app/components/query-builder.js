@@ -4,6 +4,8 @@ import { tracked } from '@glimmer/tracking';
 import SingleSlotQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/single-slot-query-block';
 
 export default class QueryBuilderComponent extends Component {
+  intlPrefix = 'components.query-builder';
+
   @tracked rootQueryBlock = new SingleSlotQueryBlock();
 
   @action

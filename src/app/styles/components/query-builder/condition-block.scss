@@ -2,10 +2,18 @@
   font-size: 80%;
 
   .property-path {
-    font-size: inherit;
+    font-size: 100%;
+    color: $body-color;
+    font-weight: bold;
   }
 
   .comparator {
     margin: 0 $spacer * 0.2;
+  }
+
+  .property-path,
+  .comparator-value {
+    min-width: 0;
+    word-wrap: break-word;
   }
 }
