@@ -12,8 +12,8 @@ describe('Unit | Utility | index', function () {
             type: 'text',
           },
           b: {
-            type: 'text',
-            fields: {
+            type: 'object',
+            properties: {
               ba: {
                 type: 'keyword',
               },
@@ -43,7 +43,7 @@ describe('Unit | Utility | index', function () {
     expect(index.properties.b.properties.ba).to.be.an.instanceOf(IndexProperty)
       .and.to.deep.include({
         name: 'ba',
-        rawMapping: this.rawMapping.mappings.properties.b.fields.ba,
+        rawMapping: this.rawMapping.mappings.properties.b.properties.ba,
       });
   });
 

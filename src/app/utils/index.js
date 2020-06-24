@@ -32,10 +32,8 @@ export default class Index extends IndexPropertyCollection {
 
     const flattenedProperties = [];
     propertiesToFlatten.forEach(property => {
-      if (property.type !== 'object') {
-        flattenedProperties.push(property);
-      }
       flattenedProperties.push(
+        property,
         ...this.getFlattenedProperties(Object.values(property.properties))
       );
     });
