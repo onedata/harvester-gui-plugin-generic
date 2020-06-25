@@ -1,0 +1,40 @@
+<div class="visible-properties-selector">
+  <BsButton class="show-properties-selector">
+    {{tt this "selectorTrigger"}}
+    (<span class="selection-counter">{{this.selectedPropertiesCount}}/{{this.flatModel.length}}</span>)
+    <AttachPopover
+      @showOn="click"
+      @hideOn="clickout"
+      @interactive={{true}}
+      @arrow={{true}}
+      @placement="bottom-start"
+      @lazyRender={{true}}
+      as |popover|
+    >
+      <div class="visible-properties-selector-body">
+        <BsButton
+          @size="sm"
+          @onClick={{this.selectAll}}
+          class="select-all"
+        >
+          {{tt this "selectAllBtn"}}
+        </BsButton>
+        <BsButton
+          @size="sm"
+          @onClick={{this.deselectAll}}
+          class="deselect-all"
+        >
+          {{tt this "deselectAllBtn"}}
+        </BsButton>
+        <XTree
+          @model={{this.model}}
+          @checkable={{true}}
+          @recursiveCheck={{true}}
+          @collapsedIcon={{component "fa-icon" icon="caret-right"}}
+          @expandedIcon={{component "fa-icon" icon="caret-down"}}
+          @onCheck={{this.onCheck}}/>
+        {{yield}}
+      </div>
+    </AttachPopover>
+  </BsButton>
+</div>

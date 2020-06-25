@@ -1,6 +1,7 @@
 .query-builder {
   display: flex;
   align-items: flex-start;
+  margin-bottom: $spacer;
 
   .query-builder-input {
     display: flex;

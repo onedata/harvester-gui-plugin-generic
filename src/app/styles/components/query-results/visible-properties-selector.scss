@@ -1,0 +1,31 @@
+.ember-attacher {
+  .visible-properties-selector-body {
+    padding: $spacer * 0.5;
+    background-color: white;
+    font-size: 80%;
+
+    .tree {
+      margin-top: $spacer * 0.5;
+      border: 1px solid $input-border-color;
+      padding: $spacer * 0.5;
+      padding-left: 0;
+    }
+
+    .tree-node {
+      line-height: 1.8em;
+    }
+
+    .tree-highlight {
+      background-color: initial;
+      color: inherit;
+      cursor: initial;
+    }
+
+    .toggle-icon {
+      margin-left: 0.3em;
+      width: 0.7em;
+      color: $body-color;
+      font-size: 100%;
+    }
+  }
+}
