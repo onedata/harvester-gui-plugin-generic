@@ -1,17 +1,17 @@
 <div class="query-results">
-  <ul class="results-list">
-    {{#each @queryResults.results as |queryResult|}}
-      <li class="card result">
-        <div class="card-header">
-          <a class="go-to-file-link" href={{queryResult.fileBrowserUrl}} target="_blank">
-            {{t "components.query-results.goToFileLink"}}
-          </a>
-        </div>
-        <div class="card-body">
-          <p class="card-text"><samp>{{{queryResult.simplyFormattedJson}}}</samp></p>
-        </div>
-      </li>
-    {{/each}}
-  </ul>
+  {{#if @queryResults.results}}
+    <QueryResults::VisiblePropertiesSelector
+      @queryResults={{@queryResults}}
+      @onSelectionChange={{this.visiblePropertiesChanged}}
+    />
+    <ul class="results-list">
+      {{#each @queryResults.results as |queryResult|}}
+        <QueryResults::Result
+          @queryResult={{queryResult}}
+          @visibleProperties={{this.visibleProperties}}
+        />
+      {{/each}}
+    </ul>
+  {{/if}}
 </div>
 {{yield}}

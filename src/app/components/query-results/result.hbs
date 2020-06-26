@@ -1,0 +1,24 @@
+<li class="card query-results-result">
+  <div class="card-header">
+    <a class="go-to-file-link" href={{@queryResult.fileBrowserUrl}} target="_blank">
+      {{t "components.query-results.goToFileLink"}}
+    </a>
+  </div>
+  <div class="card-body">
+    <div class="card-text">
+      {{#if this.visualisedProperties}}
+        <ul class="fields-visualiser">
+          {{#each this.visualisedProperties as |property|}}
+            <li class="property">
+              <samp class="property-name">{{{property.key}}}</samp>:
+              <samp class="property-value">{{{property.value}}}</samp>
+            </li>
+          {{/each}}
+        </ul>
+      {{else}}
+        <samp>{{{@queryResult.simplyFormattedJson}}}</samp>
+      {{/if}}
+    </div>
+    {{yield}}
+  </div>
+</li>

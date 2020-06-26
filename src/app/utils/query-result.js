@@ -47,7 +47,7 @@ export default class QueryResult {
       ).join(', ');
       return isNestedCall ? `{${objectRepresentation}}` : objectRepresentation;
     } else {
-      return JSON.stringify(valueToFormat);
+      return _.escape(JSON.stringify(valueToFormat));
     }
   }
 }
