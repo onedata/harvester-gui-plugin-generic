@@ -1,8 +1,13 @@
 <QueryBuilder
   @query={{this.query}}
+  @filteredProperties={{this.filteredProperties}}
   @queryChanged={{this.queryChanged}}
   @onPerformQuery={{this.performQuery}}
+  @onGenerateCurl={{this.getQueryCurl}}
   @index={{this.index}}
 />
-<QueryResults @queryResults={{this.queryResults}}/>
+<QueryResults
+  @queryResults={{this.queryResults}}
+  @onFilteredPropertiesChange={{this.filteredPropertiesChange}}
+/>
 {{yield}}

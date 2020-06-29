@@ -9,6 +9,7 @@ import { selectChoose, clickTrigger } from 'ember-power-select/test-support/help
 import SingleSlotQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/single-slot-query-block';
 import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/condition-query-block';
 import Index from 'harvester-gui-plugin-generic/utils/index';
+import { Promise } from 'rsvp';
 
 describe('Integration | Component | query-builder', function () {
   setupRenderingTest();
@@ -80,4 +81,107 @@ describe('Integration | Component | query-builder', function () {
       .and(sinon.match.has('slot', sinon.match.instanceOf(ConditionQueryBlock)));
     expect(submitSpy).to.be.calledOnce.and.be.calledWith(queryMatcher);
   });
+
+  it(
+    'does not ask for CURL request before "generate request" button click',
+    async function () {
+      const generateCurlStub = this.set('generateCurlStub', sinon.stub());
+
+      await render(hbs `<QueryBuilder
+        @onGenerateCurl={{this.generateCurlStub}}
+        @index={{this.index}}
+      />`);
+      await click('.add-trigger');
+      await selectChoose('.property-selector', 'a.b');
+      await click('.accept-condition');
+
+      expect(generateCurlStub).to.not.be.called;
+    }
+  );
+
+  it('shows CURL request content on "generate request" button click', async function () {
+    const generateCurlStub = this.set('generateCurlStub', sinon.stub().resolves('curl!'));
+
+    await render(hbs `<QueryBuilder
+      @onGenerateCurl={{this.generateCurlStub}}
+      @index={{this.index}}
+    />`);
+    await click('.add-trigger');
+    await selectChoose('.property-selector', 'a.b');
+    await click('.accept-condition');
+    await click('.generate-query-request');
+
+    expect(generateCurlStub).to.be.calledOnce;
+    expect(generateCurlStub.lastCall.args[0]).to.deep.equal({
+      query: {
+        term: {
+          'a.b': {
+            value: 'true',
+          },
+        },
+      },
+    });
+    expect(document.querySelector('.ember-attacher .spinner')).to.not.exist;
+    expect(document.querySelector('.ember-attacher textarea')).to.have.value('curl!');
+  });
+
+  it('shows spinner when CURL request is being loaded', async function () {
+    this.set(
+      'generateCurlStub',
+      sinon.stub().returns(new Promise(() => {}))
+    );
+
+    await render(hbs `<QueryBuilder
+      @onGenerateCurl={{this.generateCurlStub}}
+      @index={{this.index}}
+    />`);
+    await click('.add-trigger');
+    await selectChoose('.property-selector', 'a.b');
+    await click('.accept-condition');
+    await click('.generate-query-request');
+
+    expect(document.querySelector('.ember-attacher textarea')).to.not.exist;
+    expect(document.querySelector('.ember-attacher .spinner')).to.exist;
+  });
+
+  it(
+    'shows CURL request content on "generate request" button click (with filtered fields)',
+    async function () {
+      const generateCurlStub =
+        this.set('generateCurlStub', sinon.stub().resolves('curl!'));
+      this.set('filteredProperties', {
+        a: {
+          b: {},
+        },
+        c: {},
+      });
+
+      await render(hbs `<QueryBuilder
+        @onGenerateCurl={{this.generateCurlStub}}
+        @filteredProperties={{this.filteredProperties}}
+        @index={{this.index}}
+      />`);
+      await click('.add-trigger');
+      await selectChoose('.property-selector', 'a.b');
+      await click('.accept-condition');
+      await click('.generate-query-request');
+
+      expect(generateCurlStub).to.be.calledOnce;
+      expect(generateCurlStub.lastCall.args[0]).to.deep.equal({
+        query: {
+          term: {
+            'a.b': {
+              value: 'true',
+            },
+          },
+        },
+        _source: [
+          'a.b',
+          'c',
+        ],
+      });
+      expect(document.querySelector('.ember-attacher .curl-command-string'))
+        .to.have.value('curl!');
+    }
+  );
 });

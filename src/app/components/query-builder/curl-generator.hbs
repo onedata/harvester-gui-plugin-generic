@@ -1,0 +1,34 @@
+<BsButton
+  @type="primary"
+  class="generate-query-request"
+>
+  <FaIcon @icon="external-link-alt"/>
+  <AttachPopover
+    @showOn="click"
+    @hideOn="clickout"
+    @interactive={{true}}
+    @arrow={{true}}
+    @placement="bottom"
+    @lazyRender={{true}}
+    @onChange={{this.curlPopoverOpened}}
+    as |popover|
+  >
+    <div class="curl-generator-body">
+      <Await @promise={{this.curlPromise}} as |await|>
+        <await.Pending>
+          <EmberSpinner/>
+        </await.Pending>
+
+        <await.Fulfilled as |curlRequest|>
+          <textarea class="form-control curl-command-string" spellcheck="false">{{curlRequest}}</textarea>
+          <p class="access-token-info">{{tt this "accessTokenInfo" htmlSafe=true}}</p>
+        </await.Fulfilled>
+
+        <await.Rejected>
+          Something went wrong :(
+        </await.Rejected>
+      </Await>
+    </div>
+  </AttachPopover>
+  {{yield}}
+</BsButton>

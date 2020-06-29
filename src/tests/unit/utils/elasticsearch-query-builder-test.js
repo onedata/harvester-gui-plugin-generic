@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
-import ElasticsearchQueryConstructor from 'harvester-gui-plugin-generic/utils/elasticsearch-query-constructor';
+import ElasticsearchQueryBuilder from 'harvester-gui-plugin-generic/utils/elasticsearch-query-builder';
 import SingleSlotQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/single-slot-query-block';
 import MultiSlotQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/multi-slot-query-block';
 import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/condition-query-block';
@@ -129,31 +129,37 @@ const exampleNestedOperatorsQuery = {
   },
 };
 
-describe('Unit | Utility | elasticsearch-query-constructor', function () {
-  it('converts boolean "is" condition in "convertBooleanCondition" method', function () {
-    const esQueryConstructor = new ElasticsearchQueryConstructor();
-    const result = esQueryConstructor
-      .convertBooleanCondition(exampleBooleanConditionBlock);
-    expect(result).to.deep.equal(exampleBooleanConditionQuery);
+describe('Unit | Utility | elasticsearch-query-builder', function () {
+  it('converts boolean "is" condition', function () {
+    const esQueryBuilder = new ElasticsearchQueryBuilder();
+    esQueryBuilder.rootQueryBlock = exampleBooleanConditionBlock;
+    const result = esQueryBuilder.buildQuery();
+
+    expect(result).to.deep.equal({
+      query: exampleBooleanConditionQuery,
+    });
   });
 
   it(
-    'converts text "contains" condition in "convertSimpleQueryStringCondition" method',
+    'converts text "contains" condition',
     function () {
-      const esQueryConstructor = new ElasticsearchQueryConstructor();
-      const result = esQueryConstructor
+      const esQueryBuilder = new ElasticsearchQueryBuilder();
+      const result = esQueryBuilder
         .convertSimpleQueryStringCondition(exampleTextContainsConditionBlock);
       expect(result).to.deep.equal(exampleTextContainsConditionQuery);
     }
   );
 
   it(
-    'converts number "=" condition in "convertNumberRangeCondition" method',
+    'converts number "=" condition',
     function () {
-      const esQueryConstructor = new ElasticsearchQueryConstructor();
-      const result = esQueryConstructor
-        .convertNumberRangeCondition(exampleNumberEqualsConditionBlock);
-      expect(result).to.deep.equal(exampleNumberEqualsConditionQuery);
+      const esQueryBuilder = new ElasticsearchQueryBuilder();
+      esQueryBuilder.rootQueryBlock = exampleNumberEqualsConditionBlock;
+      const result = esQueryBuilder.buildQuery();
+
+      expect(result).to.deep.equal({
+        query: exampleNumberEqualsConditionQuery,
+      });
     }
   );
 
@@ -171,20 +177,24 @@ describe('Unit | Utility | elasticsearch-query-constructor', function () {
     symbol: '≥',
   }].forEach(({ name, symbol }) => {
     it(
-      `converts number "${symbol}" condition in "convertNumberRangeCondition" method`,
+      `converts number "${symbol}" condition`,
       function () {
-        const esQueryConstructor = new ElasticsearchQueryConstructor();
         const conditionBlock = new ConditionQueryBlock(
           new IndexProperty(new IndexProperty(null, 'a'), 'b'),
           `number.${name}`,
           '2'
         );
-        const result = esQueryConstructor
-          .convertNumberRangeCondition(conditionBlock);
+
+        const esQueryBuilder = new ElasticsearchQueryBuilder();
+        esQueryBuilder.rootQueryBlock = conditionBlock;
+        const result = esQueryBuilder.buildQuery();
+
         expect(result).to.deep.equal({
-          range: {
-            'a.b': {
-              [name]: 2,
+          query: {
+            range: {
+              'a.b': {
+                [name]: 2,
+              },
             },
           },
         });
@@ -193,12 +203,15 @@ describe('Unit | Utility | elasticsearch-query-constructor', function () {
   });
 
   it(
-    'converts keyword "is" condition in "convertKeywordIsCondition" method',
+    'converts keyword "is" condition',
     function () {
-      const esQueryConstructor = new ElasticsearchQueryConstructor();
-      const result = esQueryConstructor
-        .convertKeywordIsCondition(exampleKeywordIsConditionBlock);
-      expect(result).to.deep.equal(exampleKeywordIsConditionQuery);
+      const esQueryBuilder = new ElasticsearchQueryBuilder();
+      esQueryBuilder.rootQueryBlock = exampleKeywordIsConditionBlock;
+      const result = esQueryBuilder.buildQuery();
+
+      expect(result).to.deep.equal({
+        query: exampleKeywordIsConditionQuery,
+      });
     }
   );
 
@@ -264,9 +277,8 @@ describe('Unit | Utility | elasticsearch-query-constructor', function () {
   }].forEach(({ name, symbol, timeDisabledCompare, timeEnabledCompare }) => {
     [true, false].forEach(timeEnabled => {
       it(
-        `converts date "${symbol}" condition (timeEnabled ${timeEnabled}) in "convertDateRangeCondition" method`,
+        `converts date "${symbol}" condition (timeEnabled ${timeEnabled})`,
         function () {
-          const esQueryConstructor = new ElasticsearchQueryConstructor();
           const conditionBlock = new ConditionQueryBlock(
             new IndexProperty(new IndexProperty(null, 'a'), 'b'),
             `date.${name}`, {
@@ -274,14 +286,18 @@ describe('Unit | Utility | elasticsearch-query-constructor', function () {
               datetime: new Date(2020, 0, 2, 12, 10, 40),
             }
           );
-          const result = esQueryConstructor
-            .convertDateRangeCondition(conditionBlock);
+
+          const esQueryBuilder = new ElasticsearchQueryBuilder();
+          esQueryBuilder.rootQueryBlock = conditionBlock;
+          const result = esQueryBuilder.buildQuery();
 
           expect(result).to.deep.equal({
-            range: {
-              'a.b': Object.assign({ format: 'epoch_millis' },
-                timeEnabled ? timeEnabledCompare : timeDisabledCompare
-              ),
+            query: {
+              range: {
+                'a.b': Object.assign({ format: 'epoch_millis' },
+                  timeEnabled ? timeEnabledCompare : timeDisabledCompare
+                ),
+              },
             },
           });
         }
@@ -289,40 +305,105 @@ describe('Unit | Utility | elasticsearch-query-constructor', function () {
     });
   });
 
-  it('converts NOT operator in "convertNotOperator" method', function () {
-    const esQueryConstructor = new ElasticsearchQueryConstructor();
+  it('converts NOT operator', function () {
+    const esQueryBuilder = new ElasticsearchQueryBuilder();
+    esQueryBuilder.rootQueryBlock = exampleNotOperatorBlock;
 
-    const result = esQueryConstructor.convertNotOperator(exampleNotOperatorBlock);
-    expect(result).to.deep.equal(exampleNotOperatorQuery);
+    const result = esQueryBuilder.buildQuery();
+    expect(result).to.deep.equal({
+      query: exampleNotOperatorQuery,
+    });
   });
 
-  it('converts AND operator in "convertAndOperator" method', function () {
-    const esQueryConstructor = new ElasticsearchQueryConstructor();
+  it('converts AND operator', function () {
+    const esQueryBuilder = new ElasticsearchQueryBuilder();
+    esQueryBuilder.rootQueryBlock = exampleAndOperatorBlock;
 
-    const result = esQueryConstructor.convertAndOperator(exampleAndOperatorBlock);
-    expect(result).to.deep.equal(exampleAndOperatorQuery);
+    const result = esQueryBuilder.buildQuery();
+    expect(result).to.deep.equal({
+      query: exampleAndOperatorQuery,
+    });
   });
 
-  it('converts AND operator in "convertAndOperator" method', function () {
-    const esQueryConstructor = new ElasticsearchQueryConstructor();
+  it('converts OR operator', function () {
+    const esQueryBuilder = new ElasticsearchQueryBuilder();
+    esQueryBuilder.rootQueryBlock = exampleOrOperatorBlock;
 
-    const result = esQueryConstructor.convertOrOperator(exampleOrOperatorBlock);
-    expect(result).to.deep.equal(exampleOrOperatorQuery);
-  });
-
-  it('converts any combination operators nesting in "convertBlock" method', function () {
-    const esQueryConstructor = new ElasticsearchQueryConstructor();
-
-    const result = esQueryConstructor.convertBlock(exampleNestedOperatorsBlock);
-    expect(result).to.deep.equal(exampleNestedOperatorsQuery);
+    const result = esQueryBuilder.buildQuery();
+    expect(result).to.deep.equal({
+      query: exampleOrOperatorQuery,
+    });
   });
 
   it('constructs complete query for nested operators example', function () {
-    const esQueryConstructor = new ElasticsearchQueryConstructor();
+    const esQueryBuilder = new ElasticsearchQueryBuilder();
+    esQueryBuilder.rootQueryBlock = exampleNestedOperatorsBlock;
 
-    const result = esQueryConstructor.constructQuery(exampleNestedOperatorsBlock);
+    const result = esQueryBuilder.buildQuery();
     expect(result).to.deep.equal({
       query: exampleNestedOperatorsQuery,
     });
   });
+
+  it('constructs complete query when no query conditions are available', function () {
+    const esQueryBuilder = new ElasticsearchQueryBuilder();
+
+    const result = esQueryBuilder.buildQuery();
+    expect(result).to.deep.equal({});
+  });
+
+  it(
+    'translates null visibleContent field value to null _source query spec',
+    function () {
+      const esQueryBuilder = new ElasticsearchQueryBuilder();
+      esQueryBuilder.rootQueryBlock = exampleNestedOperatorsBlock;
+      esQueryBuilder.visibleContent = null;
+
+      const result = esQueryBuilder.buildQuery();
+      expect(result).to.deep.equal({
+        query: exampleNestedOperatorsQuery,
+      });
+    }
+  );
+
+  it(
+    'translates empty visibleContent field value to null _source query spec',
+    function () {
+      const esQueryBuilder = new ElasticsearchQueryBuilder();
+      esQueryBuilder.rootQueryBlock = exampleNestedOperatorsBlock;
+      esQueryBuilder.visibleContent = {};
+
+      const result = esQueryBuilder.buildQuery();
+      expect(result).to.deep.equal({
+        query: exampleNestedOperatorsQuery,
+      });
+    }
+  );
+
+  it(
+    'translates empty visibleContent field value to null _source query spec',
+    function () {
+      const esQueryBuilder = new ElasticsearchQueryBuilder();
+      esQueryBuilder.rootQueryBlock = exampleNestedOperatorsBlock;
+      esQueryBuilder.visibleContent = {
+        a: {},
+        b: {
+          c: {},
+          d: {
+            e: {},
+          },
+        },
+      };
+
+      const result = esQueryBuilder.buildQuery();
+      expect(result).to.deep.equal({
+        query: exampleNestedOperatorsQuery,
+        _source: [
+          'a',
+          'b.c',
+          'b.d.e',
+        ],
+      });
+    }
+  );
 });

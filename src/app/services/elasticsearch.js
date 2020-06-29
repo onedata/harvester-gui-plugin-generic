@@ -70,4 +70,43 @@ export default class ElasticsearchService extends Service {
   getMapping(indexName) {
     return this.fetch(indexName, '_mapping');
   }
+
+  /**
+   * Generates CURL command equivalent to the request to Elasticsearch.
+   * @param {String} method one of `get`, `post`
+   * @param {String} indexName
+   * @param {String} path url (without host and index)
+   * @param {any} body request body
+   * @returns {Promise<String>} CURL command
+   */
+  requestCurl(method, indexName, path, body) {
+    const dataCurlCommandRequest = this.get('appProxy.dataCurlCommandRequest');
+    return dataCurlCommandRequest({
+      method,
+      indexName,
+      path,
+      body: JSON.stringify(body),
+    });
+  }
+
+  /**
+   * Generates a CURL POST request to the index
+   * @param {String} indexName
+   * @param {String} path
+   * @param {any} body
+   * @returns {Promise<String>}
+   */
+  getPostCurl(indexName, path, body) {
+    return this.requestCurl('post', indexName, path, body);
+  }
+
+  /**
+   * Generates a CURL _search POST request to the index
+   * @param {String} indexName
+   * @param {any} body
+   * @returns {Promise<String>}
+   */
+  getSearchCurl(indexName, body) {
+    return this.getPostCurl(indexName, '_search', body);
+  }
 }

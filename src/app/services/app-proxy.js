@@ -37,6 +37,17 @@ export default class AppProxyService extends Service {
   @reads('appProxy.dataRequest') dataRequest;
 
   /**
+   * Generates CURL command that is equivalent to the dataRequest functionality
+   * @type {Function}
+   * @param {String} params.method one of `get`, `post`
+   * @param {String} params.indexName
+   * @param {String} params.path path to resource (part of the url without index)
+   * @param {String|undefined} params.body request body
+   * @returns {Promise<String>} CURL commang
+   */
+  @reads('appProxy.dataCurlCommandRequest') dataCurlCommandRequest;
+
+  /**
    * Fetches injected GUI plugin configuration
    * @type {Function}
    * @returns {Promise<Object>}

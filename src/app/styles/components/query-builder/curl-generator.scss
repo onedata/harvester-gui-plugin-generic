@@ -1,0 +1,21 @@
+.ember-attacher .curl-generator-body {
+  display: flex;
+  flex-direction: column;
+  width: 300px;
+  height: 300px;
+  padding: $spacer * 0.5;
+  background-color: white;
+  align-items: stretch;
+  
+  .curl-command-string {
+    flex-grow: 1;
+    font-family: monospace;
+    resize: none;
+    align-self: initial;
+  }
+
+  .access-token-info {
+    font-size: 75%;
+    margin: 0;
+  }
+}

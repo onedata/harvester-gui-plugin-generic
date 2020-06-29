@@ -10,6 +10,7 @@ describe('Unit | Service | app-proxy', function () {
   beforeEach(function () {
     const appProxy = {
       dataRequest: () => {},
+      dataCurlCommandRequest: () => {},
       configRequest: () => {},
       fileBrowserUrlRequest: () => {},
     };
@@ -49,6 +50,7 @@ describe('Unit | Service | app-proxy', function () {
 
   [
     'dataRequest',
+    'dataCurlCommandRequest',
     'configRequest',
     'fileBrowserUrlRequest',
   ].forEach(injectedPropName => {

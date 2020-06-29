@@ -4,17 +4,16 @@ import { tracked } from '@glimmer/tracking';
 import { action, trySet } from '@ember/object';
 import QueryResults from 'harvester-gui-plugin-generic/utils/query-results';
 import Index from 'harvester-gui-plugin-generic/utils/index';
-import ElasticsearchQueryConstructor from 'harvester-gui-plugin-generic/utils/elasticsearch-query-constructor';
+import ElasticsearchQueryBuilder from 'harvester-gui-plugin-generic/utils/elasticsearch-query-builder';
 
 export default class ContentIndexComponent extends Component {
   @service elasticsearch;
   @service appProxy;
 
   @tracked query = '';
-
   @tracked queryResults = null;
-
   @tracked index = null;
+  @tracked filteredProperties = {};
 
   constructor() {
     super(...arguments);
@@ -29,11 +28,22 @@ export default class ContentIndexComponent extends Component {
 
   @action
   performQuery(rootBlock) {
-    const queryConstructor = new ElasticsearchQueryConstructor;
+    const queryBuilder = new ElasticsearchQueryBuilder();
+    queryBuilder.rootQueryBlock = rootBlock.slot;
     this.elasticsearch.search(
       'generic-index',
-      queryConstructor.constructQuery(rootBlock.slot)
+      queryBuilder.buildQuery()
     ).then(results => trySet(this, 'queryResults', this.parseQueryResults(results)));
+  }
+
+  @action
+  getQueryCurl() {
+    return this.elasticsearch.getSearchCurl('generic-index', ...arguments);
+  }
+
+  @action
+  filteredPropertiesChange(filteredProperties) {
+    this.filteredProperties = filteredProperties;
   }
 
   parseQueryResults(rawQueryResults) {

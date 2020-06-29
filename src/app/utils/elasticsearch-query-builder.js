@@ -3,15 +3,24 @@ import MultiSlotQueryBlock from 'harvester-gui-plugin-generic/utils/query-builde
 import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/condition-query-block';
 import moment from 'moment';
 
-export default class ElasticsearchQueryConstructor {
-  constructQuery(rootBlock) {
-    if (rootBlock) {
-      return {
-        query: this.convertBlock(rootBlock),
-      };
-    } else {
-      return null;
+export default class ElasticsearchQueryBuilder {
+  rootQueryBlock = null;
+  visibleContent = null;
+
+  buildQuery() {
+    const query = {};
+
+    const queryConditions = this.convertBlock(this.rootQueryBlock);
+    if (queryConditions) {
+      query.query = queryConditions;
     }
+
+    const _sourceSpec = this.buildSourceFieldsSpec();
+    if (_sourceSpec.length) {
+      query._source = _sourceSpec;
+    }
+
+    return query;
   }
 
   convertBlock(block) {
@@ -179,6 +188,32 @@ export default class ElasticsearchQueryConstructor {
         should: multiSlotBlock.slots.map(block => this.convertBlock(block)),
       },
     };
+  }
+
+  buildSourceFieldsSpec() {
+    if (!this.visibleContent) {
+      return [];
+    }
+
+    const readyKeys = [];
+    const keysBaseHeap = [''];
+    const visibleContentObjectsHeap = [this.visibleContent];
+    while (visibleContentObjectsHeap.length > 0) {
+      const keysBase = keysBaseHeap.pop();
+      const visibleContentObject = visibleContentObjectsHeap.pop();
+      const objectKeys = Object.keys(visibleContentObject).sort().reverse();
+
+      if (objectKeys.length > 0) {
+        for (const visibleObjectKey of objectKeys) {
+          keysBaseHeap.push(`${keysBase}.${visibleObjectKey}`);
+          visibleContentObjectsHeap.push(visibleContentObject[visibleObjectKey]);
+        }
+      } else {
+        readyKeys.push(keysBase.substring(1));
+      }
+    }
+
+    return readyKeys.without('');
   }
 }
 
