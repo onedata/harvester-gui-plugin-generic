@@ -6,9 +6,8 @@ export default class QueryResultsResultComponent extends Component {
     return this.args.queryResult && this.args.queryResult.source || {};
   }
 
-  get visibleProperties() {
-    console.log(this.args.visibleProperties);
-    return this.args.visibleProperties || {};
+  get filteredProperties() {
+    return this.args.filteredProperties || {};
   }
 
   get visualisedProperties() {
@@ -17,12 +16,12 @@ export default class QueryResultsResultComponent extends Component {
 
   visualiseProperties() {
     const visualisedProperties = [];
-    const visiblePropertiesInfoQueue = [this.visibleProperties];
+    const filteredPropertiesInfoQueue = [this.filteredProperties];
     const pathsQueue = [''];
     const dataQueue = [this.rawData];
 
-    while (visiblePropertiesInfoQueue.length) {
-      const visiblePropertiesInfo = visiblePropertiesInfoQueue.pop();
+    while (filteredPropertiesInfoQueue.length) {
+      const filteredPropertiesInfo = filteredPropertiesInfoQueue.pop();
       const pathBase = pathsQueue.pop();
       const data = dataQueue.pop();
 
@@ -33,17 +32,17 @@ export default class QueryResultsResultComponent extends Component {
         });
       } else if (_.isArray(data)) {
         const arrayVisualisation =
-          this.visualisePropertySubtreeInArray(visiblePropertiesInfo, data);
+          this.visualisePropertySubtreeInArray(filteredPropertiesInfo, data);
         if (arrayVisualisation) {
           visualisedProperties.push({
             key: _.escape(pathBase),
-            value: this.visualisePropertySubtreeInArray(visiblePropertiesInfo, data),
+            value: this.visualisePropertySubtreeInArray(filteredPropertiesInfo, data),
           });
         }
       } else if (typeof data === 'object' && data !== null) {
         for (const key of Object.keys(data).sort().reverse()) {
-          if (visiblePropertiesInfo[key]) {
-            visiblePropertiesInfoQueue.push(visiblePropertiesInfo[key]);
+          if (filteredPropertiesInfo[key]) {
+            filteredPropertiesInfoQueue.push(filteredPropertiesInfo[key]);
             pathsQueue.push(`${pathBase}.${key}`);
             dataQueue.push(data[key]);
           }
@@ -61,10 +60,10 @@ export default class QueryResultsResultComponent extends Component {
     return visualisedProperties;
   }
 
-  visualisePropertySubtreeInArray(visibleProperties, dataArray) {
+  visualisePropertySubtreeInArray(filteredProperties, dataArray) {
     const arrayElements = [];
     for (const element of dataArray) {
-      const elementStringified = this.visualiseObjectInArray(visibleProperties, element);
+      const elementStringified = this.visualiseObjectInArray(filteredProperties, element);
       if (elementStringified) {
         arrayElements.push(elementStringified);
       }
@@ -73,17 +72,17 @@ export default class QueryResultsResultComponent extends Component {
     return arrayElements.length ? `[${arrayElements.join(',')}]` : null;
   }
 
-  visualiseObjectInArray(visibleProperties, data) {
+  visualiseObjectInArray(filteredProperties, data) {
     if (typeof data === 'string') {
       return `"${_.escape(data)}"`;
     } else if (_.isArray(data)) {
-      return this.visualisePropertySubtreeInArray(visibleProperties, data);
+      return this.visualisePropertySubtreeInArray(filteredProperties, data);
     } else if (typeof data === 'object' && data !== null) {
       const resultObjEntries = [];
       for (const key of Object.keys(data).sort()) {
-        if (visibleProperties[key]) {
+        if (filteredProperties[key]) {
           const stringifiedSubvalue =
-            this.visualiseObjectInArray(visibleProperties[key], data[key]);
+            this.visualiseObjectInArray(filteredProperties[key], data[key]);
           if (stringifiedSubvalue) {
             resultObjEntries.push(`"${_.escape(key)}":${stringifiedSubvalue}`);
           }

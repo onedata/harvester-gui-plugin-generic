@@ -52,10 +52,10 @@ describe('Integration | Component | query-results/result', function () {
   });
 
   it('shows no fields, when none are specified as visible', async function () {
-    this.set('visibleProperties', {});
+    this.set('filteredProperties', {});
     await render(hbs `<QueryResults::Result
       @queryResult={{this.queryResult}}
-      @visibleProperties={{this.visibleProperties}}
+      @filteredProperties={{this.filteredProperties}}
     />`);
 
     expect(this.element.querySelector('.fields-visualiser')).to.not.exist;
@@ -63,7 +63,7 @@ describe('Integration | Component | query-results/result', function () {
 
   [{
     description: 'shows single not nested property',
-    visibleProperties: {
+    filteredProperties: {
       c: {},
     },
     results: [{
@@ -72,7 +72,7 @@ describe('Integration | Component | query-results/result', function () {
     }],
   }, {
     description: 'shows single nested property',
-    visibleProperties: {
+    filteredProperties: {
       e: {
         f: {},
       },
@@ -83,7 +83,7 @@ describe('Integration | Component | query-results/result', function () {
     }],
   }, {
     description: 'shows multiple nested properties',
-    visibleProperties: {
+    filteredProperties: {
       a: {
         b: {},
       },
@@ -104,7 +104,7 @@ describe('Integration | Component | query-results/result', function () {
     }],
   }, {
     description: 'shows multiple double-nested properties',
-    visibleProperties: {
+    filteredProperties: {
       g: {
         h: {
           i: {},
@@ -121,7 +121,7 @@ describe('Integration | Component | query-results/result', function () {
     }],
   }, {
     description: 'shows multiple properties nested in arrays',
-    visibleProperties: {
+    filteredProperties: {
       l: {
         m: {
           n: {
@@ -139,7 +139,7 @@ describe('Integration | Component | query-results/result', function () {
     }],
   }, {
     description: 'does not show properties nested in arrays, which are empty',
-    visibleProperties: {
+    filteredProperties: {
       l: {
         m: {
           n: {
@@ -156,7 +156,7 @@ describe('Integration | Component | query-results/result', function () {
     }],
   }, {
     description: 'does not show anything when all properties nested in arrays are empty',
-    visibleProperties: {
+    filteredProperties: {
       l: {
         m: {
           n: {
@@ -168,12 +168,12 @@ describe('Integration | Component | query-results/result', function () {
       },
     },
     results: [],
-  }].forEach(({ description, visibleProperties, results }) => {
+  }].forEach(({ description, filteredProperties, results }) => {
     it(description, async function () {
-      this.set('visibleProperties', visibleProperties);
+      this.set('filteredProperties', filteredProperties);
       await render(hbs `<QueryResults::Result
         @queryResult={{this.queryResult}}
-        @visibleProperties={{this.visibleProperties}}
+        @filteredProperties={{this.filteredProperties}}
       />`);
 
       const properties = this.element.querySelectorAll('.fields-visualiser .property');

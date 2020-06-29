@@ -4,10 +4,14 @@ import { action } from '@ember/object';
 
 export default class QueryResultsComponent extends Component {
   @tracked
-  visibleProperties = {};
+  filteredProperties = {};
 
   @action
-  visiblePropertiesChanged(visibleProperties) {
-    this.visibleProperties = visibleProperties;
+  filteredPropertiesChanged(filteredProperties) {
+    this.filteredProperties = filteredProperties;
+
+    if (this.args.onFilteredPropertiesChange) {
+      this.args.onFilteredPropertiesChange(filteredProperties);
+    }
   }
 }

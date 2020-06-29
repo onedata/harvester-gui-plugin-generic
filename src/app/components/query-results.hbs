@@ -1,14 +1,14 @@
 <div class="query-results">
   {{#if @queryResults.results}}
-    <QueryResults::VisiblePropertiesSelector
+    <QueryResults::FilteredPropertiesSelector
       @queryResults={{@queryResults}}
-      @onSelectionChange={{this.visiblePropertiesChanged}}
+      @onSelectionChange={{this.filteredPropertiesChanged}}
     />
     <ul class="results-list">
       {{#each @queryResults.results as |queryResult|}}
         <QueryResults::Result
           @queryResult={{queryResult}}
-          @visibleProperties={{this.visibleProperties}}
+          @filteredProperties={{this.filteredProperties}}
         />
       {{/each}}
     </ul>

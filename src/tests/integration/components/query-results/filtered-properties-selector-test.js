@@ -10,7 +10,7 @@ import sinon from 'sinon';
 import { isVisible } from 'ember-attacher';
 
 describe(
-  'Integration | Component | query-results/visible-properties-selector',
+  'Integration | Component | query-results/filtered-properties-selector',
   function () {
     setupRenderingTest();
 
@@ -44,16 +44,16 @@ describe(
       });
     });
 
-    it('has class "visible-properties-selector', async function () {
-      await render(hbs `<QueryResults::VisiblePropertiesSelector
+    it('has class "filtered-properties-selector', async function () {
+      await render(hbs `<QueryResults::FilteredPropertiesSelector
         @queryResults={{this.queryResults1}}
       />`);
 
-      expect(this.element.querySelector('.visible-properties-selector')).to.exist;
+      expect(this.element.querySelector('.filtered-properties-selector')).to.exist;
     });
 
     it('does not render properties tree on init', async function () {
-      await render(hbs `<QueryResults::VisiblePropertiesSelector
+      await render(hbs `<QueryResults::FilteredPropertiesSelector
         @queryResults={{this.queryResults1}}
       />`);
 
@@ -61,22 +61,22 @@ describe(
     });
 
     it(
-      'does render properties tree on "Visible properties" button click',
+      'does render properties tree on "Filter properties" button click',
       async function () {
-        await render(hbs `<QueryResults::VisiblePropertiesSelector
+        await render(hbs `<QueryResults::FilteredPropertiesSelector
           @queryResults={{this.queryResults1}}
         />`);
         await click('.show-properties-selector');
 
         expect(this.element.querySelector('.show-properties-selector').textContent)
-          .to.contain('Visible properties');
+          .to.contain('Filter properties');
         expect(isVisible('.ember-attacher')).to.be.true;
         expect(this.element.querySelector('.tree')).to.exist;
       }
     );
 
     it('has all nested properties collapsed', async function () {
-      await render(hbs `<QueryResults::VisiblePropertiesSelector
+      await render(hbs `<QueryResults::FilteredPropertiesSelector
         @queryResults={{this.queryResults1}}
       />`);
 
@@ -84,7 +84,7 @@ describe(
     });
 
     it('renders properties', async function () {
-      await render(hbs `<QueryResults::VisiblePropertiesSelector
+      await render(hbs `<QueryResults::FilteredPropertiesSelector
         @queryResults={{this.queryResults1}}
       />`);
       await click('.show-properties-selector');
@@ -117,7 +117,7 @@ describe(
     });
 
     it('has all properties deselected on init', async function () {
-      await render(hbs `<QueryResults::VisiblePropertiesSelector
+      await render(hbs `<QueryResults::FilteredPropertiesSelector
         @queryResults={{this.queryResults1}}
       />`);
       await click('.show-properties-selector');
@@ -131,7 +131,7 @@ describe(
     });
 
     it('renders buttons "Select all" and "Deselect all"', async function () {
-      await render(hbs `<QueryResults::VisiblePropertiesSelector
+      await render(hbs `<QueryResults::FilteredPropertiesSelector
         @queryResults={{this.queryResults1}}
       />`);
       await click('.show-properties-selector');
@@ -145,7 +145,7 @@ describe(
     });
 
     it('allows to select all using "Select all" button', async function () {
-      await render(hbs `<QueryResults::VisiblePropertiesSelector
+      await render(hbs `<QueryResults::FilteredPropertiesSelector
         @queryResults={{this.queryResults1}}
       />`);
       await click('.show-properties-selector');
@@ -156,7 +156,7 @@ describe(
     });
 
     it('allows to deselect all using "Deselect all" button', async function () {
-      await render(hbs `<QueryResults::VisiblePropertiesSelector
+      await render(hbs `<QueryResults::FilteredPropertiesSelector
         @queryResults={{this.queryResults1}}
       />`);
       await click('.show-properties-selector');
@@ -169,7 +169,7 @@ describe(
 
     it('notifies about changed properties after "select all" click', async function () {
       const changeSpy = this.set('changeSpy', sinon.spy());
-      await render(hbs `<QueryResults::VisiblePropertiesSelector
+      await render(hbs `<QueryResults::FilteredPropertiesSelector
         @queryResults={{this.queryResults1}}
         @onSelectionChange={{this.changeSpy}}
       />`);
@@ -191,7 +191,7 @@ describe(
 
     it('notifies about changed properties after "deselect all" click', async function () {
       const changeSpy = this.set('changeSpy', sinon.spy());
-      await render(hbs `<QueryResults::VisiblePropertiesSelector
+      await render(hbs `<QueryResults::FilteredPropertiesSelector
         @queryResults={{this.queryResults1}}
         @onSelectionChange={{this.changeSpy}}
       />`);
@@ -207,7 +207,7 @@ describe(
       'notifies about changed properties after nested node checkbox click',
       async function () {
         const changeSpy = this.set('changeSpy', sinon.spy());
-        await render(hbs `<QueryResults::VisiblePropertiesSelector
+        await render(hbs `<QueryResults::FilteredPropertiesSelector
           @queryResults={{this.queryResults1}}
           @onSelectionChange={{this.changeSpy}}
         />`);
@@ -233,7 +233,7 @@ describe(
     it(
       'shows 0 selected properties in counter when there is no selection',
       async function () {
-        await render(hbs `<QueryResults::VisiblePropertiesSelector
+        await render(hbs `<QueryResults::FilteredPropertiesSelector
           @queryResults={{this.queryResults1}}
         />`);
 
@@ -246,7 +246,7 @@ describe(
     it(
       'shows all selected properties in counter after "Select all" click',
       async function () {
-        await render(hbs `<QueryResults::VisiblePropertiesSelector
+        await render(hbs `<QueryResults::FilteredPropertiesSelector
           @queryResults={{this.queryResults1}}
         />`);
         await click('.show-properties-selector');

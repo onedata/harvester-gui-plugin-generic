@@ -1,27 +1,117 @@
-// import { expect } from 'chai';
-import { describe, it } from 'mocha';
+import { expect } from 'chai';
+import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-// import { render } from '@ember/test-helpers';
-// import hbs from 'htmlbars-inline-precompile';
+import { render } from '@ember/test-helpers';
+import hbs from 'htmlbars-inline-precompile';
+import QueryResults from 'harvester-gui-plugin-generic/utils/query-results';
+import { click } from '@ember/test-helpers';
+import { all as allFulfilled } from 'rsvp';
+import sinon from 'sinon';
 
 describe('Integration | Component | query-results', function () {
   setupRenderingTest();
 
-  it('renders', async function () {
-    // Set any properties with this.set('myProperty', 'value');
-    // Handle any actions with this.set('myAction', function(val) { ... });
+  beforeEach(function () {
+    this.set('queryResults', new QueryResults({
+      hits: {
+        hits: [{
+          _source: {
+            a: {
+              b: true,
+            },
+            c: 'someText',
+            e: {
+              f: 'anotherText',
+            },
+          },
+        }, {
+          _source: {
+            a: [{
+              b: false,
+            }, {
+              b: true,
+              bb: false,
+            }],
+            c: 'someText2',
+          },
+        }],
+      },
+    }));
+  });
 
-    // await render(hbs`<QueryResults />`);
+  it('renders results', async function () {
+    await render(hbs `<QueryResults @queryResults={{this.queryResults}}/>`);
 
-    // expect(this.element.textContent.trim()).to.equal('');
+    const results = this.element.querySelectorAll('.query-results-result');
+    expect(results).to.have.length(2);
+    expect(results[0].textContent).to.contain('anotherText');
+    expect(results[1].textContent).to.contain('someText2');
+  });
 
-    // // Template block usage:
-    // await render(hbs`
-    //   <QueryResults>
-    //     template block text
-    //   </QueryResults>
-    // `);
+  it('has no filtered properties on init', async function () {
+    await render(hbs `<QueryResults @queryResults={{this.queryResults}}/>`);
 
-    // expect(this.element.textContent.trim()).to.equal('template block text');
+    const selectionCounter =
+      this.element.querySelector('.show-properties-selector .selection-counter');
+    expect(selectionCounter.textContent.trim()).to.equal('0/6');
+    expect(this.element.querySelectorAll('.query-results-result .fields-visualiser'))
+      .to.have.length(0);
+  });
+
+  it('filters visible properties', async function () {
+    await render(hbs `<QueryResults @queryResults={{this.queryResults}}/>`);
+    await click('.show-properties-selector');
+    // expand all nodes
+    await allFulfilled(
+      [...document.querySelectorAll('.ember-attacher .tree .toggle-icon')]
+      .map(element => click(element))
+    );
+    const firstBranchLastCheckbox = document.querySelectorAll(
+      '.ember-attacher .tree > .tree-branch > .tree-node:first-child > .tree-branch input'
+    )[1];
+    await click(firstBranchLastCheckbox);
+
+    const fieldsVisualiser =
+      this.element.querySelectorAll('.query-results-result .fields-visualiser');
+    expect(fieldsVisualiser).to.have.length(1);
+    expect(fieldsVisualiser[0].querySelectorAll('.property')).to.have.length(1);
+    expect(fieldsVisualiser[0].querySelector('.property-name').textContent.trim())
+      .to.equal('a');
+    expect(fieldsVisualiser[0].querySelector('.property-value').textContent.trim())
+      .to.equal('[{"bb":false}]');
+  });
+
+  it('does not notify about changed filtered properties on init', async function () {
+    const changeSpy = this.set('changeSpy', sinon.spy());
+
+    await render(hbs `<QueryResults
+      @queryResults={{this.queryResults}}
+      @onFilteredPropertiesChange={{this.changeSpy}}
+    />`);
+
+    expect(changeSpy).to.not.be.called;
+  });
+
+  it('notifies about act of changing filtered properties', async function () {
+    const changeSpy = this.set('changeSpy', sinon.spy());
+
+    await render(hbs `<QueryResults
+      @queryResults={{this.queryResults}}
+      @onFilteredPropertiesChange={{this.changeSpy}}
+    />`);
+    await click('.show-properties-selector');
+    await click('.select-all');
+
+    expect(changeSpy).to.be.calledOnce;
+    expect(changeSpy.lastCall.args[0]).to.deep.equal({
+      a: {
+        b: {},
+        bb: {},
+      },
+      c: {},
+      e: {
+        f: {},
+      },
+    });
   });
 });

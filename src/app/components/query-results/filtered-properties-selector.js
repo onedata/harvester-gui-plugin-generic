@@ -16,8 +16,8 @@ class TreeNode {
   children = [];
 }
 
-export default class QueryResultsVisiblePropertiesSelectorComponent extends Component {
-  intlPrefix = 'components.query-results.visible-properties-selector';
+export default class QueryResultsFilteredPropertiesSelectorComponent extends Component {
+  intlPrefix = 'components.query-results.filtered-properties-selector';
 
   lastQueryResults = null;
   calculatedModel = [];

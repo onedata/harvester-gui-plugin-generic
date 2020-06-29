@@ -1,4 +1,4 @@
-<div class="visible-properties-selector">
+<div class="filtered-properties-selector">
   <BsButton class="show-properties-selector">
     {{tt this "selectorTrigger"}}
     (<span class="selection-counter">{{this.selectedPropertiesCount}}/{{this.flatModel.length}}</span>)
@@ -11,7 +11,7 @@
       @lazyRender={{true}}
       as |popover|
     >
-      <div class="visible-properties-selector-body">
+      <div class="filtered-properties-selector-body">
         <BsButton
           @size="sm"
           @onClick={{this.selectAll}}
