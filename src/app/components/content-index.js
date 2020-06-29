@@ -10,7 +10,6 @@ export default class ContentIndexComponent extends Component {
   @service elasticsearch;
   @service appProxy;
 
-  @tracked query = '';
   @tracked queryResults = null;
   @tracked index = null;
   @tracked filteredProperties = {};
@@ -18,18 +17,16 @@ export default class ContentIndexComponent extends Component {
   constructor() {
     super(...arguments);
     this.elasticsearch.getMapping('generic-index')
-      .then(response => trySet(this, 'index', new Index(Object.values(response)[0])));
-  }
-
-  @action
-  queryChanged(query) {
-    this.query = query;
+      .then(response => {
+        trySet(this, 'index', new Index(Object.values(response)[0]));
+        return this.performQuery();
+      });
   }
 
   @action
   performQuery(rootBlock) {
     const queryBuilder = new ElasticsearchQueryBuilder();
-    queryBuilder.rootQueryBlock = rootBlock.slot;
+    queryBuilder.rootQueryBlock = rootBlock && rootBlock.slot;
     this.elasticsearch.search(
       'generic-index',
       queryBuilder.buildQuery()
