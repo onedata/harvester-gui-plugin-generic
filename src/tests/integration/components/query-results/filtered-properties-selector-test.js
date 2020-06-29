@@ -41,6 +41,17 @@ describe(
             }],
           },
         }),
+        queryResults2: new QueryResults({
+          hits: {
+            hits: [{
+              _source: {
+                a: [{
+                  bbb: false,
+                }],
+              },
+            }],
+          },
+        }),
       });
     });
 
@@ -255,6 +266,66 @@ describe(
         const counter =
           this.element.querySelector('.show-properties-selector .selection-counter');
         expect(counter.textContent.trim()).to.equal('6/6');
+      }
+    );
+
+    it('updates properties set after query results change', async function () {
+      const {
+        queryResults1,
+        queryResults2,
+      } = this.getProperties('queryResults1', 'queryResults2');
+
+      this.set('queryResults', queryResults1);
+      await render(hbs `<QueryResults::FilteredPropertiesSelector
+        @queryResults={{this.queryResults}}
+      />`);
+      await click('.show-properties-selector');
+      // expand all nodes
+      await allFulfilled([...this.element.querySelectorAll('.toggle-icon')]
+        .map(element => click(element))
+      );
+      this.set('queryResults', queryResults2);
+
+      const firstBranchLastNode = this.element.querySelectorAll(
+        '.tree > .tree-branch > .tree-node:first-child > .tree-branch .tree-node'
+      )[2];
+      expect(firstBranchLastNode).to.exist;
+      expect(firstBranchLastNode.querySelector('.tree-label').textContent.trim())
+        .to.equal('bbb');
+      expect(firstBranchLastNode.querySelector('input').checked).to.be.false;
+    });
+
+    it(
+      'updates properties set after query results change (parent property was completly checked)',
+      async function () {
+        const {
+          queryResults1,
+          queryResults2,
+        } = this.getProperties('queryResults1', 'queryResults2');
+
+        this.set('queryResults', queryResults1);
+        await render(hbs `<QueryResults::FilteredPropertiesSelector
+          @queryResults={{this.queryResults}}
+        />`);
+        await click('.show-properties-selector');
+        // expand all nodes
+        await allFulfilled([...this.element.querySelectorAll('.toggle-icon')]
+          .map(element => click(element))
+        );
+        await click(
+          '.tree > .tree-branch > .tree-node:first-child > .tree-children input'
+        );
+        this.set('queryResults', queryResults2);
+
+        const firstBranchGroupInput = this.element.querySelector(
+          '.tree > .tree-branch > .tree-node:first-child > .tree-children input'
+        );
+        const firstBranchLastNodeInput = this.element.querySelectorAll(
+          '.tree > .tree-branch > .tree-node:first-child > .tree-branch .tree-node input'
+        )[2];
+        expect(firstBranchGroupInput.indeterminate).to.be.true;
+        expect(firstBranchGroupInput.checked).to.be.false;
+        expect(firstBranchLastNodeInput.checked).to.be.false;
       }
     );
   }

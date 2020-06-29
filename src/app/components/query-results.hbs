@@ -1,9 +1,9 @@
 <div class="query-results">
+  <QueryResults::FilteredPropertiesSelector
+    @queryResults={{@queryResults}}
+    @onSelectionChange={{this.filteredPropertiesChanged}}
+  />
   {{#if @queryResults.results}}
-    <QueryResults::FilteredPropertiesSelector
-      @queryResults={{@queryResults}}
-      @onSelectionChange={{this.filteredPropertiesChanged}}
-    />
     <ul class="results-list">
       {{#each @queryResults.results as |queryResult|}}
         <QueryResults::Result

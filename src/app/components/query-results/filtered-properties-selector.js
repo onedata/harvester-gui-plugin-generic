@@ -2,6 +2,7 @@ import Component from '@glimmer/component';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 import { A } from '@ember/array';
+import _ from 'lodash';
 
 class TreeNode {
   id = null;
@@ -13,6 +14,7 @@ class TreeNode {
   @tracked isIndeterminate = false;
 
   isVisible = true;
+
   children = [];
 }
 
@@ -96,32 +98,61 @@ export default class QueryResultsFilteredPropertiesSelectorComponent extends Com
       return;
     }
 
+    const oldPropertiesSubtree = this.lastQueryResults ?
+      this.lastQueryResults.getPropertiesTree() : {};
     const propertiesTree = this.args.queryResults ?
       this.args.queryResults.getPropertiesTree() : {};
+    const oldAndNewPropertiesTree = _.merge({}, oldPropertiesSubtree, propertiesTree);
     const model = [];
     const flatModel = [];
 
-    const propertiesSubtreeQueue = [propertiesTree];
+    const propertiesSubtreeQueue = [oldAndNewPropertiesTree];
     const modelChildrenTargetQueue = [model];
+    const oldModelChildrenTargetQueue = [this.calculatedModel];
     let uniqueId = 0;
 
     while (propertiesSubtreeQueue.length) {
       const modelChildrenTarget = modelChildrenTargetQueue.pop();
+      const oldModelChildrenTarget = oldModelChildrenTargetQueue.pop();
       const propertiesSubtree = propertiesSubtreeQueue.pop();
 
       for (const key of Object.keys(propertiesSubtree).sort()) {
+        const oldModelNode = oldModelChildrenTarget.findBy('name', key);
+        const oldModelChildren = oldModelNode ? oldModelNode.children : [];
+
         const newModelNode = new TreeNode();
         newModelNode.id = uniqueId++;
         newModelNode.name = key;
+        newModelNode.isChecked = oldModelNode ? oldModelNode.isChecked : false;
+        newModelNode.isIndeterminate =
+          oldModelNode ? oldModelNode.isIndeterminate : false;
+        newModelNode.isExpanded = oldModelNode ? oldModelNode.isExpanded : false;
         modelChildrenTarget.push(newModelNode);
+
         flatModel.push(newModelNode);
         propertiesSubtreeQueue.push(propertiesSubtree[key]);
         modelChildrenTargetQueue.push(newModelNode.children);
+        oldModelChildrenTargetQueue.push(oldModelChildren);
       }
     }
+
+    model.forEach(node => this.fixTreeSelectionState(node));
 
     this.lastQueryResults = this.args.queryResults;
     this.calculatedModel = model;
     this.calculatedFlatModel = A(flatModel);
+  }
+
+  fixTreeSelectionState(node) {
+    const children = node.children || [];
+    if (children.length > 0) {
+      children.forEach(subnode => this.fixTreeSelectionState(subnode));
+      const childrenCheckedState = children.mapBy('isChecked');
+      const childrenIndeterminateState = children.mapBy('isIndeterminate');
+      node.isChecked = !childrenCheckedState.includes(false);
+      node.isIndeterminate = !node.isChecked && (
+        childrenCheckedState.includes(true) || childrenIndeterminateState.includes(true)
+      );
+    }
   }
 }
