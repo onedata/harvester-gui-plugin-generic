@@ -8,6 +8,10 @@
 />
 <QueryResults
   @queryResults={{this.queryResults}}
+  @activePageNumber={{this.activePageNumber}}
+  @pageSize={{this.pageSize}}
   @onFilteredPropertiesChange={{this.filteredPropertiesChange}}
+  @onPageChange={{this.pageChange}}
+  @onPageSizeChange={{this.pageSizeChange}}
 />
 {{yield}}

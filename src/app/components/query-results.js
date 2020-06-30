@@ -3,8 +3,7 @@ import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 
 export default class QueryResultsComponent extends Component {
-  @tracked
-  filteredProperties = {};
+  @tracked filteredProperties = {};
 
   get activePageNumber() {
     return this.args.activePageNumber || 1;
@@ -16,6 +15,10 @@ export default class QueryResultsComponent extends Component {
 
   get onPageChange() {
     return this.args.onPageChange || (() => {});
+  }
+
+  get onPageSizeChange() {
+    return this.args.onPageSizeChange || (() => {});
   }
 
   @action

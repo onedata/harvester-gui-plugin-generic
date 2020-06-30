@@ -6,9 +6,14 @@ import moment from 'moment';
 export default class ElasticsearchQueryBuilder {
   rootQueryBlock = null;
   visibleContent = null;
+  resultsFrom = 0;
+  resultsSize = 10;
 
   buildQuery() {
-    const query = {};
+    const query = {
+      from: this.resultsFrom,
+      size: this.resultsSize,
+    };
 
     const queryConditions = this.convertBlock(this.rootQueryBlock);
     if (queryConditions) {

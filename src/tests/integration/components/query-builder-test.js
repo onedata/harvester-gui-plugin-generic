@@ -113,6 +113,8 @@ describe('Integration | Component | query-builder', function () {
 
     expect(generateCurlStub).to.be.calledOnce;
     expect(generateCurlStub.lastCall.args[0]).to.deep.equal({
+      from: 0,
+      size: 10,
       query: {
         term: {
           'a.b': {
@@ -168,6 +170,8 @@ describe('Integration | Component | query-builder', function () {
 
       expect(generateCurlStub).to.be.calledOnce;
       expect(generateCurlStub.lastCall.args[0]).to.deep.equal({
+        from: 0,
+        size: 10,
         query: {
           term: {
             'a.b': {

@@ -9,6 +9,7 @@
       @activePageNumber={{this.activePageNumber}}
       @pageSize={{this.pageSize}}
       @onPageChange={{this.onPageChange}}
+      @onPageSizeChange={{this.onPageSizeChange}}
     />
     <ul class="results-list">
       {{#each @queryResults.results as |queryResult|}}
@@ -23,6 +24,7 @@
       @activePageNumber={{this.activePageNumber}}
       @pageSize={{this.pageSize}}
       @onPageChange={{this.onPageChange}}
+      @onPageSizeChange={{this.onPageSizeChange}}
     />
   {{/if}}
 </div>

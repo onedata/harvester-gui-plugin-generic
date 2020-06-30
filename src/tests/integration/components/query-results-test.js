@@ -5,6 +5,7 @@ import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import QueryResults from 'harvester-gui-plugin-generic/utils/query-results';
 import { click } from '@ember/test-helpers';
+import { selectChoose } from 'ember-power-select/test-support/helpers';
 import { all as allFulfilled } from 'rsvp';
 import sinon from 'sinon';
 
@@ -207,6 +208,24 @@ describe('Integration | Component | query-results', function () {
         await click(nextBtn);
 
         expect(changeSpy).to.be.calledOnce.and.to.be.calledWith(2);
+      }
+    );
+
+    it(
+      `notifies about page size change (${paginationPosition} pagination control)`,
+      async function () {
+        const changeSpy = this.set('changeSpy', sinon.spy());
+
+        await render(hbs `<QueryResults
+          @queryResults={{this.queryResults}}
+          @onPageSizeChange={{this.changeSpy}}
+        />`);
+        const pageSizeSelector = this.element.querySelectorAll(
+          '.query-results-pagination .page-size-selector'
+        )[index];
+        await selectChoose(pageSizeSelector, '50');
+
+        expect(changeSpy).to.be.calledOnce.and.to.be.calledWith(50);
       }
     );
   });

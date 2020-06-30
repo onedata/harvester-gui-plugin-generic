@@ -13,6 +13,10 @@ export default class ContentIndexComponent extends Component {
   @tracked queryResults = null;
   @tracked index = null;
   @tracked filteredProperties = {};
+  @tracked activePageNumber = 1;
+  @tracked pageSize = 10;
+
+  queryBuilder = new ElasticsearchQueryBuilder();
 
   constructor() {
     super(...arguments);
@@ -25,10 +29,10 @@ export default class ContentIndexComponent extends Component {
 
   @action
   performQuery(rootBlock) {
-    const queryBuilder = new ElasticsearchQueryBuilder();
-    queryBuilder.rootQueryBlock = rootBlock && rootBlock.slot;
-    this.elasticsearch.search(queryBuilder.buildQuery())
-      .then(results => trySet(this, 'queryResults', this.parseQueryResults(results)));
+    this.queryBuilder.rootQueryBlock = rootBlock && rootBlock.slot;
+    this.activePageNumber = 1;
+    this.updateQueryBuilderResultsRange();
+    this.queryElasticsearch();
   }
 
   @action
@@ -41,9 +45,34 @@ export default class ContentIndexComponent extends Component {
     this.filteredProperties = filteredProperties;
   }
 
+  @action
+  pageChange(activePageNumber) {
+    this.activePageNumber = activePageNumber;
+    this.updateQueryBuilderResultsRange();
+    this.queryElasticsearch();
+  }
+
+  @action
+  pageSizeChange(pageSize) {
+    this.pageSize = pageSize;
+    this.activePageNumber = 1;
+    this.updateQueryBuilderResultsRange();
+    this.queryElasticsearch();
+  }
+
   parseQueryResults(rawQueryResults) {
     return new QueryResults(rawQueryResults, {
       fileBrowserUrlRequest: this.appProxy.fileBrowserUrlRequest,
     });
+  }
+
+  queryElasticsearch() {
+    this.elasticsearch.search(this.queryBuilder.buildQuery())
+      .then(results => trySet(this, 'queryResults', this.parseQueryResults(results)));
+  }
+
+  updateQueryBuilderResultsRange() {
+    this.queryBuilder.resultsFrom = this.pageSize * (this.activePageNumber - 1);
+    this.queryBuilder.resultsSize = this.pageSize;
   }
 }
