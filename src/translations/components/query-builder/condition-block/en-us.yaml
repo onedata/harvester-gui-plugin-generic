@@ -17,3 +17,5 @@ comparators:
     lte: '≤'
     gt: '&gt;'
     gte: '≥'
+  space:
+    is: 'is'

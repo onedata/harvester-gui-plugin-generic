@@ -60,6 +60,8 @@ export default class ElasticsearchQueryBuilder {
         case 'date.gt':
         case 'date.gte':
           return this.convertDateRangeCondition(block);
+        case 'space.is':
+          return this.convertSpaceCondition(block);
         default:
           return undefined;
       }
@@ -161,6 +163,16 @@ export default class ElasticsearchQueryBuilder {
         [conditionBlock.property.path]: Object.assign({ format: 'epoch_millis' },
           comparison
         ),
+      },
+    };
+  }
+
+  convertSpaceCondition(conditionBlock) {
+    return {
+      term: {
+        '__onedata.spaceId': {
+          value: conditionBlock.comparatorValue.id,
+        },
       },
     };
   }

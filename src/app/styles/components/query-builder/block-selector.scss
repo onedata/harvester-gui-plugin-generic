@@ -27,6 +27,11 @@
     list-style-type: none;
   }
 
+  .comparator-main-container,
+  .comparator-additional-container {
+    display: flex;
+  }
+
   .operator {
     margin-right: $spacer * 0.25;
     text-transform: uppercase;
@@ -34,10 +39,11 @@
 
   .ember-power-select-trigger {
     line-height: 2.2;
+    white-space: nowrap;
   }
 
   .ember-power-select-option {
-    word-wrap: break-word;
+    word-break: break-all;
   }
 
   .ember-basic-dropdown {
@@ -46,6 +52,11 @@
 
   .form-group {
     margin-bottom: $spacer * 0.5;
+    min-width: 0;
+  }
+
+  .form-group-no-shrink {
+    flex-shrink: 0;
   }
 
   .form-group-full-line {

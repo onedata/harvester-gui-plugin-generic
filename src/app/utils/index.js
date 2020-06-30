@@ -1,6 +1,7 @@
 import IndexPropertyCollection from 'harvester-gui-plugin-generic/utils/index-property-collection';
 import { get } from '@ember/object';
 import IndexProperty from 'harvester-gui-plugin-generic/utils/index-property';
+import IndexOnedataProperty from 'harvester-gui-plugin-generic/utils/index-onedata-property';
 import _ from 'lodash';
 
 export default class Index extends IndexPropertyCollection {
@@ -12,7 +13,10 @@ export default class Index extends IndexPropertyCollection {
     this.rawMapping = rawMapping || {};
 
     if (this.rawMapping) {
-      this.extractProperties(get(this.rawMapping, 'mappings.properties') || {});
+      const propertiesMapping =
+        _.cloneDeep(get(this.rawMapping, 'mappings.properties') || {});
+      delete propertiesMapping.__onedata;
+      this.extractProperties(propertiesMapping);
     }
   }
 
@@ -38,5 +42,12 @@ export default class Index extends IndexPropertyCollection {
       );
     });
     return flattenedProperties;
+  }
+
+  extractProperties() {
+    super.extractProperties(...arguments);
+
+    this.properties['__onedata.space'] =
+      new IndexOnedataProperty(null, '__onedata.space');
   }
 }

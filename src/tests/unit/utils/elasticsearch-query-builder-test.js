@@ -5,6 +5,7 @@ import SingleSlotQueryBlock from 'harvester-gui-plugin-generic/utils/query-build
 import MultiSlotQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/multi-slot-query-block';
 import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/condition-query-block';
 import IndexProperty from 'harvester-gui-plugin-generic/utils/index-property';
+import IndexOnedataProperty from 'harvester-gui-plugin-generic/utils/index-onedata-property';
 
 const exampleBooleanConditionBlock = new ConditionQueryBlock(
   new IndexProperty(new IndexProperty(null, 'a'), 'b'),
@@ -75,6 +76,21 @@ const exampleDateLteConditionQuery = {
   },
 };
 
+const exampleSpaceConditionBlock = new ConditionQueryBlock(
+  new IndexOnedataProperty(null, 'space'),
+  'space.is', {
+    id: 'space1Id',
+    name: 'space1',
+  }
+);
+const exampleSpaceConditionQuery = {
+  term: {
+    '__onedata.spaceId': {
+      value: 'space1Id',
+    },
+  },
+};
+
 const exampleNotOperatorBlock = new SingleSlotQueryBlock('not');
 exampleNotOperatorBlock.slot = exampleBooleanConditionBlock;
 const exampleNotOperatorQuery = {
@@ -103,12 +119,14 @@ const exampleOrOperatorBlock = new MultiSlotQueryBlock('or');
 exampleOrOperatorBlock.slots.pushObjects([
   exampleTextContainsConditionBlock,
   exampleKeywordIsConditionBlock,
+  exampleSpaceConditionBlock,
 ]);
 const exampleOrOperatorQuery = {
   bool: {
     should: [
       exampleTextContainsConditionQuery,
       exampleKeywordIsConditionQuery,
+      exampleSpaceConditionQuery,
     ],
   },
 };
@@ -302,6 +320,16 @@ describe('Unit | Utility | elasticsearch-query-builder', function () {
           });
         }
       );
+    });
+  });
+
+  it('converts space "is" condition', function () {
+    const esQueryBuilder = new ElasticsearchQueryBuilder();
+    esQueryBuilder.rootQueryBlock = exampleSpaceConditionBlock;
+    const result = esQueryBuilder.buildQuery();
+
+    expect(result).to.deep.equal({
+      query: exampleSpaceConditionQuery,
     });
   });
 

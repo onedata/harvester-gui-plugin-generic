@@ -147,6 +147,27 @@ describe('Integration | Component | query-builder/condition-block', function () 
     }
   );
 
+  it(
+    'shows property path, comparator and comparator value for space "is" condition',
+    async function () {
+      this.set('block', new ConditionQueryBlock({ path: 'space' },
+        'space.is', {
+          id: 'space1Id',
+          name: 'space1',
+        }
+      ));
+
+      await render(hbs `<QueryBuilder::ConditionBlock @queryBlock={{this.block}} />`);
+
+      expect(this.element.querySelector('.property-path').textContent.trim())
+        .to.equal('space');
+      expect(this.element.querySelector('.comparator').textContent.trim())
+        .to.equal('is');
+      expect(this.element.querySelector('.comparator-value').textContent.trim())
+        .to.equal('space1');
+    }
+  );
+
   it('yields', async function () {
     this.set('block', new ConditionQueryBlock({ path: 'a.b' }, 'boolean.is', 'false'));
 

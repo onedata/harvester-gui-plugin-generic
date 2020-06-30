@@ -11,6 +11,7 @@ import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builde
 import { typeInSearch, clickTrigger, selectChoose } from 'ember-power-select/test-support/helpers';
 import { setFlatpickrDate } from 'ember-flatpickr/test-support/helpers';
 import moment from 'moment';
+import SpacesProvider from 'harvester-gui-plugin-generic/services/spaces-provider';
 
 const operatorsList = ['and', 'or', 'not'];
 const operatorBlockClasses = {
@@ -41,6 +42,16 @@ describe('Integration | Component | query-builder/block-selector', function () {
   setupRenderingTest();
 
   beforeEach(function () {
+    sinon.stub(SpacesProvider.prototype, 'loadSpaces').callsFake(function () {
+      this.spaces = [{
+        id: 'space1Id',
+        name: 'space1',
+      }, {
+        id: 'space2Id',
+        name: 'space2',
+      }];
+    });
+
     this.set('indexProperties', [{
       path: 'boolProp',
       type: 'boolean',
@@ -56,6 +67,9 @@ describe('Integration | Component | query-builder/block-selector', function () {
     }, {
       path: 'dateProp',
       type: 'date',
+    }, {
+      path: 'space',
+      type: 'space',
     }]);
 
     fakeClock = sinon.useFakeTimers({
@@ -66,6 +80,10 @@ describe('Integration | Component | query-builder/block-selector', function () {
 
   afterEach(function () {
     fakeClock.restore();
+
+    if (SpacesProvider.prototype.loadSpaces.restore) {
+      SpacesProvider.prototype.loadSpaces.restore();
+    }
   });
 
   it('renders three operators: AND, OR and NOT', async function () {
@@ -431,4 +449,63 @@ describe('Integration | Component | query-builder/block-selector', function () {
       }
     );
   });
+
+  it('shows only "is" comparator for space property', async function () {
+    await render(hbs `
+      <QueryBuilder::BlockSelector @indexProperties={{this.indexProperties}}/>
+    `);
+    await selectChoose('.property-selector', 'space');
+    await clickTrigger('.comparator-selector');
+
+    const options = this.element.querySelectorAll('.ember-power-select-option');
+    expect(options).to.have.length(1);
+    expect(options[0].textContent.trim()).to.equal('is');
+    expect(this.element.querySelector(
+      '.comparator-selector .ember-power-select-selected-item'
+    ).textContent.trim()).to.equal('is');
+  });
+
+  it(
+    'shows spaces dropdown for "is" comparator for space property',
+    async function () {
+
+      await render(hbs `
+        <QueryBuilder::BlockSelector @indexProperties={{this.indexProperties}}/>
+      `);
+      await selectChoose('.property-selector', 'space');
+      await clickTrigger('.comparator-value-selector');
+
+      const options = this.element.querySelectorAll('.ember-power-select-option');
+      expect(options).to.have.length(2);
+      expect(options[0].textContent.trim()).to.equal('space1');
+      expect(options[1].textContent.trim()).to.equal('space2');
+      expect(this.element.querySelector(
+        '.comparator-value-selector .ember-power-select-selected-item'
+      ).textContent.trim()).to.equal('space1');
+    }
+  );
+
+  it(
+    'calls "onConditionAdd" callback, when space property "is" condition has been accepted',
+    async function () {
+      const addSpy = this.set('addSpy', sinon.spy());
+
+      await render(hbs `<QueryBuilder::BlockSelector
+        @onConditionAdd={{this.addSpy}}
+        @indexProperties={{this.indexProperties}}
+      />`);
+
+      await selectChoose('.property-selector', 'space');
+      await selectChoose('.comparator-value-selector', 'space2');
+      await click('.accept-condition');
+
+      const blockMatcher = sinon.match.instanceOf(ConditionQueryBlock)
+        .and(sinon.match.hasNested('property.path', 'space'))
+        .and(sinon.match.has('comparator', 'space.is'))
+        .and(sinon.match.hasNested(
+          'comparatorValue',
+          sinon.match({ id: 'space2Id', name: 'space2' })));
+      expect(addSpy).to.be.calledOnce.and.to.be.calledWith(blockMatcher);
+    }
+  );
 });

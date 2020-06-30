@@ -10,6 +10,7 @@ const allowedPropertyTypes = [
   'date',
   'boolean',
   'object',
+  'space',
 ];
 
 export default class QueryBuilderComponent extends Component {

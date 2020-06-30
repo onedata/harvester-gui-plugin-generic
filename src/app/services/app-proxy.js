@@ -13,6 +13,7 @@ import { reads } from '@ember/object/computed';
 import { Promise, resolve } from 'rsvp';
 import { later } from '@ember/runloop';
 import { tracked } from '@glimmer/tracking';
+import ENV from 'harvester-gui-plugin-generic/config/environment';
 
 export default class AppProxyService extends Service {
   /**
@@ -69,6 +70,17 @@ export default class AppProxyService extends Service {
    */
   @reads('appProxy.spacesRequest') spacesRequest;
 
+  _testWindow = {
+    frameElement: {
+      appProxy: {
+        dataRequest: () => resolve({}),
+        dataCurlCommandRequest: () => resolve(''),
+        fileBrowserUrlRequest: () => resolve(''),
+        spacesRequest: () => resolve([]),
+      },
+    },
+  };
+
   constructor() {
     super(...arguments);
 
@@ -81,7 +93,7 @@ export default class AppProxyService extends Service {
    * @returns {Window}
    */
   getWindow() {
-    return window;
+    return ENV.environment === 'test' ? this._testWindow : window;
   }
 
   /**

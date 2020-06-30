@@ -17,8 +17,8 @@
     </ul>
   </div>
   <h1>{{tt this "conditionHeader"}}</h1>
-  <div class="condition-creator form-inline">
-    <div class="form-group form-group-full-line ">
+  <div class="condition-creator">
+    <div class="form-group form-group-full-line">
       <PowerSelect
         @options={{@indexProperties}}
         @selected={{this.selectedConditionProperty}}
@@ -33,80 +33,93 @@
         {{indexProperty.path}}
       </PowerSelect>
     </div>
-    {{#if this.comparators.length}}
-      <div class="form-group">
-        <PowerSelect
-          @options={{this.comparators}}
-          @selected={{this.selectedConditionComparator}}
-          @onChange={{this.conditionComparatorChanged}}
-          @renderInPlace={{true}}
-          class="comparator-selector"
-          as |comparator|
-        >
-          {{tt this (concat "comparators." comparator)}}
-        </PowerSelect>
-      </div>
-    {{/if}}
-    {{#if (eq this.comparatorEditor.type "dropdown")}}
-      <div class="form-group form-group-fill-line">
-        <PowerSelect
-          @options={{this.comparatorEditor.values}}
-          @selected={{this.conditionComparatorValue}}
-          @onChange={{this.conditionComparatorValueChanged}}
-          @renderInPlace={{true}}
-          class="comparator-value-selector"
-          as |value|
-        >
-          {{value}}
-        </PowerSelect>
-      </div>
-    {{else if (eq this.comparatorEditor.type "text")}}
-      <div class="form-group form-group-fill-line">
-        <input
-          type="text"
-          value={{this.conditionComparatorValue}}
-          {{on "input" this.conditionComparatorValueChanged}}
-          class="comparator-value-input form-control form-control-sm"
-        >
-      </div>
-    {{else if (eq this.comparatorEditor.type "date")}}
-      <div class="form-group form-group-fill-line">
-        {{#if this.conditionComparatorValue.timeEnabled}}
-          <EmberFlatpickr
-            @date={{readonly this.conditionComparatorValue.datetime}}
+    <div class="comparator-main-container">
+      {{#if this.comparators.length}}
+        <div class="form-group form-group-no-shrink">
+          <PowerSelect
+            @options={{this.comparators}}
+            @selected={{this.selectedConditionComparator}}
+            @onChange={{this.conditionComparatorChanged}}
+            @renderInPlace={{true}}
+            class="comparator-selector"
+            as |comparator|
+          >
+            {{tt this (concat "comparators." comparator)}}
+          </PowerSelect>
+        </div>
+      {{/if}}
+      {{#if (or
+        (eq this.comparatorEditor.type "dropdown")
+        (eq this.comparatorEditor.type "space")
+      )}}
+        <div class="form-group form-group-fill-line">
+          <PowerSelect
+            @options={{this.comparatorEditor.values}}
+            @selected={{this.conditionComparatorValue}}
             @onChange={{this.conditionComparatorValueChanged}}
-            @static={{true}}
-            @altFormat="Y-m-d H:i:S"
-            @altInput={{true}}
-            @altInputClass="comparator-value-input form-control form-control-sm"
-            @enableTime={{true}}
-            @time_24hr={{true}}
-            @enableSeconds={{true}}
-          />
-        {{else}}
-          <EmberFlatpickr
-            @date={{readonly this.conditionComparatorValue.datetime}}
-            @onChange={{this.conditionComparatorValueChanged}}
-            @static={{true}}
-            @altFormat="Y-m-d"
-            @altInput={{true}}
-            @altInputClass="comparator-value-input form-control form-control-sm"
-          />
-        {{/if}}
-      </div>
-      <div class="form-group form-check form-group-full-line">
-        <input
-          id={{concat guid "-include-time"}}
-          type="checkbox"
-          checked={{this.conditionComparatorValue.timeEnabled}}
-          class="include-time form-check-input"
-          {{on "change" this.conditionComparatorValueChanged}}
-        >
-        <label for={{concat guid "-include-time"}} class="form-check-label">
-          {{tt this "includeTimeInDate"}}
-        </label>
-      </div>
-    {{/if}}
+            @renderInPlace={{true}}
+            class="comparator-value-selector"
+            as |value|
+          >
+            {{#if (eq this.comparatorEditor.type "space")}}
+              {{value.name}}
+            {{else}}
+              {{value}}
+            {{/if}}
+          </PowerSelect>
+        </div>
+      {{else if (eq this.comparatorEditor.type "text")}}
+        <div class="form-group form-group-fill-line">
+          <input
+            type="text"
+            value={{this.conditionComparatorValue}}
+            {{on "input" this.conditionComparatorValueChanged}}
+            class="comparator-value-input form-control form-control-sm"
+          >
+        </div>
+      {{else if (eq this.comparatorEditor.type "date")}}
+        <div class="form-group form-group-fill-line">
+          {{#if this.conditionComparatorValue.timeEnabled}}
+            <EmberFlatpickr
+              @date={{readonly this.conditionComparatorValue.datetime}}
+              @onChange={{this.conditionComparatorValueChanged}}
+              @static={{true}}
+              @altFormat="Y-m-d H:i:S"
+              @altInput={{true}}
+              @altInputClass="comparator-value-input form-control form-control-sm"
+              @enableTime={{true}}
+              @time_24hr={{true}}
+              @enableSeconds={{true}}
+            />
+          {{else}}
+            <EmberFlatpickr
+              @date={{readonly this.conditionComparatorValue.datetime}}
+              @onChange={{this.conditionComparatorValueChanged}}
+              @static={{true}}
+              @altFormat="Y-m-d"
+              @altInput={{true}}
+              @altInputClass="comparator-value-input form-control form-control-sm"
+            />
+          {{/if}}
+        </div>
+      {{/if}}
+    </div>
+    <div class="comparator-additional-container">
+      {{#if (eq this.comparatorEditor.type "date")}}
+        <div class="form-group form-check form-group-full-line">
+          <input
+            id={{concat guid "-include-time"}}
+            type="checkbox"
+            checked={{this.conditionComparatorValue.timeEnabled}}
+            class="include-time form-check-input"
+            {{on "change" this.conditionComparatorValueChanged}}
+          >
+          <label for={{concat guid "-include-time"}} class="form-check-label">
+            {{tt this "includeTimeInDate"}}
+          </label>
+        </div>
+      {{/if}}
+    </div>
     <div class="form-group-full-line">
       <BsButton
         class="accept-condition"

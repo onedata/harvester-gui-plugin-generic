@@ -59,8 +59,8 @@ describe('Integration | Component | query-builder', function () {
     await clickTrigger('.property-selector');
 
     const options = this.element.querySelectorAll('.ember-power-select-option');
-    expect(options).to.have.length(3);
-    ['a.b', 'c', 'c.d'].forEach((propertyPath, index) =>
+    expect(options).to.have.length(4);
+    ['a.b', 'c', 'c.d', 'space'].forEach((propertyPath, index) =>
       expect(options[index].textContent.trim()).to.equal(propertyPath)
     );
   });

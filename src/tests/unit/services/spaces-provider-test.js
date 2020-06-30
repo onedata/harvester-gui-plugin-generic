@@ -92,7 +92,7 @@ describe('Unit | Service | spaces-provider', function () {
         method: 'post',
         indexName: 'generic-index',
         path: '_search',
-        body: '{"size":0,"aggs":{"spaceIds":{"terms":{"field":"__onedata.spaceId","size":10000}}}}',
+        body: '{"size":0,"aggs":{"spaceIds":{"terms":{"field":"__onedata.spaceId.keyword","size":10000}}}}',
       });
     });
   });

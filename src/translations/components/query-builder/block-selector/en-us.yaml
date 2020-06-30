@@ -24,5 +24,7 @@ comparators:
     lte: '≤'
     gt: '&gt;'
     gte: '≥'
+  space:
+    is: 'is'
 includeTimeInDate: 'Include time'
 acceptCondition: 'Add'

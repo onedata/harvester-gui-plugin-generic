@@ -37,13 +37,6 @@ describe('Unit | Service | app-proxy', function () {
     }
   });
 
-  it('returns window global object on getWindow() call', function () {
-    const service = this.owner.lookup('service:app-proxy');
-    service.getWindow.restore();
-
-    expect(service.getWindow()).to.equal(window);
-  });
-
   it('loads parent application appProxy on init', function () {
     const service = this.owner.lookup('service:app-proxy');
     expect(service.appProxy).to.equal(this.get('appProxy'));

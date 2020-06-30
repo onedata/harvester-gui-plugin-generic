@@ -2,6 +2,7 @@ import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import Index from 'harvester-gui-plugin-generic/utils/index';
 import IndexProperty from 'harvester-gui-plugin-generic/utils/index-property';
+import IndexOnedataProperty from 'harvester-gui-plugin-generic/utils/index-onedata-property';
 
 describe('Unit | Utility | index', function () {
   beforeEach(function () {
@@ -19,15 +20,34 @@ describe('Unit | Utility | index', function () {
               },
             },
           },
+          __onedata: {
+            spaceId: {
+              type: 'text',
+              fields: {
+                keyword: {
+                  type: 'keyword',
+                },
+              },
+            },
+            incorrectOnedataProperty: {
+              type: 'object',
+            },
+          },
         },
       },
     };
   });
 
-  it('it extracts properties', function () {
+  it('persists raw mapping in "rawMapping" field', function () {
     const index = new Index(Object.freeze(this.rawMapping));
 
-    expect(Object.keys(index.properties)).to.have.length(2);
+    expect(index.rawMapping).to.deep.equal(this.rawMapping);
+  });
+
+  it('extracts properties', function () {
+    const index = new Index(Object.freeze(this.rawMapping));
+
+    expect(Object.keys(index.properties)).to.have.length(3);
     expect(index.properties.a).to.be.an.instanceOf(IndexProperty)
       .and.to.deep.include({
         name: 'a',
@@ -38,8 +58,16 @@ describe('Unit | Utility | index', function () {
         name: 'b',
         rawMapping: this.rawMapping.mappings.properties.b,
       });
+    expect(index.properties['__onedata.space'])
+      .to.be.an.instanceOf(IndexOnedataProperty)
+      .and.to.deep.include({
+        name: '__onedata.space',
+        type: 'space',
+      });
     expect(Object.keys(index.properties.a.properties)).to.have.length(0);
     expect(Object.keys(index.properties.b.properties)).to.have.length(1);
+    expect(Object.keys(index.properties['__onedata.space'].properties))
+      .to.have.length(0);
     expect(index.properties.b.properties.ba).to.be.an.instanceOf(IndexProperty)
       .and.to.deep.include({
         name: 'ba',
@@ -53,11 +81,12 @@ describe('Unit | Utility | index', function () {
       const index = new Index(Object.freeze(this.rawMapping));
 
       const flattened = index.getFlattenedProperties();
-      expect(flattened).to.have.length(3);
+      expect(flattened).to.have.length(4);
       [
         'a',
         'b',
         'b.ba',
+        'space',
       ].forEach((propertyPath, index) => {
         const flattenedProperty = flattened[index];
         expect(flattenedProperty).to.be.an.instanceOf(IndexProperty);

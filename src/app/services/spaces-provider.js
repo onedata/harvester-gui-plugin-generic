@@ -42,7 +42,7 @@ export default class SpacesProviderService extends Service {
       aggs: {
         spaceIds: {
           terms: {
-            field: '__onedata.spaceId',
+            field: '__onedata.spaceId.keyword',
             size: 10000,
           },
         },

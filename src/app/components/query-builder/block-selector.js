@@ -1,5 +1,6 @@
 import Component from '@glimmer/component';
-import { action, get } from '@ember/object';
+import { action, get, set } from '@ember/object';
+import { inject as service } from '@ember/service';
 import { guidFor } from '@ember/object/internals';
 import { tracked } from '@glimmer/tracking';
 import moment from 'moment';
@@ -13,6 +14,7 @@ const defaultComparators = {
   number: ['number.eq', 'number.lt', 'number.lte', 'number.gt', 'number.gte'],
   keyword: ['keyword.is'],
   date: ['date.eq', 'date.lt', 'date.lte', 'date.gt', 'date.gte'],
+  space: ['space.is'],
 };
 
 const booleanEditor = {
@@ -59,6 +61,16 @@ const dateEditor = {
   },
 };
 
+const spaceEditor = {
+  type: 'space',
+  values: [],
+  defaultValue: () => spaceEditor.values[0],
+  isValidValue(value) {
+    // looks like a space
+    return value && value.id && value.name;
+  },
+};
+
 const defaultComparatorEditors = {
   'boolean.is': booleanEditor,
   'text.contains': textContainsEditor,
@@ -73,9 +85,12 @@ const defaultComparatorEditors = {
   'date.lte': dateEditor,
   'date.gt': dateEditor,
   'date.gte': dateEditor,
+  'space.is': spaceEditor,
 };
 
 export default class QueryBuilderBlockSelectorComponent extends Component {
+  @service spacesProvider;
+
   intlPrefix = 'components.query-builder.block-selector';
   @tracked selectedConditionProperty;
   @tracked selectedConditionComparator;
@@ -95,6 +110,17 @@ export default class QueryBuilderBlockSelectorComponent extends Component {
 
   get comparatorEditor() {
     return this.comparatorEditorsSet[this.selectedConditionComparator];
+  }
+
+  constructor() {
+    super(...arguments);
+
+    // setup list of spaces for space.is editor
+    const spaceEditor = this.comparatorEditorsSet['space.is'];
+    if (spaceEditor && spaceEditor.type === 'space') {
+      // `set` because this.comparatorEditorsSet is tracked
+      set(spaceEditor, 'values', this.spacesProvider.spaces);
+    }
   }
 
   @action
