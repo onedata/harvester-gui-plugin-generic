@@ -1,0 +1,58 @@
+<div class="input-group">
+  <div class="input-group-prepend">
+    <button
+      {{on "click" this.goToFirstPage}}
+      class="btn btn-outline-secondary first-page"
+      type="button"
+      disabled={{this.isOnFirstPage}}
+    >
+      <FaIcon @icon="angle-double-left"/>
+    </button>
+    <button
+      {{on "click" this.goToPrevPage}}
+      class="btn btn-outline-secondary prev-page"
+      type="button"
+      disabled={{this.isOnFirstPage}}
+    >
+      <FaIcon @icon="angle-left"/>
+    </button>
+  </div>
+  <div class="form-control">
+    <input
+      type="text"
+      class="active-page-number"
+      value={{this.activePageNumber}}
+      {{on "keydown" (invoke-on-enter this.goToSpecificPage)}}
+    >
+    <span class="pages-count">{{this.pagesCount}}</span>
+  </div>
+  <div class="input-group-append">
+    <button
+      {{on "click" this.goToNextPage}}
+      class="btn btn-outline-secondary next-page"
+      type="button"
+      disabled={{this.isOnLastPage}}
+    >
+      <FaIcon @icon="angle-right"/>
+    </button>
+    <button
+      {{on "click" this.goToLastPage}}
+      class="btn btn-outline-secondary last-page"
+      type="button"
+      disabled={{this.isOnLastPage}}
+    >
+      <FaIcon @icon="angle-double-right"/>
+    </button>
+  </div>
+</div>
+<PowerSelect
+  @options={{array 10 25 50 100}}
+  @selected={{this.pageSize}}
+  @onChange={{this.pageSizeChange}}
+  @renderInPlace={{true}}
+  class="page-size-selector"
+  as |pageSize|
+>
+  {{pageSize}}
+</PowerSelect>
+{{yield}}

@@ -16,7 +16,7 @@ function _invoke(action, event) {
   const keyCode = event.keyCode;
   if (keyCode === 13 && typeof action === 'function') {
     event.stopPropagation();
-    return action();
+    return action(event);
   }
 }
 
