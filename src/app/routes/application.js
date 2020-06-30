@@ -9,10 +9,12 @@
 
 import Route from '@ember/routing/route';
 import { inject as service } from '@ember/service';
+import { all as allFulfilled } from 'rsvp';
 
 export default class ApplicationRoute extends Route {
   @service appProxy;
   @service configuration;
+  @service spacesProvider;
 
   /**
    * @override
@@ -21,7 +23,10 @@ export default class ApplicationRoute extends Route {
     const result = super.beforeModel(...arguments);
 
     return this.appProxy.appProxyLoadingPromise
-      .then(() => this.configuration.reloadConfiguration())
+      .then(() => allFulfilled([
+        this.configuration.reloadConfiguration(),
+        this.spacesProvider.spacesLoadingPromise,
+      ]))
       .then(() => result);
   }
 }

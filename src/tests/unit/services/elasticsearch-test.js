@@ -33,12 +33,12 @@ describe('Unit | Service | elasticsearch', function () {
     const service = this.owner.lookup('service:elasticsearch');
     const dataRequestStub = this.get('dataRequestStub');
 
-    return service.fetch('someIndex', '_test')
+    return service.fetch('_test')
       .then(result => {
         expect(result).to.equal('result');
         expect(dataRequestStub).to.be.calledWith(sinon.match({
           method: 'get',
-          indexName: 'someIndex',
+          indexName: 'generic-index',
           path: '_test',
           body: undefined,
         }));
@@ -50,12 +50,12 @@ describe('Unit | Service | elasticsearch', function () {
     const service = this.owner.lookup('service:elasticsearch');
     const dataRequestStub = this.get('dataRequestStub');
 
-    return service.post('someIndex', '_test', { a: 'b' })
+    return service.post('_test', { a: 'b' })
       .then(result => {
         expect(result).to.equal('result');
         expect(dataRequestStub).to.be.calledWith(sinon.match({
           method: 'post',
-          indexName: 'someIndex',
+          indexName: 'generic-index',
           path: '_test',
           body: '{"a":"b"}',
         }));
@@ -67,12 +67,12 @@ describe('Unit | Service | elasticsearch', function () {
     const service = this.owner.lookup('service:elasticsearch');
     const dataRequestStub = this.get('dataRequestStub');
 
-    return service.search('someIndex', { a: 'b' })
+    return service.search({ a: 'b' })
       .then(result => {
         expect(result).to.equal('result');
         expect(dataRequestStub).to.be.calledWith(sinon.match({
           method: 'post',
-          indexName: 'someIndex',
+          indexName: 'generic-index',
           path: '_search',
           body: '{"a":"b"}',
         }));
@@ -84,12 +84,12 @@ describe('Unit | Service | elasticsearch', function () {
     const service = this.owner.lookup('service:elasticsearch');
     const dataRequestStub = this.get('dataRequestStub');
 
-    return service.getMapping('someIndex')
+    return service.getMapping()
       .then(result => {
         expect(result).to.equal('result');
         expect(dataRequestStub).to.be.calledWith(sinon.match({
           method: 'get',
-          indexName: 'someIndex',
+          indexName: 'generic-index',
           path: '_mapping',
           body: undefined,
         }));
@@ -101,12 +101,12 @@ describe('Unit | Service | elasticsearch', function () {
     const service = this.owner.lookup('service:elasticsearch');
     const dataCurlCommandRequestStub = this.get('dataCurlCommandRequestStub');
 
-    return service.getPostCurl('someIndex', '_test', { a: 'b' })
+    return service.getPostCurl('_test', { a: 'b' })
       .then(result => {
         expect(result).to.equal('curl');
         expect(dataCurlCommandRequestStub).to.be.calledWith(sinon.match({
           method: 'post',
-          indexName: 'someIndex',
+          indexName: 'generic-index',
           path: '_test',
           body: '{"a":"b"}',
         }));
@@ -118,12 +118,12 @@ describe('Unit | Service | elasticsearch', function () {
     const service = this.owner.lookup('service:elasticsearch');
     const dataCurlCommandRequestStub = this.get('dataCurlCommandRequestStub');
 
-    return service.getSearchCurl('someIndex', { a: 'b' })
+    return service.getSearchCurl({ a: 'b' })
       .then(result => {
         expect(result).to.equal('curl');
         expect(dataCurlCommandRequestStub).to.be.calledWith(sinon.match({
           method: 'post',
-          indexName: 'someIndex',
+          indexName: 'generic-index',
           path: '_search',
           body: '{"a":"b"}',
         }));

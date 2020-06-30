@@ -16,7 +16,7 @@ export default class ContentIndexComponent extends Component {
 
   constructor() {
     super(...arguments);
-    this.elasticsearch.getMapping('generic-index')
+    this.elasticsearch.getMapping()
       .then(response => {
         trySet(this, 'index', new Index(Object.values(response)[0]));
         return this.performQuery();
@@ -27,15 +27,13 @@ export default class ContentIndexComponent extends Component {
   performQuery(rootBlock) {
     const queryBuilder = new ElasticsearchQueryBuilder();
     queryBuilder.rootQueryBlock = rootBlock && rootBlock.slot;
-    this.elasticsearch.search(
-      'generic-index',
-      queryBuilder.buildQuery()
-    ).then(results => trySet(this, 'queryResults', this.parseQueryResults(results)));
+    this.elasticsearch.search(queryBuilder.buildQuery())
+      .then(results => trySet(this, 'queryResults', this.parseQueryResults(results)));
   }
 
   @action
   getQueryCurl() {
-    return this.elasticsearch.getSearchCurl('generic-index', ...arguments);
+    return this.elasticsearch.getSearchCurl(...arguments);
   }
 
   @action

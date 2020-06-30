@@ -13,6 +13,7 @@ describe('Unit | Service | app-proxy', function () {
       dataCurlCommandRequest: () => {},
       configRequest: () => {},
       fileBrowserUrlRequest: () => {},
+      spacesRequest: () => {},
     };
     const windowMock = {
       frameElement: {
@@ -53,6 +54,7 @@ describe('Unit | Service | app-proxy', function () {
     'dataCurlCommandRequest',
     'configRequest',
     'fileBrowserUrlRequest',
+    'spacesRequest',
   ].forEach(injectedPropName => {
     it(
       `loads ${injectedPropName} from appProxy to the ${injectedPropName} field`,

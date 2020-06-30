@@ -15,16 +15,15 @@ export default class ElasticsearchService extends Service {
   /**
    * Performs request to Elasticsearch.
    * @param {String} method one of `get`, `post`
-   * @param {String} indexName
    * @param {String} path url (without host and index)
    * @param {any} body request body
    * @returns {Promise<any>} request result
    */
-  request(method, indexName, path, body) {
+  request(method, path, body) {
     const dataRequest = this.get('appProxy.dataRequest');
     return dataRequest({
       method,
-      indexName,
+      indexName: 'generic-index',
       path,
       body: JSON.stringify(body),
     });
@@ -33,57 +32,52 @@ export default class ElasticsearchService extends Service {
   /**
    * Makes a GET request
    * `fetch` because `get` is an Ember reserved function name
-   * @param {String} indexName
    * @param {String} path
    * @returns {Promise<any>}
    */
-  fetch(indexName, path) {
-    return this.request('get', indexName, path);
+  fetch(path) {
+    return this.request('get', path);
   }
 
   /**
    * Makes a POST request
-   * @param {String} indexName
    * @param {String} path
    * @param {any} body
    * @returns {Promise<any>}
    */
-  post(indexName, path, body) {
-    return this.request('post', indexName, path, body);
+  post(path, body) {
+    return this.request('post', path, body);
   }
 
   /**
    * Makes a _search POST request to the index
-   * @param {String} indexName
    * @param {any} body
    * @returns {Promise<any>}
    */
-  search(indexName, body) {
-    return this.post(indexName, '_search', body);
+  search(body) {
+    return this.post('_search', body);
   }
 
   /**
    * Makes a _mapping GET request to the index
-   * @param {String} indexName
    * @returns {Promise<any>}
    */
-  getMapping(indexName) {
-    return this.fetch(indexName, '_mapping');
+  getMapping() {
+    return this.fetch('_mapping');
   }
 
   /**
    * Generates CURL command equivalent to the request to Elasticsearch.
    * @param {String} method one of `get`, `post`
-   * @param {String} indexName
    * @param {String} path url (without host and index)
    * @param {any} body request body
    * @returns {Promise<String>} CURL command
    */
-  requestCurl(method, indexName, path, body) {
+  requestCurl(method, path, body) {
     const dataCurlCommandRequest = this.get('appProxy.dataCurlCommandRequest');
     return dataCurlCommandRequest({
       method,
-      indexName,
+      indexName: 'generic-index',
       path,
       body: JSON.stringify(body),
     });
@@ -91,22 +85,20 @@ export default class ElasticsearchService extends Service {
 
   /**
    * Generates a CURL POST request to the index
-   * @param {String} indexName
    * @param {String} path
    * @param {any} body
    * @returns {Promise<String>}
    */
-  getPostCurl(indexName, path, body) {
-    return this.requestCurl('post', indexName, path, body);
+  getPostCurl(path, body) {
+    return this.requestCurl('post', path, body);
   }
 
   /**
    * Generates a CURL _search POST request to the index
-   * @param {String} indexName
    * @param {any} body
    * @returns {Promise<String>}
    */
-  getSearchCurl(indexName, body) {
-    return this.getPostCurl(indexName, '_search', body);
+  getSearchCurl(body) {
+    return this.getPostCurl('_search', body);
   }
 }

@@ -62,6 +62,13 @@ export default class AppProxyService extends Service {
    */
   @reads('appProxy.fileBrowserUrlRequest') fileBrowserUrlRequest;
 
+  /**
+   * Fetches harvester spaces
+   * @type {Function}
+   * @returns {Promise<Array<{ id: String, name: String }>>}
+   */
+  @reads('appProxy.spacesRequest') spacesRequest;
+
   constructor() {
     super(...arguments);
 
