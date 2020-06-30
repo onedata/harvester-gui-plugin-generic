@@ -6,6 +6,18 @@ export default class QueryResultsComponent extends Component {
   @tracked
   filteredProperties = {};
 
+  get activePageNumber() {
+    return this.args.activePageNumber || 1;
+  }
+
+  get pageSize() {
+    return this.args.pageSize || 10;
+  }
+
+  get onPageChange() {
+    return this.args.onPageChange || (() => {});
+  }
+
   @action
   filteredPropertiesChanged(filteredProperties) {
     this.filteredProperties = filteredProperties;

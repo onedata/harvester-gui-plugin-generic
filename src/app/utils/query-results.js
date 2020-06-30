@@ -5,6 +5,7 @@ import _ from 'lodash';
 export default class QueryResults {
   rawResultsObject = undefined;
   results = [];
+  totalResultsCount = 0;
   parseHelpers = {};
 
   constructor(rawResultsObject, parseHelpers) {
@@ -17,8 +18,11 @@ export default class QueryResults {
   }
 
   recalculateFields() {
-    this.results = (get(this.rawResultsObject || {}, 'hits.hits') || [])
+    const rawResultsObject = this.rawResultsObject || {};
+    this.results = (get(rawResultsObject, 'hits.hits') || [])
       .map(hit => new QueryResult(hit, this.parseHelpers));
+    this.totalResultsCount = get(rawResultsObject, 'hits.total.value') ||
+      this.results.length;
   }
 
   getPropertiesTree() {

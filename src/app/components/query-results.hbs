@@ -4,6 +4,12 @@
     @onSelectionChange={{this.filteredPropertiesChanged}}
   />
   {{#if @queryResults.results}}
+    <QueryResults::Pagination
+      @resultsCount={{@queryResults.totalResultsCount}}
+      @activePageNumber={{this.activePageNumber}}
+      @pageSize={{this.pageSize}}
+      @onPageChange={{this.onPageChange}}
+    />
     <ul class="results-list">
       {{#each @queryResults.results as |queryResult|}}
         <QueryResults::Result
@@ -12,6 +18,12 @@
         />
       {{/each}}
     </ul>
+    <QueryResults::Pagination
+      @resultsCount={{@queryResults.totalResultsCount}}
+      @activePageNumber={{this.activePageNumber}}
+      @pageSize={{this.pageSize}}
+      @onPageChange={{this.onPageChange}}
+    />
   {{/if}}
 </div>
 {{yield}}

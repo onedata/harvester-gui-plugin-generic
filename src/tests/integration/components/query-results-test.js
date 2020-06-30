@@ -14,6 +14,9 @@ describe('Integration | Component | query-results', function () {
   beforeEach(function () {
     this.set('queryResults', new QueryResults({
       hits: {
+        total: {
+          value: 2,
+        },
         hits: [{
           _source: {
             a: {
@@ -113,5 +116,98 @@ describe('Integration | Component | query-results', function () {
         f: {},
       },
     });
+  });
+
+  it('has no pagination controls when query results are empty', async function () {
+    this.set('queryResults', new QueryResults({
+      hits: {
+        hits: [],
+      },
+    }));
+
+    await render(hbs `<QueryResults @queryResults={{this.queryResults}}/>`);
+
+    expect(this.element.querySelector('.query-results-pagination')).to.not.exist;
+  });
+
+  it('has two pagination controls when query results are not empty', async function () {
+    await render(hbs `<QueryResults @queryResults={{this.queryResults}}/>`);
+
+    expect(this.element.querySelectorAll('.query-results-pagination')).to.have.length(2);
+  });
+
+  ['top', 'bottom'].forEach((paginationPosition, index) => {
+    it(
+      `has page set to a value passed on init (${paginationPosition} pagination control)`,
+      async function () {
+        await render(hbs `<QueryResults
+          @queryResults={{this.queryResults}}
+          @activePageNumber={{5}}
+        />`);
+
+        const activePageInput = this.element
+          .querySelectorAll('.query-results-pagination .active-page-number')[index];
+        expect(activePageInput).to.have.value('5');
+      }
+    );
+
+    it(
+      `has page size set to a value passed on init (${paginationPosition} pagination control)`,
+      async function () {
+        await render(hbs `<QueryResults
+          @queryResults={{this.queryResults}}
+          @pageSize={{25}}
+        />`);
+
+        const pageSize = this.element.querySelectorAll(
+          '.query-results-pagination .page-size-selector .ember-power-select-selected-item'
+        )[index];
+        expect(pageSize.textContent.trim()).to.equal('25');
+      }
+    );
+
+    it(
+      `shows correct number of pages for a small results set (${paginationPosition} pagination control)`,
+      async function () {
+        await render(hbs `<QueryResults @queryResults={{this.queryResults}}/>`);
+
+        const pagesCount = this.element.querySelectorAll(
+          '.query-results-pagination .pages-count'
+        )[index];
+        expect(pagesCount.textContent.trim()).to.equal('1');
+      }
+    );
+
+    it(
+      `shows correct number of pages for a large results set (${paginationPosition} pagination control)`,
+      async function () {
+        this.get('queryResults').totalResultsCount = 50;
+        await render(hbs `<QueryResults @queryResults={{this.queryResults}}/>`);
+
+        const pagesCount = this.element.querySelectorAll(
+          '.query-results-pagination .pages-count'
+        )[index];
+        expect(pagesCount.textContent.trim()).to.equal('5');
+      }
+    );
+
+    it(
+      `notifies about page change (${paginationPosition} pagination control)`,
+      async function () {
+        this.get('queryResults').totalResultsCount = 50;
+        const changeSpy = this.set('changeSpy', sinon.spy());
+
+        await render(hbs `<QueryResults
+          @queryResults={{this.queryResults}}
+          @onPageChange={{this.changeSpy}}
+        />`);
+        const nextBtn = this.element.querySelectorAll(
+          '.query-results-pagination .next-page'
+        )[index];
+        await click(nextBtn);
+
+        expect(changeSpy).to.be.calledOnce.and.to.be.calledWith(2);
+      }
+    );
   });
 });
