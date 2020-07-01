@@ -1,16 +1,20 @@
 <div class="query-results">
-  <QueryResults::FilteredPropertiesSelector
-    @queryResults={{@queryResults}}
-    @onSelectionChange={{this.filteredPropertiesChanged}}
-  />
-  {{#if @queryResults.results}}
-    <QueryResults::Pagination
-      @resultsCount={{@queryResults.totalResultsCount}}
-      @activePageNumber={{this.activePageNumber}}
-      @pageSize={{this.pageSize}}
-      @onPageChange={{this.onPageChange}}
-      @onPageSizeChange={{this.onPageSizeChange}}
+  <div class="results-header">
+    <QueryResults::FilteredPropertiesSelector
+      @queryResults={{@queryResults}}
+      @onSelectionChange={{this.filteredPropertiesChanged}}
     />
+    {{#if @queryResults.results}}
+      <QueryResults::Pagination
+        @resultsCount={{@queryResults.totalResultsCount}}
+        @activePageNumber={{this.activePageNumber}}
+        @pageSize={{this.pageSize}}
+        @onPageChange={{this.onPageChange}}
+        @onPageSizeChange={{this.onPageSizeChange}}
+      />
+    {{/if}}
+  </div>
+  {{#if @queryResults.results}}
     <ul class="results-list">
       {{#each @queryResults.results as |queryResult|}}
         <QueryResults::Result

@@ -1,0 +1,32 @@
+.query-results-pagination {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+
+  .btn {
+    border: 0;
+  }
+
+  .pages-counter-container {
+    align-items: center;
+    display: flex;
+    border: 0;
+  }
+
+  .active-page-number {
+    width: 3em;
+    margin-right: $spacer * 0.5;
+    border: 1px solid $input-border-color;
+    border-radius: $input-border-radius;
+    text-align: center;
+  }
+
+  .pages-count {
+    margin-left: $spacer * 0.5;
+  }
+
+  .page-size-selector {
+    margin: 0 $spacer * 0.5;
+    flex-shrink: 0;
+  }
+}
