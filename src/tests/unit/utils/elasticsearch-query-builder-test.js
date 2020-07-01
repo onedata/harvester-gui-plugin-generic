@@ -6,6 +6,7 @@ import MultiSlotQueryBlock from 'harvester-gui-plugin-generic/utils/query-builde
 import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/condition-query-block';
 import IndexProperty from 'harvester-gui-plugin-generic/utils/index-property';
 import IndexOnedataProperty from 'harvester-gui-plugin-generic/utils/index-onedata-property';
+import IndexAnyProperty from 'harvester-gui-plugin-generic/utils/index-any-property';
 
 const exampleBooleanConditionBlock = new ConditionQueryBlock(
   new IndexProperty(new IndexProperty(null, 'a'), 'b'),
@@ -91,6 +92,19 @@ const exampleSpaceConditionQuery = {
   },
 };
 
+const exampleAnyPropertyConditionBlock = new ConditionQueryBlock(
+  new IndexAnyProperty(),
+  'anyProperty.hasPhrase',
+  'abc def'
+);
+const exampleAnyPropertyConditionQuery = {
+  multi_match: {
+    query: 'abc def',
+    type: 'phrase',
+    fields: ['*', '__onedata.*'],
+  },
+};
+
 const exampleNotOperatorBlock = new SingleSlotQueryBlock('not');
 exampleNotOperatorBlock.slot = exampleBooleanConditionBlock;
 const exampleNotOperatorQuery = {
@@ -104,6 +118,7 @@ exampleAndOperatorBlock.slots.pushObjects([
   exampleBooleanConditionBlock,
   exampleNumberEqualsConditionBlock,
   exampleDateLteConditionBlock,
+  exampleAnyPropertyConditionBlock,
 ]);
 const exampleAndOperatorQuery = {
   bool: {
@@ -111,6 +126,7 @@ const exampleAndOperatorQuery = {
       exampleBooleanConditionQuery,
       exampleNumberEqualsConditionQuery,
       exampleDateLteConditionQuery,
+      exampleAnyPropertyConditionQuery,
     ],
   },
 };
@@ -331,6 +347,14 @@ describe('Unit | Utility | elasticsearch-query-builder', function () {
     const result = esQueryBuilder.buildQuery();
 
     expect(result).to.deep.equal(fullQuery(exampleSpaceConditionQuery));
+  });
+
+  it('converts anyProperty "hasPhrase" condition', function () {
+    const esQueryBuilder = new ElasticsearchQueryBuilder();
+    esQueryBuilder.rootQueryBlock = exampleAnyPropertyConditionBlock;
+    const result = esQueryBuilder.buildQuery();
+
+    expect(result).to.deep.equal(fullQuery(exampleAnyPropertyConditionQuery));
   });
 
   it('converts NOT operator', function () {

@@ -67,6 +67,8 @@ export default class ElasticsearchQueryBuilder {
           return this.convertDateRangeCondition(block);
         case 'space.is':
           return this.convertSpaceCondition(block);
+        case 'anyProperty.hasPhrase':
+          return this.convertAnyPropertyCondition(block);
         default:
           return undefined;
       }
@@ -178,6 +180,16 @@ export default class ElasticsearchQueryBuilder {
         '__onedata.spaceId': {
           value: conditionBlock.comparatorValue.id,
         },
+      },
+    };
+  }
+
+  convertAnyPropertyCondition(conditionBlock) {
+    return {
+      multi_match: {
+        query: conditionBlock.comparatorValue,
+        type: 'phrase',
+        fields: ['*', '__onedata.*'],
       },
     };
   }

@@ -168,6 +168,25 @@ describe('Integration | Component | query-builder/condition-block', function () 
     }
   );
 
+  it(
+    'shows property path, comparator and comparator value for anyProperty "hasPhrase" condition',
+    async function () {
+      this.set('block', new ConditionQueryBlock({ path: 'any property' },
+        'anyProperty.hasPhrase',
+        'abc def'
+      ));
+
+      await render(hbs `<QueryBuilder::ConditionBlock @queryBlock={{this.block}} />`);
+
+      expect(this.element.querySelector('.property-path').textContent.trim())
+        .to.equal('any property');
+      expect(this.element.querySelector('.comparator').textContent.trim())
+        .to.equal('has phrase');
+      expect(this.element.querySelector('.comparator-value').textContent.trim())
+        .to.equal('abc def');
+    }
+  );
+
   it('yields', async function () {
     this.set('block', new ConditionQueryBlock({ path: 'a.b' }, 'boolean.is', 'false'));
 

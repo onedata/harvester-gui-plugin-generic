@@ -70,6 +70,9 @@ describe('Integration | Component | query-builder/block-selector', function () {
     }, {
       path: 'space',
       type: 'space',
+    }, {
+      path: 'any property',
+      type: 'anyProperty',
     }]);
 
     fakeClock = sinon.useFakeTimers({
@@ -505,6 +508,56 @@ describe('Integration | Component | query-builder/block-selector', function () {
         .and(sinon.match.hasNested(
           'comparatorValue',
           sinon.match({ id: 'space2Id', name: 'space2' })));
+      expect(addSpy).to.be.calledOnce.and.to.be.calledWith(blockMatcher);
+    }
+  );
+
+  it('shows only "is" comparator for space property', async function () {
+    await render(hbs `
+      <QueryBuilder::BlockSelector @indexProperties={{this.indexProperties}}/>
+    `);
+    await selectChoose('.property-selector', 'any property');
+    await clickTrigger('.comparator-selector');
+
+    const options = this.element.querySelectorAll('.ember-power-select-option');
+    expect(options).to.have.length(1);
+    expect(options[0].textContent.trim()).to.equal('has phrase');
+    expect(this.element.querySelector(
+      '.comparator-selector .ember-power-select-selected-item'
+    ).textContent.trim()).to.equal('has phrase');
+  });
+
+  it(
+    'shows text input for "hasPhrase" comparator for anyProperty property',
+    async function () {
+      await render(hbs `
+        <QueryBuilder::BlockSelector @indexProperties={{this.indexProperties}}/>
+      `);
+      await selectChoose('.property-selector', 'any property');
+
+      expect(this.element.querySelector('input[type="text"].comparator-value-input'))
+        .to.exist;
+    }
+  );
+
+  it(
+    'calls "onConditionAdd" callback, when anyProperty property "hasPhrase" condition has been accepted',
+    async function () {
+      const addSpy = this.set('addSpy', sinon.spy());
+
+      await render(hbs `<QueryBuilder::BlockSelector
+        @onConditionAdd={{this.addSpy}}
+        @indexProperties={{this.indexProperties}}
+      />`);
+
+      await selectChoose('.property-selector', 'any property');
+      await fillIn('.comparator-value-input', 'abc def');
+      await click('.accept-condition');
+
+      const blockMatcher = sinon.match.instanceOf(ConditionQueryBlock)
+        .and(sinon.match.hasNested('property.path', 'any property'))
+        .and(sinon.match.has('comparator', 'anyProperty.hasPhrase'))
+        .and(sinon.match.hasNested('comparatorValue', 'abc def'));
       expect(addSpy).to.be.calledOnce.and.to.be.calledWith(blockMatcher);
     }
   );

@@ -15,6 +15,7 @@ const defaultComparators = {
   keyword: ['keyword.is'],
   date: ['date.eq', 'date.lt', 'date.lte', 'date.gt', 'date.gte'],
   space: ['space.is'],
+  anyProperty: ['anyProperty.hasPhrase'],
 };
 
 const booleanEditor = {
@@ -26,7 +27,7 @@ const booleanEditor = {
   },
 };
 
-const textContainsEditor = {
+const textEditor = {
   type: 'text',
   defaultValue: () => '',
   isValidValue(value) {
@@ -39,14 +40,6 @@ const numberBasicEditor = {
   defaultValue: () => '',
   isValidValue(value) {
     return typeof value === 'string' && !isNaN(parseFloat(value));
-  },
-};
-
-const keywordIsEditor = {
-  type: 'text',
-  defaultValue: () => '',
-  isValidValue(value) {
-    return typeof value === 'string';
   },
 };
 
@@ -73,19 +66,20 @@ const spaceEditor = {
 
 const defaultComparatorEditors = {
   'boolean.is': booleanEditor,
-  'text.contains': textContainsEditor,
+  'text.contains': textEditor,
   'number.eq': numberBasicEditor,
   'number.lt': numberBasicEditor,
   'number.lte': numberBasicEditor,
   'number.gt': numberBasicEditor,
   'number.gte': numberBasicEditor,
-  'keyword.is': keywordIsEditor,
+  'keyword.is': textEditor,
   'date.eq': dateEditor,
   'date.lt': dateEditor,
   'date.lte': dateEditor,
   'date.gt': dateEditor,
   'date.gte': dateEditor,
   'space.is': spaceEditor,
+  'anyProperty.hasPhrase': textEditor,
 };
 
 export default class QueryBuilderBlockSelectorComponent extends Component {

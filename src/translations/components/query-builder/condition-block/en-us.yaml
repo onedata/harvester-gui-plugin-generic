@@ -19,3 +19,5 @@ comparators:
     gte: '≥'
   space:
     is: 'is'
+  anyProperty:
+    hasPhrase: 'has phrase'

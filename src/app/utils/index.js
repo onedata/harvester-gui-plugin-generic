@@ -2,6 +2,7 @@ import IndexPropertyCollection from 'harvester-gui-plugin-generic/utils/index-pr
 import { get } from '@ember/object';
 import IndexProperty from 'harvester-gui-plugin-generic/utils/index-property';
 import IndexOnedataProperty from 'harvester-gui-plugin-generic/utils/index-onedata-property';
+import IndexAnyProperty from 'harvester-gui-plugin-generic/utils/index-any-property';
 import _ from 'lodash';
 
 export default class Index extends IndexPropertyCollection {
@@ -49,5 +50,6 @@ export default class Index extends IndexPropertyCollection {
 
     this.properties['__onedata.space'] =
       new IndexOnedataProperty(null, '__onedata.space');
+    this.properties['__anyProperty'] = new IndexAnyProperty();
   }
 }
