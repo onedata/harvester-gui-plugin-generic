@@ -8,4 +8,11 @@ export default class SingleSlotQueryBlock {
   constructor(operator = null) {
     this.operator = operator;
   }
+
+  clone() {
+    const clonedBlock = new SingleSlotQueryBlock(this.operator);
+    clonedBlock.slot = this.slot && typeof this.slot.clone === 'function' ?
+      this.slot.clone() : this.slot;
+    return clonedBlock;
+  }
 }

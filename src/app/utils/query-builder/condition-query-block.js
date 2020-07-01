@@ -11,4 +11,8 @@ export default class ConditionQueryBlock {
     this.comparator = comparator;
     this.comparatorValue = comparatorValue;
   }
+
+  clone() {
+    return new ConditionQueryBlock(this.property, this.comparator, this.comparatorValue);
+  }
 }
