@@ -41,6 +41,9 @@ describe('Integration | Component | query-results/result', function () {
             }],
           }],
         },
+        __onedata: {
+          fileName: 'abc.txt',
+        },
       },
     }));
   });
@@ -49,6 +52,14 @@ describe('Integration | Component | query-results/result', function () {
     await render(hbs `<QueryResults::Result />`);
 
     expect(this.element.querySelector('li.query-results-result')).to.exist;
+  });
+
+  it('shows file name', async function () {
+    this.set('filteredProperties', {});
+    await render(hbs `<QueryResults::Result @queryResult={{this.queryResult}}/>`);
+
+    expect(this.element.querySelector('.file-name').textContent.trim())
+      .to.equal('abc.txt');
   });
 
   it('shows no fields, when none are specified as visible', async function () {

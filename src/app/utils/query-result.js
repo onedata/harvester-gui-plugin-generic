@@ -1,11 +1,14 @@
 import { tracked } from '@glimmer/tracking';
 import _ from 'lodash';
 
+import { get } from '@ember/object';
+
 export default class QueryResult {
   parseHelpers = {};
   rawObject = undefined;
   source = undefined;
   fileId = undefined;
+  fileName = '';
   stringifiedJson = '';
   simplyFormattedJson = '';
   @tracked fileBrowserUrl = '';
@@ -22,6 +25,7 @@ export default class QueryResult {
     const rawObject = this.rawObject || {};
     this.source = rawObject._source;
     this.fileId = rawObject._id;
+    this.fileName = get(rawObject._source || {}, '__onedata.fileName');
 
     if (this.source) {
       this.stringifiedJson = JSON.stringify(this.source);

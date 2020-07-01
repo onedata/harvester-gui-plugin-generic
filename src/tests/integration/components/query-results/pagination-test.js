@@ -163,7 +163,7 @@ describe('Integration | Component | query-results/pagination', function () {
 
   it('provides options 10, 25, 50 and 100 in page size selector', async function () {
     await render(hbs `<QueryResults::Pagination @pageSize={{10}}/>`);
-    await clickTrigger('.page-size-selector');
+    await clickTrigger('.query-results-pagination');
     const options = this.element.querySelectorAll('.ember-power-select-option');
 
     expect(options).to.have.length(4);

@@ -1,4 +1,9 @@
 .query-results-result {
+  .file-name {
+    flex-grow: 1;
+    min-width: 0;
+  }
+
   .fields-visualiser {
     list-style-type: none;
     padding: 0;
