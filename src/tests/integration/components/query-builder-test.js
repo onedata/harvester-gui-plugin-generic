@@ -4,7 +4,8 @@ import { setupRenderingTest } from 'ember-mocha';
 import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import sinon from 'sinon';
-import { click } from '@ember/test-helpers';
+import { click, waitUntil } from '@ember/test-helpers';
+import { isVisible } from 'ember-attacher';
 import { selectChoose, clickTrigger } from 'ember-power-select/test-support/helpers';
 import SingleSlotQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/single-slot-query-block';
 import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/condition-query-block';
@@ -110,6 +111,7 @@ describe('Integration | Component | query-builder', function () {
     await selectChoose('.property-selector', 'a.b');
     await click('.accept-condition');
     await click('.generate-query-request');
+    await waitUntil(() => isVisible('.ember-attacher'), { timeout: 1000 });
 
     expect(generateCurlStub).to.be.calledOnce;
     expect(generateCurlStub.lastCall.args[0]).to.deep.equal({
@@ -141,6 +143,7 @@ describe('Integration | Component | query-builder', function () {
     await selectChoose('.property-selector', 'a.b');
     await click('.accept-condition');
     await click('.generate-query-request');
+    await waitUntil(() => isVisible('.ember-attacher'), { timeout: 1000 });
 
     expect(document.querySelector('.ember-attacher textarea')).to.not.exist;
     expect(document.querySelector('.ember-attacher .spinner')).to.exist;
@@ -167,6 +170,7 @@ describe('Integration | Component | query-builder', function () {
       await selectChoose('.property-selector', 'a.b');
       await click('.accept-condition');
       await click('.generate-query-request');
+      await waitUntil(() => isVisible('.ember-attacher'), { timeout: 1000 });
 
       expect(generateCurlStub).to.be.calledOnce;
       expect(generateCurlStub.lastCall.args[0]).to.deep.equal({
