@@ -13,11 +13,22 @@ export default class ElasticsearchQueryBuilder {
     const query = {
       from: this.resultsFrom,
       size: this.resultsSize,
+      query: {
+        bool: {
+          filter: [{
+            term: {
+              '__onedata.json_metadata_exists': {
+                value: 'true',
+              },
+            },
+          }],
+        },
+      },
     };
 
     const queryConditions = this.convertBlock(this.rootQueryBlock);
     if (queryConditions) {
-      query.query = queryConditions;
+      query.query.bool.must = [queryConditions];
     }
 
     const _sourceSpec = this.buildSourceFieldsSpec();

@@ -63,8 +63,7 @@ for i in range(files_no):
   enabled = 'true' if random.random() > 0.5 else 'false'
   html = '<b>no content</b>'
   creation_time = datetime.fromtimestamp(int(time.time()) - i * 7200).strftime('%Y/%m/%d %H:%M:%S')
-  __onedata = '{{"spaceId": "44386e1d83be14e0629c34e93724ecbfchaaaa", "fileName": "{0}" }}'.format(filename)
-  metadata = '{{"id": {0}, "creator": "{1}", "status": {{"now": "{2}", "prev": "{3}" }}, "keywords": [{4}], "enabled": {5}, "html": "{6}", "editionTime": "{7}", "__onedata": {8} }}'.format(entry_id, rand_name, status, prev_status, keywords, enabled, html, creation_time, __onedata)
+  metadata = '{{"id": {0}, "creator": "{1}", "status": {{"now": "{2}", "prev": "{3}" }}, "keywords": [{4}], "enabled": {5}, "html": "{6}", "editionTime": "{7}" }}'.format(entry_id, rand_name, status, prev_status, keywords, enabled, html, creation_time)
 
   curl = [
     'curl',

@@ -167,9 +167,20 @@ function fullQuery(conditionQuery) {
   const query = {
     from: 0,
     size: 10,
+    query: {
+      bool: {
+        filter: [{
+          term: {
+            '__onedata.json_metadata_exists': {
+              value: 'true',
+            },
+          },
+        }],
+      },
+    },
   };
   if (conditionQuery) {
-    query.query = conditionQuery;
+    query.query.bool.must = [conditionQuery];
   }
   return query;
 }
