@@ -123,6 +123,7 @@
     <div class="form-group-full-line">
       <BsButton
         class="accept-condition"
+        disabled={{not this.isConditionDataValid}}
         @type="primary"
         @size="sm"
         @onClick={{this.onConditionAdd}}

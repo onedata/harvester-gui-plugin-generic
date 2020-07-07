@@ -42,38 +42,42 @@ describe('Integration | Component | query-builder/block-selector', function () {
   setupRenderingTest();
 
   beforeEach(function () {
+    const spaces = [{
+      id: 'space1Id',
+      name: 'space1',
+    }, {
+      id: 'space2Id',
+      name: 'space2',
+    }];
     sinon.stub(SpacesProvider.prototype, 'loadSpaces').callsFake(function () {
-      this.spaces = [{
-        id: 'space1Id',
-        name: 'space1',
-      }, {
-        id: 'space2Id',
-        name: 'space2',
-      }];
+      this.spaces = spaces;
     });
 
-    this.set('indexProperties', [{
-      path: 'boolProp',
-      type: 'boolean',
-    }, {
-      path: 'textProp',
-      type: 'text',
-    }, {
-      path: 'numberProp',
-      type: 'number',
-    }, {
-      path: 'keywordProp',
-      type: 'keyword',
-    }, {
-      path: 'dateProp',
-      type: 'date',
-    }, {
-      path: 'space',
-      type: 'space',
-    }, {
-      path: 'any property',
-      type: 'anyProperty',
-    }]);
+    this.setProperties({
+      spaces,
+      indexProperties: [{
+        path: 'boolProp',
+        type: 'boolean',
+      }, {
+        path: 'textProp',
+        type: 'text',
+      }, {
+        path: 'numberProp',
+        type: 'number',
+      }, {
+        path: 'keywordProp',
+        type: 'keyword',
+      }, {
+        path: 'dateProp',
+        type: 'date',
+      }, {
+        path: 'space',
+        type: 'space',
+      }, {
+        path: 'any property',
+        type: 'anyProperty',
+      }],
+    });
 
     fakeClock = sinon.useFakeTimers({
       now: moment('2020-05-04 12:00').valueOf(),
@@ -142,6 +146,14 @@ describe('Integration | Component | query-builder/block-selector', function () {
     const options = this.element.querySelectorAll('.ember-power-select-option');
     expect(options).to.have.length(1);
     expect(options[0].textContent.trim()).to.equal('boolProp');
+  });
+
+  it('blocks "Add" button when no property is selected', async function () {
+    await render(hbs `
+      <QueryBuilder::BlockSelector @indexProperties={{this.indexProperties}}/>
+    `);
+
+    expect(this.element.querySelector('.accept-condition')).to.have.attr('disabled');
   });
 
   it('does not show comparator selector on init', async function () {
@@ -217,6 +229,20 @@ describe('Integration | Component | query-builder/block-selector', function () {
     }
   );
 
+  it(
+    'does not block "Add" button when boolean property "is" condition has default value',
+    async function () {
+      await render(hbs `<QueryBuilder::BlockSelector
+        @indexProperties={{this.indexProperties}}
+      />`);
+
+      await selectChoose('.property-selector', 'boolProp');
+
+      expect(this.element.querySelector('.accept-condition'))
+        .to.not.have.attr('disabled');
+    }
+  );
+
   it('shows only "contains" comparator for text property', async function () {
     await render(hbs `
       <QueryBuilder::BlockSelector @indexProperties={{this.indexProperties}}/>
@@ -264,6 +290,20 @@ describe('Integration | Component | query-builder/block-selector', function () {
         .and(sinon.match.has('comparator', 'text.contains'))
         .and(sinon.match.hasNested('comparatorValue', 'a | b'));
       expect(addSpy).to.be.calledOnce.and.to.be.calledWith(blockMatcher);
+    }
+  );
+
+  it(
+    'blocks "Add" button when text property "contains" condition has empty condition value',
+    async function () {
+      await render(hbs `<QueryBuilder::BlockSelector
+        @indexProperties={{this.indexProperties}}
+      />`);
+
+      await selectChoose('.property-selector', 'textProp');
+      await fillIn('.comparator-value-input', '');
+
+      expect(this.element.querySelector('.accept-condition')).to.have.attr('disabled');
     }
   );
 
@@ -321,6 +361,35 @@ describe('Integration | Component | query-builder/block-selector', function () {
         expect(addSpy).to.be.calledOnce.and.to.be.calledWith(blockMatcher);
       }
     );
+
+    it(
+      `blocks "Add" button when number property "${symbol}" condition has empty condition value`,
+      async function () {
+        await render(hbs `<QueryBuilder::BlockSelector
+          @indexProperties={{this.indexProperties}}
+        />`);
+
+        await selectChoose('.property-selector', 'numberProp');
+        await selectChoose('.comparator-selector', symbol);
+
+        expect(this.element.querySelector('.accept-condition')).to.have.attr('disabled');
+      }
+    );
+
+    it(
+      `blocks "Add" button when number property "${symbol}" condition has a non-number condition value`,
+      async function () {
+        await render(hbs `<QueryBuilder::BlockSelector
+          @indexProperties={{this.indexProperties}}
+        />`);
+
+        await selectChoose('.property-selector', 'numberProp');
+        await selectChoose('.comparator-selector', symbol);
+        await fillIn('.comparator-value-input', 'xyz');
+
+        expect(this.element.querySelector('.accept-condition')).to.have.attr('disabled');
+      }
+    );
   });
 
   it('shows only "is" comparator for keyword property', async function () {
@@ -370,6 +439,20 @@ describe('Integration | Component | query-builder/block-selector', function () {
         .and(sinon.match.has('comparator', 'keyword.is'))
         .and(sinon.match.hasNested('comparatorValue', 'abc'));
       expect(addSpy).to.be.calledOnce.and.to.be.calledWith(blockMatcher);
+    }
+  );
+
+  it(
+    'blocks "Add" button when keyword property "is" condition has empty condition value',
+    async function () {
+      await render(hbs `<QueryBuilder::BlockSelector
+        @indexProperties={{this.indexProperties}}
+      />`);
+
+      await selectChoose('.property-selector', 'keywordProp');
+      await fillIn('.comparator-value-input', '');
+
+      expect(this.element.querySelector('.accept-condition')).to.have.attr('disabled');
     }
   );
 
@@ -512,7 +595,22 @@ describe('Integration | Component | query-builder/block-selector', function () {
     }
   );
 
-  it('shows only "is" comparator for space property', async function () {
+  it(
+    'blocks "Add" button when space property "is" condition has empty condition value',
+    async function () {
+      // simulate no space to choose
+      this.get('spaces').clear();
+      await render(hbs `<QueryBuilder::BlockSelector
+        @indexProperties={{this.indexProperties}}
+      />`);
+
+      await selectChoose('.property-selector', 'space');
+
+      expect(this.element.querySelector('.accept-condition')).to.have.attr('disabled');
+    }
+  );
+
+  it('shows only "is" comparator for anyProperty property', async function () {
     await render(hbs `
       <QueryBuilder::BlockSelector @indexProperties={{this.indexProperties}}/>
     `);
@@ -559,6 +657,20 @@ describe('Integration | Component | query-builder/block-selector', function () {
         .and(sinon.match.has('comparator', 'anyProperty.hasPhrase'))
         .and(sinon.match.hasNested('comparatorValue', 'abc def'));
       expect(addSpy).to.be.calledOnce.and.to.be.calledWith(blockMatcher);
+    }
+  );
+
+  it(
+    'blocks "Add" button when anyProperty property "hasPhrase" condition has empty condition value',
+    async function () {
+      await render(hbs `<QueryBuilder::BlockSelector
+        @indexProperties={{this.indexProperties}}
+      />`);
+
+      await selectChoose('.property-selector', 'any property');
+      await fillIn('.comparator-value-input', '');
+
+      expect(this.element.querySelector('.accept-condition')).to.have.attr('disabled');
     }
   );
 });

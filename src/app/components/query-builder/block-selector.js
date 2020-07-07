@@ -31,7 +31,7 @@ const textEditor = {
   type: 'text',
   defaultValue: () => '',
   isValidValue(value) {
-    return typeof value === 'string';
+    return typeof value === 'string' && value.length > 0;
   },
 };
 
@@ -106,6 +106,17 @@ export default class QueryBuilderBlockSelectorComponent extends Component {
     return this.comparatorEditorsSet[this.selectedConditionComparator];
   }
 
+  get isConditionComparatorValueValid() {
+    return this.comparatorEditor ?
+      this.comparatorEditor.isValidValue(this.conditionComparatorValue) : false;
+  }
+
+  get isConditionDataValid() {
+    return this.selectedConditionProperty &&
+      this.selectedConditionComparator &&
+      this.isConditionComparatorValueValid;
+  }
+
   constructor() {
     super(...arguments);
 
@@ -152,7 +163,7 @@ export default class QueryBuilderBlockSelectorComponent extends Component {
   conditionComparatorChanged(comparator) {
     this.selectedConditionComparator = comparator;
 
-    if (!this.comparatorEditor.isValidValue(this.conditionComparatorValue)) {
+    if (!this.isConditionComparatorValueValid) {
       this.conditionComparatorValueChanged(this.comparatorEditor.defaultValue());
     }
   }
