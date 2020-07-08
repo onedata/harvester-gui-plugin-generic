@@ -1,0 +1,4 @@
+direction:
+  asc: 'asc'
+  desc: 'desc'
+queryScoreProperty: query score

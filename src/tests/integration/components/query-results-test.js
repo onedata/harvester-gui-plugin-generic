@@ -8,39 +8,72 @@ import { click } from '@ember/test-helpers';
 import { selectChoose } from 'ember-power-select/test-support/helpers';
 import { all as allFulfilled } from 'rsvp';
 import sinon from 'sinon';
+import Index from 'harvester-gui-plugin-generic/utils/index';
 
 describe('Integration | Component | query-results', function () {
   setupRenderingTest();
 
   beforeEach(function () {
-    this.set('queryResults', new QueryResults({
-      hits: {
-        total: {
-          value: 2,
+    this.setProperties({
+      queryResults: new QueryResults({
+        hits: {
+          total: {
+            value: 2,
+          },
+          hits: [{
+            _source: {
+              a: {
+                b: true,
+              },
+              c: 'someText',
+              e: {
+                f: 'anotherText',
+              },
+            },
+          }, {
+            _source: {
+              a: [{
+                b: false,
+              }, {
+                b: true,
+                bb: false,
+              }],
+              c: 'someText2',
+            },
+          }],
         },
-        hits: [{
-          _source: {
+      }),
+      index: new Index({
+        mappings: {
+          properties: {
             a: {
-              b: true,
+              type: 'object',
+              properties: {
+                b: {
+                  type: 'boolean',
+                },
+              },
             },
-            c: 'someText',
+            c: {
+              type: 'text',
+              fields: {
+                d: {
+                  type: 'keyword',
+                },
+              },
+            },
             e: {
-              f: 'anotherText',
+              type: 'nested',
+              properties: {
+                f: {
+                  type: 'text',
+                },
+              },
             },
           },
-        }, {
-          _source: {
-            a: [{
-              b: false,
-            }, {
-              b: true,
-              bb: false,
-            }],
-            c: 'someText2',
-          },
-        }],
-      },
-    }));
+        },
+      }),
+    });
   });
 
   it('renders results', async function () {
@@ -228,5 +261,57 @@ describe('Integration | Component | query-results', function () {
         expect(changeSpy).to.be.calledOnce.and.to.be.calledWith(50);
       }
     );
+  });
+
+  it('has sort selector set to values passed to the component', async function () {
+    await render(hbs `<QueryResults
+      @index={{this.index}}
+      @queryResults={{this.queryResults}}
+      @sortProperty={{this.index.properties.a.properties.b}}
+      @sortDirection="asc"
+    />`);
+
+    expect(this.element.querySelector(
+      '.property-selector .ember-power-select-selected-item'
+    ).textContent.trim()).to.equal('a.b');
+    expect(this.element.querySelector(
+      '.direction-selector .ember-power-select-selected-item'
+    ).textContent.trim()).to.equal('asc');
+  });
+
+  it('notifies about sort property change', async function () {
+    const changeSpy = this.set('changeSpy', sinon.spy());
+    await render(hbs `<QueryResults
+      @index={{this.index}}
+      @queryResults={{this.queryResults}}
+      @sortProperty={{this.index.properties.a.properties.b}}
+      @sortDirection="desc"
+      @onSortChange={{this.changeSpy}}
+    />`);
+
+    await selectChoose('.property-selector', 'c.d');
+    const changeMatcher = sinon.match({
+      direction: 'desc',
+      property: sinon.match.same(this.get('index').properties.c.properties.d),
+    });
+    expect(changeSpy).to.be.calledOnce.and.to.be.calledWith(changeMatcher);
+  });
+
+  it('notifies about sort direction change', async function () {
+    const changeSpy = this.set('changeSpy', sinon.spy());
+    await render(hbs `<QueryResults
+      @index={{this.index}}
+      @queryResults={{this.queryResults}}
+      @sortProperty={{this.index.properties.a.properties.b}}
+      @sortDirection="desc"
+      @onSortChange={{this.changeSpy}}
+    />`);
+
+    await selectChoose('.direction-selector', 'asc');
+    const changeMatcher = sinon.match({
+      direction: 'asc',
+      property: sinon.match.same(this.get('index').properties.a.properties.b),
+    });
+    expect(changeSpy).to.be.calledOnce.and.to.be.calledWith(changeMatcher);
   });
 });

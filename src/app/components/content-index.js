@@ -13,6 +13,8 @@ export default class ContentIndexComponent extends Component {
   @tracked queryResults = null;
   @tracked index = null;
   @tracked filteredProperties = {};
+  @tracked sortProperty = {};
+  @tracked sortDirection = 'desc';
   @tracked activePageNumber = 1;
   @tracked pageSize = 10;
 
@@ -44,6 +46,15 @@ export default class ContentIndexComponent extends Component {
   @action
   filteredPropertiesChange(filteredProperties) {
     this.filteredProperties = filteredProperties;
+  }
+
+  @action
+  sortChange({ property, direction }) {
+    this.sortProperty = this.queryBuilder.sortProperty = property;
+    this.sortDirection = this.queryBuilder.sortDirection = direction;
+    this.activePageNumber = 1;
+    this.updateQueryBuilderResultsRange();
+    this.queryElasticsearch();
   }
 
   @action

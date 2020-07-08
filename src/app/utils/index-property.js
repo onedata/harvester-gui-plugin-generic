@@ -17,6 +17,7 @@ export default class IndexProperty extends IndexPropertyCollection {
   rawMapping = {};
   isField = false;
   type = 'object';
+  isRealProperty = true;
 
   get path() {
     const parentPath = (this.parentProperty && this.parentProperty.path) || '';

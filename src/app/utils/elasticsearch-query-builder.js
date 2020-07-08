@@ -6,6 +6,9 @@ import moment from 'moment';
 export default class ElasticsearchQueryBuilder {
   rootQueryBlock = null;
   visibleContent = null;
+  // {} means _score
+  sortProperty = {};
+  sortDirection = 'desc';
   resultsFrom = 0;
   resultsSize = 10;
 
@@ -24,6 +27,7 @@ export default class ElasticsearchQueryBuilder {
           }],
         },
       },
+      sort: this.buildSortSpec(),
     };
 
     const queryConditions = this.convertBlock(this.rootQueryBlock);
@@ -254,6 +258,17 @@ export default class ElasticsearchQueryBuilder {
     }
 
     return readyKeys.without('');
+  }
+
+  buildSortSpec() {
+    const sortPropertyPath = this.sortProperty && this.sortProperty.path ?
+      this.sortProperty.path : '_score';
+    const sortDirection = ['asc', 'desc'].includes(this.sortDirection) ?
+      this.sortDirection : 'desc';
+
+    return [{
+      [sortPropertyPath]: sortDirection,
+    }];
   }
 }
 

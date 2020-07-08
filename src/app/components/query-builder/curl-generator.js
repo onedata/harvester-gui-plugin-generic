@@ -19,6 +19,8 @@ export default class QueryBuilderCurlGeneratorComponent extends Component {
     if (isShown) {
       this.queryBuilder.rootQueryBlock = this.args.rootQueryBlock.slot;
       this.queryBuilder.visibleContent = this.args.filteredProperties;
+      this.queryBuilder.sortProperty = this.args.sortProperty;
+      this.queryBuilder.sortDirection = this.args.sortDirection;
       this.curlPromise = this.onGenerateCurl(this.queryBuilder.buildQuery());
     }
   }

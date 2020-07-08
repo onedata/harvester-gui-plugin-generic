@@ -178,6 +178,9 @@ function fullQuery(conditionQuery) {
         }],
       },
     },
+    sort: [{
+      _score: 'desc',
+    }],
   };
   if (conditionQuery) {
     query.query.bool.must = [conditionQuery];
@@ -468,6 +471,21 @@ describe('Unit | Utility | elasticsearch-query-builder', function () {
       fullQuery(), {
         from: 50,
         size: 25,
+      }
+    ));
+  });
+
+  it('allows to specify custom sorting', function () {
+    const esQueryBuilder = new ElasticsearchQueryBuilder();
+    esQueryBuilder.sortProperty = new IndexProperty(new IndexProperty(null, 'x'), 'y');
+    esQueryBuilder.sortDirection = 'asc';
+
+    const result = esQueryBuilder.buildQuery();
+    expect(result).to.deep.equal(Object.assign(
+      fullQuery(), {
+        sort: [{
+          'x.y': 'asc',
+        }],
       }
     ));
   });
