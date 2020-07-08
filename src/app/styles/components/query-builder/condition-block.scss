@@ -1,19 +1,24 @@
-.query-builder-condition-block {
-  font-size: 80%;
+.query-builder {
+  .query-builder-condition-block {
+    font-size: 80%;
+    align-items: baseline;
 
-  .property-path {
-    font-size: 100%;
-    color: $body-color;
-    font-weight: bold;
-  }
+    .property-path {
+      font-size: 100%;
+      color: $body-color;
+      font-weight: bold;
+    }
 
-  .comparator {
-    margin: 0 $spacer * 0.2;
-  }
+    .comparator {
+      margin: 0 $spacer * 0.2;
+    }
 
-  .property-path,
-  .comparator-value {
-    min-width: 0;
-    word-wrap: break-word;
+    .property-path,
+    .comparator,
+    .comparator-value {
+      min-width: 0;
+      word-wrap: break-word;
+      line-height: 1;
+    }
   }
 }

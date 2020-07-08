@@ -137,8 +137,8 @@ describe(
         click(element)
       ));
 
-      const checkboxes = [...this.element.querySelectorAll('input[type="checkbox"]')];
-      expect(checkboxes.mapBy('checked').every(checked => !checked)).to.be.true;
+      [...this.element.querySelectorAll('.one-checkbox')]
+      .forEach(checkbox => expect(checkbox).to.not.have.class('checked'));
     });
 
     it('renders buttons "Select all" and "Deselect all"', async function () {
@@ -162,8 +162,8 @@ describe(
       await click('.show-properties-selector');
       await click('.select-all');
 
-      const checkboxes = [...this.element.querySelectorAll('input[type="checkbox"]')];
-      expect(checkboxes.mapBy('checked').every(checked => checked)).to.be.true;
+      [...this.element.querySelectorAll('.one-checkbox')]
+      .forEach(checkbox => expect(checkbox).to.have.class('checked'));
     });
 
     it('allows to deselect all using "Deselect all" button', async function () {
@@ -174,8 +174,8 @@ describe(
       await click('.select-all');
       await click('.deselect-all');
 
-      const checkboxes = [...this.element.querySelectorAll('input[type="checkbox"]')];
-      expect(checkboxes.mapBy('checked').every(checked => !checked)).to.be.true;
+      [...this.element.querySelectorAll('.one-checkbox')]
+      .forEach(checkbox => expect(checkbox).to.not.have.class('checked'));
     });
 
     it('notifies about changed properties after "select all" click', async function () {
@@ -228,7 +228,7 @@ describe(
           .map(element => click(element))
         );
         const firstBranchLastCheckbox = this.element.querySelectorAll(
-          '.tree > .tree-branch > .tree-node:first-child > .tree-branch input'
+          '.tree > .tree-branch > .tree-node:first-child > .tree-branch .one-checkbox'
         )[1];
         await click(firstBranchLastCheckbox);
 
@@ -292,7 +292,8 @@ describe(
       expect(firstBranchLastNode).to.exist;
       expect(firstBranchLastNode.querySelector('.tree-label').textContent.trim())
         .to.equal('bbb');
-      expect(firstBranchLastNode.querySelector('input').checked).to.be.false;
+      expect(firstBranchLastNode.querySelector('.one-checkbox'))
+        .to.have.class('unchecked');
     });
 
     it(
@@ -313,19 +314,18 @@ describe(
           .map(element => click(element))
         );
         await click(
-          '.tree > .tree-branch > .tree-node:first-child > .tree-children input'
+          '.tree > .tree-branch > .tree-node:first-child > .tree-children .one-checkbox'
         );
         this.set('queryResults', queryResults2);
 
-        const firstBranchGroupInput = this.element.querySelector(
-          '.tree > .tree-branch > .tree-node:first-child > .tree-children input'
+        const firstBranchGroupCheckbox = this.element.querySelector(
+          '.tree > .tree-branch > .tree-node:first-child > .tree-children .one-checkbox'
         );
-        const firstBranchLastNodeInput = this.element.querySelectorAll(
-          '.tree > .tree-branch > .tree-node:first-child > .tree-branch .tree-node input'
+        const firstBranchLastNodeCheckbox = this.element.querySelectorAll(
+          '.tree > .tree-branch > .tree-node:first-child > .tree-branch .tree-node .one-checkbox'
         )[2];
-        expect(firstBranchGroupInput.indeterminate).to.be.true;
-        expect(firstBranchGroupInput.checked).to.be.false;
-        expect(firstBranchLastNodeInput.checked).to.be.false;
+        expect(firstBranchGroupCheckbox).to.have.class('indeterminate');
+        expect(firstBranchLastNodeCheckbox).to.have.class('unchecked');
       }
     );
   }

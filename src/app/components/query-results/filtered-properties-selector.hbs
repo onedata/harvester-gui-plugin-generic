@@ -1,5 +1,5 @@
 <div class="filtered-properties-selector">
-  <BsButton class="show-properties-selector">
+  <BsButton @size="sm" class="show-properties-selector">
     {{tt this "selectorTrigger"}}
     (<span class="selection-counter">{{this.selectedPropertiesCount}}/{{this.flatModel.length}}</span>)
     <AttachPopover
@@ -7,13 +7,13 @@
       @hideOn="clickout"
       @interactive={{true}}
       @arrow={{true}}
-      @placement="bottom-start"
       @lazyRender={{true}}
       as |popover|
     >
       <div class="filtered-properties-selector-body">
         <BsButton
           @size="sm"
+          @outline={{true}}
           @onClick={{this.selectAll}}
           class="select-all"
         >
@@ -21,6 +21,7 @@
         </BsButton>
         <BsButton
           @size="sm"
+          @outline={{true}}
           @onClick={{this.deselectAll}}
           class="deselect-all"
         >

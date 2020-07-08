@@ -7,7 +7,7 @@
         type="button"
         disabled={{this.isOnFirstPage}}
       >
-        <FaIcon @icon="angle-double-left"/>
+        <FaIcon @icon="step-backward" @size="xs"/>
       </button>
       <button
         {{on "click" this.goToPrevPage}}
@@ -15,7 +15,7 @@
         type="button"
         disabled={{this.isOnFirstPage}}
       >
-        <FaIcon @icon="angle-left"/>
+        <FaIcon @icon="caret-left"/>
       </button>
     </div>
     <div class="form-control pages-counter-container">
@@ -24,7 +24,7 @@
         class="active-page-number"
         value={{this.activePageNumber}}
         {{on "keydown" (invoke-on-enter this.goToSpecificPage)}}
-      > /
+      > {{tt this "pageOf"}}
       <span class="pages-count">{{this.pagesCount}}</span>
     </div>
     <div class="input-group-append">
@@ -34,7 +34,7 @@
         type="button"
         disabled={{this.isOnLastPage}}
       >
-        <FaIcon @icon="angle-right"/>
+        <FaIcon @icon="caret-right"/>
       </button>
       <button
         {{on "click" this.goToLastPage}}
@@ -42,7 +42,7 @@
         type="button"
         disabled={{this.isOnLastPage}}
       >
-        <FaIcon @icon="angle-double-right"/>
+        <FaIcon @icon="step-forward" @size="xs"/>
       </button>
     </div>
   </div>

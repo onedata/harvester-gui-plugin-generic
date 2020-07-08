@@ -1,3 +1,4 @@
+sortByLabel: 'Sort by:'
 direction:
   asc: 'asc'
   desc: 'desc'

@@ -1,11 +1,16 @@
-@import "ember-bootstrap/bootstrap";
-@import "./bootstrap-variables.scss";
+$root-url: './';
+
+@import "./fonts";
+@import "./colors";
+
+@import "./bootstrap";
 @import "ember-power-select/themes/bootstrap";
 @import "./ember-power-select-overrides";
 @import "ember-power-select";
 @import "./ember-attacher-overrides";
 
 @import "./layout";
+@import "./components/one-checkbox";
 @import "./components/query-builder";
 @import "./components/query-builder/block-adder";
 @import "./components/query-builder/block-selector";
@@ -16,3 +21,4 @@
 @import "./components/query-results/filtered-properties-selector";
 @import "./components/query-results/pagination";
 @import "./components/query-results/result";
+@import "./components/query-results/sort-selector";

@@ -4,13 +4,13 @@
       @queryResults={{@queryResults}}
       @onSelectionChange={{this.filteredPropertiesChanged}}
     />
-    <QueryResults::SortSelector 
-      @index={{this.index}}
-      @sortProperty={{this.sortProperty}}
-      @sortDirection={{this.sortDirection}}
-      @onSortChange={{this.onSortChange}}
-    />
     {{#if @queryResults.results}}
+      <QueryResults::SortSelector 
+        @index={{this.index}}
+        @sortProperty={{this.sortProperty}}
+        @sortDirection={{this.sortDirection}}
+        @onSortChange={{this.onSortChange}}
+      />
       <QueryResults::Pagination
         @resultsCount={{@queryResults.totalResultsCount}}
         @activePageNumber={{this.activePageNumber}}

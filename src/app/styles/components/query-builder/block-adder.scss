@@ -1,13 +1,13 @@
 .query-builder-block-adder {
   .add-trigger {
-    background-color: transparent;
-    border: 1px dashed rgba($gray-900, 0.3);
-    color: black;
+    display: block;
+    // border: 0;
     line-height: 1;
-    font-size: 80%;
+    font-size: 60%;
+    padding: 2px 3px;
 
-    &:hover {
-      background-color: rgba($gray-900, 0.1);
-    }
+    // &:hover {
+    //   background-color: rgba($gray-900, 0.1);
+    // }
   }
 }

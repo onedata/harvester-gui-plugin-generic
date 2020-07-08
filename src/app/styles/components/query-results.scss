@@ -5,9 +5,20 @@
 
   .results-header {
     display: flex;
+    align-items: center;
     justify-content: space-between;
     flex-basis: 100%;
     min-width: 0;
+    flex-wrap: wrap;
+  }
+
+  .filtered-properties-selector {
+    flex-grow: 1;
+  }
+
+  .query-results-pagination {
+    flex-grow: 1;
+    justify-content: flex-end;
   }
   
   .results-list {

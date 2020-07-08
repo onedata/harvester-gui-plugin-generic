@@ -1,0 +1,13 @@
+<div class="one-checkbox {{this.valueClass}} {{if this.disabled "disabled"}}" {{on "click" this.changed}}>
+  <input
+    id={{this.inputId}}
+    type="checkbox"
+    disabled={{this.disabled}}
+    indeterminate={{this.indeterminate}}
+    {{on "change" this.changed}}
+    {{on "click" this.clicked}}
+  >
+  {{#if this.valueIcon}}
+    <FaIcon @icon={{this.valueIcon}}/>
+  {{/if}}
+</div>

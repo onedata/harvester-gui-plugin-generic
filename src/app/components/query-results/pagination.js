@@ -2,6 +2,8 @@ import Component from '@glimmer/component';
 import { action } from '@ember/object';
 
 export default class QueryResultsPaginationComponent extends Component {
+  intlPrefix = 'components.query-results.pagination';
+
   get resultsCount() {
     return this.args.resultsCount || 0;
   }

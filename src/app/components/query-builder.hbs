@@ -6,21 +6,19 @@
       class="root-block"
     />
   </div>
-  <div class="btn-group" role="group">
-    <BsButton
-      @type="primary"
-      @onClick={{this.performQuery}}
-      class="submit-query"
-    >
-      {{tt this "performQueryButton"}}
-    </BsButton>
-    <QueryBuilder::CurlGenerator
-      @rootQueryBlock={{this.rootQueryBlock}}
-      @filteredProperties={{@filteredProperties}}
-      @sortProperty={{@sortProperty}}
-      @sortDirection={{@sortDirection}}
-      @onGenerateCurl={{@onGenerateCurl}}
-    />
-  </div>
+  <BsButton
+    @type="primary"
+    @onClick={{this.performQuery}}
+    class="submit-query"
+  >
+    {{tt this "performQueryButton"}}
+  </BsButton>
+  <QueryBuilder::CurlGenerator
+    @rootQueryBlock={{this.rootQueryBlock}}
+    @filteredProperties={{@filteredProperties}}
+    @sortProperty={{@sortProperty}}
+    @sortDirection={{@sortDirection}}
+    @onGenerateCurl={{@onGenerateCurl}}
+  />
   {{yield}}
 </div>

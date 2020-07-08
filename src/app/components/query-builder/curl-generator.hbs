@@ -1,8 +1,9 @@
 <BsButton
   @type="primary"
-  class="generate-query-request"
+  @outline={{true}}
+  class="query-builder-curl-generator generate-query-request"
 >
-  <FaIcon @icon="external-link-alt"/>
+  {{tt this "triggerLabel"}}
   <AttachPopover
     @showOn="click"
     @hideOn="clickout"

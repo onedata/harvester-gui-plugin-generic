@@ -1,0 +1,46 @@
+.one-checkbox {
+  $checkbox-size: 16px;
+  
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 90%;
+  width: $checkbox-size;
+  height: $checkbox-size;
+  border-radius: $input-border-radius-sm;
+  border: 1px solid $body-color;
+  background-color: white;
+  vertical-align: middle;
+
+  &.checked,
+  &.indeterminate {
+    border: 1px solid $primary;
+    color: $primary;
+  }
+
+  &.indeterminate {
+    border: 1px solid $primary;
+  }
+
+  &.disabled {
+    opacity: 0.6;
+  }
+
+  &:not(.disabled) {
+    &.checked:hover {
+      background-color: lighten($success, 40%);
+    }
+    &:hover {
+      cursor: pointer;
+      background-color: lighten($body-color, 60%);
+    }
+  }
+
+  input[type="checkbox"] {
+    position: absolute;
+    width: 0;
+    height: 0;
+    z-index: -1;
+    opacity: 0;
+  }
+}
