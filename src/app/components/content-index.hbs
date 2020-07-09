@@ -1,23 +1,25 @@
-<QueryBuilder
-  @query={{this.query}}
-  @filteredProperties={{this.filteredProperties}}
-  @sortProperty={{this.sortProperty}}
-  @sortDirection={{this.sortDirection}}
-  @queryChanged={{this.queryChanged}}
-  @onPerformQuery={{this.performQuery}}
-  @onGenerateCurl={{this.getQueryCurl}}
-  @index={{this.index}}
-/>
-<QueryResults
-  @queryResults={{this.queryResults}}
-  @activePageNumber={{this.activePageNumber}}
-  @pageSize={{this.pageSize}}
-  @index={{this.index}}
-  @sortProperty={{this.sortProperty}}
-  @sortDirection={{this.sortDirection}}
-  @onFilteredPropertiesChange={{this.filteredPropertiesChange}}
-  @onSortChange={{this.sortChange}}
-  @onPageChange={{this.pageChange}}
-  @onPageSizeChange={{this.pageSizeChange}}
-/>
+<div class="content-index">
+  <QueryBuilder
+    @query={{this.query}}
+    @filteredProperties={{this.filteredProperties}}
+    @sortProperty={{this.sortProperty}}
+    @sortDirection={{this.sortDirection}}
+    @queryChanged={{this.queryChanged}}
+    @onPerformQuery={{this.performQuery}}
+    @onGenerateCurl={{this.getQueryCurl}}
+    @index={{this.index}}
+  />
+  <QueryResults
+    @queryResults={{this.queryResults}}
+    @activePageNumber={{this.activePageNumber}}
+    @pageSize={{this.pageSize}}
+    @index={{this.index}}
+    @sortProperty={{this.sortProperty}}
+    @sortDirection={{this.sortDirection}}
+    @onFilteredPropertiesChange={{this.filteredPropertiesChange}}
+    @onSortChange={{this.sortChange}}
+    @onPageChange={{this.pageChange}}
+    @onPageSizeChange={{this.pageSizeChange}}
+  />
+</div>
 {{yield}}

@@ -10,6 +10,7 @@
     flex-basis: 100%;
     min-width: 0;
     flex-wrap: wrap;
+    margin-bottom: $spacer;
   }
 
   .filtered-properties-selector {
@@ -26,17 +27,12 @@
     min-width: 0;
     margin-top: $spacer * 0.5;
     padding: 0;
+    list-style-type: none;
   }
 
   .query-results-result {
     + .query-results-result {
-      margin-top: $spacer * .5;
+      margin-top: $spacer * 3;
     }
-  }
-
-  .card-header {
-    display: flex;
-    justify-content: flex-end;
-    font-size: 90%;
   }
 }

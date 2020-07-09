@@ -1,25 +1,32 @@
-<li class="card query-results-result">
-  <div class="card-header">
-    <span class="file-name">{{@queryResult.fileName}}</span>
-    <a class="go-to-file-link" href={{@queryResult.fileBrowserUrl}} target="_blank">
-      {{t "components.query-results.goToFileLink"}}
-    </a>
-  </div>
-  <div class="card-body">
-    <div class="card-text">
-      {{#if this.visualisedProperties}}
-        <ul class="fields-visualiser">
-          {{#each this.visualisedProperties as |property|}}
-            <li class="property">
-              <samp class="property-name">{{{property.key}}}</samp>:
-              <samp class="property-value">{{{property.value}}}</samp>
-            </li>
-          {{/each}}
-        </ul>
-      {{else}}
-        <samp>{{{@queryResult.simplyFormattedJson}}}</samp>
-      {{/if}}
+<li class="query-results-result">
+  <div class="result-heading" {{on "click" this.toggleExpand}}>
+    <div class="left-col-icon">
+      <FaIcon @icon={{if isExpanded "caret-down" "caret-right"}} @size="lg"/>
     </div>
-    {{yield}}
+    <samp class="result-sample">{{{this.readableJson}}}</samp>
   </div>
+  <a class="go-to-file-link" href={{@queryResult.fileBrowserUrl}} target="_blank">
+    <span class="left-col-icon">
+      <FaIcon @icon="external-link-alt"/>
+    </span>
+    {{tt this "goToFileLink" fileName=@queryResult.fileName}}
+  </a>
+  <BsCollapse @collapsed={{not this.isExpanded}}>
+    <BsTab class="result-representations" as |tab|>
+      <tab.pane @title={{tt this "tableTabTitle"}}>
+        <div class="properties-table">
+          {{#each this.propertiesForTable as |property|}}
+            <div class="property">
+              <samp class="property-name">{{{property.key}}}</samp>
+              <samp class="property-value">{{{property.value}}}</samp>
+            </div>
+          {{/each}}
+        </div>
+      </tab.pane>
+      <tab.pane @title={{tt this "jsonTabTitle"}}>
+        <textarea class="form-control json-textarea">{{this.stringifiedJsonForTextarea}}</textarea>
+      </tab.pane>
+    </BsTab>
+  </BsCollapse>
+  {{yield}}
 </li>

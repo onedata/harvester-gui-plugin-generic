@@ -85,17 +85,7 @@ describe('Integration | Component | query-results', function () {
     expect(results[1].textContent).to.contain('someText2');
   });
 
-  it('has no filtered properties on init', async function () {
-    await render(hbs `<QueryResults @queryResults={{this.queryResults}}/>`);
-
-    const selectionCounter =
-      this.element.querySelector('.show-properties-selector .selection-counter');
-    expect(selectionCounter.textContent.trim()).to.equal('0/6');
-    expect(this.element.querySelectorAll('.query-results-result .fields-visualiser'))
-      .to.have.length(0);
-  });
-
-  it('filters visible properties', async function () {
+  it('filters properties', async function () {
     await render(hbs `<QueryResults @queryResults={{this.queryResults}}/>`);
     await click('.show-properties-selector');
     // expand all nodes
@@ -104,18 +94,13 @@ describe('Integration | Component | query-results', function () {
       .map(element => click(element))
     );
     const firstBranchLastCheckbox = document.querySelectorAll(
-      '.ember-attacher .tree > .tree-branch > .tree-node:first-child > .tree-branch input'
+      '.ember-attacher .tree > .tree-branch > .tree-node:first-child > .tree-branch .one-checkbox'
     )[1];
     await click(firstBranchLastCheckbox);
 
-    const fieldsVisualiser =
-      this.element.querySelectorAll('.query-results-result .fields-visualiser');
-    expect(fieldsVisualiser).to.have.length(1);
-    expect(fieldsVisualiser[0].querySelectorAll('.property')).to.have.length(1);
-    expect(fieldsVisualiser[0].querySelector('.property-name').textContent.trim())
-      .to.equal('a');
-    expect(fieldsVisualiser[0].querySelector('.property-value').textContent.trim())
-      .to.equal('[{"bb":false}]');
+    const resultSamples = this.element.querySelectorAll('.result-sample');
+    expect(resultSamples[0].textContent.trim()).to.equal('');
+    expect(resultSamples[1].textContent.trim()).to.equal('a: [{bb: false}]');
   });
 
   it('does not notify about changed filtered properties on init', async function () {

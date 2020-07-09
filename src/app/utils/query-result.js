@@ -1,6 +1,4 @@
 import { tracked } from '@glimmer/tracking';
-import _ from 'lodash';
-
 import { get } from '@ember/object';
 
 export default class QueryResult {
@@ -9,8 +7,6 @@ export default class QueryResult {
   source = undefined;
   fileId = undefined;
   fileName = '';
-  stringifiedJson = '';
-  simplyFormattedJson = '';
   @tracked fileBrowserUrl = '';
 
   constructor(rawObject, parseHelpers) {
@@ -27,31 +23,9 @@ export default class QueryResult {
     this.fileId = rawObject._id;
     this.fileName = get(rawObject._source || {}, '__onedata.fileName');
 
-    if (this.source) {
-      this.stringifiedJson = JSON.stringify(this.source);
-      this.simplyFormattedJson = this.stringifyAndFormat(this.source);
-    } else {
-      this.stringifiedJson = '';
-    }
-
     if (this.parseHelpers.fileBrowserUrlRequest && this.fileId) {
       this.parseHelpers.fileBrowserUrlRequest(this.fileId)
         .then(url => this.fileBrowserUrl = url);
-    }
-  }
-
-  stringifyAndFormat(valueToFormat, isNestedCall = false) {
-    if (typeof valueToFormat === 'string') {
-      return `"${_.escape(valueToFormat)}"`;
-    } else if (_.isArray(valueToFormat)) {
-      return `[${valueToFormat.map(subvalue => this.stringifyAndFormat(subvalue, true)).join(', ')}]`;
-    } else if (typeof valueToFormat === 'object' && valueToFormat !== null) {
-      const objectRepresentation = Object.keys(valueToFormat).sort().map(key =>
-        `<strong>${_.escape(key)}</strong>: ${this.stringifyAndFormat(valueToFormat[key], true)}`
-      ).join(', ');
-      return isNestedCall ? `{${objectRepresentation}}` : objectRepresentation;
-    } else {
-      return _.escape(JSON.stringify(valueToFormat));
     }
   }
 }

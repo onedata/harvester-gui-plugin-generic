@@ -9,8 +9,10 @@ $root-url: './';
 @import "ember-power-select";
 @import "./ember-attacher-overrides";
 
-@import "./layout";
 @import "./components/one-checkbox";
+
+@import "./layout";
+@import "./components/content-index";
 @import "./components/query-builder";
 @import "./components/query-builder/block-adder";
 @import "./components/query-builder/block-selector";
