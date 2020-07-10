@@ -5,16 +5,19 @@
     </div>
     <samp class="result-sample">{{{this.readableJson}}}</samp>
   </div>
-  <div class="file-id-copier">
-    <span class="file-id-label">{{tt this "fileIdLabel"}}</span>
-    <ClipboardLine @value={{@queryResult.fileId}}/>
-  </div>
   <a class="go-to-file-link" href={{@queryResult.fileBrowserUrl}} target="_blank">
     <span class="left-col-icon">
       <FaIcon @icon="external-link-alt"/>
     </span>
     {{tt this "goToFileLink" fileName=@queryResult.fileName}}
-  </a>
+  </a> |
+  <CopyButton
+    class="btn btn-sm btn-light file-id-copier"
+    title={{tt this "copyFileIdButtonTip"}}
+    @clipboardText={{@queryResult.fileId}}
+  >
+    {{tt this "copyFileIdButton"}} <FaIcon @icon="copy"/>
+  </CopyButton>
   <BsCollapse @collapsed={{not this.isExpanded}}>
     <BsTab class="result-representations" as |tab|>
       <tab.pane @title={{tt this "tableTabTitle"}}>

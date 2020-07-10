@@ -1,4 +1,5 @@
 goToFileLink: Go to source file "{fileName}"
-fileIdLabel: 'File ID:'
 tableTabTitle: Table
 jsonTabTitle: JSON
+copyFileIdButton: File ID
+copyFileIdButtonTip: Copy file ID to clipboard
