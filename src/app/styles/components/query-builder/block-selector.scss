@@ -47,6 +47,11 @@
     flex-grow: 1;
   }
 
+  .special-property {
+    @include font-semibold;
+    font-style: italic;
+  }
+
   .form-group {
     margin-bottom: $spacer * 0.5;
     min-width: 0;

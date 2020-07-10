@@ -3,6 +3,10 @@
     font-size: 80%;
     align-items: baseline;
 
+    .special-property {
+      font-style: italic;
+    }
+
     .property-path {
       font-size: 100%;
       color: $body-color;

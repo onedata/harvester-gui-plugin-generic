@@ -20,9 +20,13 @@ export default class QueryBuilderComponent extends Component {
   @tracked rootQueryBlock = new SingleSlotQueryBlock();
 
   get indexProperties() {
-    return (this.args.index ? this.args.index.getFlattenedProperties() : [])
+    const allProperties =
+      (this.args.index ? this.args.index.getFlattenedProperties() : [])
       .filter(property => this.isSupportedProperty(property))
       .sortBy('path');
+    const specialProperties = allProperties.rejectBy('isRealProperty');
+    const ordinaryProperties = allProperties.filterBy('isRealProperty');
+    return [...specialProperties, ...ordinaryProperties];
   }
 
   @action

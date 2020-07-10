@@ -59,7 +59,7 @@ describe('Integration | Component | query-builder', function () {
 
     const options = this.element.querySelectorAll('.ember-power-select-option');
     expect(options).to.have.length(5);
-    ['a.b', 'any property', 'c', 'c.d', 'space'].forEach((propertyPath, index) =>
+    ['any property', 'space', 'a.b', 'c', 'c.d'].forEach((propertyPath, index) =>
       expect(options[index].textContent.trim()).to.equal(propertyPath)
     );
   });

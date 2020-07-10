@@ -31,7 +31,9 @@
         class="property-selector"
         as |indexProperty|
       >
-        {{indexProperty.path}}
+        <span class={{if (not indexProperty.isRealProperty) "special-property"}}>
+          {{indexProperty.path}}
+        </span>
       </PowerSelect>
     </div>
     <div class="comparator-main-container">
