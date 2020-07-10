@@ -5,13 +5,15 @@
     font-size: 80%;
 
     .tree {
-      // margin-top: $spacer * 0.5;
-      padding-top: $spacer * 0.5;
-      // padding-left: 0;
+      margin-top: $spacer * 0.5;
+      max-width: 80vw;
+      overflow: auto;
+      max-height: 60vh;
     }
 
     .tree-node {
       line-height: 2.7em;
+      white-space: nowrap;
     }
 
     .tree-checkbox {
@@ -26,7 +28,6 @@
     }
 
     .toggle-icon {
-      // margin-left: 0.3em;
       width: 0.7em;
       color: $body-color;
       font-size: 100%;
