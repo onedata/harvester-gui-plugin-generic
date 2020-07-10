@@ -1,0 +1,20 @@
+.clipboard-line {
+  display: inline-block;
+  position: relative;
+
+  .copy-input {
+    background-color: white;
+    padding-right: $spacer * 2;
+    text-overflow: ellipsis;
+  }
+
+  .copy-btn {
+    border: 0;
+    background-color: transparent;
+    position: absolute;
+    right: $spacer * 0.2;
+    top: 50%;
+    transform: translateY(-50%);
+    color: $body-color;
+  }
+}

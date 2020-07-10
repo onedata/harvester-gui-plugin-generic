@@ -1,3 +1,4 @@
 goToFileLink: Go to source file "{fileName}"
+fileIdLabel: 'File ID:'
 tableTabTitle: Table
 jsonTabTitle: JSON

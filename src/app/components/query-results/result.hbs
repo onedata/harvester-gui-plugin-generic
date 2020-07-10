@@ -5,6 +5,10 @@
     </div>
     <samp class="result-sample">{{{this.readableJson}}}</samp>
   </div>
+  <div class="file-id-copier">
+    <span class="file-id-label">{{tt this "fileIdLabel"}}</span>
+    <ClipboardLine @value={{@queryResult.fileId}}/>
+  </div>
   <a class="go-to-file-link" href={{@queryResult.fileBrowserUrl}} target="_blank">
     <span class="left-col-icon">
       <FaIcon @icon="external-link-alt"/>

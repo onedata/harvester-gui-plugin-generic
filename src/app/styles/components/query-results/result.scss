@@ -24,6 +24,23 @@
     overflow: hidden;
   }
 
+  .file-id-copier {
+    margin-right: $spacer;
+    margin-left: $left-icon-column-width;
+    white-space: nowrap;
+    margin-bottom: 0.2 * $spacer;
+    font-size: 90%;
+
+    .copy-input {
+      width: 30em;
+      max-width: 70vw;
+    }
+  }
+
+  .file-id-label {
+    @include font-semibold;
+  }
+
   .result-representations {
     margin-top: $spacer;
   }

@@ -1,0 +1,16 @@
+<div class="clipboard-line">
+  <input
+    id={{this.inputId}}
+    type="text"
+    value={{@value}}
+    readonly="readonly"
+    class="form-control form-control-sm copy-input"
+  />
+  <CopyButton
+    @clipboardTarget={{concat "#" this.inputId}}
+    title={{tt this "copyButtonTip"}}
+  >
+    <FaIcon @icon="copy"/>
+  </CopyButton>
+</div>
+{{yield}}
