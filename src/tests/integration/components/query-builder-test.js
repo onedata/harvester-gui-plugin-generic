@@ -98,7 +98,7 @@ describe('Integration | Component | query-builder', function () {
     }
   );
 
-  // FIXME: test commented due to bamboo tests passing problem
+  // FIXME: test commented due to bamboo tests passing problem. Uncomment after Chrome upgrade
   // it('shows CURL request content on "generate request" button click', async function () {
   //   const generateCurlStub = this.set('generateCurlStub', sinon.stub().resolves('curl!'));
 

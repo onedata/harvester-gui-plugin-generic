@@ -16,11 +16,10 @@ export default class SpacesProviderService extends Service {
   }
 
   loadSpaces() {
-    return this.appProxy.spacesRequest()
-      .then(() => allFulfilled([
+    return allFulfilled([
         this.fetchOnezoneSpaces(),
         this.fetchElasticsearchSpaces(),
-      ]))
+      ])
       .then(([onezoneSpaces, elasticsearchSpaces]) => {
         const spaceIdsWithNames = new Set(onezoneSpaces.mapBy('id'));
         this.spaces = [
