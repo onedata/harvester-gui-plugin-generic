@@ -15,20 +15,10 @@
     as |popover|
   >
     <div class="curl-generator-body">
-      <Await @promise={{this.curlPromise}} as |await|>
-        <await.Pending>
-          <EmberSpinner/>
-        </await.Pending>
-
-        <await.Fulfilled as |curlRequest|>
-          <textarea class="form-control curl-command-string" spellcheck="false">{{curlRequest}}</textarea>
-          <p class="access-token-info">{{tt this "accessTokenInfo" htmlSafe=true}}</p>
-        </await.Fulfilled>
-
-        <await.Rejected>
-          Something went wrong :(
-        </await.Rejected>
-      </Await>
+      <PromiseLoader @promise={{this.curlPromise}} as |curlRequest|>
+        <textarea class="form-control curl-command-string" spellcheck="false">{{curlRequest}}</textarea>
+        <p class="access-token-info">{{tt this "accessTokenInfo" htmlSafe=true}}</p>
+      </PromiseLoader>
     </div>
   </AttachPopover>
   {{yield}}

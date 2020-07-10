@@ -1,7 +1,9 @@
 .query-results {
   display: flex;
   flex-wrap: wrap;
-  justify-content: flex-end;
+  flex-direction: column;
+  position: relative;
+  min-height: 200px;
 
   .results-header {
     display: flex;

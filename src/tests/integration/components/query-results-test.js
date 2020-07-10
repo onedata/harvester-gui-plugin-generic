@@ -6,7 +6,7 @@ import hbs from 'htmlbars-inline-precompile';
 import QueryResults from 'harvester-gui-plugin-generic/utils/query-results';
 import { click } from '@ember/test-helpers';
 import { selectChoose } from 'ember-power-select/test-support/helpers';
-import { all as allFulfilled } from 'rsvp';
+import { all as allFulfilled, resolve } from 'rsvp';
 import sinon from 'sinon';
 import Index from 'harvester-gui-plugin-generic/utils/index';
 
@@ -14,35 +14,37 @@ describe('Integration | Component | query-results', function () {
   setupRenderingTest();
 
   beforeEach(function () {
-    this.setProperties({
-      queryResults: new QueryResults({
-        hits: {
-          total: {
-            value: 2,
-          },
-          hits: [{
-            _source: {
-              a: {
-                b: true,
-              },
-              c: 'someText',
-              e: {
-                f: 'anotherText',
-              },
-            },
-          }, {
-            _source: {
-              a: [{
-                b: false,
-              }, {
-                b: true,
-                bb: false,
-              }],
-              c: 'someText2',
-            },
-          }],
+    const queryResults = new QueryResults({
+      hits: {
+        total: {
+          value: 2,
         },
-      }),
+        hits: [{
+          _source: {
+            a: {
+              b: true,
+            },
+            c: 'someText',
+            e: {
+              f: 'anotherText',
+            },
+          },
+        }, {
+          _source: {
+            a: [{
+              b: false,
+            }, {
+              b: true,
+              bb: false,
+            }],
+            c: 'someText2',
+          },
+        }],
+      },
+    });
+    this.setProperties({
+      queryResults,
+      queryResultsPromise: resolve(queryResults),
       index: new Index({
         mappings: {
           properties: {
@@ -77,7 +79,7 @@ describe('Integration | Component | query-results', function () {
   });
 
   it('renders results', async function () {
-    await render(hbs `<QueryResults @queryResults={{this.queryResults}}/>`);
+    await render(hbs `<QueryResults @queryResultsPromise={{this.queryResultsPromise}}/>`);
 
     const results = this.element.querySelectorAll('.query-results-result');
     expect(results).to.have.length(2);
@@ -86,7 +88,7 @@ describe('Integration | Component | query-results', function () {
   });
 
   it('filters properties', async function () {
-    await render(hbs `<QueryResults @queryResults={{this.queryResults}}/>`);
+    await render(hbs `<QueryResults @queryResultsPromise={{this.queryResultsPromise}}/>`);
     await click('.show-properties-selector');
     // expand all nodes
     await allFulfilled(
@@ -107,7 +109,7 @@ describe('Integration | Component | query-results', function () {
     const changeSpy = this.set('changeSpy', sinon.spy());
 
     await render(hbs `<QueryResults
-      @queryResults={{this.queryResults}}
+      @queryResultsPromise={{this.queryResultsPromise}}
       @onFilteredPropertiesChange={{this.changeSpy}}
     />`);
 
@@ -118,7 +120,7 @@ describe('Integration | Component | query-results', function () {
     const changeSpy = this.set('changeSpy', sinon.spy());
 
     await render(hbs `<QueryResults
-      @queryResults={{this.queryResults}}
+      @queryResultsPromise={{this.queryResultsPromise}}
       @onFilteredPropertiesChange={{this.changeSpy}}
     />`);
     await click('.show-properties-selector');
@@ -138,19 +140,19 @@ describe('Integration | Component | query-results', function () {
   });
 
   it('has no pagination controls when query results are empty', async function () {
-    this.set('queryResults', new QueryResults({
+    this.set('queryResultsPromise', resolve(new QueryResults({
       hits: {
         hits: [],
       },
-    }));
+    })));
 
-    await render(hbs `<QueryResults @queryResults={{this.queryResults}}/>`);
+    await render(hbs `<QueryResults @queryResultsPromise={{this.queryResultsPromise}}/>`);
 
     expect(this.element.querySelector('.query-results-pagination')).to.not.exist;
   });
 
   it('has two pagination controls when query results are not empty', async function () {
-    await render(hbs `<QueryResults @queryResults={{this.queryResults}}/>`);
+    await render(hbs `<QueryResults @queryResultsPromise={{this.queryResultsPromise}}/>`);
 
     expect(this.element.querySelectorAll('.query-results-pagination')).to.have.length(2);
   });
@@ -160,7 +162,7 @@ describe('Integration | Component | query-results', function () {
       `has page set to a value passed on init (${paginationPosition} pagination control)`,
       async function () {
         await render(hbs `<QueryResults
-          @queryResults={{this.queryResults}}
+          @queryResultsPromise={{this.queryResultsPromise}}
           @activePageNumber={{5}}
         />`);
 
@@ -174,7 +176,7 @@ describe('Integration | Component | query-results', function () {
       `has page size set to a value passed on init (${paginationPosition} pagination control)`,
       async function () {
         await render(hbs `<QueryResults
-          @queryResults={{this.queryResults}}
+          @queryResultsPromise={{this.queryResultsPromise}}
           @pageSize={{25}}
         />`);
 
@@ -188,7 +190,7 @@ describe('Integration | Component | query-results', function () {
     it(
       `shows correct number of pages for a small results set (${paginationPosition} pagination control)`,
       async function () {
-        await render(hbs `<QueryResults @queryResults={{this.queryResults}}/>`);
+        await render(hbs `<QueryResults @queryResultsPromise={{this.queryResultsPromise}}/>`);
 
         const pagesCount = this.element.querySelectorAll(
           '.query-results-pagination .pages-count'
@@ -201,7 +203,7 @@ describe('Integration | Component | query-results', function () {
       `shows correct number of pages for a large results set (${paginationPosition} pagination control)`,
       async function () {
         this.get('queryResults').totalResultsCount = 50;
-        await render(hbs `<QueryResults @queryResults={{this.queryResults}}/>`);
+        await render(hbs `<QueryResults @queryResultsPromise={{this.queryResultsPromise}}/>`);
 
         const pagesCount = this.element.querySelectorAll(
           '.query-results-pagination .pages-count'
@@ -217,7 +219,7 @@ describe('Integration | Component | query-results', function () {
         const changeSpy = this.set('changeSpy', sinon.spy());
 
         await render(hbs `<QueryResults
-          @queryResults={{this.queryResults}}
+          @queryResultsPromise={{this.queryResultsPromise}}
           @onPageChange={{this.changeSpy}}
         />`);
         const nextBtn = this.element.querySelectorAll(
@@ -235,7 +237,7 @@ describe('Integration | Component | query-results', function () {
         const changeSpy = this.set('changeSpy', sinon.spy());
 
         await render(hbs `<QueryResults
-          @queryResults={{this.queryResults}}
+          @queryResultsPromise={{this.queryResultsPromise}}
           @onPageSizeChange={{this.changeSpy}}
         />`);
         const pageSizeSelector = this.element.querySelectorAll(
@@ -251,7 +253,7 @@ describe('Integration | Component | query-results', function () {
   it('has sort selector set to values passed to the component', async function () {
     await render(hbs `<QueryResults
       @index={{this.index}}
-      @queryResults={{this.queryResults}}
+      @queryResultsPromise={{this.queryResultsPromise}}
       @sortProperty={{this.index.properties.a.properties.b}}
       @sortDirection="asc"
     />`);
@@ -268,7 +270,7 @@ describe('Integration | Component | query-results', function () {
     const changeSpy = this.set('changeSpy', sinon.spy());
     await render(hbs `<QueryResults
       @index={{this.index}}
-      @queryResults={{this.queryResults}}
+      @queryResultsPromise={{this.queryResultsPromise}}
       @sortProperty={{this.index.properties.a.properties.b}}
       @sortDirection="desc"
       @onSortChange={{this.changeSpy}}
@@ -286,7 +288,7 @@ describe('Integration | Component | query-results', function () {
     const changeSpy = this.set('changeSpy', sinon.spy());
     await render(hbs `<QueryResults
       @index={{this.index}}
-      @queryResults={{this.queryResults}}
+      @queryResultsPromise={{this.queryResultsPromise}}
       @sortProperty={{this.index.properties.a.properties.b}}
       @sortDirection="desc"
       @onSortChange={{this.changeSpy}}

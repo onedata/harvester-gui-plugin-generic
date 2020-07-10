@@ -1,0 +1,22 @@
+<Await
+  @promise={{@promise}}
+  @onResolve={{@onResolve}}
+  @onReject={{@onReject}}
+  as |await|
+>
+  <await.Pending>
+    <EmberSpinner
+      @scale={{or @spinnerScale 1}}
+      @lines={{12}}
+      @length={{12}}
+    />
+  </await.Pending>
+
+  <await.Fulfilled as |promiseData|>
+    {{yield promiseData}}
+  </await.Fulfilled>
+
+  <await.Rejected as |error|>
+    <ResourceLoadError @details={{error}}/>
+  </await.Rejected>
+</Await>

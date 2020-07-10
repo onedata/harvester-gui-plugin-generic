@@ -10,6 +10,7 @@ $root-url: './';
 @import "./ember-attacher-overrides";
 
 @import "./components/one-checkbox";
+@import "./components/resource-load-error";
 
 @import "./layout";
 @import "./components/content-index";

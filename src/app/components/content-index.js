@@ -1,7 +1,7 @@
 import Component from '@glimmer/component';
 import { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
-import { action, trySet } from '@ember/object';
+import { action } from '@ember/object';
 import QueryResults from 'harvester-gui-plugin-generic/utils/query-results';
 import Index from 'harvester-gui-plugin-generic/utils/index';
 import ElasticsearchQueryBuilder from 'harvester-gui-plugin-generic/utils/elasticsearch-query-builder';
@@ -10,7 +10,8 @@ export default class ContentIndexComponent extends Component {
   @service elasticsearch;
   @service appProxy;
 
-  @tracked queryResults = null;
+  @tracked indexPromise;
+  @tracked queryResultsPromise;
   @tracked index = null;
   @tracked filteredProperties = {};
   @tracked sortProperty = {};
@@ -22,10 +23,10 @@ export default class ContentIndexComponent extends Component {
 
   constructor() {
     super(...arguments);
-    this.elasticsearch.getMapping()
+    this.indexPromise = this.elasticsearch.getMapping()
       .then(response => {
-        trySet(this, 'index', new Index(Object.values(response)[0]));
-        return this.performQuery();
+        this.performQuery();
+        return new Index(Object.values(response)[0]);
       });
   }
 
@@ -79,8 +80,8 @@ export default class ContentIndexComponent extends Component {
   }
 
   queryElasticsearch() {
-    this.elasticsearch.search(this.queryBuilder.buildQuery())
-      .then(results => trySet(this, 'queryResults', this.parseQueryResults(results)));
+    this.queryResultsPromise = this.elasticsearch.search(this.queryBuilder.buildQuery())
+      .then(queryResults => this.parseQueryResults(queryResults));
   }
 
   updateQueryBuilderResultsRange() {

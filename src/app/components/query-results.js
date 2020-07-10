@@ -1,9 +1,12 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
+import QueryResults from 'harvester-gui-plugin-generic/utils/query-results';
 
 export default class QueryResultsComponent extends Component {
   @tracked filteredProperties = {};
+  @tracked emptyQueryResults = new QueryResults();
+  @tracked queryResults;
 
   get index() {
     return this.args.index || null;
@@ -37,6 +40,12 @@ export default class QueryResultsComponent extends Component {
     return this.args.onPageSizeChange || (() => {});
   }
 
+  constructor() {
+    super(...arguments);
+
+    this.queryResults = this.emptyQueryResults;
+  }
+
   @action
   filteredPropertiesChanged(filteredProperties) {
     this.filteredProperties = filteredProperties;
@@ -44,5 +53,10 @@ export default class QueryResultsComponent extends Component {
     if (this.args.onFilteredPropertiesChange) {
       this.args.onFilteredPropertiesChange(filteredProperties);
     }
+  }
+
+  @action
+  gotNewQueryResults(newQueryResults) {
+    this.queryResults = newQueryResults;
   }
 }

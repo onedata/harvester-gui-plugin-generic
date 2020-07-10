@@ -1,10 +1,10 @@
 <div class="query-results">
   <div class="results-header">
     <QueryResults::FilteredPropertiesSelector
-      @queryResults={{@queryResults}}
+      @queryResults={{this.queryResults}}
       @onSelectionChange={{this.filteredPropertiesChanged}}
     />
-    {{#if @queryResults.results}}
+    {{#if this.queryResults.results}}
       <QueryResults::SortSelector 
         @index={{this.index}}
         @sortProperty={{this.sortProperty}}
@@ -12,7 +12,7 @@
         @onSortChange={{this.onSortChange}}
       />
       <QueryResults::Pagination
-        @resultsCount={{@queryResults.totalResultsCount}}
+        @resultsCount={{this.queryResults.totalResultsCount}}
         @activePageNumber={{this.activePageNumber}}
         @pageSize={{this.pageSize}}
         @onPageChange={{this.onPageChange}}
@@ -20,22 +20,29 @@
       />
     {{/if}}
   </div>
-  {{#if @queryResults.results}}
-    <ul class="results-list">
-      {{#each @queryResults.results as |queryResult|}}
-        <QueryResults::Result
-          @queryResult={{queryResult}}
-          @filteredProperties={{this.filteredProperties}}
-        />
-      {{/each}}
-    </ul>
-    <QueryResults::Pagination
-      @resultsCount={{@queryResults.totalResultsCount}}
-      @activePageNumber={{this.activePageNumber}}
-      @pageSize={{this.pageSize}}
-      @onPageChange={{this.onPageChange}}
-      @onPageSizeChange={{this.onPageSizeChange}}
-    />
-  {{/if}}
+  <PromiseLoader
+    @promise={{@queryResultsPromise}}
+    @onResolve={{this.gotNewQueryResults}}
+    @onReject={{fn this.gotNewQueryResults this.emptyQueryResults}}
+    as |queryResults|
+  >
+    {{#if queryResults.results}}
+      <ul class="results-list">
+        {{#each queryResults.results as |queryResult|}}
+          <QueryResults::Result
+            @queryResult={{queryResult}}
+            @filteredProperties={{this.filteredProperties}}
+          />
+        {{/each}}
+      </ul>
+      <QueryResults::Pagination
+        @resultsCount={{queryResults.totalResultsCount}}
+        @activePageNumber={{this.activePageNumber}}
+        @pageSize={{this.pageSize}}
+        @onPageChange={{this.onPageChange}}
+        @onPageSizeChange={{this.onPageSizeChange}}
+      />
+    {{/if}}
+  </PromiseLoader>
 </div>
 {{yield}}
