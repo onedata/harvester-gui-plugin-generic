@@ -20,6 +20,7 @@
   <modal.body>
     <div class="curl-generator-body">
       <PromiseLoader @promise={{this.curlPromise}} as |curlRequest|>
+        <p class="command-description">{{tt this "commandDescription"}}</p>
         <p class="access-token-info">{{tt this "accessTokenInfo" htmlSafe=true}}</p>
         <OneCopyButton
           @value={{curlRequest}}
