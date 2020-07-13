@@ -9,8 +9,8 @@ $root-url: './';
 @import "ember-power-select";
 @import "./ember-attacher-overrides";
 
-@import "./components/clipboard-line";
 @import "./components/one-checkbox";
+@import "./components/one-copy-button";
 @import "./components/resource-load-error";
 
 @import "./layout";

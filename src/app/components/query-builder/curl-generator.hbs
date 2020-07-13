@@ -1,25 +1,39 @@
 <BsButton
   @type="primary"
   @outline={{true}}
-  class="query-builder-curl-generator generate-query-request"
+  @onClick={{this.openCurlModal}}
+  class="query-builder-curl-generator generate-query-request btn-input-padding"
 >
   {{tt this "triggerLabel"}}
-  <AttachPopover
-    @showOn="click"
-    @hideOn="clickout"
-    @interactive={{true}}
-    @arrow={{true}}
-    @placement="bottom"
-    @lazyRender={{true}}
-    @onChange={{this.curlPopoverOpened}}
-    as |popover|
-  >
-    <div class="curl-generator-body">
-      <PromiseLoader @promise={{this.curlPromise}} as |curlRequest|>
-        <textarea class="form-control curl-command-string" spellcheck="false">{{curlRequest}}</textarea>
-        <p class="access-token-info">{{tt this "accessTokenInfo" htmlSafe=true}}</p>
-      </PromiseLoader>
-    </div>
-  </AttachPopover>
   {{yield}}
 </BsButton>
+<BsModal
+  @open={{isCurlModalVisible}}
+  @onHidden={{this.closeCurlModal}}
+  @size="lg"
+  @position="center"
+  as |modal|
+>
+  <modal.header @closeButton={{false}}>
+    <h1 class="modal-title">{{tt this "modalTitle"}}</h1>
+  </modal.header>
+  <modal.body>
+    <div class="curl-generator-body">
+      <PromiseLoader @promise={{this.curlPromise}} as |curlRequest|>
+        <p class="access-token-info">{{tt this "accessTokenInfo" htmlSafe=true}}</p>
+        <OneCopyButton
+          @value={{curlRequest}}
+          @mode="textarea"
+        />
+      </PromiseLoader>
+    </div>
+  </modal.body>
+  <modal.footer>
+    <BsButton
+      @onClick={{modal.close}}
+      @type="primary"
+    >
+      {{tt this "closeModal"}}
+    </BsButton>
+  </modal.footer>
+</BsModal>

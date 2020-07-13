@@ -1,0 +1,34 @@
+<div class="one-copy-button mode-{{this.mode}}">
+  {{#if (eq @mode "input")}}
+    <input
+      id={{this.inputId}}
+      type="text"
+      value={{@value}}
+      readonly="readonly"
+      class="form-control form-control-sm copy-input"
+    />
+  {{else if (eq @mode "textarea")}}
+    <textarea
+      id={{this.inputId}}
+      class="form-control copy-textarea"
+      spellcheck="false"
+      readonly="readonly"
+    >{{@value}}</textarea>
+  {{/if}}
+  <CopyButton
+    @clipboardTarget={{if (not-eq this.mode "button") (concat "#" this.inputId) undefined}}
+    @clipboardText={{if (eq this.mode "button") this.value undefined}}
+    @success={{this.copySuccess}}
+    class={{this.buttonClasses}}
+    title={{this.hoverTip}}
+  >
+    <FaIcon @icon="copy"/>
+    {{yield}}
+    <BsTooltip
+      @title={{this.copiedTip}}
+      @triggerEvents=""
+      @visible={{this.isCopiedNotificationVisible}}
+      @renderInPlace={{true}}
+    />
+  </CopyButton>
+</div>

@@ -11,19 +11,13 @@
     </span>
     {{tt this "goToFileLink" fileName=@queryResult.fileName}}
   </a> |
-  <CopyButton
-    class="btn btn-sm btn-light file-id-copier"
-    title={{tt this "copyFileIdButtonTip"}}
-    @clipboardText={{@queryResult.fileId}}
-    @success={{this.copyFileIdSuccess}}
+  <OneCopyButton
+    @value={{@queryResult.fileId}}
+    @mode="button"
+    @buttonClasses="btn btn-sm btn-light"
   >
-    {{tt this "copyFileIdButton"}} <FaIcon @icon="copy"/>
-    <BsTooltip
-      @title={{tt this "fileIdCopiedNotification"}}
-      @triggerEvents=""
-      @visible={{this.isFileIdCopiedNotificationVisible}}
-    />
-  </CopyButton>
+    {{tt this "copyFileIdButton"}}
+  </OneCopyButton>
   <BsCollapse @collapsed={{not this.isExpanded}}>
     <BsTab class="result-representations" as |tab|>
       <tab.pane @title={{tt this "tableTabTitle"}}>

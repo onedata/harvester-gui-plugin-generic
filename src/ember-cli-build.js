@@ -11,6 +11,7 @@ module.exports = function (defaults) {
       whitelist: [
         'bs-button',
         'bs-collapse',
+        'bs-modal',
         'bs-tab',
         'bs-tooltip',
       ],

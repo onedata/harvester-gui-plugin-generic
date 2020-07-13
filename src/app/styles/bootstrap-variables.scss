@@ -306,10 +306,15 @@ $font-weight-base:            $font-weight-normal !default;
 $line-height-base:            1.5 !default;
 
 $h1-font-size:                $font-size-base * 2.5 !default;
+$h1-font-size:                $font-size-base * 1.4;
 $h2-font-size:                $font-size-base * 2 !default;
+$h2-font-size:                $font-size-base * 1.25;
 $h3-font-size:                $font-size-base * 1.75 !default;
+$h3-font-size:                $font-size-base * 1.15;
 $h4-font-size:                $font-size-base * 1.5 !default;
+$h4-font-size:                $font-size-base * 1.05;
 $h5-font-size:                $font-size-base * 1.25 !default;
+$h5-font-size:                $font-size-base;
 $h6-font-size:                $font-size-base !default;
 
 $headings-margin-bottom:      $spacer / 2 !default;
@@ -424,7 +429,9 @@ $input-btn-border-width:      $border-width !default;
 // For each of Bootstrap's buttons, define text, background, and border color.
 
 $btn-padding-y:               $input-btn-padding-y !default;
+$btn-padding-y:               .75rem;
 $btn-padding-x:               $input-btn-padding-x !default;
+$btn-padding-x:               2.25rem;
 $btn-font-family:             $input-btn-font-family !default;
 $btn-font-size:               $input-btn-font-size !default;
 $btn-line-height:             $input-btn-line-height !default;
@@ -951,6 +958,7 @@ $badge-pill-border-radius:          10rem !default;
 
 // Padding applied to the modal body
 $modal-inner-padding:               1rem !default;
+$modal-inner-padding:               2rem;
 
 // Margin between elements in footer, must be lower than or equal to 2 * $modal-inner-padding
 $modal-footer-margin-between:       .5rem !default;
@@ -964,6 +972,7 @@ $modal-content-color:               null !default;
 $modal-content-bg:                  $white !default;
 $modal-content-border-color:        rgba($black, .2) !default;
 $modal-content-border-width:        $border-width !default;
+$modal-content-border-width:        0;
 $modal-content-border-radius:       $border-radius-lg !default;
 $modal-content-inner-border-radius: subtract($modal-content-border-radius, $modal-content-border-width) !default;
 $modal-content-box-shadow-xs:       0 .25rem .5rem rgba($black, .5) !default;
@@ -976,7 +985,9 @@ $modal-footer-border-color:         $modal-header-border-color !default;
 $modal-header-border-width:         $modal-content-border-width !default;
 $modal-footer-border-width:         $modal-header-border-width !default;
 $modal-header-padding-y:            1rem !default;
+$modal-header-padding-y:            2rem;
 $modal-header-padding-x:            1rem !default;
+$modal-header-padding-x:            2rem;
 $modal-header-padding:              $modal-header-padding-y $modal-header-padding-x !default; // Keep this for backwards compatibility
 
 $modal-xl:                          1140px !default;

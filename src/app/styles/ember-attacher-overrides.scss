@@ -1,3 +1,7 @@
+.ember-attacher {
+  z-index: $zindex-modal-backdrop - 1;
+}
+
 .ember-attacher-fill {
   background-color: white;
   border: 1px solid $input-border-color;
