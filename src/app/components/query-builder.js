@@ -25,8 +25,11 @@ export default class QueryBuilderComponent extends Component {
       .filter(property => this.isSupportedProperty(property))
       .sortBy('path');
     const specialProperties = allProperties.rejectBy('isRealProperty');
-    const ordinaryProperties = allProperties.filterBy('isRealProperty');
-    return [...specialProperties, ...ordinaryProperties];
+    const ordinaryProperties = allProperties
+      .filter(prop => prop.isRealProperty && !prop.path.startsWith('_'));
+    const internalProperties = allProperties
+      .filter(prop => prop.isRealProperty && prop.path.startsWith('_'));
+    return [...specialProperties, ...ordinaryProperties, ...internalProperties];
   }
 
   @action

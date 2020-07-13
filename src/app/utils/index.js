@@ -16,7 +16,16 @@ export default class Index extends IndexPropertyCollection {
     if (this.rawMapping) {
       const propertiesMapping =
         _.cloneDeep(get(this.rawMapping, 'mappings.properties') || {});
-      delete propertiesMapping.__onedata;
+
+      if (propertiesMapping.__onedata &&
+        propertiesMapping.__onedata.properties &&
+        propertiesMapping.__onedata.properties.spaceId) {
+        delete propertiesMapping.__onedata.properties.spaceId;
+        if (Object.keys(propertiesMapping.__onedata.properties).length === 0) {
+          delete propertiesMapping.__onedata;
+        }
+      }
+
       this.extractProperties(propertiesMapping);
     }
   }

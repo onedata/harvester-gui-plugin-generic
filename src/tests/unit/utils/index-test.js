@@ -22,16 +22,15 @@ describe('Unit | Utility | index', function () {
             },
           },
           __onedata: {
-            spaceId: {
-              type: 'text',
-              fields: {
-                keyword: {
-                  type: 'keyword',
+            properties: {
+              spaceId: {
+                type: 'text',
+                fields: {
+                  keyword: {
+                    type: 'keyword',
+                  },
                 },
               },
-            },
-            incorrectOnedataProperty: {
-              type: 'object',
             },
           },
         },
