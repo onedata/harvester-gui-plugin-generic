@@ -12,6 +12,7 @@ module.exports = function (defaults) {
         'bs-button',
         'bs-collapse',
         'bs-tab',
+        'bs-tooltip',
       ],
     },
   });

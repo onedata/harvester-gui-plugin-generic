@@ -3,3 +3,4 @@ tableTabTitle: Table
 jsonTabTitle: JSON
 copyFileIdButton: File ID
 copyFileIdButtonTip: Copy file ID to clipboard
+fileIdCopiedNotification: File ID has been copied!

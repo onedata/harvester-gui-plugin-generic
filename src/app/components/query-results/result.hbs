@@ -15,8 +15,14 @@
     class="btn btn-sm btn-light file-id-copier"
     title={{tt this "copyFileIdButtonTip"}}
     @clipboardText={{@queryResult.fileId}}
+    @success={{this.copyFileIdSuccess}}
   >
     {{tt this "copyFileIdButton"}} <FaIcon @icon="copy"/>
+    <BsTooltip
+      @title={{tt this "fileIdCopiedNotification"}}
+      @triggerEvents=""
+      @visible={{this.isFileIdCopiedNotificationVisible}}
+    />
   </CopyButton>
   <BsCollapse @collapsed={{not this.isExpanded}}>
     <BsTab class="result-representations" as |tab|>

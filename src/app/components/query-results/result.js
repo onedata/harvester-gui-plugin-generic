@@ -1,12 +1,14 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
+import { later, cancel } from '@ember/runloop';
 import _ from 'lodash';
 
 export default class QueryResultsResultComponent extends Component {
   intlPrefix = 'components.query-results.result';
 
   @tracked isExpanded = false;
+  @tracked isFileIdCopiedNotificationVisible = false;
 
   get rawData() {
     return this.args.queryResult && this.args.queryResult.source || {};
@@ -33,6 +35,17 @@ export default class QueryResultsResultComponent extends Component {
 
   @action toggleExpand() {
     this.isExpanded = !this.isExpanded;
+  }
+
+  @action copyFileIdSuccess() {
+    cancel(this.fileIdCopiedNotificationTimer);
+
+    this.isFileIdCopiedNotificationVisible = true;
+    this.fileIdCopiedNotificationTimer = later(
+      this,
+      () => this.isFileIdCopiedNotificationVisible = false,
+      2000
+    );
   }
 
   visualiseJsonForTable() {
