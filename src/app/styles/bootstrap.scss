@@ -31,3 +31,7 @@
 .modal-body {
   padding: 0 $modal-inner-padding;
 }
+
+.form-control[readonly] {
+  background-color: white;
+}

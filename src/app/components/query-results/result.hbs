@@ -31,7 +31,10 @@
         </div>
       </tab.pane>
       <tab.pane @title={{tt this "jsonTabTitle"}}>
-        <textarea class="form-control json-textarea">{{this.stringifiedJsonForTextarea}}</textarea>
+        <textarea
+          class="form-control json-textarea"
+          readonly="readonly"
+        >{{this.stringifiedJsonForTextarea}}</textarea>
       </tab.pane>
     </BsTab>
   </BsCollapse>
