@@ -1,0 +1,26 @@
+propertySelectorPlaceholder: 'Choose property...'
+comparators:
+  boolean:
+    is: 'is'
+  text:
+    contains: 'contains'
+  number:
+    eq: '='
+    lt: '&lt;'
+    lte: '≤'
+    gt: '&gt;'
+    gte: '≥'
+  keyword:
+    is: 'is'
+  date:
+    eq: '='
+    lt: '&lt;'
+    lte: '≤'
+    gt: '&gt;'
+    gte: '≥'
+  space:
+    is: 'is'
+  anyProperty:
+    hasPhrase: 'has phrase'
+includeTimeInDate: 'Include time'
+acceptCondition: 'Add'
