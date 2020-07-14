@@ -1,21 +1,9 @@
 <div class="query-builder-block-selector">
   <div class="operators-section">
     <h1>{{tt this "operatorsHeader"}}</h1>
-    <ul class="operators-list">
-      {{#each (array "and" "or" "not") as |operator|}}
-        <li>
-          <BsButton
-            class="operator operator-{{operator}}"
-            @type="secondary"
-            @size="sm"
-            @outline={{true}}
-            @onClick={{fn this.onOperatorAdd operator}}
-          >
-            {{tt this (concat "operators." operator)}}
-          </BsButton>
-        </li>
-      {{/each}}
-    </ul>
+    <QueryBuilder::BlockSelector::OperatorSelector
+      @onOperatorSelected={{this.onOperatorAdd}}
+    />
   </div>
   <h1>{{tt this "conditionHeader"}}</h1>
   <div class="condition-creator">

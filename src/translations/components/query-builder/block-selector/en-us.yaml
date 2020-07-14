@@ -1,9 +1,5 @@
 operatorsHeader: 'Operator'
 conditionHeader: 'Condition'
-operators:
-  and: 'and'
-  or: 'or'
-  not: 'not'
 propertySelectorPlaceholder: 'Choose property...'
 comparators:
   boolean:

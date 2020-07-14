@@ -1,0 +1,16 @@
+<ul class="operator-selector">
+  {{#each this.operators as |operator|}}
+    <li>
+      <BsButton
+        class="operator operator-{{operator}}"
+        @type="secondary"
+        @size="sm"
+        @outline={{true}}
+        @onClick={{fn this.onOperatorSelected operator}}
+      >
+        {{tt this (concat "operators." operator)}}
+      </BsButton>
+    </li>
+  {{/each}}
+</ul>
+{{yield}}

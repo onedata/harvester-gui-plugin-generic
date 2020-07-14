@@ -96,12 +96,11 @@ describe('Integration | Component | query-builder/block-selector', function () {
   it('renders three operators: AND, OR and NOT', async function () {
     await render(hbs `<QueryBuilder::BlockSelector />`);
 
-    const operators = this.element.querySelectorAll('.operators-list .operator');
+    const operators = this.element.querySelectorAll('.operator-selector .operator');
     expect(operators).to.have.length(3);
     operatorsList.forEach((operatorName, index) => {
       const operator = operators[index];
       expect(operator.textContent.trim()).to.equal(operatorName);
-      expect(operator).to.have.class(`operator-${operatorName}`);
     });
   });
 
