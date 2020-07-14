@@ -98,11 +98,14 @@ export default class QueryResultsFilteredPropertiesSelectorComponent extends Com
       return;
     }
 
-    const oldPropertiesSubtree = this.lastQueryResults ?
+    const oldPropertiesTree = this.lastQueryResults ?
       this.lastQueryResults.getPropertiesTree() : {};
-    const propertiesTree = this.args.queryResults ?
+    const newPropertiesTree = this.args.queryResults ?
       this.args.queryResults.getPropertiesTree() : {};
-    const oldAndNewPropertiesTree = _.merge({}, oldPropertiesSubtree, propertiesTree);
+    const schemaPropertiesTree = this.args.index ?
+      this.args.index.getPropertiesTree() : {};
+    const oldAndNewPropertiesTree =
+      _.merge({}, oldPropertiesTree, newPropertiesTree, schemaPropertiesTree);
     const model = [];
     const flatModel = [];
 

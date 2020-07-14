@@ -97,4 +97,18 @@ describe('Unit | Utility | index', function () {
       });
     }
   );
+
+  it('builds properties tree', function () {
+    const index = new Index(Object.freeze(this.rawMapping));
+    const propertiesTree = index.getPropertiesTree();
+    expect(propertiesTree).to.deep.equal({
+      a: {},
+      b: {
+        ba: {},
+      },
+      __onedata: {
+        spaceId: {},
+      },
+    });
+  });
 });

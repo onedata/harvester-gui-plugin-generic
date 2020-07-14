@@ -61,4 +61,25 @@ export default class Index extends IndexPropertyCollection {
       new IndexOnedataProperty(null, '__onedata.space');
     this.properties['__anyProperty'] = new IndexAnyProperty();
   }
+
+  getPropertiesTree() {
+    const propertiesMapping = get(this.rawMapping, 'mappings.properties') || {};
+    const treeRoot = {};
+    const parentsQueue = [treeRoot];
+    const propertiesObjectsQueue = [propertiesMapping];
+    while (propertiesObjectsQueue.length) {
+      const parent = parentsQueue.pop();
+      const propertiesObject = propertiesObjectsQueue.pop();
+
+      for (const key in propertiesObject) {
+        parent[key] = {};
+        if (propertiesObject[key].properties) {
+          parentsQueue.push(parent[key]);
+          propertiesObjectsQueue.push(propertiesObject[key].properties);
+        }
+      }
+    }
+
+    return treeRoot;
+  }
 }
