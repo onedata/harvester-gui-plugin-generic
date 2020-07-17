@@ -7,9 +7,30 @@
     indexProperties=@indexProperties
   }}
     <BsButton
-      @onClick={{@onRemoveBlock}}
+      @type="secondary"
+      class="block-button block-settings"
+    >
+      <FaIcon @icon="wrench" />
+      <AttachPopover
+        @showOn="click"
+        @hideOn="clickout"
+        @interactive={{true}}
+        @arrow={{true}}
+        @placement="auto"
+        @lazyRender={{true}}
+        as |popover|
+      >
+        <QueryBuilder::BlockSelector
+          @mode="edit"
+          @editBlock={{@queryBlock}}
+          @onBlockReplace={{@onBlockReplace}}
+        />
+      </AttachPopover>
+    </BsButton>
+    <BsButton
+      @onClick={{@onBlockRemove}}
       @type="danger"
-      class="remove-block"
+      class="block-button remove-block"
     >
       <FaIcon @icon="times" />
     </BsButton>

@@ -10,6 +10,11 @@ export default class QueryBuilderSingleSlotBlockComponent extends Component {
   }
 
   @action
+  replaceBlock(newBlock) {
+    this.args.queryBlock.slot = newBlock;
+  }
+
+  @action
   removeBlock() {
     this.args.queryBlock.slot = null;
   }

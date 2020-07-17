@@ -11,9 +11,9 @@
       as |popover|
     >
       <QueryBuilder::BlockSelector
+        @mode="create"
         @indexProperties={{@indexProperties}}
-        @onOperatorAdd={{fn this.onBlockAdd popover.hide}}
-        @onConditionAdd={{fn this.onBlockAdd popover.hide}}
+        @onBlockAdd={{fn this.onBlockAdd popover.hide}}
       />
     </AttachPopover>
   </BsButton>

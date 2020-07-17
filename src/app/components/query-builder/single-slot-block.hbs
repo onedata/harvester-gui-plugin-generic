@@ -6,7 +6,8 @@
     <QueryBuilder::BlockVisualiser
       @queryBlock={{@queryBlock.slot}}
       @indexProperties={{@indexProperties}}
-      @onRemoveBlock={{this.removeBlock}}
+      @onBlockReplace={{this.replaceBlock}}
+      @onBlockRemove={{this.removeBlock}}
     />
   {{else}}
     <QueryBuilder::BlockAdder

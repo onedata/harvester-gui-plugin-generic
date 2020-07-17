@@ -1,2 +1,3 @@
 operatorsHeader: 'Operator'
 conditionHeader: 'Condition'
+surroundHeader: 'Surround with operator'

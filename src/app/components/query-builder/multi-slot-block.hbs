@@ -3,7 +3,8 @@
     <QueryBuilder::BlockVisualiser
       @queryBlock={{slotBlock}}
       @indexProperties={{@indexProperties}}
-      @onRemoveBlock={{fn this.removeBlock slotBlock}}
+      @onBlockReplace={{fn this.replaceBlock slotBlock}}
+      @onBlockRemove={{fn this.removeBlock slotBlock}}
     />
     {{#if @queryBlock.operator}}
       <div class="block-label block-infix-label">

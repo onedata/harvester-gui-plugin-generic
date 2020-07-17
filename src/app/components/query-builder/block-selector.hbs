@@ -1,14 +1,23 @@
-<div class="query-builder-block-selector">
-  <div class="operators-section">
-    <h1>{{tt this "operatorsHeader"}}</h1>
-    <QueryBuilder::BlockSelector::OperatorSelector
-      @onOperatorSelected={{this.operatorAdded}}
+<div class="query-builder-block-selector {{this.mode}}-block-selector">
+  {{#if (eq this.mode "create")}}
+    <div class="operators-section">
+      <h1>{{tt this "operatorsHeader"}}</h1>
+      <QueryBuilder::BlockSelector::OperatorSelector
+        @onOperatorSelected={{this.operatorAdded}}
+      />
+    </div>
+    <h1>{{tt this "conditionHeader"}}</h1>
+    <QueryBuilder::BlockSelector::ConditionSelector
+      @indexProperties={{@indexProperties}}
+      @onConditionSelected={{this.conditionAdded}}
     />
-  </div>
-  <h1>{{tt this "conditionHeader"}}</h1>
-  <QueryBuilder::BlockSelector::ConditionSelector
-    @indexProperties={{@indexProperties}}
-    @onConditionSelected={{this.conditionAdded}}
-  />
+  {{else}}
+    <div class="operators-section surround-section">
+      <h1>{{tt this "surroundHeader"}}</h1>
+      <QueryBuilder::BlockSelector::OperatorSelector
+        @onOperatorSelected={{this.surround}}
+      />
+    </div>
+  {{/if}}
 </div>
 {{yield}}
