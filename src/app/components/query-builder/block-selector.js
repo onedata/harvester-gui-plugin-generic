@@ -1,10 +1,17 @@
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
-import SingleSlotQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/single-slot-query-block';
-import MultiSlotQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/multi-slot-query-block';
 import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/condition-query-block';
+import OperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/operator-query-block';
+import AndOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/and-operator-query-block';
+import OrOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/or-operator-query-block';
+import NotOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/not-operator-query-block';
 
 const allowedModes = ['create', 'edit'];
+const operatorClasses = {
+  and: AndOperatorQueryBlock,
+  or: OrOperatorQueryBlock,
+  not: NotOperatorQueryBlock,
+};
 
 export default class QueryBuilderBlockSelectorComponent extends Component {
   intlPrefix = 'components.query-builder.block-selector';
@@ -18,18 +25,6 @@ export default class QueryBuilderBlockSelectorComponent extends Component {
     return this.args.editBlock || null;
   }
 
-  get editBlockSlots() {
-    if (this.editBlock) {
-      if (this.editBlock.slots) {
-        return this.editBlock.slots;
-      } else if (this.editBlock.slot) {
-        return [this.editBlock.slot];
-      }
-    }
-
-    return [];
-  }
-
   get onBlockAdd() {
     return this.args.onBlockAdd || (() => {});
   }
@@ -39,22 +34,33 @@ export default class QueryBuilderBlockSelectorComponent extends Component {
   }
 
   get isEditBlockAnOperator() {
-    return this.editBlock instanceof MultiSlotQueryBlock ||
-      this.editBlock instanceof SingleSlotQueryBlock;
+    return this.editBlock instanceof OperatorQueryBlock;
   }
 
   get changeToDisabledOperators() {
-    const disabledOperators = [this.editBlock.operator];
-    if (this.editBlockSlots.length > 1) {
-      disabledOperators.push('not');
+    const operatorNames = Object.keys(operatorClasses);
+
+    if (!this.editBlock) {
+      return operatorNames;
     }
+
+    const disabledOperators = [this.editBlock.operator];
+    operatorNames
+      .without(this.editBlock.operator)
+      .forEach(operatorName => {
+        if (
+          operatorClasses[operatorName].maxOperandsNumber < this.editBlock.operands.length
+        ) {
+          disabledOperators.push(operatorName);
+        }
+      });
 
     return disabledOperators;
   }
 
   @action
   operatorAdded(operatorName) {
-    this.onBlockAdd(this.createNewOperatorBlock(operatorName));
+    this.onBlockAdd(this.createOperatorBlock(operatorName));
   }
 
   @action
@@ -69,7 +75,7 @@ export default class QueryBuilderBlockSelectorComponent extends Component {
       return;
     }
 
-    this.onBlockReplace(this.createNewOperatorBlock(operatorName, [this.editBlock]));
+    this.onBlockReplace(this.createOperatorBlock(operatorName, [this.editBlock]));
   }
 
   @action
@@ -78,30 +84,18 @@ export default class QueryBuilderBlockSelectorComponent extends Component {
       return;
     }
 
-    this.onBlockReplace(this.createNewOperatorBlock(
+    this.onBlockReplace(this.createOperatorBlock(
       operatorName,
-      this.editBlockSlots
+      this.editBlock.operands
     ));
   }
 
-  createNewOperatorBlock(operatorName, initialSubblocks = []) {
+  createOperatorBlock(operatorName, initialSubblocks = []) {
     const normalizedInitialSubblocks = initialSubblocks || [];
-    switch (operatorName) {
-      case 'not': {
-        const newBlock = new SingleSlotQueryBlock(operatorName);
-        if (normalizedInitialSubblocks.length) {
-          newBlock.slot = normalizedInitialSubblocks[0];
-        }
-        return newBlock;
-      }
-      case 'and':
-      case 'or': {
-        const newBlock = new MultiSlotQueryBlock(operatorName);
-        if (normalizedInitialSubblocks.length) {
-          newBlock.slots.pushObjects(normalizedInitialSubblocks);
-        }
-        return newBlock;
-      }
-    }
+
+    const newBlock = new operatorClasses[operatorName]();
+    newBlock.operands.pushObjects(normalizedInitialSubblocks);
+
+    return newBlock;
   }
 }

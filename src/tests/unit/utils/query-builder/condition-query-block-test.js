@@ -14,9 +14,8 @@ describe('Unit | Utility | query-builder/condition-query-block', function () {
     }
   );
 
-  it('has "renderer" field set to "condition-block"', function () {
-    const block = new ConditionQueryBlock();
-    expect(block.renderer).to.equal('condition-block');
+  it('has "renderer" static field set to "condition-block"', function () {
+    expect(ConditionQueryBlock.renderer).to.equal('condition-block');
   });
 
   it('can be cloned', function () {

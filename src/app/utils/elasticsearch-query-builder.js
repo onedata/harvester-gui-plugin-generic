@@ -1,5 +1,6 @@
-import SingleSlotQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/single-slot-query-block';
-import MultiSlotQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/multi-slot-query-block';
+import AndOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/and-operator-query-block';
+import OrOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/or-operator-query-block';
+import NotOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/not-operator-query-block';
 import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/condition-query-block';
 import moment from 'moment';
 
@@ -37,22 +38,12 @@ export default class ElasticsearchQueryBuilder {
   }
 
   convertBlock(block) {
-    if (block instanceof SingleSlotQueryBlock) {
-      switch (block.operator) {
-        case 'not':
-          return this.convertNotOperator(block);
-        default:
-          return undefined;
-      }
-    } else if (block instanceof MultiSlotQueryBlock) {
-      switch (block.operator) {
-        case 'and':
-          return this.convertAndOperator(block);
-        case 'or':
-          return this.convertOrOperator(block);
-        default:
-          return undefined;
-      }
+    if (block instanceof NotOperatorQueryBlock) {
+      return this.convertNotOperator(block);
+    } else if (block instanceof AndOperatorQueryBlock) {
+      return this.convertAndOperator(block);
+    } else if (block instanceof OrOperatorQueryBlock) {
+      return this.convertOrOperator(block);
     } else if (block instanceof ConditionQueryBlock) {
       switch (block.comparator) {
         case 'boolean.is':
@@ -202,27 +193,27 @@ export default class ElasticsearchQueryBuilder {
     };
   }
 
-  convertNotOperator(singleSlotBlock) {
+  convertNotOperator(notOperatorBlock) {
     return {
       bool: {
-        must_not: (singleSlotBlock.slot ? [singleSlotBlock.slot] : [])
+        must_not: (notOperatorBlock.operands[0] ? [notOperatorBlock.operands[0]] : [])
           .map(block => this.convertBlock(block)),
       },
     };
   }
 
-  convertAndOperator(multiSlotBlock) {
+  convertAndOperator(andOperatorBlock) {
     return {
       bool: {
-        must: multiSlotBlock.slots.map(block => this.convertBlock(block)),
+        must: andOperatorBlock.operands.map(block => this.convertBlock(block)),
       },
     };
   }
 
-  convertOrOperator(multiSlotBlock) {
+  convertOrOperator(orOperatorBlock) {
     return {
       bool: {
-        should: multiSlotBlock.slots.map(block => this.convertBlock(block)),
+        should: orOperatorBlock.operands.map(block => this.convertBlock(block)),
       },
     };
   }

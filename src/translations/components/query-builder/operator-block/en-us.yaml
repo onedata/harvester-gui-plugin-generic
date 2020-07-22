@@ -1,3 +1,4 @@
 operators:
   and: 'and'
   or: 'or'
+  not: 'not'

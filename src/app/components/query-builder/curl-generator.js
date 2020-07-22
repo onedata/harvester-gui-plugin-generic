@@ -25,7 +25,7 @@ export default class QueryBuilderCurlGeneratorComponent extends Component {
   }
 
   regenerateCurl() {
-    this.queryBuilder.rootQueryBlock = this.args.rootQueryBlock.slot;
+    this.queryBuilder.rootQueryBlock = this.args.rootQueryBlock.operands[0];
     this.queryBuilder.visibleContent = this.args.filteredProperties;
     this.queryBuilder.sortProperty = this.args.sortProperty;
     this.queryBuilder.sortDirection = this.args.sortDirection;

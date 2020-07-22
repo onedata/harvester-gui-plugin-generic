@@ -5,18 +5,19 @@ import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import sinon from 'sinon';
 import { click } from '@ember/test-helpers';
-import SingleSlotQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/single-slot-query-block';
-import MultiSlotQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/multi-slot-query-block';
+import AndOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/and-operator-query-block';
+import OrOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/or-operator-query-block';
+import NotOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/not-operator-query-block';
 import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/condition-query-block';
 import { clickTrigger, selectChoose } from 'ember-power-select/test-support/helpers';
 
-const multiSlotOperatorsList = ['and', 'or'];
-const singleSlotOperatorsList = ['not'];
-const operatorsList = [...multiSlotOperatorsList, ...singleSlotOperatorsList];
+const multiOperandOperatorsList = ['and', 'or'];
+const singleOperandOperatorsList = ['not'];
+const operatorsList = [...multiOperandOperatorsList, ...singleOperandOperatorsList];
 const operatorBlockClasses = {
-  and: MultiSlotQueryBlock,
-  or: MultiSlotQueryBlock,
-  not: SingleSlotQueryBlock,
+  and: AndOperatorQueryBlock,
+  or: OrOperatorQueryBlock,
+  not: NotOperatorQueryBlock,
 };
 
 describe('Integration | Component | query-builder/block-selector', function () {
@@ -57,8 +58,7 @@ describe('Integration | Component | query-builder/block-selector', function () {
 
           expect(addSpy).to.not.be.called;
           await click(`.operator-${operatorName}`);
-          const blockMatcher = sinon.match.instanceOf(operatorBlockClasses[operatorName])
-            .and(sinon.match.has('operator', operatorName));
+          const blockMatcher = sinon.match.instanceOf(operatorBlockClasses[operatorName]);
           expect(addSpy).to.be.calledOnce.and.to.be.calledWith(blockMatcher);
         }
       );
@@ -105,7 +105,7 @@ describe('Integration | Component | query-builder/block-selector', function () {
 
   context('in "edit" mode', function () {
     beforeEach(function () {
-      this.set('editBlock', new SingleSlotQueryBlock('not'));
+      this.set('editBlock', new NotOperatorQueryBlock());
     });
 
     it(
@@ -128,7 +128,6 @@ describe('Integration | Component | query-builder/block-selector', function () {
       it(
         `calls "onBlockReplace" callback, when ${operatorName.toUpperCase()} operator in "surround" section has been clicked`,
         async function () {
-          const isSingleSlot = singleSlotOperatorsList.includes(operatorName);
           const editBlock = this.get('editBlock');
           const replaceSpy = this.set('replaceSpy', sinon.spy());
 
@@ -141,11 +140,7 @@ describe('Integration | Component | query-builder/block-selector', function () {
           expect(replaceSpy).to.not.be.called;
           await click(`.surround-section .operator-${operatorName}`);
           const blockMatcher = sinon.match.instanceOf(operatorBlockClasses[operatorName])
-            .and(sinon.match.has('operator', operatorName))
-            .and(isSingleSlot ?
-              sinon.match.has('slot', editBlock) :
-              sinon.match.has('slots', [editBlock])
-            );
+            .and(sinon.match.has('operands', [editBlock]));
           expect(replaceSpy).to.be.calledOnce.and.to.be.calledWith(blockMatcher);
         }
       );
@@ -191,11 +186,8 @@ describe('Integration | Component | query-builder/block-selector', function () {
       }, {
         beforeFunc(testCase) {
           const editBlock = testCase.get('editBlock');
-          const hasSingleSlot = editBlock instanceof SingleSlotQueryBlock;
           const conditionBlock = new ConditionQueryBlock();
-          hasSingleSlot ?
-            editBlock.slot = conditionBlock :
-            editBlock.slots.pushObject(conditionBlock);
+          editBlock.operands.pushObject(conditionBlock);
         },
         descriptionSuffix: 'with single condition',
       }].forEach(({ beforeFunc, descriptionSuffix }) => {
@@ -221,7 +213,7 @@ describe('Integration | Component | query-builder/block-selector', function () {
       });
     });
 
-    multiSlotOperatorsList.forEach(operatorName => {
+    multiOperandOperatorsList.forEach(operatorName => {
       it(
         `blocks "change to" ${operatorName.toUpperCase()} and NOT when editing ${operatorName.toUpperCase()} operator with two conditions`,
         async function () {
@@ -230,7 +222,7 @@ describe('Integration | Component | query-builder/block-selector', function () {
             new operatorBlockClasses[operatorName](operatorName)
           );
           const conditionBlock = new ConditionQueryBlock();
-          editBlock.slots.pushObjects([conditionBlock, conditionBlock]);
+          editBlock.operands.pushObjects([conditionBlock, conditionBlock]);
 
           await render(hbs `<QueryBuilder::BlockSelector
             @mode="edit"
@@ -263,10 +255,7 @@ describe('Integration | Component | query-builder/block-selector', function () {
               new operatorBlockClasses[sourceOperatorName](sourceOperatorName)
             );
             const conditionBlock = new ConditionQueryBlock();
-            const hasSingleSlot = editBlock instanceof SingleSlotQueryBlock;
-            hasSingleSlot ?
-              editBlock.slot = conditionBlock :
-              editBlock.slots.pushObject(conditionBlock);
+            editBlock.operands.pushObject(conditionBlock);
             const replaceSpy = this.set('replaceSpy', sinon.spy());
 
             await render(hbs `<QueryBuilder::BlockSelector
@@ -276,16 +265,9 @@ describe('Integration | Component | query-builder/block-selector', function () {
             />`);
             await click(`.change-to-section .operator-${destinationOperatorName}`);
 
-            const isDestinationSingleSlot =
-              singleSlotOperatorsList.includes(destinationOperatorName);
             const blockMatcher = sinon.match
               .instanceOf(operatorBlockClasses[destinationOperatorName])
-              .and(sinon.match.has('operator', destinationOperatorName))
-              .and(isDestinationSingleSlot ?
-                sinon.match.has('slot', conditionBlock) :
-                sinon.match.has('slots', [conditionBlock])
-              );
-
+              .and(sinon.match.has('operands', [conditionBlock]));
             expect(replaceSpy).to.be.calledOnce.and.to.be.calledWith(blockMatcher);
           }
         );

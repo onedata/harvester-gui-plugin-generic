@@ -1,7 +1,7 @@
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
-import SingleSlotQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/single-slot-query-block';
+import RootOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/root-operator-query-block';
 
 const allowedPropertyTypes = [
   'text',
@@ -17,7 +17,7 @@ const allowedPropertyTypes = [
 export default class QueryBuilderComponent extends Component {
   intlPrefix = 'components.query-builder';
 
-  @tracked rootQueryBlock = new SingleSlotQueryBlock();
+  @tracked rootQueryBlock = new RootOperatorQueryBlock();
 
   get indexProperties() {
     const allProperties =

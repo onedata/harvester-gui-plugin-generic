@@ -1,8 +1,9 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import ElasticsearchQueryBuilder from 'harvester-gui-plugin-generic/utils/elasticsearch-query-builder';
-import SingleSlotQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/single-slot-query-block';
-import MultiSlotQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/multi-slot-query-block';
+import AndOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/and-operator-query-block';
+import OrOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/or-operator-query-block';
+import NotOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/not-operator-query-block';
 import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/condition-query-block';
 import IndexProperty from 'harvester-gui-plugin-generic/utils/index-property';
 import IndexOnedataProperty from 'harvester-gui-plugin-generic/utils/index-onedata-property';
@@ -105,16 +106,16 @@ const exampleAnyPropertyConditionQuery = {
   },
 };
 
-const exampleNotOperatorBlock = new SingleSlotQueryBlock('not');
-exampleNotOperatorBlock.slot = exampleBooleanConditionBlock;
+const exampleNotOperatorBlock = new NotOperatorQueryBlock();
+exampleNotOperatorBlock.operands.pushObject(exampleBooleanConditionBlock);
 const exampleNotOperatorQuery = {
   bool: {
     must_not: [exampleBooleanConditionQuery],
   },
 };
 
-const exampleAndOperatorBlock = new MultiSlotQueryBlock('and');
-exampleAndOperatorBlock.slots.pushObjects([
+const exampleAndOperatorBlock = new AndOperatorQueryBlock();
+exampleAndOperatorBlock.operands.pushObjects([
   exampleBooleanConditionBlock,
   exampleNumberEqualsConditionBlock,
   exampleDateLteConditionBlock,
@@ -131,8 +132,8 @@ const exampleAndOperatorQuery = {
   },
 };
 
-const exampleOrOperatorBlock = new MultiSlotQueryBlock('or');
-exampleOrOperatorBlock.slots.pushObjects([
+const exampleOrOperatorBlock = new OrOperatorQueryBlock();
+exampleOrOperatorBlock.operands.pushObjects([
   exampleTextContainsConditionBlock,
   exampleKeywordIsConditionBlock,
   exampleSpaceConditionBlock,
@@ -147,9 +148,9 @@ const exampleOrOperatorQuery = {
   },
 };
 
-const exampleNestedOperatorsBlock = new SingleSlotQueryBlock('not');
-exampleNestedOperatorsBlock.slot = new MultiSlotQueryBlock('or');
-exampleNestedOperatorsBlock.slot.slots.pushObjects([
+const exampleNestedOperatorsBlock = new NotOperatorQueryBlock();
+exampleNestedOperatorsBlock.operands.pushObject(new OrOperatorQueryBlock());
+exampleNestedOperatorsBlock.operands[0].operands.pushObjects([
   exampleAndOperatorBlock,
   exampleOrOperatorBlock,
 ]);

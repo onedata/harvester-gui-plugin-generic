@@ -6,7 +6,7 @@ import hbs from 'htmlbars-inline-precompile';
 import sinon from 'sinon';
 import { click } from '@ember/test-helpers';
 import { selectChoose, clickTrigger } from 'ember-power-select/test-support/helpers';
-import SingleSlotQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/single-slot-query-block';
+import RootOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/root-operator-query-block';
 import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/condition-query-block';
 import Index from 'harvester-gui-plugin-generic/utils/index';
 
@@ -76,8 +76,8 @@ describe('Integration | Component | query-builder', function () {
     await click('.accept-condition');
     await click('.submit-query');
 
-    const queryMatcher = sinon.match.instanceOf(SingleSlotQueryBlock)
-      .and(sinon.match.has('slot', sinon.match.instanceOf(ConditionQueryBlock)));
+    const queryMatcher = sinon.match.instanceOf(RootOperatorQueryBlock)
+      .and(sinon.match.has('operands', [sinon.match.instanceOf(ConditionQueryBlock)]));
     expect(submitSpy).to.be.calledOnce.and.be.calledWith(queryMatcher);
   });
 

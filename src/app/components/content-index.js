@@ -32,8 +32,8 @@ export default class ContentIndexComponent extends Component {
 
   @action
   performQuery(rootBlock) {
-    const rootSlot = rootBlock && rootBlock.slot;
-    this.queryBuilder.rootQueryBlock = rootSlot ? rootSlot.clone() : rootSlot;
+    const rootOperand = rootBlock && rootBlock.operands[0];
+    this.queryBuilder.rootQueryBlock = rootOperand ? rootOperand.clone() : rootOperand;
     this.activePageNumber = 1;
     this.updateQueryBuilderResultsRange();
     this.queryElasticsearch();

@@ -2,7 +2,7 @@
   class="query-builder-block-visualiser {{if isDirectlyHovered "directly-hovered"}}"
   {{closest-hovered selector=".query-builder-block-visualiser" handler=this.directlyHovered}}
 >
-  {{#component (concat "query-builder/" @queryBlock.renderer)
+  {{#component (concat "query-builder/" @queryBlock.constructor.renderer)
     queryBlock=@queryBlock
     indexProperties=@indexProperties
   }}
@@ -23,7 +23,7 @@
         <QueryBuilder::BlockSelector
           @mode="edit"
           @editBlock={{@queryBlock}}
-          @onBlockReplace={{@onBlockReplace}}
+          @onBlockReplace={{fn this.onBlockReplace popover.hide}}
         />
       </AttachPopover>
     </BsButton>

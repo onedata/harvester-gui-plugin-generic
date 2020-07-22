@@ -7,7 +7,7 @@ import { click, waitUntil } from '@ember/test-helpers';
 import { isVisible } from 'ember-attacher';
 import sinon from 'sinon';
 import { selectChoose } from 'ember-power-select/test-support/helpers';
-import MultiSlotQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/multi-slot-query-block';
+import AndOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/and-operator-query-block';
 import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/condition-query-block';
 
 describe('Integration | Component | query-builder/block-adder', function () {
@@ -36,7 +36,7 @@ describe('Integration | Component | query-builder/block-adder', function () {
     await click('.ember-attacher .operator-and');
 
     expect(addSpy).to.be.calledOnce
-      .and.to.be.calledWith(sinon.match.instanceOf(MultiSlotQueryBlock));
+      .and.to.be.calledWith(sinon.match.instanceOf(AndOperatorQueryBlock));
   });
 
   it('passess through information about new condition', async function () {
