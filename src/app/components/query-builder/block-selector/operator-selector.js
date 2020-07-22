@@ -11,7 +11,18 @@ extends Component {
       this.validOperators;
   }
 
+  get disabledOperators() {
+    return this.args.disabledOperators || [];
+  }
+
   get onOperatorSelected() {
     return this.args.onOperatorSelected || (() => {});
+  }
+
+  get operatorsSpec() {
+    return this.operators.map(operatorName => ({
+      name: operatorName,
+      disabled: this.disabledOperators.includes(operatorName),
+    }));
   }
 }

@@ -70,6 +70,32 @@ describe(
         checkOperatorButton(operators[0], 'and');
       }
     );
+
+    it(
+      'does not disable any operator by default',
+      async function () {
+        await render(hbs `<QueryBuilder::BlockSelector::OperatorSelector/>`);
+
+        expect(this.element.querySelector(
+          '.operator-selector .operator[disabled]'
+        )).to.not.exist;
+      }
+    );
+
+    it(
+      'disables specified operators',
+      async function () {
+        await render(hbs `<QueryBuilder::BlockSelector::OperatorSelector
+          @disabledOperators={{array "and" "or"}}
+        />`);
+
+        expect(this.element.querySelectorAll(
+          '.operator-selector .operator[disabled]'
+        )).to.have.length(2);
+        expect(this.element.querySelector('.operator-selector .operator-not'))
+          .to.not.have.attr('disabled');
+      }
+    );
   }
 );
 

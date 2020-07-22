@@ -18,12 +18,38 @@ export default class QueryBuilderBlockSelectorComponent extends Component {
     return this.args.editBlock || null;
   }
 
+  get editBlockSlots() {
+    if (this.editBlock) {
+      if (this.editBlock.slots) {
+        return this.editBlock.slots;
+      } else if (this.editBlock.slot) {
+        return [this.editBlock.slot];
+      }
+    }
+
+    return [];
+  }
+
   get onBlockAdd() {
     return this.args.onBlockAdd || (() => {});
   }
 
   get onBlockReplace() {
     return this.args.onBlockReplace || (() => {});
+  }
+
+  get isEditBlockAnOperator() {
+    return this.editBlock instanceof MultiSlotQueryBlock ||
+      this.editBlock instanceof SingleSlotQueryBlock;
+  }
+
+  get changeToDisabledOperators() {
+    const disabledOperators = [this.editBlock.operator];
+    if (this.editBlockSlots.length > 1) {
+      disabledOperators.push('not');
+    }
+
+    return disabledOperators;
   }
 
   @action
@@ -44,6 +70,18 @@ export default class QueryBuilderBlockSelectorComponent extends Component {
     }
 
     this.onBlockReplace(this.createNewOperatorBlock(operatorName, [this.editBlock]));
+  }
+
+  @action
+  changeTo(operatorName) {
+    if (!this.editBlock) {
+      return;
+    }
+
+    this.onBlockReplace(this.createNewOperatorBlock(
+      operatorName,
+      this.editBlockSlots
+    ));
   }
 
   createNewOperatorBlock(operatorName, initialSubblocks = []) {

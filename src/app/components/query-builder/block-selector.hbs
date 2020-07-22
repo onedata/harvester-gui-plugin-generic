@@ -18,6 +18,15 @@
         @onOperatorSelected={{this.surround}}
       />
     </div>
+    {{#if this.isEditBlockAnOperator}}
+      <div class="operators-section change-to-section">
+        <h1>{{tt this "changeToHeader"}}</h1>
+        <QueryBuilder::BlockSelector::OperatorSelector
+          @onOperatorSelected={{this.changeTo}}
+          @disabledOperators={{this.changeToDisabledOperators}}
+        />
+      </div>
+    {{/if}}
   {{/if}}
 </div>
 {{yield}}

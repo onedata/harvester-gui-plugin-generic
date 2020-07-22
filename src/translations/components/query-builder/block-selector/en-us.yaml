@@ -1,3 +1,4 @@
 operatorsHeader: 'Operator'
 conditionHeader: 'Condition'
 surroundHeader: 'Surround with operator'
+changeToHeader: 'Change to operator'

@@ -22,17 +22,17 @@ const operatorBlockClasses = {
 describe('Integration | Component | query-builder/block-selector', function () {
   setupRenderingTest();
 
-  beforeEach(function () {
-    this.set('indexProperties', [{
-      path: 'boolProp',
-      type: 'boolean',
-    }, {
-      path: 'textProp',
-      type: 'text',
-    }]);
-  });
-
   context('in "create" mode', function () {
+    beforeEach(function () {
+      this.set('indexProperties', [{
+        path: 'boolProp',
+        type: 'boolean',
+      }, {
+        path: 'textProp',
+        type: 'text',
+      }]);
+    });
+
     it('renders three operators: AND, OR and NOT', async function () {
       await render(hbs `<QueryBuilder::BlockSelector @mode="create"/>`);
 
@@ -130,7 +130,7 @@ describe('Integration | Component | query-builder/block-selector', function () {
         async function () {
           const isSingleSlot = singleSlotOperatorsList.includes(operatorName);
           const editBlock = this.get('editBlock');
-          const addSpy = this.set('replaceSpy', sinon.spy());
+          const replaceSpy = this.set('replaceSpy', sinon.spy());
 
           await render(hbs `<QueryBuilder::BlockSelector
             @mode="edit"
@@ -138,7 +138,7 @@ describe('Integration | Component | query-builder/block-selector', function () {
             @onBlockReplace={{this.replaceSpy}}
           />`);
 
-          expect(addSpy).to.not.be.called;
+          expect(replaceSpy).to.not.be.called;
           await click(`.surround-section .operator-${operatorName}`);
           const blockMatcher = sinon.match.instanceOf(operatorBlockClasses[operatorName])
             .and(sinon.match.has('operator', operatorName))
@@ -146,9 +146,150 @@ describe('Integration | Component | query-builder/block-selector', function () {
               sinon.match.has('slot', editBlock) :
               sinon.match.has('slots', [editBlock])
             );
-          expect(addSpy).to.be.calledOnce.and.to.be.calledWith(blockMatcher);
+          expect(replaceSpy).to.be.calledOnce.and.to.be.calledWith(blockMatcher);
         }
       );
+    });
+
+    it(
+      'renders three operators: AND, OR and NOT in "change to" section',
+      async function () {
+        await render(hbs `<QueryBuilder::BlockSelector
+          @mode="edit"
+          @editBlock={{this.editBlock}}
+        />`);
+
+        const operators = this.element.querySelectorAll(
+          '.change-to-section .operator-selector .operator'
+        );
+        expect(operators).to.have.length(3);
+        operatorsList.forEach((operatorName, index) => {
+          const operator = operators[index];
+          expect(operator.textContent.trim()).to.equal(operatorName);
+        });
+      }
+    );
+
+    it(
+      'does not render operators in "change to" section when block is an operator',
+      async function () {
+        this.set('editBlock', new ConditionQueryBlock());
+
+        await render(hbs `<QueryBuilder::BlockSelector
+          @mode="edit"
+          @editBlock={{this.editBlock}}
+        />`);
+
+        expect(this.element.querySelector('.change-to-section')).to.not.exist;
+      }
+    );
+
+    operatorsList.forEach(operatorName => {
+      [{
+        beforeFunc() {},
+        descriptionSuffix: 'with no condition',
+      }, {
+        beforeFunc(testCase) {
+          const editBlock = testCase.get('editBlock');
+          const hasSingleSlot = editBlock instanceof SingleSlotQueryBlock;
+          const conditionBlock = new ConditionQueryBlock();
+          hasSingleSlot ?
+            editBlock.slot = conditionBlock :
+            editBlock.slots.pushObject(conditionBlock);
+        },
+        descriptionSuffix: 'with single condition',
+      }].forEach(({ beforeFunc, descriptionSuffix }) => {
+        it(
+          `blocks "change to" ${operatorName.toUpperCase()} when editing ${operatorName.toUpperCase()} operator ${descriptionSuffix}`,
+          async function () {
+            this.set('editBlock', new operatorBlockClasses[operatorName](operatorName));
+            beforeFunc(this);
+
+            await render(hbs `<QueryBuilder::BlockSelector
+              @mode="edit"
+              @editBlock={{this.editBlock}}
+            />`);
+
+            expect(
+              this.element.querySelector(`.change-to-section .operator-${operatorName}`)
+            ).to.have.attr('disabled');
+            expect(
+              this.element.querySelectorAll('.change-to-section .operator:not([disabled])')
+            ).to.have.length(2);
+          }
+        );
+      });
+    });
+
+    multiSlotOperatorsList.forEach(operatorName => {
+      it(
+        `blocks "change to" ${operatorName.toUpperCase()} and NOT when editing ${operatorName.toUpperCase()} operator with two conditions`,
+        async function () {
+          const editBlock = this.set(
+            'editBlock',
+            new operatorBlockClasses[operatorName](operatorName)
+          );
+          const conditionBlock = new ConditionQueryBlock();
+          editBlock.slots.pushObjects([conditionBlock, conditionBlock]);
+
+          await render(hbs `<QueryBuilder::BlockSelector
+            @mode="edit"
+            @editBlock={{this.editBlock}}
+          />`);
+
+          [
+            operatorName,
+            'not',
+          ].forEach(disabledOperator => {
+            expect(this.element.querySelector(
+              `.change-to-section .operator-${disabledOperator}`
+            )).to.have.attr('disabled');
+          });
+
+          expect(
+            this.element.querySelectorAll('.change-to-section .operator:not([disabled])')
+          ).to.have.length(1);
+        }
+      );
+    });
+
+    operatorsList.forEach(sourceOperatorName => {
+      operatorsList.without(sourceOperatorName).forEach(destinationOperatorName => {
+        it(
+          `changes ${sourceOperatorName.toUpperCase()} operator with single condition to ${destinationOperatorName.toUpperCase()} operator`,
+          async function () {
+            const editBlock = this.set(
+              'editBlock',
+              new operatorBlockClasses[sourceOperatorName](sourceOperatorName)
+            );
+            const conditionBlock = new ConditionQueryBlock();
+            const hasSingleSlot = editBlock instanceof SingleSlotQueryBlock;
+            hasSingleSlot ?
+              editBlock.slot = conditionBlock :
+              editBlock.slots.pushObject(conditionBlock);
+            const replaceSpy = this.set('replaceSpy', sinon.spy());
+
+            await render(hbs `<QueryBuilder::BlockSelector
+              @mode="edit"
+              @editBlock={{this.editBlock}}
+              @onBlockReplace={{this.replaceSpy}}
+            />`);
+            await click(`.change-to-section .operator-${destinationOperatorName}`);
+
+            const isDestinationSingleSlot =
+              singleSlotOperatorsList.includes(destinationOperatorName);
+            const blockMatcher = sinon.match
+              .instanceOf(operatorBlockClasses[destinationOperatorName])
+              .and(sinon.match.has('operator', destinationOperatorName))
+              .and(isDestinationSingleSlot ?
+                sinon.match.has('slot', conditionBlock) :
+                sinon.match.has('slots', [conditionBlock])
+              );
+
+            expect(replaceSpy).to.be.calledOnce.and.to.be.calledWith(blockMatcher);
+          }
+        );
+      });
     });
   });
 });

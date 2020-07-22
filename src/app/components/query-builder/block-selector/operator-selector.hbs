@@ -1,14 +1,15 @@
 <ul class="operator-selector">
-  {{#each this.operators as |operator|}}
+  {{#each this.operatorsSpec as |operator|}}
     <li>
       <BsButton
-        class="operator operator-{{operator}}"
+        class="operator operator-{{operator.name}}"
+        disabled={{operator.disabled}}
         @type="secondary"
         @size="sm"
         @outline={{true}}
-        @onClick={{fn this.onOperatorSelected operator}}
+        @onClick={{fn this.onOperatorSelected operator.name}}
       >
-        {{tt this (concat "operators." operator)}}
+        {{tt this (concat "operators." operator.name)}}
       </BsButton>
     </li>
   {{/each}}

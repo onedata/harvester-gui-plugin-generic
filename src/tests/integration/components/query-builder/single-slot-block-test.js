@@ -151,4 +151,31 @@ describe('Integration | Component | query-builder/single-slot-block', function (
     expect(innerBlock.querySelector('.block-prefix-label').textContent.trim())
       .to.equal('not');
   });
+
+  it('allows to change nested operator to another operator', async function () {
+    this.set('queryBlock', new SingleSlotQueryBlock('not'));
+
+    await render(hbs `
+      <QueryBuilder::SingleSlotBlock @queryBlock={{this.queryBlock}} />
+    `);
+    await click('.add-trigger');
+    await click('.ember-attacher .operator-not');
+    await click('.add-trigger');
+    await click('.ember-attacher .operator-or');
+    await click('.query-builder-single-slot-block > .block-settings');
+    await click('.ember-attacher .change-to-section .operator-and');
+
+    expect(this.element.querySelectorAll('.query-builder-block')).to.have.length(3);
+    const changedBlock =
+      this.element.querySelector('.query-builder-block .query-builder-block');
+    expect(changedBlock).to.have.class('query-builder-multi-slot-block');
+    expect(changedBlock.querySelector(':scope > .block-infix-label').textContent.trim())
+      .to.equal('and');
+    const innerBlock = this.element.querySelector(
+      '.query-builder-block .query-builder-block .query-builder-block'
+    );
+    expect(innerBlock).to.have.class('query-builder-multi-slot-block');
+    expect(innerBlock.querySelector(':scope > .block-infix-label').textContent.trim())
+      .to.equal('or');
+  });
 });
