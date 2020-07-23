@@ -75,16 +75,19 @@
     justify-content: flex-start;
   }
   
-  .flatpickr-wrapper, .form-group input:not([type="checkbox"]) {
+  .date-editor {
+    .input-group {
+      flex-wrap: nowrap;
+    }
+
+    .form-control {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+  }
+  
+  .flatpickr-wrapper {
     width: 100%;
-  }
-
-  .comparator-value-input[readonly] {
-    background-color: $input-bg;
-  }
-
-  .form-check-input {
-    margin-top: 0;
   }
 
   .accept-condition {

@@ -52,7 +52,7 @@ describe('Integration | Component | query-builder/block-adder', function () {
     />`);
     await click('.add-trigger');
     await selectChoose('.property-selector', 'a.b');
-    await selectChoose('.comparator-value-selector', 'false');
+    await selectChoose('.comparator-value', 'false');
     await click('.accept-condition');
 
     expect(addSpy).to.be.calledOnce

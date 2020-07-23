@@ -1,0 +1,70 @@
+{{#if (eq this.mode "create")}}
+  <div class="form-group {{this.comparatorEditor.type}}-editor" ...attributes>
+    {{#if (or
+      (eq this.comparatorEditor.type "dropdown")
+      (eq this.comparatorEditor.type "space")
+    )}}
+      <PowerSelect
+        @options={{this.comparatorEditor.values}}
+        @selected={{this.value}}
+        @onChange={{this.valueChanged}}
+        @renderInPlace={{true}}
+        class="comparator-value"
+        as |value|
+      >
+        {{#if (eq this.comparatorEditor.type "space")}}
+          {{value.name}}
+        {{else}}
+          {{value}}
+        {{/if}}
+      </PowerSelect>
+    {{else if (eq this.comparatorEditor.type "text")}}
+      <input
+        type="text"
+        value={{this.value}}
+        {{on "input" this.valueChanged}}
+        class="comparator-value form-control form-control-sm"
+      >
+    {{else if (eq this.comparatorEditor.type "date")}}
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <BsButton
+            @size="sm"
+            @type="secondary"
+            @outline={{true}}
+            class="include-time {{if this.value.timeEnabled "active"}}"
+            onClick={{fn this.valueChanged (not this.value.timeEnabled)}}
+          >
+            <FaIcon @icon="clock"/>
+            <BsTooltip @title={{tt this "includeTimeInDate"}}/>
+          </BsButton>
+        </div>
+        {{#if this.value.timeEnabled}}
+          <EmberFlatpickr
+            @date={{readonly this.value.datetime}}
+            @onChange={{this.valueChanged}}
+            @static={{true}}
+            @altFormat="Y-m-d H:i:S"
+            @altInput={{true}}
+            @altInputClass="comparator-value form-control form-control-sm"
+            @enableTime={{true}}
+            @time_24hr={{true}}
+            @enableSeconds={{true}}
+          />
+        {{else}}
+          <EmberFlatpickr
+            @date={{readonly this.value.datetime}}
+            @onChange={{this.valueChanged}}
+            @static={{true}}
+            @altFormat="Y-m-d"
+            @altInput={{true}}
+            @altInputClass="comparator-value form-control form-control-sm"
+          />
+        {{/if}}
+      </div>
+    {{/if}}
+  </div>
+{{else}}
+  <samp class="comparator-value">{{this.viewModeComparatorValue}}</samp>
+{{/if}}
+{{yield}}

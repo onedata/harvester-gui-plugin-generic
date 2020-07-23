@@ -153,20 +153,15 @@ describe(
     });
 
     it(
-      'shows true/false dropdown for "is" comparator for boolean property',
+      'sets default comparator value for "is" comparator for boolean property',
       async function () {
         await render(hbs `<QueryBuilder::BlockSelector::ConditionSelector
           @indexProperties={{this.indexProperties}}
         />`);
         await selectChoose('.property-selector', 'boolProp');
-        await clickTrigger('.comparator-value-selector');
 
-        const options = this.element.querySelectorAll('.ember-power-select-option');
-        expect(options).to.have.length(2);
-        expect(options[0].textContent.trim()).to.equal('true');
-        expect(options[1].textContent.trim()).to.equal('false');
         expect(this.element.querySelector(
-          '.comparator-value-selector .ember-power-select-selected-item'
+          '.comparator-value .ember-power-select-selected-item'
         ).textContent.trim()).to.equal('true');
       }
     );
@@ -182,7 +177,7 @@ describe(
         />`);
 
         await selectChoose('.property-selector', 'boolProp');
-        await selectChoose('.comparator-value-selector', 'false');
+        await selectChoose('.comparator-value', 'false');
         await click('.accept-condition');
 
         expect(selectedSpy).to.be.calledOnce.and.to.be.calledWith(
@@ -223,19 +218,6 @@ describe(
     });
 
     it(
-      'shows text input for "contains" comparator for text property',
-      async function () {
-        await render(hbs `<QueryBuilder::BlockSelector::ConditionSelector
-          @indexProperties={{this.indexProperties}}
-        />`);
-        await selectChoose('.property-selector', 'textProp');
-
-        expect(this.element.querySelector('input[type="text"].comparator-value-input'))
-          .to.exist;
-      }
-    );
-
-    it(
       'calls "onConditionSelected" callback, when text property "contains" condition has been accepted',
       async function () {
         const selectedSpy = this.set('selectedSpy', sinon.spy());
@@ -246,7 +228,7 @@ describe(
         />`);
 
         await selectChoose('.property-selector', 'textProp');
-        await fillIn('.comparator-value-input', 'a | b');
+        await fillIn('.comparator-value', 'a | b');
         await click('.accept-condition');
 
         expect(selectedSpy).to.be.calledOnce.and.to.be.calledWith(
@@ -265,7 +247,7 @@ describe(
         />`);
 
         await selectChoose('.property-selector', 'textProp');
-        await fillIn('.comparator-value-input', '');
+        await fillIn('.comparator-value', '');
 
         expect(this.element.querySelector('.accept-condition')).to.have.attr('disabled');
       }
@@ -290,20 +272,6 @@ describe(
 
     numberComparators.forEach(({ name, symbol }) => {
       it(
-        `shows text input for "${symbol}" comparator for number property`,
-        async function () {
-          await render(hbs `<QueryBuilder::BlockSelector::ConditionSelector
-            @indexProperties={{this.indexProperties}}
-          />`);
-          await selectChoose('.property-selector', 'numberProp');
-          await selectChoose('.comparator-selector', symbol);
-
-          expect(this.element.querySelector('input[type="text"].comparator-value-input'))
-            .to.exist;
-        }
-      );
-
-      it(
         `calls "onConditionSelected" callback, when number property "${symbol}" condition has been accepted`,
         async function () {
           const selectedSpy = this.set('selectedSpy', sinon.spy());
@@ -315,7 +283,7 @@ describe(
 
           await selectChoose('.property-selector', 'numberProp');
           await selectChoose('.comparator-selector', symbol);
-          await fillIn('.comparator-value-input', '2');
+          await fillIn('.comparator-value', '2');
           await click('.accept-condition');
 
           expect(selectedSpy).to.be.calledOnce.and.to.be.calledWith(
@@ -349,7 +317,7 @@ describe(
 
           await selectChoose('.property-selector', 'numberProp');
           await selectChoose('.comparator-selector', symbol);
-          await fillIn('.comparator-value-input', 'xyz');
+          await fillIn('.comparator-value', 'xyz');
 
           expect(this.element.querySelector('.accept-condition')).to.have.attr('disabled');
         }
@@ -372,19 +340,6 @@ describe(
     });
 
     it(
-      'shows text input for "is" comparator for keyword property',
-      async function () {
-        await render(hbs `<QueryBuilder::BlockSelector::ConditionSelector
-          @indexProperties={{this.indexProperties}}
-        />`);
-        await selectChoose('.property-selector', 'keywordProp');
-
-        expect(this.element.querySelector('input[type="text"].comparator-value-input'))
-          .to.exist;
-      }
-    );
-
-    it(
       'calls "onConditionSelected" callback, when keyword property "is" condition has been accepted',
       async function () {
         const selectedSpy = this.set('selectedSpy', sinon.spy());
@@ -395,7 +350,7 @@ describe(
         />`);
 
         await selectChoose('.property-selector', 'keywordProp');
-        await fillIn('.comparator-value-input', 'abc');
+        await fillIn('.comparator-value', 'abc');
         await click('.accept-condition');
 
         expect(selectedSpy).to.be.calledOnce.and.to.be.calledWith(
@@ -414,7 +369,7 @@ describe(
         />`);
 
         await selectChoose('.property-selector', 'keywordProp');
-        await fillIn('.comparator-value-input', '');
+        await fillIn('.comparator-value', '');
 
         expect(this.element.querySelector('.accept-condition')).to.have.attr('disabled');
       }
@@ -439,7 +394,7 @@ describe(
 
     numberComparators.forEach(({ name, symbol }) => {
       it(
-        `shows flatpickr input without time for "${symbol}" comparator for date property`,
+        `sets default comparator value for "${symbol}" comparator for date property`,
         async function () {
           await render(hbs `<QueryBuilder::BlockSelector::ConditionSelector
             @indexProperties={{this.indexProperties}}
@@ -447,15 +402,13 @@ describe(
           await selectChoose('.property-selector', 'dateProp');
           await selectChoose('.comparator-selector', symbol);
 
-          expect(this.element.querySelector('.comparator-value-input'))
+          expect(this.element.querySelector('.comparator-value'))
             .to.exist.and.to.have.value('2020-05-04');
-          expect(this.element.querySelector('.flatpickr-calendar')).to.exist;
-          expect(this.element.querySelector('.flatpickr-time.hasSeconds')).to.not.exist;
         }
       );
 
       it(
-        `allows to enable time flatpickr input for "${symbol}" comparator for date property`,
+        `sets default comparator value for "${symbol}" comparator for date property (time enabled)`,
         async function () {
           await render(hbs `<QueryBuilder::BlockSelector::ConditionSelector
             @indexProperties={{this.indexProperties}}
@@ -464,9 +417,8 @@ describe(
           await selectChoose('.comparator-selector', symbol);
           await click('.include-time');
 
-          expect(this.element.querySelector('.comparator-value-input'))
+          expect(this.element.querySelector('.comparator-value'))
             .to.have.value('2020-05-04 00:00:00');
-          expect(this.element.querySelector('.flatpickr-time.hasSeconds')).to.exist;
         }
       );
 
@@ -517,20 +469,15 @@ describe(
     });
 
     it(
-      'shows spaces dropdown for "is" comparator for space property',
+      'sets default comparator value for "is" comparator for space property',
       async function () {
         await render(hbs `<QueryBuilder::BlockSelector::ConditionSelector
           @indexProperties={{this.indexProperties}}
         />`);
         await selectChoose('.property-selector', 'space');
-        await clickTrigger('.comparator-value-selector');
 
-        const options = this.element.querySelectorAll('.ember-power-select-option');
-        expect(options).to.have.length(2);
-        expect(options[0].textContent.trim()).to.equal('space1');
-        expect(options[1].textContent.trim()).to.equal('space2');
         expect(this.element.querySelector(
-          '.comparator-value-selector .ember-power-select-selected-item'
+          '.comparator-value .ember-power-select-selected-item'
         ).textContent.trim()).to.equal('space1');
       }
     );
@@ -546,7 +493,7 @@ describe(
         />`);
 
         await selectChoose('.property-selector', 'space');
-        await selectChoose('.comparator-value-selector', 'space2');
+        await selectChoose('.comparator-value', 'space2');
         await click('.accept-condition');
 
         expect(selectedSpy).to.be.calledOnce.and.to.be.calledWith(
@@ -588,19 +535,6 @@ describe(
     });
 
     it(
-      'shows text input for "hasPhrase" comparator for anyProperty property',
-      async function () {
-        await render(hbs `<QueryBuilder::BlockSelector::ConditionSelector
-          @indexProperties={{this.indexProperties}}
-        />`);
-        await selectChoose('.property-selector', 'any property');
-
-        expect(this.element.querySelector('input[type="text"].comparator-value-input'))
-          .to.exist;
-      }
-    );
-
-    it(
       'calls "onConditionSelected" callback, when anyProperty property "hasPhrase" condition has been accepted',
       async function () {
         const selectedSpy = this.set('selectedSpy', sinon.spy());
@@ -611,7 +545,7 @@ describe(
         />`);
 
         await selectChoose('.property-selector', 'any property');
-        await fillIn('.comparator-value-input', 'abc def');
+        await fillIn('.comparator-value', 'abc def');
         await click('.accept-condition');
 
         expect(selectedSpy).to.be.calledOnce.and.to.be.calledWith(
@@ -630,7 +564,7 @@ describe(
         />`);
 
         await selectChoose('.property-selector', 'any property');
-        await fillIn('.comparator-value-input', '');
+        await fillIn('.comparator-value', '');
 
         expect(this.element.querySelector('.accept-condition')).to.have.attr('disabled');
       }

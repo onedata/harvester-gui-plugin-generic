@@ -91,7 +91,7 @@ describe('Integration | Component | query-builder/block-selector', function () {
         />`);
 
         await selectChoose('.property-selector', 'boolProp');
-        await selectChoose('.comparator-value-selector', 'false');
+        await selectChoose('.comparator-value', 'false');
         await click('.accept-condition');
 
         const blockMatcher = sinon.match.instanceOf(ConditionQueryBlock)

@@ -3,6 +3,10 @@
     {{@queryBlock.property.path}}
   </code>
   <span class="comparator">{{tt this (concat "comparators." @queryBlock.comparator)}}</span>
-  <samp class="comparator-value">{{this.comparatorValue}}</samp>
+  <QueryBuilder::ConditionComparatorValueEditor
+    @mode="view"
+    @comparator={{@queryBlock.comparator}}
+    @value={{@queryBlock.comparatorValue}}
+  />
   {{yield}}
 </div>
