@@ -6,10 +6,18 @@ import hbs from 'htmlbars-inline-precompile';
 import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/condition-query-block';
 import sinon from 'sinon';
 import { clickTrigger, selectChoose } from 'ember-power-select/test-support/helpers';
-import { click, fillIn } from '@ember/test-helpers';
-import { setFlatpickrDate } from 'ember-flatpickr/test-support/helpers';
+import { click, fillIn, blur, triggerKeyEvent } from '@ember/test-helpers';
+import { isFlatpickrOpen, setFlatpickrDate, closeFlatpickrDate } from 'ember-flatpickr/test-support/helpers';
 import moment from 'moment';
 import SpacesProvider from 'harvester-gui-plugin-generic/services/spaces-provider';
+
+const spaces = [{
+  id: 'space1Id',
+  name: 'space1',
+}, {
+  id: 'space2Id',
+  name: 'space2',
+}];
 
 describe(
   'Integration | Component | query-builder/condition-comparator-value-editor',
@@ -160,17 +168,23 @@ describe(
             .to.equal('abc def');
         }
       );
+
+      it('calls "onStartEdit" on click', async function () {
+        const onStartEditSpy = this.set('onStartEditSpy', sinon.spy());
+        await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
+          @mode="view"
+          @comparator="boolean.is"
+          @value="false"
+          @onStartEdit={{this.onStartEditSpy}}
+        />`);
+        await click('.comparator-value');
+
+        expect(onStartEditSpy).to.be.calledOnce;
+      });
     });
 
     context('in create mode', function () {
       beforeEach(function () {
-        const spaces = [{
-          id: 'space1Id',
-          name: 'space1',
-        }, {
-          id: 'space2Id',
-          name: 'space2',
-        }];
         sinon.stub(SpacesProvider.prototype, 'loadSpaces').callsFake(function () {
           this.spaces = spaces;
         });
@@ -445,6 +459,339 @@ describe(
           await fillIn('.comparator-value', 'abc def');
 
           expect(changeSpy).to.be.calledOnce.and.to.be.calledWith('abc def');
+        }
+      );
+    });
+
+    context('in edit mode', function () {
+      beforeEach(function () {
+
+        sinon.stub(SpacesProvider.prototype, 'loadSpaces').callsFake(function () {
+          this.spaces = spaces;
+        });
+      });
+
+      afterEach(function () {
+        if (SpacesProvider.prototype.loadSpaces.restore) {
+          SpacesProvider.prototype.loadSpaces.restore();
+        }
+      });
+
+      [
+        'text.contains',
+        'number.lt',
+        'keyword.is',
+        'anyProperty.hasPhrase',
+      ].forEach(comparator => {
+        const [propertyType, comparatorName] = comparator.split('.');
+        const beforeTest = testCase => {
+          testCase.setProperties({
+            comparator,
+          });
+        };
+
+        it(
+          `shows current comparator value for "${comparatorName}" comparator for ${propertyType} property`,
+          async function () {
+            beforeTest(this);
+            await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
+              @mode="edit"
+              @comparator={{this.comparator}}
+              @value="abc"
+            />`);
+
+            expect(this.element.querySelector('.comparator-value')).to.have.value('abc');
+          }
+        );
+
+        it(
+          `closes editor and notifies about new value for "${comparatorName}" comparator for ${propertyType} property (close using Enter)`,
+          async function () {
+            beforeTest(this);
+            const changeSpy = this.set('changeSpy', sinon.spy());
+            const stopEditSpy = this.set('stopEditSpy', sinon.spy());
+
+            await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
+              @mode="edit"
+              @comparator={{this.comparator}}
+              @value={{this.value}}
+              @onValueChange={{this.changeSpy}}
+              @onStopEdit={{this.stopEditSpy}}
+            />`);
+            await fillIn('.comparator-value', 'def');
+            await triggerKeyEvent('.comparator-value', 'keydown', 13);
+
+            expect(changeSpy).to.be.calledWith('def');
+            expect(stopEditSpy).to.be.calledOnce;
+          }
+        );
+
+        it(
+          `closes editor and notifies about new value for "${comparatorName}" comparator for ${propertyType} property (close using blur)`,
+          async function () {
+            beforeTest(this);
+            const changeSpy = this.set('changeSpy', sinon.spy());
+            const stopEditSpy = this.set('stopEditSpy', sinon.spy());
+
+            await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
+              @mode="edit"
+              @comparator={{this.comparator}}
+              @value={{this.value}}
+              @onValueChange={{this.changeSpy}}
+              @onStopEdit={{this.stopEditSpy}}
+            />`);
+            await fillIn('.comparator-value', 'def');
+            await blur('.comparator-value');
+
+            expect(changeSpy).to.be.calledWith('def');
+            expect(stopEditSpy).to.be.calledOnce;
+          }
+        );
+
+        it(
+          `notifies about partial new value before close for "${comparatorName}" comparator for ${propertyType} property`,
+          async function () {
+            beforeTest(this);
+            const changeSpy = this.set('changeSpy', sinon.spy());
+            const stopEditSpy = this.set('stopEditSpy', sinon.spy());
+
+            await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
+              @mode="edit"
+              @comparator={{this.comparator}}
+              @value={{this.value}}
+              @onValueChange={{this.changeSpy}}
+              @onStopEdit={{this.stopEditSpy}}
+            />`);
+            await fillIn('.comparator-value', 'de');
+
+            expect(changeSpy).to.be.calledWith('de');
+            expect(stopEditSpy).to.not.be.called;
+          }
+        );
+
+        it(
+          `cancels editor on Escape key down for "${comparatorName}" comparator for ${propertyType} property`,
+          async function () {
+            beforeTest(this);
+            const cancelEditSpy = this.set('cancelEditSpy', sinon.spy());
+            const stopEditSpy = this.set('stopEditSpy', sinon.spy());
+
+            await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
+              @mode="edit"
+              @comparator={{this.comparator}}
+              @value={{this.value}}
+              @onStopEdit={{this.stopEditSpy}}
+              @onCancelEdit={{this.cancelEditSpy}}
+            />`);
+            await triggerKeyEvent('.comparator-value', 'keydown', 27);
+
+            expect(stopEditSpy).to.not.be.called;
+            expect(cancelEditSpy).to.be.calledOnce;
+          }
+        );
+      });
+
+      [{
+        comparator: 'boolean.is',
+        initialValue: 'false',
+        initialTriggerValue: 'false',
+        optionsCount: 2,
+        stringToSelect: 'true',
+        selectionResult: 'true',
+      }, {
+        comparator: 'space.is',
+        initialValue: spaces[0],
+        initialTriggerValue: 'space1',
+        optionsCount: 2,
+        stringToSelect: 'space2',
+        selectionResult: spaces[1],
+      }].forEach(({
+        comparator,
+        initialValue,
+        initialTriggerValue,
+        optionsCount,
+        stringToSelect,
+        selectionResult,
+      }) => {
+        const [propertyType, comparatorName] = comparator.split('.');
+        const beforeTest = testCase => {
+          testCase.setProperties({
+            comparator,
+            value: initialValue,
+          });
+        };
+
+        it(
+          `shows current comparator value for "${comparatorName}" comparator for ${propertyType} property`,
+          async function () {
+            beforeTest(this);
+            await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
+              @mode="edit"
+              @comparator={{this.comparator}}
+              @value={{this.value}}
+            />`);
+
+            expect(this.element.querySelector(
+              '.comparator-value .ember-power-select-selected-item'
+            ).textContent.trim()).to.equal(initialTriggerValue);
+          }
+        );
+
+        it(
+          `shows expanded dropdown for "${comparatorName}" comparator for ${propertyType} property`,
+          async function () {
+            beforeTest(this);
+            await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
+              @mode="edit"
+              @comparator={{this.comparator}}
+              @value={{this.value}}
+            />`);
+
+            const options = this.element.querySelectorAll('.ember-power-select-option');
+            expect(options).to.have.length(optionsCount);
+          }
+        );
+
+        it(
+          `closes editor and notifies about new value for "${comparatorName}" comparator for ${propertyType} property`,
+          async function () {
+            beforeTest(this);
+            const changeSpy = this.set('changeSpy', sinon.spy());
+            const stopEditSpy = this.set('stopEditSpy', sinon.spy());
+
+            await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
+              @mode="edit"
+              @comparator={{this.comparator}}
+              @value={{this.value}}
+              @onValueChange={{this.changeSpy}}
+              @onStopEdit={{this.stopEditSpy}}
+            />`);
+            await selectChoose('.comparator-value', stringToSelect);
+
+            expect(changeSpy).to.be.calledOnce.and.to.be.calledWith(selectionResult);
+            expect(stopEditSpy).to.be.calledOnce;
+          }
+        );
+
+        it(
+          `closes editor for "${comparatorName}" comparator for ${propertyType} property on dropdown trigger click`,
+          async function () {
+            beforeTest(this);
+            const stopEditSpy = this.set('stopEditSpy', sinon.spy());
+
+            await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
+              @mode="edit"
+              @comparator={{this.comparator}}
+              @value={{this.value}}
+              @onStopEdit={{this.stopEditSpy}}
+            />`);
+            await clickTrigger('.comparator-value');
+
+            expect(stopEditSpy).to.be.calledOnce;
+          }
+        );
+      });
+
+      it(
+        'shows current comparator value and opened flatpickr for "lt" comparator for date property',
+        async function () {
+          this.set('value', {
+            datetime: moment('2020-05-04 12:00').toDate(),
+            timeEnabled: true,
+          });
+
+          await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
+            @mode="edit"
+            @comparator="date.lt"
+            @value={{this.value}}
+          />`);
+
+          expect(this.element.querySelector('.comparator-value'))
+            .to.have.value('2020-05-04 12:00:00');
+          expect(this.element.querySelector('.include-time')).to.have.class('active');
+          expect(isFlatpickrOpen()).to.be.true;
+        }
+      );
+
+      it(
+        'closes editor for "lt" comparator for date property on flatpickr close',
+        async function () {
+          this.set('value', {
+            datetime: moment('2020-05-04 12:00').toDate(),
+            timeEnabled: false,
+          });
+          const stopEditSpy = this.set('stopEditSpy', sinon.spy());
+
+          await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
+            @mode="edit"
+            @comparator="date.lt"
+            @value={{this.value}}
+            @onStopEdit={{this.stopEditSpy}}
+          />`);
+          await closeFlatpickrDate('.flatpickr-input');
+
+          expect(stopEditSpy).to.be.calledOnce;
+        }
+      );
+
+      it(
+        'toggle of "time-enabled" button does not turn off editor of "lt" comparator for date property',
+        async function () {
+          this.set('value', {
+            datetime: moment('2020-05-04 12:00').toDate(),
+            timeEnabled: false,
+          });
+          const stopEditSpy = this.set('stopEditSpy', sinon.spy());
+          const valueChangeStub = this.set(
+            'valueChangeStub',
+            sinon.stub().callsFake(value => this.set('value', value))
+          );
+
+          await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
+            @mode="edit"
+            @comparator="date.lt"
+            @value={{this.value}}
+            @onValueChange={{this.valueChangeStub}}
+            @onStopEdit={{this.stopEditSpy}}
+          />`);
+          await click('.include-time');
+
+          expect(isFlatpickrOpen()).to.be.true;
+          expect(this.element.querySelector('.flatpickr-time.hasSeconds')).to.exist;
+          expect(stopEditSpy).to.not.be.called;
+          expect(valueChangeStub).to.be.calledWith(sinon.match({
+            datetime: sinon.match.date,
+            timeEnabled: true,
+          }));
+        }
+      );
+
+      it(
+        'notifies about changed value of "lt" comparator for date property',
+        async function () {
+          this.set('value', {
+            datetime: moment('2020-05-04 12:00').toDate(),
+            timeEnabled: false,
+          });
+          const stopEditSpy = this.set('stopEditSpy', sinon.spy());
+          const valueChangeSpy = this.set('valueChangeSpy', sinon.spy());
+
+          await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
+            @mode="edit"
+            @comparator="date.lt"
+            @value={{this.value}}
+            @onValueChange={{this.valueChangeSpy}}
+            @onStopEdit={{this.stopEditSpy}}
+          />`);
+          await setFlatpickrDate('.flatpickr-input', new Date(2020, 0, 2));
+
+          expect(stopEditSpy).to.not.be.called;
+          expect(valueChangeSpy).to.be.calledWith(sinon.match({
+            datetime: sinon.match.date,
+            timeEnabled: false,
+          }));
+          expect(moment(valueChangeSpy.lastCall.args[0].datetime).format('YYYY-MM-DD'))
+            .to.equal('2020-01-02');
         }
       );
     });

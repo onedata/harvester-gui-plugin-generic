@@ -22,5 +22,4 @@ comparators:
     is: 'is'
   anyProperty:
     hasPhrase: 'has phrase'
-includeTimeInDate: 'Include time'
 acceptCondition: 'Add'

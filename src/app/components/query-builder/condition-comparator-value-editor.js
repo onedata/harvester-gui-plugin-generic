@@ -1,5 +1,4 @@
 import Component from '@glimmer/component';
-import { guidFor } from '@ember/object/internals';
 import moment from 'moment';
 import { tracked } from '@glimmer/tracking';
 import { action, set } from '@ember/object';
@@ -12,6 +11,7 @@ extends Component {
   intlPrefix = 'components.query-builder.condition-comparator-value-editor';
 
   @tracked comparatorEditorsSet = defaultComparatorEditors;
+  @tracked includeTimeBtnElement = null;
 
   get mode() {
     return this.args.mode || 'view';
@@ -29,8 +29,16 @@ extends Component {
     return this.args.onValueChange || (() => {});
   }
 
-  get guid() {
-    return guidFor(this);
+  get onStartEdit() {
+    return this.args.onStartEdit || (() => {});
+  }
+
+  get onStopEdit() {
+    return this.args.onStopEdit || (() => {});
+  }
+
+  get onCancelEdit() {
+    return this.args.onCancelEdit || (() => {});
   }
 
   get comparatorEditor() {
@@ -82,5 +90,49 @@ extends Component {
     }
 
     this.onValueChange(newValue);
+  }
+
+  @action
+  registerDropdownApi(dropdownApi) {
+    // Ember Power Select has a bug, which breaks down `initiallyOpened` setting.
+    // To reproduce its functionality, we are trying to open dropdown just after initial
+    // render using dedicated API.
+    if (this.mode === 'edit') {
+      dropdownApi.actions.open();
+    }
+  }
+
+  @action
+  includeTimeBtnInserted(btnElement) {
+    this.includeTimeBtnElement = btnElement;
+  }
+
+  @action
+  includeTimeBtnDestroyed() {
+    this.includeTimeBtnElement = null;
+  }
+
+  @action
+  flatpickrReady(selectedDates, dateStr, instance) {
+    if (this.mode === 'edit') {
+      instance.open();
+    }
+  }
+
+  @action
+  flatpickrClose(selectedDates) {
+    if (this.mode === 'edit') {
+      // Sending "valueChanged" notify, because flatpickr first sends onClose and then
+      // onChange. onClose causes stop of edition, which then ignores incoming onChange.
+      this.valueChanged(selectedDates);
+      this.onStopEdit();
+    }
+  }
+
+  @action
+  keyDown(event) {
+    if (event.keyCode === 27) {
+      this.onCancelEdit();
+    }
   }
 }

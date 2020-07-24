@@ -4,9 +4,13 @@
   </code>
   <span class="comparator">{{tt this (concat "comparators." @queryBlock.comparator)}}</span>
   <QueryBuilder::ConditionComparatorValueEditor
-    @mode="view"
+    @mode={{this.mode}}
     @comparator={{@queryBlock.comparator}}
-    @value={{@queryBlock.comparatorValue}}
+    @value={{if (eq this.mode "edit") this.editComparatorValue @queryBlock.comparatorValue}}
+    @onStartEdit={{this.startEdit}}
+    @onValueChange={{this.comparatorValueChange}}
+    @onStopEdit={{this.stopEdit}}
+    @onCancelEdit={{this.cancelEdit}}
   />
   {{yield}}
 </div>

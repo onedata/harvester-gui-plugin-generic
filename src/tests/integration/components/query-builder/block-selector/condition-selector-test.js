@@ -204,8 +204,8 @@ describe(
 
     it('shows only "contains" comparator for text property', async function () {
       await render(hbs `<QueryBuilder::BlockSelector::ConditionSelector
-          @indexProperties={{this.indexProperties}}
-        />`);
+        @indexProperties={{this.indexProperties}}
+      />`);
       await selectChoose('.property-selector', 'textProp');
       await clickTrigger('.comparator-selector');
 

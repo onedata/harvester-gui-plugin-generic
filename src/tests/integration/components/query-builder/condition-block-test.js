@@ -4,6 +4,7 @@ import { setupRenderingTest } from 'ember-mocha';
 import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/condition-query-block';
+import { click, fillIn, blur, triggerKeyEvent } from '@ember/test-helpers';
 
 describe('Integration | Component | query-builder/condition-block', function () {
   setupRenderingTest();
@@ -197,5 +198,49 @@ describe('Integration | Component | query-builder/condition-block', function () 
     `);
 
     expect(this.element.querySelector('.test-element')).to.exist;
+  });
+
+  it('starts comparator value edition on value click', async function () {
+    this.set('block', new ConditionQueryBlock({ path: 'a.b' }, 'text.contains', 'abc'));
+
+    await render(hbs `<QueryBuilder::ConditionBlock @queryBlock={{this.block}} />`);
+    await click('.comparator-value');
+
+    expect(this.element.querySelector('.comparator-value-editor')).to.exist;
+    expect(this.element.querySelector('input[type="text"]')).to.exist;
+  });
+
+  it('accepts new edited comparator value', async function () {
+    const block = this.set(
+      'block',
+      new ConditionQueryBlock({ path: 'a.b' }, 'text.contains', 'abc')
+    );
+
+    await render(hbs `<QueryBuilder::ConditionBlock @queryBlock={{this.block}} />`);
+    await click('.comparator-value');
+    await fillIn('.comparator-value', 'def');
+    await blur('.comparator-value');
+
+    expect(this.element.querySelector('.comparator-value').textContent.trim())
+      .to.equal('def');
+    expect(this.element.querySelector('input[type="text"]')).to.not.exist;
+    expect(block.comparatorValue).to.equal('def');
+  });
+
+  it('allows to cancel edition of comparator value', async function () {
+    const block = this.set(
+      'block',
+      new ConditionQueryBlock({ path: 'a.b' }, 'text.contains', 'abc')
+    );
+
+    await render(hbs `<QueryBuilder::ConditionBlock @queryBlock={{this.block}} />`);
+    await click('.comparator-value');
+    await fillIn('.comparator-value', 'def');
+    await triggerKeyEvent('.comparator-value', 'keydown', 27);
+
+    expect(this.element.querySelector('.comparator-value').textContent.trim())
+      .to.equal('abc');
+    expect(this.element.querySelector('input[type="text"]')).to.not.exist;
+    expect(block.comparatorValue).to.equal('abc');
   });
 });
