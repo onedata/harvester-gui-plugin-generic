@@ -9,9 +9,9 @@
         @selected={{this.value}}
         @onChange={{this.valueChanged}}
         @renderInPlace={{true}}
-        @registerAPI={{this.registerDropdownApi}}
         @onClose={{this.onStopEdit}}
         class="comparator-value"
+        {{did-insert this.dropdownEditorInserted}}
         as |value|
       >
         {{#if (eq this.comparatorEditor.type "space")}}
@@ -28,7 +28,8 @@
         {{on "keydown" (invoke-on-enter this.onStopEdit)}}
         {{on "keydown" this.keyDown}}
         {{on "blur" this.onStopEdit}}
-        class="comparator-value form-control form-control-sm"
+        {{did-insert this.textEditorInserted}}
+        class="comparator-value form-control form-control-sm {{if this.this.isValueInvalid "is-invalid"}}"
       >
     {{else if (eq this.comparatorEditor.type "date")}}
       <div class="input-group">
@@ -80,7 +81,11 @@
     {{/if}}
   </div>
 {{else}}
-  <samp class="comparator-value" {{on "click" this.onStartEdit}} ...attributes>
+  <samp
+    class="comparator-value comparator-value-view"
+    {{on "click" this.onStartEdit}}
+    ...attributes
+  >
     {{this.viewModeComparatorValue}}
   </samp>
 {{/if}}

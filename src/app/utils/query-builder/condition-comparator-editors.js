@@ -31,7 +31,7 @@ const numberBasicEditor = {
   type: 'text',
   defaultValue: () => '',
   isValidValue(value) {
-    return typeof value === 'string' && !isNaN(parseFloat(value));
+    return typeof value === 'string' && value.trim().length > 0 && !isNaN(Number(value));
   },
 };
 

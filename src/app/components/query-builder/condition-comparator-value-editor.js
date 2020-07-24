@@ -2,6 +2,7 @@ import Component from '@glimmer/component';
 import moment from 'moment';
 import { tracked } from '@glimmer/tracking';
 import { action, set } from '@ember/object';
+import { next } from '@ember/runloop';
 import { inject as service } from '@ember/service';
 import { defaultComparatorEditors } from 'harvester-gui-plugin-generic/utils/query-builder/condition-comparator-editors';
 
@@ -23,6 +24,10 @@ extends Component {
 
   get value() {
     return this.args.value || null;
+  }
+
+  get isValueInvalid() {
+    return this.args.isValueInvalid || false;
   }
 
   get onValueChange() {
@@ -54,6 +59,8 @@ extends Component {
       return moment(this.value.datetime).format(formatString);
     } else if (this.comparator.startsWith('space.')) {
       return this.value.name;
+    } else if (typeof this.value === 'string') {
+      return `"${this.value}"`;
     } else {
       return this.value;
     }
@@ -93,12 +100,22 @@ extends Component {
   }
 
   @action
-  registerDropdownApi(dropdownApi) {
-    // Ember Power Select has a bug, which breaks down `initiallyOpened` setting.
-    // To reproduce its functionality, we are trying to open dropdown just after initial
-    // render using dedicated API.
+  textEditorInserted(inputElement) {
     if (this.mode === 'edit') {
-      dropdownApi.actions.open();
+      inputElement.focus();
+      inputElement.select();
+    }
+  }
+
+  @action
+  dropdownEditorInserted(dropdownElement) {
+    if (this.mode === 'edit') {
+      next(() => {
+        const trigger = dropdownElement.querySelector('.ember-power-select-trigger');
+        const mouseDownEvent = new MouseEvent('mousedown');
+        trigger.dispatchEvent(mouseDownEvent);
+        trigger.focus();
+      });
     }
   }
 

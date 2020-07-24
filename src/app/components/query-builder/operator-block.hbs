@@ -9,6 +9,10 @@
         @indexProperties={{@indexProperties}}
         @onBlockReplace={{fn this.replaceBlock @queryBlock.operands.firstObject}}
         @onBlockRemove={{fn this.removeBlock @queryBlock.operands.firstObject}}
+        @onConditionEditionStart={{@onConditionEditionStart}}
+        @onConditionEditionEnd={{@onConditionEditionEnd}}
+        @onConditionEditionValidityChange={{@onConditionEditionValidityChange}}
+        @onBlockRemoved={{@onBlockRemoved}}
       />
     {{else}}
       <QueryBuilder::BlockAdder
@@ -23,6 +27,10 @@
         @indexProperties={{@indexProperties}}
         @onBlockReplace={{fn this.replaceBlock operandBlock}}
         @onBlockRemove={{fn this.removeBlock operandBlock}}
+        @onConditionEditionStart={{@onConditionEditionStart}}
+        @onConditionEditionEnd={{@onConditionEditionEnd}}
+        @onConditionEditionValidityChange={{@onConditionEditionValidityChange}}
+        @onBlockRemoved={{@onBlockRemoved}}
       />
       {{#if @queryBlock.operator}}
         <div class="block-label block-infix-label">

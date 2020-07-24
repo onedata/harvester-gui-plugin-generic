@@ -35,3 +35,15 @@
 .form-control[readonly] {
   background-color: white;
 }
+
+.was-validated .form-control:invalid,
+.form-control.is-invalid,
+.was-validated .form-control:valid,
+.form-control.is-valid {
+  background-image: none;
+  padding-right: $input-padding-x;
+
+  &.form-control-sm {
+    padding-right: $input-padding-x-sm;
+  }
+}

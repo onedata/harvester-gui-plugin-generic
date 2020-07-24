@@ -7,6 +7,7 @@
     @mode={{this.mode}}
     @comparator={{@queryBlock.comparator}}
     @value={{if (eq this.mode "edit") this.editComparatorValue @queryBlock.comparatorValue}}
+    @isValueInvalid={{not this.isEditComparatorValueValid}}
     @onStartEdit={{this.startEdit}}
     @onValueChange={{this.comparatorValueChange}}
     @onStopEdit={{this.stopEdit}}

@@ -34,7 +34,7 @@ describe('Integration | Component | query-builder/condition-block', function () 
       expect(this.element.querySelector('.comparator').textContent.trim())
         .to.equal('is');
       expect(this.element.querySelector('.comparator-value').textContent.trim())
-        .to.equal('false');
+        .to.equal('"false"');
     }
   );
 
@@ -53,7 +53,7 @@ describe('Integration | Component | query-builder/condition-block', function () 
       expect(this.element.querySelector('.comparator').textContent.trim())
         .to.equal('contains');
       expect(this.element.querySelector('.comparator-value').textContent.trim())
-        .to.equal('a | b');
+        .to.equal('"a | b"');
     }
   );
 
@@ -88,7 +88,7 @@ describe('Integration | Component | query-builder/condition-block', function () 
         expect(this.element.querySelector('.comparator').textContent.trim())
           .to.equal(symbol);
         expect(this.element.querySelector('.comparator-value').textContent.trim())
-          .to.equal('2');
+          .to.equal('"2"');
       }
     );
 
@@ -144,7 +144,7 @@ describe('Integration | Component | query-builder/condition-block', function () 
       expect(this.element.querySelector('.comparator').textContent.trim())
         .to.equal('is');
       expect(this.element.querySelector('.comparator-value').textContent.trim())
-        .to.equal('abc');
+        .to.equal('"abc"');
     }
   );
 
@@ -184,7 +184,7 @@ describe('Integration | Component | query-builder/condition-block', function () 
       expect(this.element.querySelector('.comparator').textContent.trim())
         .to.equal('has phrase');
       expect(this.element.querySelector('.comparator-value').textContent.trim())
-        .to.equal('abc def');
+        .to.equal('"abc def"');
     }
   );
 
@@ -222,7 +222,7 @@ describe('Integration | Component | query-builder/condition-block', function () 
     await blur('.comparator-value');
 
     expect(this.element.querySelector('.comparator-value').textContent.trim())
-      .to.equal('def');
+      .to.equal('"def"');
     expect(this.element.querySelector('input[type="text"]')).to.not.exist;
     expect(block.comparatorValue).to.equal('def');
   });
@@ -239,8 +239,68 @@ describe('Integration | Component | query-builder/condition-block', function () 
     await triggerKeyEvent('.comparator-value', 'keydown', 27);
 
     expect(this.element.querySelector('.comparator-value').textContent.trim())
-      .to.equal('abc');
+      .to.equal('"abc"');
     expect(this.element.querySelector('input[type="text"]')).to.not.exist;
     expect(block.comparatorValue).to.equal('abc');
+  });
+
+  [{
+    comparator: 'text.contains',
+    initialValue: 'abc',
+    incorrectValues: [''],
+  }, {
+    comparator: 'number.lt',
+    initialValue: '1',
+    incorrectValues: ['', 'abc'],
+  }, {
+    comparator: 'keyword.is',
+    initialValue: 'abc',
+    incorrectValues: [''],
+  }, {
+    comparator: 'anyProperty.hasPhrase',
+    initialValue: 'abc',
+    incorrectValues: [''],
+  }].forEach(({ comparator, initialValue, incorrectValues }) => {
+    const [propertyType, comparatorName] = comparator.split('.');
+    incorrectValues.forEach(incorrectValue => {
+      it(
+        `shown invalid state when incorrect value ${JSON.stringify(incorrectValue)} has been provider for "${comparatorName}" comparator of "${propertyType}" property`,
+        async function () {
+          this.set(
+            'block',
+            new ConditionQueryBlock({ path: 'a.b' }, comparator, initialValue)
+          );
+
+          await render(hbs `<QueryBuilder::ConditionBlock @queryBlock={{this.block}} />`);
+          await click('.comparator-value');
+
+          expect(this.element.querySelector('input[type="text"]'))
+            .to.not.have.class('is-invalid');
+
+          await fillIn('.comparator-value', incorrectValue);
+
+          expect(this.element.querySelector('input[type="text"]'))
+            .to.have.class('is-invalid');
+        }
+      );
+
+      it(
+        `does not allow to stop edition when incorrect value ${JSON.stringify(incorrectValue)} has been provider for "${comparatorName}" comparator of "${propertyType}" property`,
+        async function () {
+          const block = this.set(
+            'block',
+            new ConditionQueryBlock({ path: 'a.b' }, comparator, initialValue)
+          );
+
+          await render(hbs `<QueryBuilder::ConditionBlock @queryBlock={{this.block}} />`);
+          await click('.comparator-value');
+          await fillIn('.comparator-value', incorrectValue);
+          await blur('.comparator-value');
+
+          expect(this.element.querySelector('input[type="text"]')).to.exist;
+          expect(block.comparatorValue).to.equal(initialValue);
+        }
+      );
+    });
   });
 });

@@ -35,7 +35,7 @@ describe(
           />`);
 
           expect(this.element.querySelector('.comparator-value').textContent.trim())
-            .to.equal('false');
+            .to.equal('"false"');
         }
       );
 
@@ -55,7 +55,7 @@ describe(
           />`);
 
           expect(this.element.querySelector('.comparator-value').textContent.trim())
-            .to.equal('a | b');
+            .to.equal('"a | b"');
         }
       );
 
@@ -74,7 +74,7 @@ describe(
           />`);
 
           expect(this.element.querySelector('.comparator-value').textContent.trim())
-            .to.equal('2');
+            .to.equal('"2"');
         }
       );
 
@@ -127,7 +127,7 @@ describe(
           />`);
 
           expect(this.element.querySelector('.comparator-value').textContent.trim())
-            .to.equal('abc');
+            .to.equal('"abc"');
         }
       );
 
@@ -165,7 +165,7 @@ describe(
           />`);
 
           expect(this.element.querySelector('.comparator-value').textContent.trim())
-            .to.equal('abc def');
+            .to.equal('"abc def"');
         }
       );
 
@@ -491,6 +491,21 @@ describe(
         };
 
         it(
+          `has focused editor on init for "${comparatorName}" comparator for ${propertyType} property`,
+          async function () {
+            beforeTest(this);
+            await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
+              @mode="edit"
+              @comparator={{this.comparator}}
+              @value="abc"
+            />`);
+
+            expect(this.element.querySelector('.comparator-value'))
+              .to.equal(document.activeElement);
+          }
+        );
+
+        it(
           `shows current comparator value for "${comparatorName}" comparator for ${propertyType} property`,
           async function () {
             beforeTest(this);
@@ -620,6 +635,22 @@ describe(
             value: initialValue,
           });
         };
+
+        it(
+          `has focused editor on init for "${comparatorName}" comparator for ${propertyType} property`,
+          async function () {
+            beforeTest(this);
+            await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
+              @mode="edit"
+              @comparator={{this.comparator}}
+              @value="abc"
+            />`);
+
+            expect(
+              this.element.querySelector('.comparator-value .ember-power-select-trigger')
+            ).to.equal(document.activeElement);
+          }
+        );
 
         it(
           `shows current comparator value for "${comparatorName}" comparator for ${propertyType} property`,

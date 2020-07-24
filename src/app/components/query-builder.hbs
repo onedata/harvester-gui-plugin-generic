@@ -3,12 +3,17 @@
     <QueryBuilder::OperatorBlock
       @queryBlock={{this.rootQueryBlock}}
       @indexProperties={{this.indexProperties}}
+      @onConditionEditionStart={{this.onConditionEditionStart}}
+      @onConditionEditionEnd={{this.onConditionEditionEnd}}
+      @onConditionEditionValidityChange={{this.onConditionEditionValidityChange}}
+      @onBlockRemoved={{this.onBlockRemoved}}
       class="root-block"
     />
   </div>
   <BsButton
     @type="primary"
     @onClick={{this.performQuery}}
+    disabled={{this.hasInvalidCondition}}
     class="submit-query btn-input-padding"
   >
     {{tt this "performQueryButton"}}

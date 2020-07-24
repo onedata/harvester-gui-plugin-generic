@@ -1,7 +1,8 @@
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
+import { action, set } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 import RootOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/root-operator-query-block';
+import OperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/operator-query-block';
 
 const allowedPropertyTypes = [
   'text',
@@ -18,6 +19,7 @@ export default class QueryBuilderComponent extends Component {
   intlPrefix = 'components.query-builder';
 
   @tracked rootQueryBlock = new RootOperatorQueryBlock();
+  @tracked editedConditions = new Map();
 
   get indexProperties() {
     const allProperties =
@@ -32,6 +34,10 @@ export default class QueryBuilderComponent extends Component {
     return [...specialProperties, ...ordinaryProperties, ...internalProperties];
   }
 
+  get hasInvalidCondition() {
+    return [...this.editedConditions.values()].mapBy('isValid').some(isValid => !isValid);
+  }
+
   @action
   performQuery() {
     if (!this.args.onPerformQuery) {
@@ -39,6 +45,51 @@ export default class QueryBuilderComponent extends Component {
     }
 
     this.args.onPerformQuery(this.rootQueryBlock);
+  }
+
+  @action
+  onConditionEditionStart(conditionBlock) {
+    this.editedConditions.set(conditionBlock, { isValid: true });
+    // trigger change
+    this.editedConditions = this.editedConditions;
+  }
+
+  @action
+  onConditionEditionEnd(conditionBlock) {
+    this.editedConditions.delete(conditionBlock);
+    // trigger change
+    this.editedConditions = this.editedConditions;
+  }
+
+  @action
+  onConditionEditionValidityChange(conditionBlock, isValid) {
+    const editedConditionEntry = this.editedConditions.get(conditionBlock);
+    if (editedConditionEntry) {
+      set(editedConditionEntry, 'isValid', isValid);
+      // trigger change
+      this.editedConditions = this.editedConditions;
+    }
+  }
+
+  @action
+  onBlockRemoved(block) {
+    const flattenedConditionsList = [];
+    const blocksToFlatten = [block];
+    while (blocksToFlatten.length) {
+      const blockToFlatten = blocksToFlatten.pop();
+      if (blockToFlatten instanceof OperatorQueryBlock) {
+        blocksToFlatten.push(...blockToFlatten.operands);
+      } else {
+        flattenedConditionsList.push(blockToFlatten);
+      }
+    }
+
+    for (const condition of flattenedConditionsList) {
+      this.editedConditions.delete(condition);
+    }
+
+    // trigger change
+    this.editedConditions = this.editedConditions;
   }
 
   isSupportedProperty(property) {

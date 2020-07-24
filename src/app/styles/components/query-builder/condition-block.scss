@@ -24,5 +24,10 @@
       word-wrap: break-word;
       line-height: 1;
     }
+
+    .comparator-value-view:hover {
+      cursor: pointer;
+      text-decoration: underline;
+    }
   }
 }

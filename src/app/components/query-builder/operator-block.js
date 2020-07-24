@@ -8,6 +8,10 @@ export default class QueryBuilderOperatorBlockComponent extends Component {
     return this.args.queryBlock;
   }
 
+  get onBlockRemoved() {
+    return this.args.onBlockRemoved || (() => {});
+  }
+
   get hasSingleOperandOperator() {
     return this.queryBlock && this.queryBlock.constructor.maxOperandsNumber === 1;
   }
@@ -28,5 +32,6 @@ export default class QueryBuilderOperatorBlockComponent extends Component {
   @action
   removeBlock(queryBlock) {
     this.args.queryBlock.operands.removeObject(queryBlock);
+    this.onBlockRemoved(queryBlock);
   }
 }

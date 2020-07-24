@@ -5,6 +5,10 @@
   {{#component (concat "query-builder/" @queryBlock.constructor.renderer)
     queryBlock=@queryBlock
     indexProperties=@indexProperties
+    onConditionEditionStart=@onConditionEditionStart
+    onConditionEditionEnd=@onConditionEditionEnd
+    onConditionEditionValidityChange=@onConditionEditionValidityChange
+    onBlockRemoved=@onBlockRemoved
   }}
     <BsButton
       @type="secondary"
