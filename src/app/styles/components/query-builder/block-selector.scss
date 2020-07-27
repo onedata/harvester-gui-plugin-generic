@@ -16,9 +16,8 @@
     font-size: inherit;
   }
 
-  .operators-section {
-    margin-bottom: $spacer * 0.5;
-    padding-bottom: $spacer * 0.5;
+  .operators-section:not(:last-child) {
+    margin-bottom: $spacer;
   }
 
   .operator-selector {
