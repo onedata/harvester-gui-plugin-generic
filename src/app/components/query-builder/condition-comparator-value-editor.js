@@ -38,8 +38,8 @@ extends Component {
     return this.args.onStartEdit || (() => {});
   }
 
-  get onStopEdit() {
-    return this.args.onStopEdit || (() => {});
+  get onFinishEdit() {
+    return this.args.onFinishEdit || (() => {});
   }
 
   get onCancelEdit() {
@@ -142,7 +142,7 @@ extends Component {
       // Sending "valueChanged" notify, because flatpickr first sends onClose and then
       // onChange. onClose causes stop of edition, which then ignores incoming onChange.
       this.valueChanged(selectedDates);
-      this.onStopEdit();
+      this.onFinishEdit();
     }
   }
 

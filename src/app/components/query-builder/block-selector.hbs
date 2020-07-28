@@ -1,16 +1,18 @@
 <div class="query-builder-block-selector {{this.mode}}-block-selector">
   {{#if (eq this.mode "create")}}
-    <div class="operators-section">
+    <div class="operators-section add-operator-section">
       <h1>{{tt this "operatorsHeader"}}</h1>
       <QueryBuilder::BlockSelector::OperatorSelector
         @onOperatorSelected={{this.operatorAdded}}
       />
     </div>
-    <h1>{{tt this "conditionHeader"}}</h1>
-    <QueryBuilder::BlockSelector::ConditionSelector
-      @indexProperties={{@indexProperties}}
-      @onConditionSelected={{this.conditionAdded}}
-    />
+    <div class="condition-section">
+      <h1>{{tt this "conditionHeader"}}</h1>
+      <QueryBuilder::BlockSelector::ConditionSelector
+        @indexProperties={{@indexProperties}}
+        @onConditionSelected={{this.conditionAdded}}
+      />
+    </div>
   {{else}}
     <div class="operators-section surround-section">
       <h1>{{tt this "surroundHeader"}}</h1>

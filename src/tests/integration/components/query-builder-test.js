@@ -4,7 +4,7 @@ import { setupRenderingTest } from 'ember-mocha';
 import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import sinon from 'sinon';
-import { click } from '@ember/test-helpers';
+import { click, fillIn, triggerKeyEvent } from '@ember/test-helpers';
 import { selectChoose, clickTrigger } from 'ember-power-select/test-support/helpers';
 import RootOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/root-operator-query-block';
 import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/condition-query-block';
@@ -54,7 +54,7 @@ describe('Integration | Component | query-builder', function () {
 
   it('filters list of available index properties to supported ones', async function () {
     await render(hbs `<QueryBuilder @index={{this.index}}/>`);
-    await click('.add-trigger');
+    await click('.query-builder-block-adder');
     await clickTrigger('.property-selector');
 
     const options = this.element.querySelectorAll('.ember-power-select-option');
@@ -71,7 +71,7 @@ describe('Integration | Component | query-builder', function () {
       @onPerformQuery={{this.submitSpy}}
       @index={{this.index}}
     />`);
-    await click('.add-trigger');
+    await click('.query-builder-block-adder');
     await selectChoose('.property-selector', 'a.b');
     await click('.accept-condition');
     await click('.submit-query');
@@ -82,104 +82,126 @@ describe('Integration | Component | query-builder', function () {
   });
 
   it(
-    'does not ask for CURL request before "generate request" button click',
+    'does not disable submit button when edited condition has valid value',
     async function () {
-      const generateCurlStub = this.set('generateCurlStub', sinon.stub());
-
-      await render(hbs `<QueryBuilder
-        @onGenerateCurl={{this.generateCurlStub}}
-        @index={{this.index}}
-      />`);
-      await click('.add-trigger');
-      await selectChoose('.property-selector', 'a.b');
+      await render(hbs `<QueryBuilder @index={{this.index}}/>`);
+      await click('.query-builder-block-adder');
+      await selectChoose('.property-selector', 'c.d');
+      await fillIn('.ember-attacher .comparator-value', 'abc');
       await click('.accept-condition');
+      await click('.query-builder-condition-block .comparator-value');
+      await fillIn('.query-builder-condition-block .comparator-value', 'def');
 
-      expect(generateCurlStub).to.not.be.called;
+      expect(this.element.querySelector('.submit-query')).to.not.have.attr('disabled');
+    }
+  );
+
+  it('disables submit button when edited condition has invalid value', async function () {
+    await render(hbs `<QueryBuilder @index={{this.index}}/>`);
+    await click('.query-builder-block-adder');
+    await selectChoose('.property-selector', 'c.d');
+    await fillIn('.ember-attacher .comparator-value', 'abc');
+    await click('.accept-condition');
+    await click('.query-builder-condition-block .comparator-value');
+    await fillIn('.query-builder-condition-block .comparator-value', '');
+
+    expect(this.element.querySelector('.submit-query')).to.have.attr('disabled');
+  });
+
+  it(
+    'enables submit button when edited condition had invalid value and then the edition was cancelled',
+    async function () {
+      await render(hbs `<QueryBuilder @index={{this.index}}/>`);
+      await click('.query-builder-block-adder');
+      await selectChoose('.property-selector', 'c.d');
+      await fillIn('.ember-attacher .comparator-value', 'abc');
+      await click('.accept-condition');
+      await click('.query-builder-condition-block .comparator-value');
+      await fillIn('.query-builder-condition-block .comparator-value', '');
+      await triggerKeyEvent('.comparator-value', 'keydown', 27);
+
+      expect(this.element.querySelector('.submit-query')).to.not.have.attr('disabled');
+    }
+  );
+
+  it(
+    'enables submit button when edited condition had invalid value and then the condition was deleted',
+    async function () {
+      await render(hbs `<QueryBuilder @index={{this.index}}/>`);
+      await click('.query-builder-block-adder');
+      await selectChoose('.property-selector', 'c.d');
+      await fillIn('.ember-attacher .comparator-value', 'abc');
+      await click('.accept-condition');
+      await click('.query-builder-condition-block .comparator-value');
+      await fillIn('.query-builder-condition-block .comparator-value', '');
+      await click('.remove-block');
+
+      expect(this.element.querySelector('.submit-query')).to.not.have.attr('disabled');
+    }
+  );
+
+  it(
+    'enables submit button when edited condition had invalid value and then the containing operator was deleted',
+    async function () {
+      await render(hbs `<QueryBuilder @index={{this.index}}/>`);
+      await click('.query-builder-block-adder');
+      await click('.operator-not');
+      await click('.query-builder-block-adder');
+      await selectChoose('.property-selector', 'c.d');
+      await fillIn('.ember-attacher .comparator-value', 'abc');
+      await click('.accept-condition');
+      await click('.query-builder-condition-block .comparator-value');
+      await fillIn('.query-builder-condition-block .comparator-value', '');
+      await click('.not-operator-block > .remove-block');
+
+      expect(this.element.querySelector('.submit-query')).to.not.have.attr('disabled');
     }
   );
 
   // FIXME: test commented due to bamboo tests passing problem. Uncomment after Chrome upgrade
-  // it('shows CURL request content on "generate request" button click', async function () {
-  //   const generateCurlStub = this.set('generateCurlStub', sinon.stub().resolves('curl!'));
-
-  //   await render(hbs `<QueryBuilder
-  //     @onGenerateCurl={{this.generateCurlStub}}
-  //     @index={{this.index}}
-  //   />`);
-  //   await click('.add-trigger');
-  //   await selectChoose('.property-selector', 'a.b');
-  //   await click('.accept-condition');
-  //   await click('.generate-query-request');
-  //   await waitUntil(() => isVisible('.ember-attacher'), { timeout: 1000 });
-
-  //   expect(generateCurlStub).to.be.calledOnce;
-  //   expect(generateCurlStub.lastCall.args[0]).to.deep.equal({
-  //     from: 0,
-  //     size: 10,
-  //     query: {
-  //       term: {
-  //         'a.b': {
-  //           value: 'true',
-  //         },
-  //       },
-  //     },
-  //   });
-  //   expect(document.querySelector('.ember-attacher .spinner')).to.not.exist;
-  //   expect(document.querySelector('.ember-attacher textarea')).to.have.value('curl!');
-  // });
-
-  // it('shows spinner when CURL request is being loaded', async function () {
-  //   this.set(
-  //     'generateCurlStub',
-  //     sinon.stub().returns(new Promise(() => {}))
-  //   );
-
-  //   await render(hbs `<QueryBuilder
-  //     @onGenerateCurl={{this.generateCurlStub}}
-  //     @index={{this.index}}
-  //   />`);
-  //   await click('.add-trigger');
-  //   await selectChoose('.property-selector', 'a.b');
-  //   await click('.accept-condition');
-  //   await click('.generate-query-request');
-  //   await waitUntil(() => isVisible('.ember-attacher'), { timeout: 1000 });
-
-  //   expect(document.querySelector('.ember-attacher textarea')).to.not.exist;
-  //   expect(document.querySelector('.ember-attacher .spinner')).to.exist;
-  // });
-
   // it(
-  //   'shows CURL request content on "generate request" button click (with filtered fields)',
+  //   'shows CURL request content on "generate request" button click',
   //   async function () {
-  //     const generateCurlStub =
-  //       this.set('generateCurlStub', sinon.stub().resolves('curl!'));
-  //     this.set('filteredProperties', {
-  //       a: {
-  //         b: {},
+  //     const { generateCurlStub } = this.setProperties({
+  //       generateCurlStub: sinon.stub().resolves('curl!'),
+  //       filteredProperties: {
+  //         a: {
+  //           b: {},
+  //         },
+  //         c: {},
   //       },
-  //       c: {},
+  //       sortProperty: { path: 'e.f' },
+  //       sortDirection: 'asc',
   //     });
 
   //     await render(hbs `<QueryBuilder
   //       @onGenerateCurl={{this.generateCurlStub}}
   //       @filteredProperties={{this.filteredProperties}}
+  //       @sortProperty={{this.sortProperty}}
+  //       @sortDirection={{this.sortDirection}}
   //       @index={{this.index}}
   //     />`);
-  //     await click('.add-trigger');
+  //     await click('.query-builder-block-adder');
   //     await selectChoose('.property-selector', 'a.b');
   //     await click('.accept-condition');
   //     await click('.generate-query-request');
-  //     await waitUntil(() => isVisible('.ember-attacher'), { timeout: 1000 });
 
   //     expect(generateCurlStub).to.be.calledOnce;
   //     expect(generateCurlStub.lastCall.args[0]).to.deep.equal({
   //       from: 0,
   //       size: 10,
+  //       sort: [{
+  //         'e.f': 'asc',
+  //       }],
   //       query: {
-  //         term: {
-  //           'a.b': {
-  //             value: 'true',
-  //           },
+  //         bool: {
+  //           must: [{
+  //             term: {
+  //               'a.b': {
+  //                 value: 'true',
+  //               },
+  //             },
+  //           }],
   //         },
   //       },
   //       _source: [
@@ -187,7 +209,7 @@ describe('Integration | Component | query-builder', function () {
   //         'c',
   //       ],
   //     });
-  //     expect(document.querySelector('.ember-attacher .curl-command-string'))
+  //     expect(document.querySelector('.curl-generator-modal textarea'))
   //       .to.have.value('curl!');
   //   }
   // );

@@ -22,7 +22,7 @@ describe('Integration | Component | query-builder/block-adder', function () {
   it('shows block selector on click', async function () {
     await render(hbs `<QueryBuilder::BlockAdder />`);
 
-    await click('.add-trigger');
+    await click('.query-builder-block-adder');
     expect(isVisible('.ember-attacher')).to.be.true;
     expect(this.element.querySelector('.ember-attacher .query-builder-block-selector'))
       .to.exist;
@@ -32,7 +32,7 @@ describe('Integration | Component | query-builder/block-adder', function () {
     const addSpy = this.set('addSpy', sinon.spy());
 
     await render(hbs `<QueryBuilder::BlockAdder @onBlockAdd={{this.addSpy}} />`);
-    await click('.add-trigger');
+    await click('.query-builder-block-adder');
     await click('.ember-attacher .operator-and');
 
     expect(addSpy).to.be.calledOnce
@@ -50,7 +50,7 @@ describe('Integration | Component | query-builder/block-adder', function () {
       @indexProperties={{this.indexProperties}}
       @onBlockAdd={{this.addSpy}}
     />`);
-    await click('.add-trigger');
+    await click('.query-builder-block-adder');
     await selectChoose('.property-selector', 'a.b');
     await selectChoose('.comparator-value', 'false');
     await click('.accept-condition');
@@ -59,19 +59,37 @@ describe('Integration | Component | query-builder/block-adder', function () {
       .and.to.be.calledWith(sinon.match.instanceOf(ConditionQueryBlock));
   });
 
-  it('disables adder button when "disabled" is true', async function () {
-    await render(hbs `<QueryBuilder::BlockAdder @disabled={{true}}/>`);
-
-    await click('.add-trigger');
-    expect(this.element.querySelector('.ember-attacher')).to.not.exist;
-    expect(this.element.querySelector('.add-trigger')).to.have.attr('disabled');
-  });
-
   it('closes block selector when operator has been choosen', async function () {
     await render(hbs `<QueryBuilder::BlockAdder />`);
-    await click('.add-trigger');
+    await click('.query-builder-block-adder');
     await click('.ember-attacher .operator-and');
     await waitUntil(() => !isVisible('.ember-attacher'), { timeout: 1000 });
+
     expect(isVisible('.ember-attacher')).to.be.false;
+  });
+
+  it('closes block selector when condition has been choosen', async function () {
+    this.set('indexProperties', [{
+      path: 'a.b',
+      type: 'boolean',
+    }]);
+
+    await render(hbs `<QueryBuilder::BlockAdder
+      @indexProperties={{this.indexProperties}}
+    />`);
+    await click('.query-builder-block-adder');
+    await selectChoose('.property-selector', 'a.b');
+    await selectChoose('.comparator-value', 'false');
+    await click('.accept-condition');
+    await waitUntil(() => !isVisible('.ember-attacher'), { timeout: 1000 });
+
+    expect(isVisible('.ember-attacher')).to.be.false;
+  });
+
+  it('can be disabled', async function () {
+    await render(hbs `<QueryBuilder::BlockAdder disabled={{true}}/>`);
+
+    expect(this.element.querySelector('.query-builder-block-adder'))
+      .to.have.attr('disabled');
   });
 });

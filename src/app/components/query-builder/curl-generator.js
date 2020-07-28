@@ -15,6 +15,22 @@ export default class QueryBuilderCurlGeneratorComponent extends Component {
     return this.args.onGenerateCurl || resolve;
   }
 
+  get rootQueryBlock() {
+    return this.args.rootQueryBlock || null;
+  }
+
+  get filteredProperties() {
+    return this.args.filteredProperties || null;
+  }
+
+  get sortProperty() {
+    return this.args.sortProperty || null;
+  }
+
+  get sortDirection() {
+    return this.args.sortDirection || null;
+  }
+
   @action openCurlModal() {
     this.regenerateCurl();
     this.isCurlModalVisible = true;
@@ -25,10 +41,11 @@ export default class QueryBuilderCurlGeneratorComponent extends Component {
   }
 
   regenerateCurl() {
-    this.queryBuilder.rootQueryBlock = this.args.rootQueryBlock.operands[0];
-    this.queryBuilder.visibleContent = this.args.filteredProperties;
-    this.queryBuilder.sortProperty = this.args.sortProperty;
-    this.queryBuilder.sortDirection = this.args.sortDirection;
+    this.queryBuilder.rootQueryBlock =
+      this.rootQueryBlock && this.rootQueryBlock.operands[0];
+    this.queryBuilder.visibleContent = this.filteredProperties;
+    this.queryBuilder.sortProperty = this.sortProperty;
+    this.queryBuilder.sortDirection = this.sortDirection;
     this.curlPromise = this.onGenerateCurl(this.queryBuilder.buildQuery());
   }
 }

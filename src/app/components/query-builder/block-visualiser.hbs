@@ -10,27 +10,11 @@
     onConditionEditionValidityChange=@onConditionEditionValidityChange
     onBlockRemoved=@onBlockRemoved
   }}
-    <BsButton
-      @type="secondary"
-      class="block-button block-settings"
-    >
-      <FaIcon @icon="wrench" />
-      <AttachPopover
-        @showOn="click"
-        @hideOn="clickout"
-        @interactive={{true}}
-        @arrow={{true}}
-        @placement="auto"
-        @lazyRender={{true}}
-        as |popover|
-      >
-        <QueryBuilder::BlockSelector
-          @mode="edit"
-          @editBlock={{@queryBlock}}
-          @onBlockReplace={{fn this.onBlockReplace popover.hide}}
-        />
-      </AttachPopover>
-    </BsButton>
+    <QueryBuilder::BlockSettings
+      @queryBlock={{@queryBlock}}
+      @onBlockReplace={{@onBlockReplace}}
+      class="block-button"
+    />
     <BsButton
       @onClick={{@onBlockRemove}}
       @type="danger"

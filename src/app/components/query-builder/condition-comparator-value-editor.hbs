@@ -9,7 +9,7 @@
         @selected={{this.value}}
         @onChange={{this.valueChanged}}
         @renderInPlace={{true}}
-        @onClose={{this.onStopEdit}}
+        @onClose={{this.onFinishEdit}}
         class="comparator-value"
         {{did-insert this.dropdownEditorInserted}}
         as |value|
@@ -25,9 +25,9 @@
         type="text"
         value={{this.value}}
         {{on "input" this.valueChanged}}
-        {{on "keydown" (invoke-on-enter this.onStopEdit)}}
+        {{on "keydown" (invoke-on-enter this.onFinishEdit)}}
         {{on "keydown" this.keyDown}}
-        {{on "blur" this.onStopEdit}}
+        {{on "blur" this.onFinishEdit}}
         {{did-insert this.textEditorInserted}}
         class="comparator-value form-control form-control-sm {{if this.this.isValueInvalid "is-invalid"}}"
       >

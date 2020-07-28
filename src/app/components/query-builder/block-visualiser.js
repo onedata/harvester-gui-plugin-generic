@@ -9,12 +9,4 @@ export default class QueryBuilderBlockVisualiserComponent extends Component {
   directlyHovered(isDirectlyHovered) {
     this.isDirectlyHovered = isDirectlyHovered;
   }
-
-  @action
-  onBlockReplace(closeSelectorCallback, newBlock) {
-    closeSelectorCallback();
-    if (this.args.onBlockReplace) {
-      this.args.onBlockReplace(newBlock);
-    }
-  }
 }

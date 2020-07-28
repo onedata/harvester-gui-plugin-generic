@@ -3,13 +3,14 @@ import { describe, context, it, beforeEach, afterEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
 import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
-import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/condition-query-block';
 import sinon from 'sinon';
 import { clickTrigger, selectChoose } from 'ember-power-select/test-support/helpers';
 import { click, fillIn, blur, triggerKeyEvent } from '@ember/test-helpers';
 import { isFlatpickrOpen, setFlatpickrDate, closeFlatpickrDate } from 'ember-flatpickr/test-support/helpers';
 import moment from 'moment';
 import SpacesProvider from 'harvester-gui-plugin-generic/services/spaces-provider';
+
+const mathOperators = ['eq', 'lt', 'lte', 'gt', 'gte'];
 
 const spaces = [{
   id: 'space1Id',
@@ -24,153 +25,76 @@ describe(
   function () {
     setupRenderingTest();
 
+    beforeEach(function () {
+      sinon.stub(SpacesProvider.prototype, 'loadSpaces').callsFake(function () {
+        this.spaces = spaces;
+      });
+    });
+
+    afterEach(function () {
+      if (SpacesProvider.prototype.loadSpaces.restore) {
+        SpacesProvider.prototype.loadSpaces.restore();
+      }
+    });
+
     context('in view mode', function () {
-      it(
-        'shows comparator value for boolean "is" condition',
-        async function () {
-          await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
-            @mode="view"
-            @comparator="boolean.is"
-            @value="false"
-          />`);
+      [{
+        comparator: 'boolean.is',
+        value: 'false',
+        viewValue: '"false"',
+      }, {
+        comparator: 'text.contains',
+        value: 'a | b',
+        viewValue: '"a | b"',
+      }, {
+        comparator: 'number.eq',
+        value: '2',
+        viewValue: '"2"',
+      }, {
+        comparator: 'date.eq',
+        value: { timeEnabled: false, datetime: new Date(2020, 0, 2) },
+        viewValue: '2020-01-02',
+      }, {
+        comparator: 'date.eq',
+        value: {
+          timeEnabled: true,
+          datetime: new Date(2020, 0, 2, 12, 5, 40),
+        },
+        viewValue: '2020-01-02 12:05:40',
+        descriptionSuffix: ' with truthy timeEnabled',
+      }, {
+        comparator: 'space.is',
+        value: { id: 'space1Id', name: 'space1' },
+        viewValue: 'space1',
+      }, {
+        comparator: 'anyProperty.hasPhrase',
+        value: 'abc def',
+        viewValue: '"abc def"',
+      }].forEach(({ comparator, value, viewValue, descriptionSuffix }) => {
+        const [propertyType, comparatorName] = comparator.split('.');
+        it(
+          `shows comparator value for "${comparatorName}" comparator for ${propertyType} property${descriptionSuffix || ''}`,
+          async function () {
+            this.setProperties({
+              comparator,
+              value,
+            });
 
-          expect(this.element.querySelector('.comparator-value').textContent.trim())
-            .to.equal('"false"');
-        }
-      );
+            await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
+              @mode="view"
+              @comparator={{this.comparator}}
+              @value={{this.value}}
+            />`);
 
-      it(
-        'shows comparator value for text "contains" condition',
-        async function () {
-          this.set('block', new ConditionQueryBlock({ path: 'a.b' },
-            'text.contains',
-            'a | b'
-          ));
-
-          await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
-            @mode="view"
-            @conditionBlock={{this.block}}
-            @comparator="text.contains"
-            @value="a | b"
-          />`);
-
-          expect(this.element.querySelector('.comparator-value').textContent.trim())
-            .to.equal('"a | b"');
-        }
-      );
-
-      it(
-        'shows comparator value for number condition',
-        async function () {
-          this.set('block', new ConditionQueryBlock({ path: 'a.b' },
-            'number.eq',
-            '2'
-          ));
-
-          await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
-            @mode="view"
-            @comparator="number.eq"
-            @value="2"
-          />`);
-
-          expect(this.element.querySelector('.comparator-value').textContent.trim())
-            .to.equal('"2"');
-        }
-      );
-
-      it(
-        'shows comparator value for date condition',
-        async function () {
-          this.set('value', { timeEnabled: false, datetime: new Date(2020, 0, 2) });
-
-          await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
-            @mode="view"
-            @comparator="date.eq"
-            @value={{this.value}}
-          />`);
-
-          expect(this.element.querySelector('.comparator-value').textContent.trim())
-            .to.equal('2020-01-02');
-        }
-      );
-
-      it(
-        'shows comparator value for date  condition with truthy timeEnabled',
-        async function () {
-          this.set('value', {
-            timeEnabled: true,
-            datetime: new Date(2020, 0, 2, 12, 5, 40),
-          });
-          await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
-            @mode="view"
-            @comparator="date.eq"
-            @value={{this.value}}
-          />`);
-
-          expect(this.element.querySelector('.comparator-value').textContent.trim())
-            .to.equal('2020-01-02 12:05:40');
-        }
-      );
-
-      it(
-        'shows comparator value for keyword "is" condition',
-        async function () {
-          this.set('block', new ConditionQueryBlock({ path: 'a.b' },
-            'keyword.is',
-            'abc'
-          ));
-
-          await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
-            @mode="view"
-            @comparator="keyword.is"
-            @value="abc"
-          />`);
-
-          expect(this.element.querySelector('.comparator-value').textContent.trim())
-            .to.equal('"abc"');
-        }
-      );
-
-      it(
-        'shows comparator value for space "is" condition',
-        async function () {
-          this.set('block', new ConditionQueryBlock({ path: 'space' },
-            'space.is',
-          ));
-          this.set('value', { id: 'space1Id', name: 'space1' });
-
-          await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
-            @mode="view"
-            @comparator='space.is'
-            @value={{this.value}}
-          />`);
-
-          expect(this.element.querySelector('.comparator-value').textContent.trim())
-            .to.equal('space1');
-        }
-      );
-
-      it(
-        'shows comparator value for anyProperty "hasPhrase" condition',
-        async function () {
-          this.set('block', new ConditionQueryBlock({ path: 'any property' },
-            'anyProperty.hasPhrase',
-            'abc def'
-          ));
-
-          await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
-            @mode="view"
-            @comparator="anyProperty.hasPhrase"
-            @value="abc def"
-          />`);
-
-          expect(this.element.querySelector('.comparator-value').textContent.trim())
-            .to.equal('"abc def"');
-        }
-      );
+            expect(this.element.querySelector('.comparator-value').textContent.trim())
+              .to.equal(viewValue);
+          }
+        );
+      });
 
       it('calls "onStartEdit" on click', async function () {
         const onStartEditSpy = this.set('onStartEditSpy', sinon.spy());
+
         await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
           @mode="view"
           @comparator="boolean.is"
@@ -184,316 +108,215 @@ describe(
     });
 
     context('in create mode', function () {
-      beforeEach(function () {
-        sinon.stub(SpacesProvider.prototype, 'loadSpaces').callsFake(function () {
-          this.spaces = spaces;
-        });
+      [{
+        comparator: 'text.contains',
+        valueToInput: 'abc',
+      }, ...mathOperators.map(operator => ({
+        comparator: `number.${operator}`,
+        valueToInput: '2',
+      })), {
+        comparator: 'keyword.is',
+        valueToInput: 'abc',
+      }, {
+        comparator: 'anyProperty.hasPhrase',
+        valueToInput: 'abc',
+      }].forEach(({ comparator, valueToInput }) => {
+        const [propertyType, comparatorName] = comparator.split('.');
+
+        it(
+          `shows text input for "${comparatorName}" comparator for ${propertyType} property`,
+          async function () {
+            this.set('comparator', comparator);
+
+            await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
+              @mode="create"
+              @comparator={{this.comparator}}
+            />`);
+
+            expect(this.element.querySelector('input[type="text"].comparator-value'))
+              .to.exist;
+          }
+        );
+
+        it(
+          `calls "onValueChange" callback, when ${propertyType} property "${comparatorName}" condition value has changed`,
+          async function () {
+            const { changeSpy } = this.setProperties({
+              comparator,
+              changeSpy: sinon.spy(),
+            });
+
+            await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
+              @mode="create"
+              @comparator={{this.comparator}}
+              @onValueChange={{this.changeSpy}}
+            />`);
+            await fillIn('.comparator-value', valueToInput);
+
+            expect(changeSpy).to.be.calledOnce.and.to.be.calledWith(valueToInput);
+          }
+        );
       });
 
-      afterEach(function () {
-        if (SpacesProvider.prototype.loadSpaces.restore) {
-          SpacesProvider.prototype.loadSpaces.restore();
-        }
+      [{
+        comparator: 'boolean.is',
+        options: ['true', 'false'],
+        toSelect: 'false',
+        selectedValue: 'false',
+      }, {
+        comparator: 'space.is',
+        options: ['space1', 'space2'],
+        toSelect: 'space2',
+        selectedValue: spaces[1],
+      }].forEach(({ comparator, options, toSelect, selectedValue }) => {
+        const [propertyType, comparatorName] = comparator.split('.');
+
+        it(
+          `shows dropdown for "${comparatorName}" comparator for ${propertyType} property`,
+          async function () {
+            this.set('comparator', comparator);
+
+            await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
+              @mode="create"
+              @comparator={{this.comparator}}
+            />`);
+            await clickTrigger('.comparator-value');
+
+            const optionsNodes =
+              this.element.querySelectorAll('.ember-power-select-option');
+            expect(optionsNodes).to.have.length(options.length);
+            options.forEach((option, index) =>
+              expect(optionsNodes[index].textContent.trim()).to.equal(option)
+            );
+          }
+        );
+
+        it(
+          `calls "onValueChange" callback, when ${propertyType} property "${comparatorName}" condition value has changed`,
+          async function () {
+            const { changeSpy } = this.setProperties({
+              comparator,
+              changeSpy: sinon.spy(),
+            });
+
+            await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
+              @mode="create"
+              @comparator={{this.comparator}}
+              @onValueChange={{this.changeSpy}}
+            />`);
+            await selectChoose('.comparator-value', toSelect);
+
+            expect(changeSpy).to.be.calledOnce.and.to.be.calledWith(selectedValue);
+          }
+        );
       });
 
-      it(
-        'shows true/false dropdown for "is" comparator for boolean property',
-        async function () {
-          await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
-            @mode="create"
-            @comparator="boolean.is"
-          />`);
-          await clickTrigger('.comparator-value');
+      mathOperators.forEach(operator => {
+        it(
+          `shows flatpickr input without time for "${operator}" comparator for date property`,
+          async function () {
+            this.setProperties({
+              value: {
+                datetime: moment('2020-05-04 12:00').toDate(),
+                timeEnabled: false,
+              },
+              comparator: `date.${operator}`,
+            });
+            await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
+              @mode="create"
+              @comparator={{this.comparator}}
+              @value={{this.value}}
+            />`);
 
-          const options = this.element.querySelectorAll('.ember-power-select-option');
-          expect(options).to.have.length(2);
-          expect(options[0].textContent.trim()).to.equal('true');
-          expect(options[1].textContent.trim()).to.equal('false');
-        }
-      );
+            expect(this.element.querySelector('.comparator-value'))
+              .to.exist.and.to.have.value('2020-05-04');
+            expect(this.element.querySelector('.flatpickr-calendar')).to.exist;
+            expect(this.element.querySelector('.flatpickr-time.hasSeconds')).to.not.exist;
+          }
+        );
 
-      it(
-        'calls "onValueChange" callback, when boolean property "is" condition value has changed',
-        async function () {
-          const changeSpy = this.set('changeSpy', sinon.spy());
+        it(
+          `allows to enable time flatpickr input for "${operator}" comparator for date property`,
+          async function () {
+            const { changeSpy } = this.setProperties({
+              value: {
+                datetime: moment('2020-05-04 12:00').toDate(),
+                timeEnabled: false,
+              },
+              comparator: `date.${operator}`,
+              changeSpy: sinon.stub().callsFake(value => {
+                this.set('value', value);
+              }),
+            });
 
-          await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
-            @mode="create"
-            @comparator="boolean.is"
-            @onValueChange={{this.changeSpy}}
-          />`);
+            await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
+              @mode="create"
+              @comparator={{this.comparator}}
+              @value={{this.value}}
+              @onValueChange={{this.changeSpy}}
+            />`);
+            await click('.include-time');
 
-          await selectChoose('.comparator-value', 'false');
+            expect(changeSpy).to.be.calledOnce.and.to.be.calledWith({
+              datetime: sinon.match.date,
+              timeEnabled: true,
+            });
+            expect(this.element.querySelector('.comparator-value'))
+              .to.have.value('2020-05-04 12:00:00');
+            expect(this.element.querySelector('.flatpickr-time.hasSeconds')).to.exist;
+          }
+        );
 
-          expect(changeSpy).to.be.calledOnce.and.to.be.calledWith('false');
-        }
-      );
+        it(
+          `calls "onValueChange" callback, when date property "${operator}" condition value has changed`,
+          async function () {
+            const { changeSpy } = this.setProperties({
+              value: {
+                datetime: moment('2020-05-04 12:00').toDate(),
+                timeEnabled: false,
+              },
+              comparator: `date.${operator}`,
+              changeSpy: sinon.stub().callsFake(value => {
+                this.set('value', value);
+              }),
+            });
 
-      it(
-        'shows text input for "contains" comparator for text property',
-        async function () {
-          await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
-            @mode="create"
-            @comparator="text.contains"
-          />`);
+            await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
+              @mode="create"
+              @comparator={{this.comparator}}
+              @value={{this.value}}
+              @onValueChange={{this.changeSpy}}
+            />`);
+            await click('.include-time');
+            await setFlatpickrDate('.flatpickr-input', new Date(2020, 0, 2, 13, 10, 15));
 
-          expect(this.element.querySelector('input[type="text"].comparator-value'))
-            .to.exist;
-        }
-      );
-
-      it(
-        'calls "onValueChange" callback, when text property "contains" condition value has changed',
-        async function () {
-          const changeSpy = this.set('changeSpy', sinon.spy());
-
-          await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
-            @mode="create"
-            @comparator="text.contains"
-            @onValueChange={{this.changeSpy}}
-          />`);
-          await fillIn('.comparator-value', 'a | b');
-
-          expect(changeSpy).to.be.calledOnce.and.to.be.calledWith('a | b');
-        }
-      );
-
-      it(
-        'shows text input for "=" comparator for number property',
-        async function () {
-          await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
-            @mode="create"
-            @comparator="number.eq"
-          />`);
-
-          expect(this.element.querySelector('input[type="text"].comparator-value'))
-            .to.exist;
-        }
-      );
-
-      it(
-        'calls "onValueChange" callback, when number property "=" condition value has changed',
-        async function () {
-          const changeSpy = this.set('changeSpy', sinon.spy());
-
-          await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
-            @mode="create"
-            @comparator="number.eq"
-            @onValueChange={{this.changeSpy}}
-          />`);
-          await fillIn('.comparator-value', '2');
-
-          expect(changeSpy).to.be.calledOnce.and.to.be.calledWith('2');
-        }
-      );
-
-      it(
-        'shows text input for "is" comparator for keyword property',
-        async function () {
-          await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
-            @mode="create"
-            @comparator="keyword.is"
-          />`);
-
-          expect(this.element.querySelector('input[type="text"].comparator-value'))
-            .to.exist;
-        }
-      );
-
-      it(
-        'calls "onValueChange" callback, when keyword property "is" condition value has changed',
-        async function () {
-          const changeSpy = this.set('changeSpy', sinon.spy());
-
-          await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
-            @mode="create"
-            @comparator="keyword.is"
-            @onValueChange={{this.changeSpy}}
-          />`);
-          await fillIn('.comparator-value', 'abc');
-
-          expect(changeSpy).to.be.calledOnce.and.to.be.calledWith('abc');
-        }
-      );
-
-      it(
-        'shows flatpickr input without time for "=" comparator for date property',
-        async function () {
-          this.set('value', {
-            datetime: moment('2020-05-04 12:00').toDate(),
-            timeEnabled: false,
-          });
-          await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
-            @mode="create"
-            @comparator="date.eq"
-            @value={{this.value}}
-          />`);
-
-          expect(this.element.querySelector('.comparator-value'))
-            .to.exist.and.to.have.value('2020-05-04');
-          expect(this.element.querySelector('.flatpickr-calendar')).to.exist;
-          expect(this.element.querySelector('.flatpickr-time.hasSeconds')).to.not.exist;
-        }
-      );
-
-      it(
-        'allows to enable time flatpickr input for "=" comparator for date property',
-        async function () {
-          const changeSpy = this.set(
-            'changeSpy',
-            sinon.stub().callsFake(value => {
-              this.set('value', value);
-            })
-          );
-          this.set('value', {
-            datetime: moment('2020-05-04 12:00').toDate(),
-            timeEnabled: false,
-          });
-          await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
-            @mode="create"
-            @comparator="date.eq"
-            @value={{this.value}}
-            @onValueChange={{this.changeSpy}}
-          />`);
-          await click('.include-time');
-
-          expect(changeSpy).to.be.calledOnce.and.to.be.calledWith({
-            datetime: sinon.match.date,
-            timeEnabled: true,
-          });
-          expect(this.element.querySelector('.comparator-value'))
-            .to.have.value('2020-05-04 12:00:00');
-          expect(this.element.querySelector('.flatpickr-time.hasSeconds')).to.exist;
-        }
-      );
-
-      it(
-        'calls "onValueChange" callback, when date property "=" condition value has changed',
-        async function () {
-          const changeSpy = this.set(
-            'changeSpy',
-            sinon.stub().callsFake(value => {
-              this.set('value', value);
-            })
-          );
-          this.set('value', {
-            datetime: moment('2020-05-04 12:00').toDate(),
-            timeEnabled: false,
-          });
-          await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
-            @mode="create"
-            @comparator="date.eq"
-            @value={{this.value}}
-            @onValueChange={{this.changeSpy}}
-          />`);
-          await click('.include-time');
-          await setFlatpickrDate('.flatpickr-input', new Date(2020, 0, 2, 13, 10, 15));
-
-          expect(changeSpy).to.be.calledTwice.and.to.be.calledWith({
-            datetime: sinon.match.date,
-            timeEnabled: true,
-          });
-          expect(
-            moment(changeSpy.lastCall.args[0].datetime).format('YYYY-MM-DD HH:mm:ss')
-          ).to.equal('2020-01-02 13:10:15');
-        }
-      );
-
-      it(
-        'shows spaces dropdown for "is" comparator for space property',
-        async function () {
-          await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
-            @mode="create"
-            @comparator="space.is"
-          />`);
-          await clickTrigger('.comparator-value');
-
-          const options = this.element.querySelectorAll('.ember-power-select-option');
-          expect(options).to.have.length(2);
-          expect(options[0].textContent.trim()).to.equal('space1');
-          expect(options[1].textContent.trim()).to.equal('space2');
-        }
-      );
-
-      it(
-        'calls "onValueChange" callback, when space property "is" condition value has changed',
-        async function () {
-          const changeSpy = this.set('changeSpy', sinon.spy());
-
-          await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
-            @mode="create"
-            @comparator="space.is"
-            @onValueChange={{this.changeSpy}}
-          />`);
-          await selectChoose('.comparator-value', 'space2');
-
-          expect(changeSpy).to.be.calledOnce.and.to.be.calledWith(
-            sinon.match({ id: 'space2Id', name: 'space2' })
-          );
-        }
-      );
-
-      it(
-        'shows text input for "hasPhrase" comparator for anyProperty property',
-        async function () {
-          await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
-            @mode="create"
-            @comparator="anyProperty.hasPhrase"
-          />`);
-
-          expect(this.element.querySelector('input[type="text"].comparator-value'))
-            .to.exist;
-        }
-      );
-
-      it(
-        'calls "onValueChange" callback, when anyProperty property "hasPhrase" condition value has changed',
-        async function () {
-          const changeSpy = this.set('changeSpy', sinon.spy());
-
-          await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
-            @mode="create"
-            @comparator="anyProperty.hasPhrase"
-            @onValueChange={{this.changeSpy}}
-          />`);
-          await fillIn('.comparator-value', 'abc def');
-
-          expect(changeSpy).to.be.calledOnce.and.to.be.calledWith('abc def');
-        }
-      );
+            expect(changeSpy).to.be.calledTwice.and.to.be.calledWith({
+              datetime: sinon.match.date,
+              timeEnabled: true,
+            });
+            expect(
+              moment(changeSpy.lastCall.args[0].datetime).format('YYYY-MM-DD HH:mm:ss')
+            ).to.equal('2020-01-02 13:10:15');
+          }
+        );
+      });
     });
 
     context('in edit mode', function () {
-      beforeEach(function () {
-
-        sinon.stub(SpacesProvider.prototype, 'loadSpaces').callsFake(function () {
-          this.spaces = spaces;
-        });
-      });
-
-      afterEach(function () {
-        if (SpacesProvider.prototype.loadSpaces.restore) {
-          SpacesProvider.prototype.loadSpaces.restore();
-        }
-      });
-
       [
         'text.contains',
-        'number.lt',
+        ...mathOperators.map(operator => `number.${operator}`),
         'keyword.is',
         'anyProperty.hasPhrase',
       ].forEach(comparator => {
         const [propertyType, comparatorName] = comparator.split('.');
-        const beforeTest = testCase => {
-          testCase.setProperties({
-            comparator,
-          });
-        };
+        const beforeTest = testCase => testCase.set('comparator', comparator);
 
         it(
           `has focused editor on init for "${comparatorName}" comparator for ${propertyType} property`,
           async function () {
             beforeTest(this);
+
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="edit"
               @comparator={{this.comparator}}
@@ -509,6 +332,7 @@ describe(
           `shows current comparator value for "${comparatorName}" comparator for ${propertyType} property`,
           async function () {
             beforeTest(this);
+
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="edit"
               @comparator={{this.comparator}}
@@ -523,21 +347,26 @@ describe(
           `closes editor and notifies about new value for "${comparatorName}" comparator for ${propertyType} property (close using Enter)`,
           async function () {
             beforeTest(this);
-            const changeSpy = this.set('changeSpy', sinon.spy());
-            const stopEditSpy = this.set('stopEditSpy', sinon.spy());
+            const {
+              changeSpy,
+              finishEditSpy,
+            } = this.setProperties({
+              changeSpy: sinon.spy(),
+              finishEditSpy: sinon.spy(),
+            });
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="edit"
               @comparator={{this.comparator}}
               @value={{this.value}}
               @onValueChange={{this.changeSpy}}
-              @onStopEdit={{this.stopEditSpy}}
+              @onFinishEdit={{this.finishEditSpy}}
             />`);
             await fillIn('.comparator-value', 'def');
             await triggerKeyEvent('.comparator-value', 'keydown', 13);
 
             expect(changeSpy).to.be.calledWith('def');
-            expect(stopEditSpy).to.be.calledOnce;
+            expect(finishEditSpy).to.be.calledOnce;
           }
         );
 
@@ -545,21 +374,26 @@ describe(
           `closes editor and notifies about new value for "${comparatorName}" comparator for ${propertyType} property (close using blur)`,
           async function () {
             beforeTest(this);
-            const changeSpy = this.set('changeSpy', sinon.spy());
-            const stopEditSpy = this.set('stopEditSpy', sinon.spy());
+            const {
+              changeSpy,
+              finishEditSpy,
+            } = this.setProperties({
+              changeSpy: sinon.spy(),
+              finishEditSpy: sinon.spy(),
+            });
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="edit"
               @comparator={{this.comparator}}
               @value={{this.value}}
               @onValueChange={{this.changeSpy}}
-              @onStopEdit={{this.stopEditSpy}}
+              @onFinishEdit={{this.finishEditSpy}}
             />`);
             await fillIn('.comparator-value', 'def');
             await blur('.comparator-value');
 
             expect(changeSpy).to.be.calledWith('def');
-            expect(stopEditSpy).to.be.calledOnce;
+            expect(finishEditSpy).to.be.calledOnce;
           }
         );
 
@@ -567,20 +401,25 @@ describe(
           `notifies about partial new value before close for "${comparatorName}" comparator for ${propertyType} property`,
           async function () {
             beforeTest(this);
-            const changeSpy = this.set('changeSpy', sinon.spy());
-            const stopEditSpy = this.set('stopEditSpy', sinon.spy());
+            const {
+              changeSpy,
+              finishEditSpy,
+            } = this.setProperties({
+              changeSpy: sinon.spy(),
+              finishEditSpy: sinon.spy(),
+            });
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="edit"
               @comparator={{this.comparator}}
               @value={{this.value}}
               @onValueChange={{this.changeSpy}}
-              @onStopEdit={{this.stopEditSpy}}
+              @onFinishEdit={{this.finishEditSpy}}
             />`);
             await fillIn('.comparator-value', 'de');
 
             expect(changeSpy).to.be.calledWith('de');
-            expect(stopEditSpy).to.not.be.called;
+            expect(finishEditSpy).to.not.be.called;
           }
         );
 
@@ -588,20 +427,58 @@ describe(
           `cancels editor on Escape key down for "${comparatorName}" comparator for ${propertyType} property`,
           async function () {
             beforeTest(this);
-            const cancelEditSpy = this.set('cancelEditSpy', sinon.spy());
-            const stopEditSpy = this.set('stopEditSpy', sinon.spy());
+            const {
+              finishEditSpy,
+              cancelEditSpy,
+            } = this.setProperties({
+              finishEditSpy: sinon.spy(),
+              cancelEditSpy: sinon.spy(),
+            });
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="edit"
               @comparator={{this.comparator}}
               @value={{this.value}}
-              @onStopEdit={{this.stopEditSpy}}
+              @onFinishEdit={{this.finishEditSpy}}
               @onCancelEdit={{this.cancelEditSpy}}
             />`);
             await triggerKeyEvent('.comparator-value', 'keydown', 27);
 
-            expect(stopEditSpy).to.not.be.called;
+            expect(finishEditSpy).to.not.be.called;
             expect(cancelEditSpy).to.be.calledOnce;
+          }
+        );
+
+        it(
+          `does not add class "is-invalid" to the input by default for "${comparatorName}" comparator for ${propertyType} property`,
+          async function () {
+            beforeTest(this);
+
+            await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
+              @mode="edit"
+              @comparator={{this.comparator}}
+              @value="abc"
+            />`);
+
+            expect(this.element.querySelector('.comparator-value'))
+              .to.not.have.class('is-invalid');
+          }
+        );
+
+        it(
+          `adds class "is-invalid" to the input if isValueInvalid is true for "${comparatorName}" comparator for ${propertyType} property`,
+          async function () {
+            beforeTest(this);
+
+            await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
+              @mode="edit"
+              @comparator={{this.comparator}}
+              @isValueInvalid={{true}}
+              @value="abc"
+            />`);
+
+            expect(this.element.querySelector('.comparator-value'))
+              .to.have.class('is-invalid');
           }
         );
       });
@@ -629,17 +506,16 @@ describe(
         selectionResult,
       }) => {
         const [propertyType, comparatorName] = comparator.split('.');
-        const beforeTest = testCase => {
-          testCase.setProperties({
-            comparator,
-            value: initialValue,
-          });
-        };
+        const beforeTest = testCase => testCase.setProperties({
+          comparator,
+          value: initialValue,
+        });
 
         it(
           `has focused editor on init for "${comparatorName}" comparator for ${propertyType} property`,
           async function () {
             beforeTest(this);
+
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="edit"
               @comparator={{this.comparator}}
@@ -656,6 +532,7 @@ describe(
           `shows current comparator value for "${comparatorName}" comparator for ${propertyType} property`,
           async function () {
             beforeTest(this);
+
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="edit"
               @comparator={{this.comparator}}
@@ -672,6 +549,7 @@ describe(
           `shows expanded dropdown for "${comparatorName}" comparator for ${propertyType} property`,
           async function () {
             beforeTest(this);
+
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="edit"
               @comparator={{this.comparator}}
@@ -687,20 +565,25 @@ describe(
           `closes editor and notifies about new value for "${comparatorName}" comparator for ${propertyType} property`,
           async function () {
             beforeTest(this);
-            const changeSpy = this.set('changeSpy', sinon.spy());
-            const stopEditSpy = this.set('stopEditSpy', sinon.spy());
+            const {
+              changeSpy,
+              finishEditSpy,
+            } = this.setProperties({
+              changeSpy: sinon.spy(),
+              finishEditSpy: sinon.spy(),
+            });
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="edit"
               @comparator={{this.comparator}}
               @value={{this.value}}
               @onValueChange={{this.changeSpy}}
-              @onStopEdit={{this.stopEditSpy}}
+              @onFinishEdit={{this.finishEditSpy}}
             />`);
             await selectChoose('.comparator-value', stringToSelect);
 
             expect(changeSpy).to.be.calledOnce.and.to.be.calledWith(selectionResult);
-            expect(stopEditSpy).to.be.calledOnce;
+            expect(finishEditSpy).to.be.calledOnce;
           }
         );
 
@@ -708,17 +591,17 @@ describe(
           `closes editor for "${comparatorName}" comparator for ${propertyType} property on dropdown trigger click`,
           async function () {
             beforeTest(this);
-            const stopEditSpy = this.set('stopEditSpy', sinon.spy());
+            const finishEditSpy = this.set('finishEditSpy', sinon.spy());
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="edit"
               @comparator={{this.comparator}}
               @value={{this.value}}
-              @onStopEdit={{this.stopEditSpy}}
+              @onFinishEdit={{this.finishEditSpy}}
             />`);
             await clickTrigger('.comparator-value');
 
-            expect(stopEditSpy).to.be.calledOnce;
+            expect(finishEditSpy).to.be.calledOnce;
           }
         );
       });
@@ -744,87 +627,103 @@ describe(
         }
       );
 
-      it(
-        'closes editor for "lt" comparator for date property on flatpickr close',
-        async function () {
-          this.set('value', {
-            datetime: moment('2020-05-04 12:00').toDate(),
-            timeEnabled: false,
-          });
-          const stopEditSpy = this.set('stopEditSpy', sinon.spy());
+      mathOperators.forEach(operator => {
+        const comparator = `date.${operator}`;
 
-          await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
-            @mode="edit"
-            @comparator="date.lt"
-            @value={{this.value}}
-            @onStopEdit={{this.stopEditSpy}}
-          />`);
-          await closeFlatpickrDate('.flatpickr-input');
+        it(
+          `closes editor for "${operator}" comparator for date property on flatpickr close`,
+          async function () {
+            const { finishEditSpy } = this.setProperties({
+              value: {
+                datetime: moment('2020-05-04 12:00').toDate(),
+                timeEnabled: false,
+              },
+              comparator,
+              finishEditSpy: sinon.spy(),
+            });
 
-          expect(stopEditSpy).to.be.calledOnce;
-        }
-      );
+            await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
+              @mode="edit"
+              @comparator={{this.comparator}}
+              @value={{this.value}}
+              @onFinishEdit={{this.finishEditSpy}}
+            />`);
+            await closeFlatpickrDate('.flatpickr-input');
 
-      it(
-        'toggle of "time-enabled" button does not turn off editor of "lt" comparator for date property',
-        async function () {
-          this.set('value', {
-            datetime: moment('2020-05-04 12:00').toDate(),
-            timeEnabled: false,
-          });
-          const stopEditSpy = this.set('stopEditSpy', sinon.spy());
-          const valueChangeStub = this.set(
-            'valueChangeStub',
-            sinon.stub().callsFake(value => this.set('value', value))
-          );
+            expect(finishEditSpy).to.be.calledOnce;
+          }
+        );
 
-          await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
-            @mode="edit"
-            @comparator="date.lt"
-            @value={{this.value}}
-            @onValueChange={{this.valueChangeStub}}
-            @onStopEdit={{this.stopEditSpy}}
-          />`);
-          await click('.include-time');
+        it(
+          `toggle of "time-enabled" button does not turn off editor of "${operator}" comparator for date property`,
+          async function () {
+            const {
+              finishEditSpy,
+              valueChangeStub,
+            } = this.setProperties({
+              value: {
+                datetime: moment('2020-05-04 12:00').toDate(),
+                timeEnabled: false,
+              },
+              comparator,
+              finishEditSpy: sinon.spy(),
+              valueChangeStub: sinon.stub().callsFake(value => this.set('value', value)),
+            });
 
-          expect(isFlatpickrOpen()).to.be.true;
-          expect(this.element.querySelector('.flatpickr-time.hasSeconds')).to.exist;
-          expect(stopEditSpy).to.not.be.called;
-          expect(valueChangeStub).to.be.calledWith(sinon.match({
-            datetime: sinon.match.date,
-            timeEnabled: true,
-          }));
-        }
-      );
+            await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
+              @mode="edit"
+              @comparator={{this.comparator}}
+              @value={{this.value}}
+              @onValueChange={{this.valueChangeStub}}
+              @onFinishEdit={{this.finishEditSpy}}
+            />`);
+            await click('.include-time');
 
-      it(
-        'notifies about changed value of "lt" comparator for date property',
-        async function () {
-          this.set('value', {
-            datetime: moment('2020-05-04 12:00').toDate(),
-            timeEnabled: false,
-          });
-          const stopEditSpy = this.set('stopEditSpy', sinon.spy());
-          const valueChangeSpy = this.set('valueChangeSpy', sinon.spy());
+            expect(isFlatpickrOpen()).to.be.true;
+            expect(this.element.querySelector('.flatpickr-time.hasSeconds')).to.exist;
+            expect(finishEditSpy).to.not.be.called;
+            expect(valueChangeStub).to.be.calledWith(sinon.match({
+              datetime: sinon.match.date,
+              timeEnabled: true,
+            }));
+          }
+        );
 
-          await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
-            @mode="edit"
-            @comparator="date.lt"
-            @value={{this.value}}
-            @onValueChange={{this.valueChangeSpy}}
-            @onStopEdit={{this.stopEditSpy}}
-          />`);
-          await setFlatpickrDate('.flatpickr-input', new Date(2020, 0, 2));
+        it(
+          `notifies about changed value of "${operator}" comparator for date property`,
+          async function () {
+            const {
+              finishEditSpy,
+              valueChangeSpy,
+            } = this.setProperties({
+              value: {
+                datetime: moment('2020-05-04 12:00').toDate(),
+                timeEnabled: false,
+              },
+              comparator,
+              finishEditSpy: sinon.spy(),
+              valueChangeSpy: sinon.spy(),
+            });
 
-          expect(stopEditSpy).to.not.be.called;
-          expect(valueChangeSpy).to.be.calledWith(sinon.match({
-            datetime: sinon.match.date,
-            timeEnabled: false,
-          }));
-          expect(moment(valueChangeSpy.lastCall.args[0].datetime).format('YYYY-MM-DD'))
-            .to.equal('2020-01-02');
-        }
-      );
+            await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
+              @mode="edit"
+              @comparator={{this.comparator}}
+              @value={{this.value}}
+              @onValueChange={{this.valueChangeSpy}}
+              @onFinishEdit={{this.finishEditSpy}}
+            />`);
+            await setFlatpickrDate('.flatpickr-input', new Date(2020, 0, 2));
+
+            expect(finishEditSpy).to.not.be.called;
+            expect(valueChangeSpy).to.be.calledWith(sinon.match({
+              datetime: sinon.match.date,
+              timeEnabled: false,
+            }));
+            expect(moment(valueChangeSpy.lastCall.args[0].datetime).format('YYYY-MM-DD'))
+              .to.equal('2020-01-02');
+          }
+        );
+      });
     });
   }
 );

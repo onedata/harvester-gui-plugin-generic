@@ -22,6 +22,7 @@ describe('Integration | Component | query-builder/block-visualiser', function ()
       `renders ${operatorName.toUpperCase()} operator block according to the passed block spec`,
       async function () {
         this.set('block', new operatorBlockClasses[operatorName]());
+
         await render(hbs `<QueryBuilder::BlockVisualiser @queryBlock={{this.block}} />`);
 
         expect(this.element.querySelector(

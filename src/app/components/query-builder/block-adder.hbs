@@ -1,21 +1,24 @@
-<div class="query-builder-block-adder">
-  <BsButton class="add-trigger" @size="sm" @type="secondary" disabled={{@disabled}}>
-    <FaIcon @icon="plus" />
-    <AttachPopover
-      @showOn="click"
-      @hideOn="clickout"
-      @interactive={{true}}
-      @arrow={{true}}
-      @placement="auto"
-      @lazyRender={{true}}
-      as |popover|
-    >
-      <QueryBuilder::BlockSelector
-        @mode="create"
-        @indexProperties={{@indexProperties}}
-        @onBlockAdd={{fn this.onBlockAdd popover.hide}}
-      />
-    </AttachPopover>
-  </BsButton>
+<BsButton
+  class="query-builder-block-adder"
+  @size="sm"
+  @type="secondary"
+  ...attributes
+>
+  <FaIcon @icon="plus" />
+  <AttachPopover
+    @showOn="click"
+    @hideOn="clickout"
+    @interactive={{true}}
+    @arrow={{true}}
+    @placement="auto"
+    @lazyRender={{true}}
+    as |popover|
+  >
+    <QueryBuilder::BlockSelector
+      @mode="create"
+      @indexProperties={{@indexProperties}}
+      @onBlockAdd={{fn this.onBlockAdd popover.hide}}
+    />
+  </AttachPopover>
   {{yield}}
-</div>
+</BsButton>

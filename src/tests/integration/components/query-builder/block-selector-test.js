@@ -55,9 +55,9 @@ describe('Integration | Component | query-builder/block-selector', function () {
             @mode="create"
             @onBlockAdd={{this.addSpy}}
           />`);
-
           expect(addSpy).to.not.be.called;
           await click(`.operator-${operatorName}`);
+
           const blockMatcher = sinon.match.instanceOf(operatorBlockClasses[operatorName]);
           expect(addSpy).to.be.calledOnce.and.to.be.calledWith(blockMatcher);
         }
@@ -101,6 +101,13 @@ describe('Integration | Component | query-builder/block-selector', function () {
         expect(addSpy).to.be.calledOnce.and.to.be.calledWith(blockMatcher);
       }
     );
+
+    it('does not render edit-specific sections', async function () {
+      await render(hbs `<QueryBuilder::BlockSelector @mode="create"/>`);
+
+      expect(this.element.querySelector('.surround-section')).to.not.exist;
+      expect(this.element.querySelector('.change-to-section')).to.not.exist;
+    });
   });
 
   context('in "edit" mode', function () {
@@ -166,7 +173,7 @@ describe('Integration | Component | query-builder/block-selector', function () {
     );
 
     it(
-      'does not render operators in "change to" section when block is an operator',
+      'does not render operators in "change to" section when block is not an operator',
       async function () {
         this.set('editBlock', new ConditionQueryBlock());
 
@@ -272,6 +279,16 @@ describe('Integration | Component | query-builder/block-selector', function () {
           }
         );
       });
+    });
+
+    it('does not render create-specific sections', async function () {
+      await render(hbs `<QueryBuilder::BlockSelector
+        @mode="edit"
+        @editBlock={{this.editBlock}}
+      />`);
+
+      expect(this.element.querySelector('.add-operator-section')).to.not.exist;
+      expect(this.element.querySelector('.condition-section')).to.not.exist;
     });
   });
 });

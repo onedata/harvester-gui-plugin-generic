@@ -203,7 +203,7 @@ describe('Unit | Utility | elasticsearch-query-builder', function () {
   );
 
   it(
-    'converts number "=" condition',
+    'converts number "eq" condition',
     function () {
       const esQueryBuilder = new ElasticsearchQueryBuilder();
       esQueryBuilder.rootQueryBlock = exampleNumberEqualsConditionBlock;
@@ -213,25 +213,13 @@ describe('Unit | Utility | elasticsearch-query-builder', function () {
     }
   );
 
-  [{
-    name: 'lt',
-    symbol: '<',
-  }, {
-    name: 'lte',
-    symbol: '≤',
-  }, {
-    name: 'gt',
-    symbol: '>',
-  }, {
-    name: 'gte',
-    symbol: '≥',
-  }].forEach(({ name, symbol }) => {
+  ['lt', 'lte', 'gt', 'gte'].forEach(operator => {
     it(
-      `converts number "${symbol}" condition`,
+      `converts number "${operator}" condition`,
       function () {
         const conditionBlock = new ConditionQueryBlock(
           new IndexProperty(new IndexProperty(null, 'a'), 'b'),
-          `number.${name}`,
+          `number.${operator}`,
           '2'
         );
 
@@ -242,7 +230,7 @@ describe('Unit | Utility | elasticsearch-query-builder', function () {
         expect(result).to.deep.equal(fullQuery({
           range: {
             'a.b': {
-              [name]: 2,
+              [operator]: 2,
             },
           },
         }));
@@ -263,7 +251,6 @@ describe('Unit | Utility | elasticsearch-query-builder', function () {
 
   [{
     name: 'eq',
-    symbol: '=',
     timeDisabledCompare: {
       // lower than or equal to the last millisecond of the compared date
       lte: 1578009599999,
@@ -278,7 +265,6 @@ describe('Unit | Utility | elasticsearch-query-builder', function () {
     },
   }, {
     name: 'lt',
-    symbol: '<',
     timeDisabledCompare: {
       // lower than the first millisecond of the compared date
       lt: 1577923200000,
@@ -289,7 +275,6 @@ describe('Unit | Utility | elasticsearch-query-builder', function () {
     },
   }, {
     name: 'lte',
-    symbol: '≤',
     timeDisabledCompare: {
       // lower than or equal to the last millisecond of the compared date
       lte: 1578009599999,
@@ -300,7 +285,6 @@ describe('Unit | Utility | elasticsearch-query-builder', function () {
     },
   }, {
     name: 'gt',
-    symbol: '>',
     timeDisabledCompare: {
       // greater than the last millisecond of the compared date
       gt: 1578009599999,
@@ -311,7 +295,6 @@ describe('Unit | Utility | elasticsearch-query-builder', function () {
     },
   }, {
     name: 'gte',
-    symbol: '≥',
     timeDisabledCompare: {
       // greater than or equal to the first millisecond of the compared date
       gte: 1577923200000,
@@ -320,10 +303,10 @@ describe('Unit | Utility | elasticsearch-query-builder', function () {
       // greater than or equal the first millisecond of the compared datetime
       gte: 1577967040000,
     },
-  }].forEach(({ name, symbol, timeDisabledCompare, timeEnabledCompare }) => {
+  }].forEach(({ name, timeDisabledCompare, timeEnabledCompare }) => {
     [true, false].forEach(timeEnabled => {
       it(
-        `converts date "${symbol}" condition (timeEnabled ${timeEnabled})`,
+        `converts date "${name}" condition (timeEnabled ${timeEnabled})`,
         function () {
           const conditionBlock = new ConditionQueryBlock(
             new IndexProperty(new IndexProperty(null, 'a'), 'b'),

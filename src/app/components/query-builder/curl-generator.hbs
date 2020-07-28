@@ -3,6 +3,7 @@
   @outline={{true}}
   @onClick={{this.openCurlModal}}
   class="query-builder-curl-generator generate-query-request btn-input-padding"
+  ...attributes
 >
   {{tt this "triggerLabel"}}
   {{yield}}
@@ -12,6 +13,7 @@
   @onHidden={{this.closeCurlModal}}
   @size="lg"
   @position="center"
+  class="curl-generator-modal"
   as |modal|
 >
   <modal.header @closeButton={{false}}>

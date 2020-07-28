@@ -51,7 +51,7 @@
     <QueryBuilder::BlockAdder
       @onBlockAdd={{this.addBlock}}
       @indexProperties={{@indexProperties}}
-      @disabled={{eq @queryBlock.operands.length 0}}
+      disabled={{eq @queryBlock.operands.length 0}}
     />
   {{/if}}
   {{yield}}

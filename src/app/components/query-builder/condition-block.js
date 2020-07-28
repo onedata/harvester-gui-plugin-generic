@@ -54,7 +54,7 @@ export default class QueryBuilderConditionBlockComponent extends Component {
   }
 
   @action
-  stopEdit() {
+  finishEdit() {
     if (!this.isEditComparatorValueValid) {
       return;
     }
