@@ -23,9 +23,14 @@ describe('Unit | Utility | query-builder/operator-query-block', function () {
     expect(OperatorQueryBlock.maxOperandsNumber).to.equal(Number.MAX_SAFE_INTEGER);
   });
 
-  it('can be cloned', function () {
+  it('creates new instance of itself via static "newInstance" method', function () {
+    const block = OperatorQueryBlock.newInstance();
+    expect(block).to.be.an.instanceOf(OperatorQueryBlock);
+  });
+
+  it('can be cloned (has operands)', function () {
     const block = new OperatorQueryBlock('and');
-    block.operands.push({
+    block.operands.pushObject({
       clone: sinon.stub().returns('operandClone'),
     });
     const clonedBlock = block.clone();

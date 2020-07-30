@@ -22,19 +22,19 @@ export default class OperatorQueryBlock extends QueryBlock {
     this.operator = operator;
   }
 
+  static newInstance() {
+    return new OperatorQueryBlock();
+  }
+
   /**
    * @override
    */
   clone() {
-    const clonedBlock = this.newInstance();
+    const clonedBlock = this.constructor.newInstance();
     clonedBlock.operator = this.operator;
     clonedBlock.operands.pushObjects(this.cloneOperands());
 
     return clonedBlock;
-  }
-
-  newInstance() {
-    return new OperatorQueryBlock();
   }
 
   cloneOperands() {

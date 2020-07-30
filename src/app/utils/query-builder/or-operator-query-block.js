@@ -8,7 +8,7 @@ export default class OrOperatorQueryBlock extends OperatorQueryBlock {
   /**
    * @override
    */
-  newInstance() {
+  static newInstance() {
     return new OrOperatorQueryBlock();
   }
 }

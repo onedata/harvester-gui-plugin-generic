@@ -8,7 +8,7 @@ export default class AndOperatorQueryBlock extends OperatorQueryBlock {
   /**
    * @override
    */
-  newInstance() {
+  static newInstance() {
     return new AndOperatorQueryBlock();
   }
 }

@@ -25,7 +25,6 @@ export default class ConditionQueryBlock extends QueryBlock {
       this.comparator,
       this.comparatorValue
     );
-    clonedBlock.renderer = this.renderer;
 
     return clonedBlock;
   }

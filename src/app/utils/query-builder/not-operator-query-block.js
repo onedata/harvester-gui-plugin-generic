@@ -13,7 +13,7 @@ export default class NotOperatorQueryBlock extends OperatorQueryBlock {
   /**
    * @override
    */
-  newInstance() {
+  static newInstance() {
     return new NotOperatorQueryBlock();
   }
 }
