@@ -10,18 +10,16 @@ export default class QueryResults {
 
   constructor(rawResultsObject, parseHelpers) {
     this.parseHelpers = parseHelpers || {};
-
-    if (rawResultsObject) {
-      this.rawResultsObject = rawResultsObject;
-      this.recalculateFields();
-    }
+    this.fillWithRawResults(rawResultsObject);
   }
 
-  recalculateFields() {
-    const rawResultsObject = this.rawResultsObject || {};
-    this.results = (get(rawResultsObject, 'hits.hits') || [])
+  fillWithRawResults(rawResultsObject) {
+    this.rawResultsObject = rawResultsObject;
+    const normalizedRawResultObject = rawResultsObject || {};
+
+    this.results = (get(normalizedRawResultObject, 'hits.hits') || [])
       .map(hit => new QueryResult(hit, this.parseHelpers));
-    this.totalResultsCount = get(rawResultsObject, 'hits.total.value') ||
+    this.totalResultsCount = get(normalizedRawResultObject, 'hits.total.value') ||
       this.results.length;
   }
 

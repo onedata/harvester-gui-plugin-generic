@@ -63,6 +63,7 @@ describe('Unit | Utility | index', function () {
       .and.to.deep.include({
         name: '__onedata.space',
         type: 'space',
+        path: 'space',
       });
     expect(index.properties['__anyProperty'])
       .to.be.an.instanceOf(IndexAnyProperty);
@@ -78,7 +79,7 @@ describe('Unit | Utility | index', function () {
   });
 
   it(
-    'returns flattened list properties on getFlattenedProperties call',
+    'returns flattened list of properties on getFlattenedProperties call',
     function () {
       const index = new Index(Object.freeze(this.rawMapping));
 

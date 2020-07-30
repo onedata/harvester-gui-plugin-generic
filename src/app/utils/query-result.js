@@ -11,17 +11,22 @@ export default class QueryResult {
 
   constructor(rawObject, parseHelpers) {
     this.parseHelpers = parseHelpers || {};
-    if (rawObject) {
-      this.rawObject = rawObject;
-      this.recalculateFields();
-    }
+    this.fillInWithRawResult(rawObject);
   }
 
-  recalculateFields() {
-    const rawObject = this.rawObject || {};
-    this.source = rawObject._source;
-    this.fileId = rawObject._id;
-    this.fileName = get(rawObject._source || {}, '__onedata.fileName');
+  fillInWithRawResult(rawObject) {
+    this.rawObject = rawObject;
+    const normalizedRawObject = rawObject || {};
+
+    this.source = normalizedRawObject._source;
+    this.fileId = normalizedRawObject._id;
+    this.fileName = get(normalizedRawObject._source || {}, '__onedata.fileName');
+
+    this.loadFileBrowserUrl();
+  }
+
+  loadFileBrowserUrl() {
+    this.fileBrowserUrl = '';
 
     if (this.parseHelpers.fileBrowserUrlRequest && this.fileId) {
       this.parseHelpers.fileBrowserUrlRequest(this.fileId)

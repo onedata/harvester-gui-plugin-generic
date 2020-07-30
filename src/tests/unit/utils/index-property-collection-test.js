@@ -5,7 +5,7 @@ import IndexPropertyCollection from 'harvester-gui-plugin-generic/utils/index-pr
 describe('Unit | Utility | index-property-collection', function () {
   it('has "properties" field equal to empty object on init', function () {
     const collection = new IndexPropertyCollection();
-    expect(collection.properties).to.be.ok;
+    expect(collection.properties).to.deep.equal({});
   });
 
   it(
