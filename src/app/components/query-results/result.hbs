@@ -14,11 +14,11 @@
   <OneCopyButton
     @value={{@queryResult.fileId}}
     @mode="button"
-    @buttonClasses="btn btn-sm btn-light"
+    @buttonClasses="btn btn-sm btn-light copy-file-id"
   >
     {{tt this "copyFileIdButton"}}
   </OneCopyButton>
-  <BsCollapse @collapsed={{not this.isExpanded}}>
+  <BsCollapse @collapsed={{not this.isExpanded}} class="result-representations-collapse">
     <BsTab class="result-representations" as |tab|>
       <tab.pane @title={{tt this "tableTabTitle"}}>
         <div class="properties-table">

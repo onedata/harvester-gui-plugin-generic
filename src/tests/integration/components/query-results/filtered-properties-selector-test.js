@@ -4,6 +4,7 @@ import { setupRenderingTest } from 'ember-mocha';
 import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import QueryResults from 'harvester-gui-plugin-generic/utils/query-results';
+import Index from 'harvester-gui-plugin-generic/utils/index';
 import { click } from '@ember/test-helpers';
 import { all as allFulfilled } from 'rsvp';
 import sinon from 'sinon';
@@ -46,10 +47,39 @@ describe(
             hits: [{
               _source: {
                 a: [{
-                  bbb: false,
+                  bbbb: false,
                 }],
               },
             }],
+          },
+        }),
+        index: new Index({
+          mappings: {
+            properties: {
+              a: {
+                type: 'object',
+                properties: {
+                  bb: {
+                    type: 'boolean',
+                  },
+                  bbb: {
+                    type: 'boolean',
+                  },
+                },
+              },
+              __onedata: {
+                properties: {
+                  spaceId: {
+                    type: 'text',
+                    fields: {
+                      keyword: {
+                        type: 'keyword',
+                      },
+                    },
+                  },
+                },
+              },
+            },
           },
         }),
       });
@@ -66,6 +96,7 @@ describe(
     it('does not render properties tree on init', async function () {
       await render(hbs `<QueryResults::FilteredPropertiesSelector
         @queryResults={{this.queryResults1}}
+        @index={{this.index}}
       />`);
 
       expect(this.element.querySelector('.tree')).to.not.exist;
@@ -76,6 +107,7 @@ describe(
       async function () {
         await render(hbs `<QueryResults::FilteredPropertiesSelector
           @queryResults={{this.queryResults1}}
+          @index={{this.index}}
         />`);
         await click('.show-properties-selector');
 
@@ -89,14 +121,16 @@ describe(
     it('has all nested properties collapsed', async function () {
       await render(hbs `<QueryResults::FilteredPropertiesSelector
         @queryResults={{this.queryResults1}}
+        @index={{this.index}}
       />`);
 
       expect(this.element.querySelector('.tree-branch .tree-branch')).to.not.exist;
     });
 
-    it('renders properties', async function () {
+    it('renders properties from results and index', async function () {
       await render(hbs `<QueryResults::FilteredPropertiesSelector
         @queryResults={{this.queryResults1}}
+        @index={{this.index}}
       />`);
       await click('.show-properties-selector');
       // expand all nodes
@@ -111,25 +145,32 @@ describe(
       const firstBranchChildrenLabels = this.element.querySelectorAll(
         '.tree > .tree-branch > .tree-node:first-child > .tree-branch .tree-label'
       );
-      const lastBranchChildrenLabels = this.element.querySelectorAll(
-        '.tree > .tree-branch > .tree-node:last-child > .tree-branch .tree-label'
+      const secondBranchChildrenLabels = this.element.querySelectorAll(
+        '.tree > .tree-branch > .tree-node:nth-child(2) > .tree-branch .tree-label'
       );
-      expect(allLabels).to.have.length(6);
-      expect(rootLevelLabels).to.have.length(3);
-      expect(firstBranchChildrenLabels).to.have.length(2);
-      expect(lastBranchChildrenLabels).to.have.length(1);
-      ['a', 'c', 'e'].forEach((label, index) =>
+      const fourthBranchChildrenLabels = this.element.querySelectorAll(
+        '.tree > .tree-branch > .tree-node:nth-child(4) > .tree-branch .tree-label'
+      );
+
+      expect(allLabels).to.have.length(9);
+      expect(rootLevelLabels).to.have.length(4);
+      expect(firstBranchChildrenLabels).to.have.length(1);
+      expect(secondBranchChildrenLabels).to.have.length(3);
+      expect(fourthBranchChildrenLabels).to.have.length(1);
+      ['__onedata', 'a', 'c', 'e'].forEach((label, index) =>
         expect(rootLevelLabels[index].textContent.trim()).to.equal(label)
       );
-      ['b', 'bb'].forEach((label, index) =>
-        expect(firstBranchChildrenLabels[index].textContent.trim()).to.equal(label)
+      expect(firstBranchChildrenLabels[0].textContent.trim()).to.equal('spaceId');
+      ['b', 'bb', 'bbb'].forEach((label, index) =>
+        expect(secondBranchChildrenLabels[index].textContent.trim()).to.equal(label)
       );
-      expect(lastBranchChildrenLabels[0].textContent.trim()).to.equal('f');
+      expect(fourthBranchChildrenLabels[0].textContent.trim()).to.equal('f');
     });
 
     it('has all properties deselected on init', async function () {
       await render(hbs `<QueryResults::FilteredPropertiesSelector
         @queryResults={{this.queryResults1}}
+        @index={{this.index}}
       />`);
       await click('.show-properties-selector');
       // expand all nodes
@@ -144,6 +185,7 @@ describe(
     it('renders buttons "Select all" and "Deselect all"', async function () {
       await render(hbs `<QueryResults::FilteredPropertiesSelector
         @queryResults={{this.queryResults1}}
+        @index={{this.index}}
       />`);
       await click('.show-properties-selector');
 
@@ -158,6 +200,7 @@ describe(
     it('allows to select all using "Select all" button', async function () {
       await render(hbs `<QueryResults::FilteredPropertiesSelector
         @queryResults={{this.queryResults1}}
+        @index={{this.index}}
       />`);
       await click('.show-properties-selector');
       await click('.select-all');
@@ -169,6 +212,7 @@ describe(
     it('allows to deselect all using "Deselect all" button', async function () {
       await render(hbs `<QueryResults::FilteredPropertiesSelector
         @queryResults={{this.queryResults1}}
+        @index={{this.index}}
       />`);
       await click('.show-properties-selector');
       await click('.select-all');
@@ -182,6 +226,7 @@ describe(
       const changeSpy = this.set('changeSpy', sinon.spy());
       await render(hbs `<QueryResults::FilteredPropertiesSelector
         @queryResults={{this.queryResults1}}
+        @index={{this.index}}
         @onSelectionChange={{this.changeSpy}}
       />`);
       await click('.show-properties-selector');
@@ -189,9 +234,13 @@ describe(
 
       expect(changeSpy).to.be.calledOnce;
       expect(changeSpy.lastCall.args[0]).to.deep.equal({
+        __onedata: {
+          spaceId: {},
+        },
         a: {
           b: {},
           bb: {},
+          bbb: {},
         },
         c: {},
         e: {
@@ -204,6 +253,7 @@ describe(
       const changeSpy = this.set('changeSpy', sinon.spy());
       await render(hbs `<QueryResults::FilteredPropertiesSelector
         @queryResults={{this.queryResults1}}
+        @index={{this.index}}
         @onSelectionChange={{this.changeSpy}}
       />`);
       await click('.show-properties-selector');
@@ -220,6 +270,7 @@ describe(
         const changeSpy = this.set('changeSpy', sinon.spy());
         await render(hbs `<QueryResults::FilteredPropertiesSelector
           @queryResults={{this.queryResults1}}
+          @index={{this.index}}
           @onSelectionChange={{this.changeSpy}}
         />`);
         await click('.show-properties-selector');
@@ -228,7 +279,7 @@ describe(
           .map(element => click(element))
         );
         const firstBranchLastCheckbox = this.element.querySelectorAll(
-          '.tree > .tree-branch > .tree-node:first-child > .tree-branch .one-checkbox'
+          '.tree > .tree-branch > .tree-node:nth-child(2) > .tree-branch .one-checkbox'
         )[1];
         await click(firstBranchLastCheckbox);
 
@@ -246,11 +297,12 @@ describe(
       async function () {
         await render(hbs `<QueryResults::FilteredPropertiesSelector
           @queryResults={{this.queryResults1}}
+          @index={{this.index}}
         />`);
 
         const counter =
           this.element.querySelector('.show-properties-selector .selection-counter');
-        expect(counter.textContent.trim()).to.equal('0/6');
+        expect(counter.textContent.trim()).to.equal('0/9');
       }
     );
 
@@ -259,13 +311,14 @@ describe(
       async function () {
         await render(hbs `<QueryResults::FilteredPropertiesSelector
           @queryResults={{this.queryResults1}}
+          @index={{this.index}}
         />`);
         await click('.show-properties-selector');
         await click('.select-all');
 
         const counter =
           this.element.querySelector('.show-properties-selector .selection-counter');
-        expect(counter.textContent.trim()).to.equal('6/6');
+        expect(counter.textContent.trim()).to.equal('9/9');
       }
     );
 
@@ -278,6 +331,7 @@ describe(
       this.set('queryResults', queryResults1);
       await render(hbs `<QueryResults::FilteredPropertiesSelector
         @queryResults={{this.queryResults}}
+        @index={{this.index}}
       />`);
       await click('.show-properties-selector');
       // expand all nodes
@@ -286,13 +340,13 @@ describe(
       );
       this.set('queryResults', queryResults2);
 
-      const firstBranchLastNode = this.element.querySelectorAll(
-        '.tree > .tree-branch > .tree-node:first-child > .tree-branch .tree-node'
-      )[2];
-      expect(firstBranchLastNode).to.exist;
-      expect(firstBranchLastNode.querySelector('.tree-label').textContent.trim())
-        .to.equal('bbb');
-      expect(firstBranchLastNode.querySelector('.one-checkbox'))
+      const secondBranchLastNode = this.element.querySelectorAll(
+        '.tree > .tree-branch > .tree-node:nth-child(2) > .tree-branch .tree-node'
+      )[3];
+      expect(secondBranchLastNode).to.exist;
+      expect(secondBranchLastNode.querySelector('.tree-label').textContent.trim())
+        .to.equal('bbbb');
+      expect(secondBranchLastNode.querySelector('.one-checkbox'))
         .to.have.class('unchecked');
     });
 
@@ -307,6 +361,7 @@ describe(
         this.set('queryResults', queryResults1);
         await render(hbs `<QueryResults::FilteredPropertiesSelector
           @queryResults={{this.queryResults}}
+          @index={{this.index}}
         />`);
         await click('.show-properties-selector');
         // expand all nodes
@@ -314,18 +369,18 @@ describe(
           .map(element => click(element))
         );
         await click(
-          '.tree > .tree-branch > .tree-node:first-child > .tree-children .one-checkbox'
+          '.tree > .tree-branch > .tree-node:nth-child(2) > .tree-children .one-checkbox'
         );
         this.set('queryResults', queryResults2);
 
-        const firstBranchGroupCheckbox = this.element.querySelector(
-          '.tree > .tree-branch > .tree-node:first-child > .tree-children .one-checkbox'
+        const secondBranchGroupCheckbox = this.element.querySelector(
+          '.tree > .tree-branch > .tree-node:nth-child(2) > .tree-children .one-checkbox'
         );
-        const firstBranchLastNodeCheckbox = this.element.querySelectorAll(
-          '.tree > .tree-branch > .tree-node:first-child > .tree-branch .tree-node .one-checkbox'
-        )[2];
-        expect(firstBranchGroupCheckbox).to.have.class('indeterminate');
-        expect(firstBranchLastNodeCheckbox).to.have.class('unchecked');
+        const secondBranchLastNodeCheckbox = this.element.querySelectorAll(
+          '.tree > .tree-branch > .tree-node:nth-child(2) > .tree-branch .tree-node .one-checkbox'
+        )[3];
+        expect(secondBranchGroupCheckbox).to.have.class('indeterminate');
+        expect(secondBranchLastNodeCheckbox).to.have.class('unchecked');
       }
     );
   }

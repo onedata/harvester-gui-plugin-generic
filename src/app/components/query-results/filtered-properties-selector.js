@@ -27,6 +27,14 @@ export default class QueryResultsFilteredPropertiesSelectorComponent extends Com
 
   @tracked propertiesCount = 0;
 
+  get queryResults() {
+    return this.args.queryResults;
+  }
+
+  get index() {
+    return this.args.index;
+  }
+
   get model() {
     this.calculateModelIfNeeded();
     return this.calculatedModel;
@@ -100,12 +108,11 @@ export default class QueryResultsFilteredPropertiesSelectorComponent extends Com
 
     const oldPropertiesTree = this.lastQueryResults ?
       this.lastQueryResults.getPropertiesTree() : {};
-    const newPropertiesTree = this.args.queryResults ?
-      this.args.queryResults.getPropertiesTree() : {};
-    const schemaPropertiesTree = this.args.index ?
-      this.args.index.getPropertiesTree() : {};
+    const newResultsPropertiesTree = this.queryResults ?
+      this.queryResults.getPropertiesTree() : {};
+    const schemaPropertiesTree = this.index ? this.index.getPropertiesTree() : {};
     const oldAndNewPropertiesTree =
-      _.merge({}, oldPropertiesTree, newPropertiesTree, schemaPropertiesTree);
+      _.merge({}, oldPropertiesTree, newResultsPropertiesTree, schemaPropertiesTree);
     const model = [];
     const flatModel = [];
 
