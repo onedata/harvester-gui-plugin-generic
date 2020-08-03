@@ -12,7 +12,6 @@ export default class ContentIndexComponent extends Component {
 
   @tracked indexPromise;
   @tracked queryResultsPromise;
-  @tracked index = null;
   @tracked filteredProperties = {};
   @tracked sortProperty = {};
   @tracked sortDirection = 'desc';
