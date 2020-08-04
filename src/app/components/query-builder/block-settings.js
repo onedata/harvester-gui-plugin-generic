@@ -1,5 +1,5 @@
 /**
- * Shows query block settings with settings trigger.
+ * Shows query block settings
  * 
  * @module components/query-builder/block-settings
  * @author Michał Borzęcki
@@ -13,10 +13,24 @@ import { action } from '@ember/object';
 export default class QueryBuilderBlockSettingsComponent extends Component {
   /**
    * @type {Function}
+   */
+  get onSettingsClose() {
+    return this.args.onSettingsClose || (() => {});
+  }
+
+  /**
+   * @type {Function}
    * @param {Utils.QueryBuilder.QueryBlock} newBlock
    */
   get onBlockReplace() {
     return this.args.onBlockReplace || (() => {});
+  }
+
+  @action
+  popoverVisibilityChange(isShown) {
+    if (!isShown) {
+      this.onSettingsClose();
+    }
   }
 
   /**

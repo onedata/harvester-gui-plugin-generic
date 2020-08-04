@@ -4,6 +4,7 @@
   </code>
   <span class="comparator">{{tt this (concat "comparators." @queryBlock.comparator)}}</span>
   <QueryBuilder::ConditionComparatorValueEditor
+    class="clickable"
     @mode={{this.mode}}
     @comparator={{@queryBlock.comparator}}
     @value={{if (eq this.mode "edit") this.editComparatorValue @queryBlock.comparatorValue}}

@@ -13,17 +13,24 @@ import sinon from 'sinon';
 describe('Integration | Component | query-builder/block-settings', function () {
   setupRenderingTest();
 
-  it('has class "block-settings"', async function () {
-    await render(hbs `<QueryBuilder::BlockSettings />`);
-
-    expect(this.element.querySelector('.block-settings')).to.exist;
-  });
-
-  it('shows block selector on click', async function () {
+  it('does not show block selector when "isShown" is false', async function () {
     this.set('queryBlock', new NotOperatorQueryBlock());
 
-    await render(hbs `<QueryBuilder::BlockSettings @queryBlock={{this.queryBlock}} />`);
-    await click('.block-settings');
+    await render(hbs `<QueryBuilder::BlockSettings
+      @queryBlock={{this.queryBlock}}
+      @isShown={{false}}
+    />`);
+
+    expect(document.querySelector('.ember-attacher')).to.not.exist;
+  });
+
+  it('shows block selector when "isShown" is true', async function () {
+    this.set('queryBlock', new NotOperatorQueryBlock());
+
+    await render(hbs `<QueryBuilder::BlockSettings
+      @queryBlock={{this.queryBlock}}
+      @isShown={{true}}
+    />`);
 
     expect(isVisible('.ember-attacher')).to.be.true;
     const blockSelector =
@@ -32,11 +39,13 @@ describe('Integration | Component | query-builder/block-settings', function () {
     expect(blockSelector).to.have.class('edit-block-selector');
   });
 
-  it('shows block selector on click (operator block variant)', async function () {
+  it('shows block selector (operator block variant)', async function () {
     this.set('queryBlock', new NotOperatorQueryBlock());
 
-    await render(hbs `<QueryBuilder::BlockSettings @queryBlock={{this.queryBlock}} />`);
-    await click('.block-settings');
+    await render(hbs `<QueryBuilder::BlockSettings
+      @queryBlock={{this.queryBlock}}
+      @isShown={{true}}
+    />`);
 
     const blockSelector =
       this.element.querySelector('.ember-attacher .query-builder-block-selector');
@@ -45,11 +54,13 @@ describe('Integration | Component | query-builder/block-settings', function () {
     expect(blockSelector.querySelector('.change-to-section')).to.exist;
   });
 
-  it('shows block selector on click (condition block variant)', async function () {
+  it('shows block selector (condition block variant)', async function () {
     this.set('queryBlock', new ConditionQueryBlock());
 
-    await render(hbs `<QueryBuilder::BlockSettings @queryBlock={{this.queryBlock}} />`);
-    await click('.block-settings');
+    await render(hbs `<QueryBuilder::BlockSettings
+      @queryBlock={{this.queryBlock}}
+      @isShown={{true}}
+    />`);
 
     const blockSelector =
       this.element.querySelector('.ember-attacher .query-builder-block-selector');
@@ -64,16 +75,20 @@ describe('Integration | Component | query-builder/block-settings', function () {
       const {
         queryBlock,
         replaceSpy,
+        closeSpy,
       } = this.setProperties({
         queryBlock: new NotOperatorQueryBlock(),
         replaceSpy: sinon.spy(),
+        closeSpy: sinon.stub().callsFake(() => this.set('isShown', false)),
+        isShown: true,
       });
 
       await render(hbs `<QueryBuilder::BlockSettings
         @queryBlock={{this.queryBlock}}
         @onBlockReplace={{this.replaceSpy}}
+        @onSettingsClose={{this.closeSpy}}
+        @isShown={{true}}
       />`);
-      await click('.block-settings');
       await click('.ember-attacher .surround-section .operator-and');
       await waitUntil(() => !isVisible('.ember-attacher'), { timeout: 1000 });
 
@@ -81,6 +96,7 @@ describe('Integration | Component | query-builder/block-settings', function () {
       const blockMatcher = sinon.match.instanceOf(AndOperatorQueryBlock)
         .and(sinon.match.has('operands', [queryBlock]));
       expect(replaceSpy).to.be.calledOnce.and.to.be.calledWith(blockMatcher);
+      expect(closeSpy).to.be.calledOnce;
     }
   );
 
@@ -90,9 +106,12 @@ describe('Integration | Component | query-builder/block-settings', function () {
       const {
         queryBlock,
         replaceSpy,
+        closeSpy,
       } = this.setProperties({
         queryBlock: new NotOperatorQueryBlock(),
         replaceSpy: sinon.spy(),
+        closeSpy: sinon.stub().callsFake(() => this.set('isShown', false)),
+        isShown: true,
       });
       const condition = new ConditionQueryBlock();
       queryBlock.operands.pushObject(condition);
@@ -100,8 +119,9 @@ describe('Integration | Component | query-builder/block-settings', function () {
       await render(hbs `<QueryBuilder::BlockSettings
         @queryBlock={{this.queryBlock}}
         @onBlockReplace={{this.replaceSpy}}
+        @onSettingsClose={{this.closeSpy}}
+        @isShown={{true}}
       />`);
-      await click('.block-settings');
       await click('.ember-attacher .change-to-section .operator-and');
       await waitUntil(() => !isVisible('.ember-attacher'), { timeout: 1000 });
 
@@ -109,6 +129,7 @@ describe('Integration | Component | query-builder/block-settings', function () {
       const blockMatcher = sinon.match.instanceOf(AndOperatorQueryBlock)
         .and(sinon.match.has('operands', [condition]));
       expect(replaceSpy).to.be.calledOnce.and.to.be.calledWith(blockMatcher);
+      expect(closeSpy).to.be.calledOnce;
     }
   );
 });

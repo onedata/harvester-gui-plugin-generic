@@ -1,23 +1,17 @@
-<BsButton
-  @type="secondary"
-  class="block-settings"
-  ...attributes
+<AttachPopover
+  @showOn=""
+  @hideOn="clickout"
+  @interactive={{true}}
+  @arrow={{true}}
+  @placement="auto"
+  @lazyRender={{true}}
+  @isShown={{@isShown}}
+  @onChange={{this.popoverVisibilityChange}}
+  as |popover|
 >
-  <FaIcon @icon="wrench" />
-  <AttachPopover
-    @showOn="click"
-    @hideOn="clickout"
-    @interactive={{true}}
-    @arrow={{true}}
-    @placement="auto"
-    @lazyRender={{true}}
-    as |popover|
-  >
-    <QueryBuilder::BlockSelector
-      @mode="edit"
-      @editBlock={{@queryBlock}}
-      @onBlockReplace={{fn this.blockReplace popover.hide}}
-    />
-  </AttachPopover>
-  {{yield}}
-</BsButton>
+  <QueryBuilder::BlockSelector
+    @mode="edit"
+    @editBlock={{@queryBlock}}
+    @onBlockReplace={{fn this.blockReplace popover.hide}}
+  />
+</AttachPopover>

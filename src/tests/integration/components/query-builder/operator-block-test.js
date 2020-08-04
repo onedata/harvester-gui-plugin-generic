@@ -276,7 +276,7 @@ describe('Integration | Component | query-builder/operator-block', function () {
         `);
         await click('.query-builder-block-adder');
         await click('.ember-attacher .operator-not');
-        await click('.block-settings');
+        await click('.query-builder-block-visualiser');
         await click('.ember-attacher .surround-section .operator-and');
 
         expect(this.element.querySelectorAll('.query-builder-block')).to.have.length(3);
@@ -303,7 +303,7 @@ describe('Integration | Component | query-builder/operator-block', function () {
         await click('.ember-attacher .operator-not');
         await click('.query-builder-block-adder');
         await click('.ember-attacher .operator-or');
-        await click('.not-operator-block > .block-settings');
+        await click('.query-builder-block-visualiser');
         await click('.ember-attacher .change-to-section .operator-and');
 
         expect(this.element.querySelectorAll('.query-builder-block')).to.have.length(3);

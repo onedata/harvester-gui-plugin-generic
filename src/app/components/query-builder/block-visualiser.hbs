@@ -1,6 +1,8 @@
 <div
   class="query-builder-block-visualiser"
   {{add-direct-hover-class}}
+  {{on "click" clicked}}
+  {{did-insert this.didInsert}}
 >
   {{#component (concat "query-builder/" @queryBlock.constructor.renderer)
     queryBlock=@queryBlock
@@ -13,12 +15,14 @@
     <QueryBuilder::BlockSettings
       @queryBlock={{@queryBlock}}
       @onBlockReplace={{@onBlockReplace}}
+      @isShown={{this.areSettingsVisible}}
+      @onSettingsClose={{this.onSettingsClose}}
       class="block-button"
     />
     <BsButton
       @onClick={{@onBlockRemove}}
       @type="danger"
-      class="block-button remove-block"
+      class="block-button remove-block clickable"
     >
       <FaIcon @icon="times" />
     </BsButton>
