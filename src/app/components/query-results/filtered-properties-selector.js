@@ -1,50 +1,92 @@
+/**
+ * A selector, which allows to choose which properties should be visible or not.
+ * No property selected should be interpreted as "all selected" (otherwise empty selection
+ * would be useless).
+ * 
+ * @module components/query-results/filtered-properties-selector
+ * @author Michał Borzęcki
+ * @copyright (C) 2020 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 import { A } from '@ember/array';
 import _ from 'lodash';
 
-class TreeNode {
-  id = null;
-  name = null;
-  isExpanded = false;
-
-  @tracked isChecked = false;
-
-  @tracked isIndeterminate = false;
-
-  isVisible = true;
-
-  children = [];
-}
-
 export default class QueryResultsFilteredPropertiesSelectorComponent extends Component {
+  /**
+   * @type {String}
+   */
   intlPrefix = 'components.query-results.filtered-properties-selector';
 
+  /**
+   * @type {Utils.QueryResults}
+   */
   lastQueryResults = null;
+
+  /**
+   * @type {Object}
+   */
+  lastPropertiesTree = {};
+
+  /**
+   * @type {Array<TreeNode>}
+   */
   calculatedModel = [];
+
+  /**
+   * @type {Array<TreeNode>}
+   */
   calculatedFlatModel = [];
 
+  /**
+   * @type {number}
+   */
   @tracked propertiesCount = 0;
 
+  /**
+   * @type {Utils.QueryResults}
+   */
   get queryResults() {
     return this.args.queryResults;
   }
 
+  /**
+   * @type {Utils.Index}
+   */
   get index() {
     return this.args.index;
   }
 
+  /**
+   * @type {Function}
+   * @param {Object} filteredProperties
+   */
+  get onSelectionChange() {
+    return this.args.onSelectionChange || (() => {});
+  }
+
+  /**
+   * @type {Array<TreeNode>}
+   */
   get model() {
     this.calculateModelIfNeeded();
     return this.calculatedModel;
   }
 
+  /**
+   * @type {Array<TreeNode>}
+   */
   get flatModel() {
     this.calculateModelIfNeeded();
     return this.calculatedFlatModel;
   }
 
+  /**
+   * @type {number}
+   */
   get selectedPropertiesCount() {
     return this.flatModel.filterBy('isChecked').length;
   }
@@ -73,11 +115,13 @@ export default class QueryResultsFilteredPropertiesSelectorComponent extends Com
   }
 
   notifyChange() {
-    if (this.args.onSelectionChange) {
-      this.args.onSelectionChange(this.dumpSelectedPropertiesTree());
-    }
+    this.onSelectionChange(this.dumpSelectedPropertiesTree());
   }
 
+  /**
+   * Returns properties tree representation of selected properties
+   * @returns {Object}
+   */
   dumpSelectedPropertiesTree() {
     const propertiesTree = {};
     const treeTargetQueue = [propertiesTree];
@@ -102,21 +146,20 @@ export default class QueryResultsFilteredPropertiesSelectorComponent extends Com
   }
 
   calculateModelIfNeeded() {
+    // Recalculate model only if query results have been changed
     if (this.args.queryResults === this.lastQueryResults) {
       return;
     }
 
-    const oldPropertiesTree = this.lastQueryResults ?
-      this.lastQueryResults.getPropertiesTree() : {};
-    const newResultsPropertiesTree = this.queryResults ?
+    const resultsPropertiesTree = this.queryResults ?
       this.queryResults.getPropertiesTree() : {};
     const schemaPropertiesTree = this.index ? this.index.getPropertiesTree() : {};
-    const oldAndNewPropertiesTree =
-      _.merge({}, oldPropertiesTree, newResultsPropertiesTree, schemaPropertiesTree);
+    const newPropertiesTree =
+      _.merge({}, this.lastPropertiesTree, resultsPropertiesTree, schemaPropertiesTree);
     const model = [];
     const flatModel = [];
 
-    const propertiesSubtreeQueue = [oldAndNewPropertiesTree];
+    const propertiesSubtreeQueue = [newPropertiesTree];
     const modelChildrenTargetQueue = [model];
     const oldModelChildrenTargetQueue = [this.calculatedModel];
     let uniqueId = 0;
@@ -149,10 +192,16 @@ export default class QueryResultsFilteredPropertiesSelectorComponent extends Com
     model.forEach(node => this.fixTreeSelectionState(node));
 
     this.lastQueryResults = this.args.queryResults;
+    this.lastPropertiesTree = newPropertiesTree;
     this.calculatedModel = model;
     this.calculatedFlatModel = A(flatModel);
   }
 
+  /**
+   * Fixes (with recursion) selection state of the TreeNode - recalculates isChecked
+   * and isIndeterminate according to the TreeNode leaves selection state.
+   * @param {TreeNode} node 
+   */
   fixTreeSelectionState(node) {
     const children = node.children || [];
     if (children.length > 0) {
@@ -165,4 +214,44 @@ export default class QueryResultsFilteredPropertiesSelectorComponent extends Com
       );
     }
   }
+}
+
+/**
+ * Class used to generate tree structure for x-tree component
+ */
+class TreeNode {
+  /**
+   * @type {boolean}
+   */
+  @tracked isChecked = false;
+
+  /**
+   * @type {boolean}
+   */
+  @tracked isIndeterminate = false;
+
+  /**
+   * @type {any}
+   */
+  id = null;
+
+  /**
+   * @type {String}
+   */
+  name = null;
+
+  /**
+   * @type {boolean}
+   */
+  isExpanded = false;
+
+  /**
+   * @type {boolean}
+   */
+  isVisible = true;
+
+  /**
+   * @type {Array<TreeNode>}
+   */
+  children = [];
 }

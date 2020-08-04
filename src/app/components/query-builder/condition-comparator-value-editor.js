@@ -1,3 +1,13 @@
+/**
+ * A component responsible for visualising and editing comparator values for condition
+ * query blocks. Has three modes: view, edit and create
+ * 
+ * @module components/query-builder/condition-comparator-value-editor
+ * @author Michał Borzęcki
+ * @copyright (C) 2020 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import Component from '@glimmer/component';
 import moment from 'moment';
 import { tracked } from '@glimmer/tracking';
@@ -9,47 +19,90 @@ import { defaultComparatorEditors } from 'harvester-gui-plugin-generic/utils/que
 export default class QueryBuilderConditionComparatorValueEditorComponent
 extends Component {
   @service spacesProvider;
+
+  /**
+   * @type {String}
+   */
   intlPrefix = 'components.query-builder.condition-comparator-value-editor';
 
+  /**
+   * @type {Object}
+   */
   @tracked comparatorEditorsSet = defaultComparatorEditors;
+
+  /**
+   * @type {HTMLButtonElement}
+   */
   @tracked includeTimeBtnElement = null;
 
+  /**
+   * One of: view, edit, create
+   * @type {String}
+   */
   get mode() {
     return this.args.mode || 'view';
   }
 
+  /**
+   * @type {String}
+   */
   get comparator() {
     return this.args.comparator || '';
   }
 
+  /**
+   * @type {any}
+   */
   get value() {
     return this.args.value || null;
   }
 
+  /**
+   * @type {boolean}
+   */
   get isValueInvalid() {
     return this.args.isValueInvalid || false;
   }
 
+  /**
+   * @type {Function}
+   * @param {any} comparatorValue
+   */
   get onValueChange() {
     return this.args.onValueChange || (() => {});
   }
 
+  /**
+   * @type {Function}
+   */
   get onStartEdit() {
     return this.args.onStartEdit || (() => {});
   }
 
+  /**
+   * @type {Function}
+   */
   get onFinishEdit() {
     return this.args.onFinishEdit || (() => {});
   }
 
+  /**
+   * @type {Function}
+   */
   get onCancelEdit() {
     return this.args.onCancelEdit || (() => {});
   }
 
+  /**
+   * @type {Object}
+   */
   get comparatorEditor() {
     return this.comparatorEditorsSet[this.comparator];
   }
 
+  /**
+   * @type {any}
+   */
   get viewModeComparatorValue() {
     if (this.comparator.startsWith('date.')) {
       let formatString = 'YYYY-MM-DD';
@@ -77,6 +130,9 @@ extends Component {
     }
   }
 
+  /**
+   * @param {any} value 
+   */
   @action
   valueChanged(value) {
     let newValue = value;
@@ -88,6 +144,7 @@ extends Component {
           this.value, { timeEnabled: value }
         );
       } else if (newValue[0] && newValue[0] instanceof Date) {
+        // datetime change
         newValue = Object.assign({},
           this.value, { datetime: newValue[0] }
         );
@@ -99,6 +156,9 @@ extends Component {
     this.onValueChange(newValue);
   }
 
+  /**
+   * @param {HTMLInputElement} inputElement 
+   */
   @action
   textEditorInserted(inputElement) {
     if (this.mode === 'edit') {
@@ -107,6 +167,9 @@ extends Component {
     }
   }
 
+  /**
+   * @param {HTMLDivElement} dropdownElement 
+   */
   @action
   dropdownEditorInserted(dropdownElement) {
     if (this.mode === 'edit') {
@@ -119,6 +182,9 @@ extends Component {
     }
   }
 
+  /**
+   * @param {HTMLButtonElement} btnElement 
+   */
   @action
   includeTimeBtnInserted(btnElement) {
     this.includeTimeBtnElement = btnElement;
@@ -129,6 +195,11 @@ extends Component {
     this.includeTimeBtnElement = null;
   }
 
+  /**
+   * @param {Array<Date>} selectedDates 
+   * @param {String} dateStr 
+   * @param {Flatpickr} instance 
+   */
   @action
   flatpickrReady(selectedDates, dateStr, instance) {
     if (this.mode === 'edit') {
@@ -136,6 +207,9 @@ extends Component {
     }
   }
 
+  /**
+   * @param {Array<Date>} selectedDates
+   */
   @action
   flatpickrClose(selectedDates) {
     if (this.mode === 'edit') {
@@ -146,6 +220,9 @@ extends Component {
     }
   }
 
+  /**
+   * @param {KeyboardEvent} event
+   */
   @action
   keyDown(event) {
     if (event.keyCode === 27) {

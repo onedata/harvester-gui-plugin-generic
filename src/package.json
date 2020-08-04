@@ -2,7 +2,7 @@
   "name": "harvester-gui-plugin-generic",
   "version": "0.0.0",
   "private": true,
-  "description": "Small description for harvester-gui-plugin-generic goes here",
+  "description": "Default harvester GUI plugin for Onezone",
   "repository": "",
   "license": "MIT",
   "author": "",
@@ -15,7 +15,9 @@
     "lint:hbs": "ember-template-lint .",
     "lint:js": "eslint .",
     "start": "ember serve",
-    "test": "ember test"
+    "test": "ember test",
+    "deps": "npm install --no-package-lock && bower install",
+    "clean": "rm -rf tmp dist rel node_modules bower_components .sass-cache tests/test-results.xml"
   },
   "devDependencies": {
     "@ember/optional-features": "1.3.0",

@@ -1,16 +1,13 @@
 import { expect } from 'chai';
-import { describe, it, beforeEach, afterEach } from 'mocha';
+import { describe, it, beforeEach } from 'mocha';
 import { setupTest } from 'ember-mocha';
 import sinon from 'sinon';
-import AppProxy from 'harvester-gui-plugin-generic/services/app-proxy';
 import { resolve } from 'rsvp';
 
 describe('Unit | Service | spaces-provider', function () {
   setupTest();
 
   beforeEach(function () {
-    sinon.stub(AppProxy.prototype, 'loadAppProxy').returns({});
-
     const spacesData = {
       fromElasticsearch: [],
       fromOnezone: [],
@@ -42,17 +39,11 @@ describe('Unit | Service | spaces-provider', function () {
     });
   });
 
-  afterEach(function () {
-    if (AppProxy.prototype.loadAppProxy.restore) {
-      AppProxy.prototype.loadAppProxy.restore();
-    }
-  });
-
   it('provides spaces from Onezone', function () {
     this.spacesData.fromOnezone = [this.space1, this.space2];
 
     const spacesProvider = this.owner.lookup('service:spaces-provider');
-    return spacesProvider.spacesLoadingPromise.then(() => {
+    return spacesProvider.reloadSpaces().then(() => {
       expect(spacesProvider.spaces).to.deep.equal([this.space1, this.space2]);
     });
   });
@@ -76,7 +67,7 @@ describe('Unit | Service | spaces-provider', function () {
     };
 
     const spacesProvider = this.owner.lookup('service:spaces-provider');
-    return spacesProvider.spacesLoadingPromise.then(() => {
+    return spacesProvider.reloadSpaces().then(() => {
       expect(spacesProvider.spaces).to.deep.equal([{
         id: 'space1Id',
         name: 'ID: space1Id',
@@ -100,7 +91,6 @@ describe('Unit | Service | spaces-provider', function () {
   it('merges spaces from Onezone and Elasticsearch', function () {
     this.spacesData.fromOnezone = [this.space2, this.space1];
     this.spacesData.fromElasticsearch = {
-
       aggregations: {
         spaceIds: {
           buckets: [{
@@ -115,7 +105,7 @@ describe('Unit | Service | spaces-provider', function () {
     };
 
     const spacesProvider = this.owner.lookup('service:spaces-provider');
-    return spacesProvider.spacesLoadingPromise.then(() => {
+    return spacesProvider.reloadSpaces().then(() => {
       expect(spacesProvider.spaces).to.deep.equal([{
         id: 'space1Id',
         name: 'space1',

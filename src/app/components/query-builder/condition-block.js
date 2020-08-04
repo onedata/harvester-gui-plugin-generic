@@ -1,37 +1,80 @@
+/**
+ * Shows and allows to edit query conditon.
+ * 
+ * @module components/query-builder/condition-block
+ * @author Michał Borzęcki
+ * @copyright (C) 2020 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
-import {
-  defaultComparatorEditors,
-} from 'harvester-gui-plugin-generic/utils/query-builder/condition-comparator-editors';
+import { defaultComparatorEditors } from 'harvester-gui-plugin-generic/utils/query-builder/condition-comparator-editors';
 
 export default class QueryBuilderConditionBlockComponent extends Component {
+  /**
+   * @type {String}
+   */
   intlPrefix = 'components.query-builder.condition-block';
 
+  /**
+   * @type {String}
+   */
   @tracked mode = 'view';
+
+  /**
+   * @type {any}
+   */
   @tracked editComparatorValue = null;
+
+  /**
+   * @type {Object}
+   */
   @tracked comparatorEditorsSet = defaultComparatorEditors;
 
+  /**
+   * @type {Utils.QueryBuilder.ConditionQueryBlock}
+   */
   get queryBlock() {
     return this.args.queryBlock || {};
   }
 
+  /**
+   * @type {Function}
+   * @param {Utils.QueryBuilder.ConditionQueryBlock} queryBlock
+   */
   get onConditionEditionStart() {
     return this.args.onConditionEditionStart || (() => {});
   }
 
+  /**
+   * @type {Function}
+   * @param {Utils.QueryBuilder.ConditionQueryBlock} queryBlock
+   */
   get onConditionEditionEnd() {
     return this.args.onConditionEditionEnd || (() => {});
   }
 
+  /**
+   * @type {Function}
+   * @param {Utils.QueryBuilder.ConditionQueryBlock} queryBlock
+   * @param {boolean} isValid
+   */
   get onConditionEditionValidityChange() {
     return this.args.onConditionEditionValidityChange || (() => {});
   }
 
+  /**
+   * @type {Object}
+   */
   get comparatorEditor() {
     return this.comparatorEditorsSet[this.queryBlock.comparator];
   }
 
+  /**
+   * @type {boolean}
+   */
   get isEditComparatorValueValid() {
     return this.comparatorEditor ?
       this.comparatorEditor.isValidValue(this.editComparatorValue) : false;
@@ -44,6 +87,9 @@ export default class QueryBuilderConditionBlockComponent extends Component {
     this.onConditionEditionStart(this.queryBlock);
   }
 
+  /**
+   * @param {any} newValue 
+   */
   @action
   comparatorValueChange(newValue) {
     this.editComparatorValue = newValue;

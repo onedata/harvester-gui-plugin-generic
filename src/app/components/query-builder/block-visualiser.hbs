@@ -1,6 +1,6 @@
 <div
-  class="query-builder-block-visualiser {{if isDirectlyHovered "directly-hovered"}}"
-  {{closest-hovered selector=".query-builder-block-visualiser" handler=this.directlyHovered}}
+  class="query-builder-block-visualiser"
+  {{add-direct-hover-class}}
 >
   {{#component (concat "query-builder/" @queryBlock.constructor.renderer)
     queryBlock=@queryBlock

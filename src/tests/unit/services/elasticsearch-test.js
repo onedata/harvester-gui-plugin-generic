@@ -1,15 +1,12 @@
 import { expect } from 'chai';
-import { describe, it, beforeEach, afterEach } from 'mocha';
+import { describe, it, beforeEach } from 'mocha';
 import { setupTest } from 'ember-mocha';
 import sinon from 'sinon';
-import AppProxy from 'harvester-gui-plugin-generic/services/app-proxy';
 
 describe('Unit | Service | elasticsearch', function () {
   setupTest();
 
   beforeEach(function () {
-    sinon.stub(AppProxy.prototype, 'loadAppProxy').returns({});
-
     const dataRequestStub = sinon.stub().resolves('result');
     const dataCurlCommandRequestStub = sinon.stub().resolves('curl');
     sinon.stub(this.owner.lookup('service:app-proxy'), 'dataRequest')
@@ -21,12 +18,6 @@ describe('Unit | Service | elasticsearch', function () {
       dataRequestStub,
       dataCurlCommandRequestStub,
     });
-  });
-
-  afterEach(function () {
-    if (AppProxy.prototype.loadAppProxy.restore) {
-      AppProxy.prototype.loadAppProxy.restore();
-    }
   });
 
   it('performs get request on fetch() call', function () {

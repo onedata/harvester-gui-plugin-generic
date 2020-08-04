@@ -13,7 +13,7 @@ export default class RootOperatorQueryBlock extends OperatorQueryBlock {
   /**
    * @override
    */
-  newInstance() {
+  static newInstance() {
     return new RootOperatorQueryBlock();
   }
 }

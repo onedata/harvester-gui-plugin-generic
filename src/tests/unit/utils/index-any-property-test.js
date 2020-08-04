@@ -5,7 +5,7 @@ import IndexAnyProperty from 'harvester-gui-plugin-generic/utils/index-any-prope
 describe('Unit | Utility | index-any-property', function () {
   it('properly instantiates', function () {
     const property = new IndexAnyProperty(null);
-    expect(property.name).to.be.null;
+    expect(property.name).to.be.undefined;
     expect(property.type).to.equal('anyProperty');
     expect(property.isField).to.equal(false);
     expect(property.path).to.equal('any property');

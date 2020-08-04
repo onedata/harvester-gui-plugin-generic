@@ -16,7 +16,7 @@
     <QueryBuilder::BlockSelector
       @mode="edit"
       @editBlock={{@queryBlock}}
-      @onBlockReplace={{fn this.onBlockReplace popover.hide}}
+      @onBlockReplace={{fn this.blockReplace popover.hide}}
     />
   </AttachPopover>
   {{yield}}

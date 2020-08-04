@@ -1,3 +1,13 @@
+/**
+ * Allows to copy a specified string to the clipboard. Can be rendered as button, input
+ * or textarea.
+ *
+ * @module components/one-checkbox
+ * @author Michał Borzęcki
+ * @copyright (C) 2020 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { guidFor } from '@ember/object/internals';
@@ -8,30 +18,64 @@ import { later, cancel } from '@ember/runloop';
 export default class ClipboardLineComponent extends Component {
   @service intl;
 
+  /**
+   * @type {String}
+   */
   intlPrefix = 'components.one-copy-button';
+
+  /**
+   * @type {any}
+   */
   copiedNotificationTimer = null;
+
+  /**
+   * @type {boolean}
+   */
   @tracked isCopiedNotificationVisible = false;
 
+  /**
+   * Value to copy
+   * @type {String}
+   */
   get value() {
     return this.args.value || '';
   }
 
+  /**
+   * One of: button, input, textarea
+   * @type {String}
+   */
   get mode() {
     return this.args.mode || 'input';
   }
 
+  /**
+   * Tip visible on hover
+   * @type {String}
+   */
   get hoverTip() {
     return this.args.hoverTip || this.intl.t(this.intlPrefix + '.defaultHoverTip');
   }
 
+  /**
+   * Tip visible when value has been copied
+   * @type {String}
+   */
   get copiedTip() {
     return this.args.copiedTip || this.intl.t(this.intlPrefix + '.defaultCopiedTip');
   }
 
+  /**
+   * Id for input/textarea element
+   * @type {String}
+   */
   get inputId() {
     return guidFor(this) + '-input';
   }
 
+  /**
+   * Classes for copy button
+   */
   get buttonClasses() {
     let classes = this.args.buttonClasses || '';
     if (this.mode !== 'button') {
@@ -41,7 +85,8 @@ export default class ClipboardLineComponent extends Component {
     return classes;
   }
 
-  @action copySuccess() {
+  @action
+  copySuccess() {
     cancel(this.copiedNotificationTimer);
 
     this.isCopiedNotificationVisible = true;

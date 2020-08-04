@@ -1,49 +1,79 @@
+/**
+ * Renders single query result.
+ *
+ * @module components/query-results/result
+ * @author Michał Borzęcki
+ * @copyright (C) 2020 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 import _ from 'lodash';
 
 export default class QueryResultsResultComponent extends Component {
+  /**
+   * @type {String}
+   */
   intlPrefix = 'components.query-results.result';
 
+  /**
+   * @type {boolean}
+   */
   @tracked isExpanded = false;
 
+  /**
+   * @type {Object}
+   */
   get rawData() {
     return this.args.queryResult && this.args.queryResult.source || {};
   }
 
+  /**
+   * @type {Object}
+   */
   get filteredProperties() {
     const filteredProperties = typeof this.args.filteredProperties === 'object' ?
       (this.args.filteredProperties || {}) : {};
     return Object.keys(filteredProperties).length > 0 ? filteredProperties : null;
   }
 
+  /**
+   * NOTE: contains HTML tags, which should be rendered
+   * @type {String}
+   */
   get readableJson() {
     return (this.visualiseJsonValue(this.filteredProperties, this.rawData) || '')
+      // slice to remove brackets { }
       .slice(1, -1);
   }
 
+  /**
+   * @type {Array<{ key: String, value: String }>}
+   */
   get propertiesForTable() {
     return this.visualiseJsonForTable();
   }
 
+  /**
+   * @type {String}
+   */
   get stringifiedJsonForTextarea() {
     return JSON.stringify(this.rawData, null, 2);
   }
 
-  @action toggleExpand() {
+  @action
+  toggleExpand() {
     this.isExpanded = !this.isExpanded;
   }
 
   visualiseJsonForTable() {
     const visualisedProperties = [];
-    // const filteredPropertiesInfoQueue = [this.filteredProperties];
     const pathsQueue = [''];
     const dataQueue = [this.rawData];
 
-    // while (filteredPropertiesInfoQueue.length) {
     while (dataQueue.length) {
-      // const filteredPropertiesInfo = filteredPropertiesInfoQueue.pop();
       const pathBase = pathsQueue.pop();
       const data = dataQueue.pop();
 
@@ -54,7 +84,6 @@ export default class QueryResultsResultComponent extends Component {
         });
       } else if (_.isArray(data)) {
         const arrayVisualisation =
-          // this.visualiseJsonArray(filteredPropertiesInfo, data);
           this.visualiseJsonArray(null, data);
         if (arrayVisualisation) {
           visualisedProperties.push({
@@ -64,11 +93,8 @@ export default class QueryResultsResultComponent extends Component {
         }
       } else if (typeof data === 'object' && data !== null) {
         for (const key of this.getSortedJsonObjectKeys(data).reverse()) {
-          // if (filteredPropertiesInfo[key]) {
-          // filteredPropertiesInfoQueue.push(filteredPropertiesInfo[key]);
           pathsQueue.push(`${pathBase}.${key}`);
           dataQueue.push(data[key]);
-          // }
         }
       } else {
         visualisedProperties.push({
@@ -78,6 +104,7 @@ export default class QueryResultsResultComponent extends Component {
       }
     }
 
+    // remove '.' (dot) from the keys beginning
     visualisedProperties.forEach(record => record.key = record.key.substring(1));
 
     return visualisedProperties;
@@ -123,6 +150,7 @@ export default class QueryResultsResultComponent extends Component {
     const keys = Object.keys(obj).sort();
     return [
       ...keys.filter(k => !k.startsWith('_')),
+      // move properties starting with the underscore to the end
       ...keys.filter(k => k.startsWith('_')),
     ];
   }

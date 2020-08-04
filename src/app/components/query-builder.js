@@ -1,3 +1,12 @@
+/**
+ * Shows query builder - blocks editor, query trigger and curl generator.
+ *
+ * @module components/query-builder
+ * @author Michał Borzęcki
+ * @copyright (C) 2020 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import Component from '@glimmer/component';
 import { action, set } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
@@ -16,37 +25,64 @@ const allowedPropertyTypes = [
 ];
 
 export default class QueryBuilderComponent extends Component {
+  /**
+   * @type {String}
+   */
   intlPrefix = 'components.query-builder';
 
+  /**
+   * @type {Utils.QueryBuilder.RootOperatorQueryBlock}
+   */
   @tracked rootQueryBlock = new RootOperatorQueryBlock();
+
+  /**
+   * Contains state of the condition blocks edition. Each state has only one field (for now):
+   * isValid: boolean.
+   * @type {Map<Utils.QueryBuilder.ConditionQueryBlock,Object>}
+   */
   @tracked editedConditions = new Map();
 
+  /**
+   * @type {Function}
+   * @param {Utils.QueryBuilder.RootOperatorQueryBlock} rootQueryBlock
+   */
+  get onPerformQuery() {
+    return this.args.onPerformQuery || (() => {});
+  }
+
+  /**
+   * @type {Array<Utils.IndexProperty>}
+   */
   get indexProperties() {
     const allProperties =
       (this.args.index ? this.args.index.getFlattenedProperties() : [])
       .filter(property => this.isSupportedProperty(property))
       .sortBy('path');
+
     const specialProperties = allProperties.rejectBy('isRealProperty');
     const ordinaryProperties = allProperties
       .filter(prop => prop.isRealProperty && !prop.path.startsWith('_'));
     const internalProperties = allProperties
       .filter(prop => prop.isRealProperty && prop.path.startsWith('_'));
+
     return [...specialProperties, ...ordinaryProperties, ...internalProperties];
   }
 
+  /**
+   * @type {boolean}
+   */
   get hasInvalidCondition() {
     return [...this.editedConditions.values()].mapBy('isValid').some(isValid => !isValid);
   }
 
   @action
   performQuery() {
-    if (!this.args.onPerformQuery) {
-      return;
-    }
-
-    this.args.onPerformQuery(this.rootQueryBlock);
+    this.onPerformQuery(this.rootQueryBlock);
   }
 
+  /**
+   * @param {Utils.QueryBuilder.ConditionQueryBlock} conditionBlock 
+   */
   @action
   onConditionEditionStart(conditionBlock) {
     this.editedConditions.set(conditionBlock, { isValid: true });
@@ -54,6 +90,9 @@ export default class QueryBuilderComponent extends Component {
     this.editedConditions = this.editedConditions;
   }
 
+  /**
+   * @param {Utils.QueryBuilder.ConditionQueryBlock} conditionBlock 
+   */
   @action
   onConditionEditionEnd(conditionBlock) {
     this.editedConditions.delete(conditionBlock);
@@ -61,6 +100,10 @@ export default class QueryBuilderComponent extends Component {
     this.editedConditions = this.editedConditions;
   }
 
+  /**
+   * @param {Utils.QueryBuilder.ConditionQueryBlock} conditionBlock
+   * @param {boolean} isValid
+   */
   @action
   onConditionEditionValidityChange(conditionBlock, isValid) {
     const editedConditionEntry = this.editedConditions.get(conditionBlock);
@@ -71,8 +114,12 @@ export default class QueryBuilderComponent extends Component {
     }
   }
 
+  /**
+   * @param {Utils.QueryBuilder.QueryBlock} block 
+   */
   @action
   onBlockRemoved(block) {
+    // building list of all conditions inside passed block (including block itself)
     const flattenedConditionsList = [];
     const blocksToFlatten = [block];
     while (blocksToFlatten.length) {
@@ -92,6 +139,10 @@ export default class QueryBuilderComponent extends Component {
     this.editedConditions = this.editedConditions;
   }
 
+  /**
+   * @param {Utils.IndexProperty} property 
+   * @returns {boolean}
+   */
   isSupportedProperty(property) {
     if (property.type === 'object') {
       return false;

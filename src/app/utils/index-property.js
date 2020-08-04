@@ -1,3 +1,13 @@
+/**
+ * Represents an index property or field. Is used to represent a hierarchy of index
+ * properties using `parentProperty` and `properties` fields.
+ * 
+ * @module utils/index-property
+ * @author Michał Borzęcki
+ * @copyright (C) 2020 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import IndexPropertyCollection from 'harvester-gui-plugin-generic/utils/index-property-collection';
 
 const numberTypes = [
@@ -12,18 +22,52 @@ const numberTypes = [
 ];
 
 export default class IndexProperty extends IndexPropertyCollection {
+  /**
+   * May be null if there is no parent property
+   * @type {Utils.IndexProperty}
+   */
   parentProperty = undefined;
+
+  /**
+   * @type {String}
+   */
   name = undefined;
+
+  /**
+   * @type {Object}
+   */
   rawMapping = {};
+
+  /**
+   * @type {boolean}
+   */
   isField = false;
+
+  /**
+   * @type {String}
+   */
   type = 'object';
+
+  /**
+   * Should be false, if represents a metaproperty not mentioned in index schema directly.
+   * @type {boolean}
+   */
   isRealProperty = true;
 
+  /**
+   * @type {String}
+   */
   get path() {
     const parentPath = (this.parentProperty && this.parentProperty.path) || '';
     return (parentPath ? `${parentPath}.` : '') + this.name;
   }
 
+  /**
+   * @param {Utils.IndexProperty} parentProperty 
+   * @param {String} name 
+   * @param {Object} rawMapping 
+   * @param {boolean} [isField=false]
+   */
   constructor(parentProperty, name, rawMapping, isField = false) {
     super(...arguments);
 
@@ -43,6 +87,9 @@ export default class IndexProperty extends IndexPropertyCollection {
     this.type = numberTypes.includes(type) ? 'number' : type;
   }
 
+  /**
+   * @override
+   */
   constructProperty(name, rawPropertyMapping, isField) {
     return new IndexProperty(this, name, rawPropertyMapping, isField);
   }

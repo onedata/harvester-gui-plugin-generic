@@ -1,5 +1,5 @@
 /**
- * Main application route. Loads appProxy and configuration.
+ * Main application route. Loads appProxy, configuration and spaces.
  * 
  * @module routes/application
  * @author Michał Borzęcki
@@ -24,8 +24,10 @@ export default class ApplicationRoute extends Route {
 
     return this.appProxy.appProxyLoadingPromise
       .then(() => allFulfilled([
+        // load configuration
         this.configuration.reloadConfiguration(),
-        this.spacesProvider.spacesLoadingPromise,
+        // load spaces
+        this.spacesProvider.reloadSpaces(),
       ]))
       .then(() => result);
   }

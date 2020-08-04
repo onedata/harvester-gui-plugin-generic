@@ -1,5 +1,7 @@
 /**
  * Exposes Onezone application proxy API (available through window.frameElement.appProxy).
+ * It is a main bridge between GUI plugin logic and Onezone harvester API. AppProxy should
+ * be initially loaded in application route.
  *
  * @module services/app-proxy
  * @author Michał Borzęcki
@@ -44,7 +46,7 @@ export default class AppProxyService extends Service {
    * @param {String} params.indexName
    * @param {String} params.path path to resource (part of the url without index)
    * @param {String|undefined} params.body request body
-   * @returns {Promise<String>} CURL commang
+   * @returns {Promise<String>} CURL command
    */
   @reads('appProxy.dataCurlCommandRequest') dataCurlCommandRequest;
 
@@ -70,11 +72,16 @@ export default class AppProxyService extends Service {
    */
   @reads('appProxy.spacesRequest') spacesRequest;
 
+  /**
+   * Fake window object used in test environment. It is a very simple mock - to make it
+   * more suitable for specific tests, stub `getWindow()` method.
+   */
   _testWindow = {
     frameElement: {
       appProxy: {
         dataRequest: () => resolve({}),
         dataCurlCommandRequest: () => resolve(''),
+        configRequest: () => resolve({}),
         fileBrowserUrlRequest: () => resolve(''),
         spacesRequest: () => resolve([]),
       },
@@ -104,7 +111,7 @@ export default class AppProxyService extends Service {
   }
 
   /**
-   * @returns {Promise}
+   * @returns {Promise} resolves when appProxy becomes available
    */
   scheduleLoadAppProxy() {
     return new Promise(resolve => {

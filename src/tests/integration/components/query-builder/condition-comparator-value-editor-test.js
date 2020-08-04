@@ -26,14 +26,15 @@ describe(
     setupRenderingTest();
 
     beforeEach(function () {
-      sinon.stub(SpacesProvider.prototype, 'loadSpaces').callsFake(function () {
+      sinon.stub(SpacesProvider.prototype, 'reloadSpaces').callsFake(function () {
         this.spaces = spaces;
       });
+      this.owner.lookup('service:spaces-provider').reloadSpaces();
     });
 
     afterEach(function () {
-      if (SpacesProvider.prototype.loadSpaces.restore) {
-        SpacesProvider.prototype.loadSpaces.restore();
+      if (SpacesProvider.prototype.reloadSpaces.restore) {
+        SpacesProvider.prototype.reloadSpaces.restore();
       }
     });
 

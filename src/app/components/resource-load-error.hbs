@@ -5,7 +5,11 @@
   <div class="error-container">
     <strong class="main-message">{{tt this "defaultMainMessage"}}</strong>
     {{#if @details}}
-      <a role="button" class="show-details text-danger" {{on "click" this.toggleShowDetails}}>
+      <a
+        role="button"
+        class="show-details text-danger"
+        {{on "click" this.toggleShowDetails}}
+      >
         {{tt this (if this.areDetailsExpanded "hideDetails" "showDetails")}}
       </a>
       <BsCollapse @collapsed={{not this.areDetailsExpanded}}>

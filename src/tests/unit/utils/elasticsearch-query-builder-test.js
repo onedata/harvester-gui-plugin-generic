@@ -185,7 +185,7 @@ function fullQuery(conditionQuery) {
 describe('Unit | Utility | elasticsearch-query-builder', function () {
   it('converts boolean "is" condition', function () {
     const esQueryBuilder = new ElasticsearchQueryBuilder();
-    esQueryBuilder.rootQueryBlock = exampleBooleanConditionBlock;
+    esQueryBuilder.mainQueryBlock = exampleBooleanConditionBlock;
     const result = esQueryBuilder.buildQuery();
 
     expect(result).to.deep.equal(fullQuery(exampleBooleanConditionQuery));
@@ -195,7 +195,7 @@ describe('Unit | Utility | elasticsearch-query-builder', function () {
     'converts text "contains" condition',
     function () {
       const esQueryBuilder = new ElasticsearchQueryBuilder();
-      esQueryBuilder.rootQueryBlock = exampleTextContainsConditionBlock;
+      esQueryBuilder.mainQueryBlock = exampleTextContainsConditionBlock;
       const result = esQueryBuilder.buildQuery();
 
       expect(result).to.deep.equal(fullQuery(exampleTextContainsConditionQuery));
@@ -206,7 +206,7 @@ describe('Unit | Utility | elasticsearch-query-builder', function () {
     'converts number "eq" condition',
     function () {
       const esQueryBuilder = new ElasticsearchQueryBuilder();
-      esQueryBuilder.rootQueryBlock = exampleNumberEqualsConditionBlock;
+      esQueryBuilder.mainQueryBlock = exampleNumberEqualsConditionBlock;
       const result = esQueryBuilder.buildQuery();
 
       expect(result).to.deep.equal(fullQuery(exampleNumberEqualsConditionQuery));
@@ -224,7 +224,7 @@ describe('Unit | Utility | elasticsearch-query-builder', function () {
         );
 
         const esQueryBuilder = new ElasticsearchQueryBuilder();
-        esQueryBuilder.rootQueryBlock = conditionBlock;
+        esQueryBuilder.mainQueryBlock = conditionBlock;
         const result = esQueryBuilder.buildQuery();
 
         expect(result).to.deep.equal(fullQuery({
@@ -242,7 +242,7 @@ describe('Unit | Utility | elasticsearch-query-builder', function () {
     'converts keyword "is" condition',
     function () {
       const esQueryBuilder = new ElasticsearchQueryBuilder();
-      esQueryBuilder.rootQueryBlock = exampleKeywordIsConditionBlock;
+      esQueryBuilder.mainQueryBlock = exampleKeywordIsConditionBlock;
       const result = esQueryBuilder.buildQuery();
 
       expect(result).to.deep.equal(fullQuery(exampleKeywordIsConditionQuery));
@@ -317,7 +317,7 @@ describe('Unit | Utility | elasticsearch-query-builder', function () {
           );
 
           const esQueryBuilder = new ElasticsearchQueryBuilder();
-          esQueryBuilder.rootQueryBlock = conditionBlock;
+          esQueryBuilder.mainQueryBlock = conditionBlock;
           const result = esQueryBuilder.buildQuery();
 
           expect(result).to.deep.equal(fullQuery({
@@ -334,7 +334,7 @@ describe('Unit | Utility | elasticsearch-query-builder', function () {
 
   it('converts space "is" condition', function () {
     const esQueryBuilder = new ElasticsearchQueryBuilder();
-    esQueryBuilder.rootQueryBlock = exampleSpaceConditionBlock;
+    esQueryBuilder.mainQueryBlock = exampleSpaceConditionBlock;
     const result = esQueryBuilder.buildQuery();
 
     expect(result).to.deep.equal(fullQuery(exampleSpaceConditionQuery));
@@ -342,7 +342,7 @@ describe('Unit | Utility | elasticsearch-query-builder', function () {
 
   it('converts anyProperty "hasPhrase" condition', function () {
     const esQueryBuilder = new ElasticsearchQueryBuilder();
-    esQueryBuilder.rootQueryBlock = exampleAnyPropertyConditionBlock;
+    esQueryBuilder.mainQueryBlock = exampleAnyPropertyConditionBlock;
     const result = esQueryBuilder.buildQuery();
 
     expect(result).to.deep.equal(fullQuery(exampleAnyPropertyConditionQuery));
@@ -350,7 +350,7 @@ describe('Unit | Utility | elasticsearch-query-builder', function () {
 
   it('converts NOT operator', function () {
     const esQueryBuilder = new ElasticsearchQueryBuilder();
-    esQueryBuilder.rootQueryBlock = exampleNotOperatorBlock;
+    esQueryBuilder.mainQueryBlock = exampleNotOperatorBlock;
 
     const result = esQueryBuilder.buildQuery();
     expect(result).to.deep.equal(fullQuery(exampleNotOperatorQuery));
@@ -358,7 +358,7 @@ describe('Unit | Utility | elasticsearch-query-builder', function () {
 
   it('converts AND operator', function () {
     const esQueryBuilder = new ElasticsearchQueryBuilder();
-    esQueryBuilder.rootQueryBlock = exampleAndOperatorBlock;
+    esQueryBuilder.mainQueryBlock = exampleAndOperatorBlock;
 
     const result = esQueryBuilder.buildQuery();
     expect(result).to.deep.equal(fullQuery(exampleAndOperatorQuery));
@@ -366,7 +366,7 @@ describe('Unit | Utility | elasticsearch-query-builder', function () {
 
   it('converts OR operator', function () {
     const esQueryBuilder = new ElasticsearchQueryBuilder();
-    esQueryBuilder.rootQueryBlock = exampleOrOperatorBlock;
+    esQueryBuilder.mainQueryBlock = exampleOrOperatorBlock;
 
     const result = esQueryBuilder.buildQuery();
     expect(result).to.deep.equal(fullQuery(exampleOrOperatorQuery));
@@ -374,7 +374,7 @@ describe('Unit | Utility | elasticsearch-query-builder', function () {
 
   it('constructs complete query for nested operators example', function () {
     const esQueryBuilder = new ElasticsearchQueryBuilder();
-    esQueryBuilder.rootQueryBlock = exampleNestedOperatorsBlock;
+    esQueryBuilder.mainQueryBlock = exampleNestedOperatorsBlock;
 
     const result = esQueryBuilder.buildQuery();
     expect(result).to.deep.equal(fullQuery(exampleNestedOperatorsQuery));
@@ -391,7 +391,7 @@ describe('Unit | Utility | elasticsearch-query-builder', function () {
     'translates null visibleContent field value to null _source query spec',
     function () {
       const esQueryBuilder = new ElasticsearchQueryBuilder();
-      esQueryBuilder.rootQueryBlock = exampleNestedOperatorsBlock;
+      esQueryBuilder.mainQueryBlock = exampleNestedOperatorsBlock;
       esQueryBuilder.visibleContent = null;
 
       const result = esQueryBuilder.buildQuery();
@@ -403,7 +403,7 @@ describe('Unit | Utility | elasticsearch-query-builder', function () {
     'translates empty visibleContent field value to null _source query spec',
     function () {
       const esQueryBuilder = new ElasticsearchQueryBuilder();
-      esQueryBuilder.rootQueryBlock = exampleNestedOperatorsBlock;
+      esQueryBuilder.mainQueryBlock = exampleNestedOperatorsBlock;
       esQueryBuilder.visibleContent = {};
 
       const result = esQueryBuilder.buildQuery();
@@ -415,7 +415,7 @@ describe('Unit | Utility | elasticsearch-query-builder', function () {
     'translates empty visibleContent field value to null _source query spec',
     function () {
       const esQueryBuilder = new ElasticsearchQueryBuilder();
-      esQueryBuilder.rootQueryBlock = exampleNestedOperatorsBlock;
+      esQueryBuilder.mainQueryBlock = exampleNestedOperatorsBlock;
       esQueryBuilder.visibleContent = {
         a: {},
         b: {

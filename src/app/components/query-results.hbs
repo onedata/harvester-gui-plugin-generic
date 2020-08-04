@@ -25,11 +25,10 @@
     @promise={{@queryResultsPromise}}
     @onResolve={{this.gotNewQueryResults}}
     @onReject={{fn this.gotNewQueryResults this.emptyQueryResults}}
-    as |queryResults|
   >
-    {{#if queryResults.results}}
+    {{#if this.queryResults.results}}
       <ul class="results-list">
-        {{#each queryResults.results as |queryResult|}}
+        {{#each this.queryResults.results as |queryResult|}}
           <QueryResults::Result
             @queryResult={{queryResult}}
             @filteredProperties={{this.filteredProperties}}
@@ -37,7 +36,7 @@
         {{/each}}
       </ul>
       <QueryResults::Pagination
-        @resultsCount={{queryResults.totalResultsCount}}
+        @resultsCount={{this.queryResults.totalResultsCount}}
         @activePageNumber={{this.activePageNumber}}
         @pageSize={{this.pageSize}}
         @onPageChange={{this.onPageChange}}

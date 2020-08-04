@@ -31,7 +31,7 @@
     }
   }
 
-  .query-builder-block-visualiser.directly-hovered {
+  .query-builder-block-visualiser.is-directly-hovered {
     > .query-builder-block {
       background-color: darken($color-light-blue, 5%);
       border: 1px solid darken($color-light-blue, 25%);

@@ -1,5 +1,18 @@
+/**
+ * Exports specification of editors for various types of index properties.
+ * 
+ * @module utils/query-builder/condition-comparator-editors
+ * @author Michał Borzęcki
+ * @copyright (C) 2020 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import moment from 'moment';
 
+/**
+ * Contains a list of allowed comparators for each property type.
+ * @type {Object}
+ */
 export const defaultComparators = {
   boolean: ['boolean.is'],
   text: ['text.contains'],
@@ -14,25 +27,20 @@ const booleanEditor = {
   type: 'dropdown',
   values: ['true', 'false'],
   defaultValue: () => 'true',
-  isValidValue(value) {
-    return ['true', 'false'].includes(String(value).trim());
-  },
+  isValidValue: value => ['true', 'false'].includes(value),
 };
 
 const textEditor = {
   type: 'text',
   defaultValue: () => '',
-  isValidValue(value) {
-    return typeof value === 'string' && value.length > 0;
-  },
+  isValidValue: value => typeof value === 'string' && value.length > 0,
 };
 
-const numberBasicEditor = {
+const numberEditor = {
   type: 'text',
   defaultValue: () => '',
-  isValidValue(value) {
-    return typeof value === 'string' && value.trim().length > 0 && !isNaN(Number(value));
-  },
+  isValidValue: value =>
+    typeof value === 'string' && value.trim().length > 0 && !isNaN(Number(value)),
 };
 
 const dateEditor = {
@@ -41,29 +49,29 @@ const dateEditor = {
     timeEnabled: false,
     datetime: moment().startOf('day').toDate(),
   }),
-  isValidValue(value) {
-    return typeof value === 'object' && value && value.datetime;
-  },
+  isValidValue: value => typeof value === 'object' && value && value.datetime,
 };
 
 const spaceEditor = {
   type: 'space',
+  // spaceEditor.values should be changed to the real spaces list before the first usage
   values: [],
   defaultValue: () => spaceEditor.values[0],
-  isValidValue(value) {
-    // looks like a space
-    return value && value.id && value.name;
-  },
+  isValidValue: value => value && value.id && value.name,
 };
 
+/**
+ * Preffered editors for each property comparator
+ * @type {Object}
+ */
 export const defaultComparatorEditors = {
   'boolean.is': booleanEditor,
   'text.contains': textEditor,
-  'number.eq': numberBasicEditor,
-  'number.lt': numberBasicEditor,
-  'number.lte': numberBasicEditor,
-  'number.gt': numberBasicEditor,
-  'number.gte': numberBasicEditor,
+  'number.eq': numberEditor,
+  'number.lt': numberEditor,
+  'number.lte': numberEditor,
+  'number.gt': numberEditor,
+  'number.gte': numberEditor,
   'keyword.is': textEditor,
   'date.eq': dateEditor,
   'date.lt': dateEditor,
