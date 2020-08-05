@@ -158,59 +158,58 @@ describe('Integration | Component | query-builder', function () {
     }
   );
 
-  // FIXME: test commented due to bamboo tests passing problem. Uncomment after Chrome upgrade
-  // it(
-  //   'shows CURL request content on "generate request" button click',
-  //   async function () {
-  //     const { generateCurlStub } = this.setProperties({
-  //       generateCurlStub: sinon.stub().resolves('curl!'),
-  //       filteredProperties: {
-  //         a: {
-  //           b: {},
-  //         },
-  //         c: {},
-  //       },
-  //       sortProperty: { path: 'e.f' },
-  //       sortDirection: 'asc',
-  //     });
+  it(
+    'shows CURL request content on "generate request" button click',
+    async function () {
+      const { generateCurlStub } = this.setProperties({
+        generateCurlStub: sinon.stub().resolves('curl!'),
+        filteredProperties: {
+          a: {
+            b: {},
+          },
+          c: {},
+        },
+        sortProperty: { path: 'e.f' },
+        sortDirection: 'asc',
+      });
 
-  //     await render(hbs `<QueryBuilder
-  //       @onGenerateCurl={{this.generateCurlStub}}
-  //       @filteredProperties={{this.filteredProperties}}
-  //       @sortProperty={{this.sortProperty}}
-  //       @sortDirection={{this.sortDirection}}
-  //       @index={{this.index}}
-  //     />`);
-  //     await click('.query-builder-block-adder');
-  //     await selectChoose('.property-selector', 'a.b');
-  //     await click('.accept-condition');
-  //     await click('.generate-query-request');
+      await render(hbs `<QueryBuilder
+        @onGenerateCurl={{this.generateCurlStub}}
+        @filteredProperties={{this.filteredProperties}}
+        @sortProperty={{this.sortProperty}}
+        @sortDirection={{this.sortDirection}}
+        @index={{this.index}}
+      />`);
+      await click('.query-builder-block-adder');
+      await selectChoose('.property-selector', 'a.b');
+      await click('.accept-condition');
+      await click('.generate-query-request');
 
-  //     expect(generateCurlStub).to.be.calledOnce;
-  //     expect(generateCurlStub.lastCall.args[0]).to.deep.equal({
-  //       from: 0,
-  //       size: 10,
-  //       sort: [{
-  //         'e.f': 'asc',
-  //       }],
-  //       query: {
-  //         bool: {
-  //           must: [{
-  //             term: {
-  //               'a.b': {
-  //                 value: 'true',
-  //               },
-  //             },
-  //           }],
-  //         },
-  //       },
-  //       _source: [
-  //         'a.b',
-  //         'c',
-  //       ],
-  //     });
-  //     expect(document.querySelector('.curl-generator-modal textarea'))
-  //       .to.have.value('curl!');
-  //   }
-  // );
+      expect(generateCurlStub).to.be.calledOnce;
+      expect(generateCurlStub.lastCall.args[0]).to.deep.equal({
+        from: 0,
+        size: 10,
+        sort: [{
+          'e.f': 'asc',
+        }],
+        query: {
+          bool: {
+            must: [{
+              term: {
+                'a.b': {
+                  value: 'true',
+                },
+              },
+            }],
+          },
+        },
+        _source: [
+          'a.b',
+          'c',
+        ],
+      });
+      expect(document.querySelector('.curl-generator-modal textarea'))
+        .to.have.value('curl!');
+    }
+  );
 });

@@ -32,6 +32,7 @@ module.exports = function (defaults) {
   // along with the exports of each module as its value.
 
   fs.copyFileSync('app/manifest.json', 'public/manifest.json');
+  app.import('node_modules/abortcontroller-polyfill/dist/abortcontroller-polyfill-only.js');
 
   return app.toTree();
 };

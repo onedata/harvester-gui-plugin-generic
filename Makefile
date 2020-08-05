@@ -1,5 +1,6 @@
 SRC_DIR	 ?= src
 REL_DIR	 ?= rel
+XVFB_ARGS ?= --server-args="-screen 0, 1366x768x24"
 
 .PHONY: deps build_dev build_prod build_plugin_dev build_plugin_prod doc clean test test_xunit_output submodules
 
@@ -32,7 +33,7 @@ test: deps
 	cd $(SRC_DIR) && xvfb-run ember test
 
 test_xunit_output: deps
-	cd $(SRC_DIR) && xvfb-run ember test -r xunit
+	cd $(SRC_DIR) && xvfb-run $(XVFB_ARGS) ember test -r xunit
 
 ##
 ## Submodules
