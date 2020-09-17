@@ -5,6 +5,22 @@ const fs = require('fs');
 
 module.exports = function (defaults) {
   const app = new EmberApp(defaults, {
+    'fingerprint': {
+      extensions: [
+        'js',
+        'css',
+        'map',
+        'svg',
+        'png',
+        'jpg',
+        'gif',
+        'ttf',
+        'woff',
+        'svg',
+        'eot',
+      ],
+      replaceExtensions: ['html', 'css', 'js'],
+    },
     'ember-bootstrap': {
       bootstrapVersion: 4,
       importBootstrapCSS: false,
