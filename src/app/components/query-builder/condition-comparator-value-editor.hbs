@@ -29,7 +29,7 @@
         {{on "keydown" this.keyDown}}
         {{on "blur" this.onFinishEdit}}
         {{did-insert this.textEditorInserted}}
-        class="comparator-value form-control form-control-sm {{if this.this.isValueInvalid "is-invalid"}}"
+        class="comparator-value form-control form-control-sm {{if this.isValueInvalid "is-invalid"}}"
       >
     {{else if (eq this.comparatorEditor.type "date")}}
       <div class="input-group">

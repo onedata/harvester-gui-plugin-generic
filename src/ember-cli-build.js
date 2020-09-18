@@ -16,6 +16,7 @@ module.exports = function (defaults) {
         'gif',
         'ttf',
         'woff',
+        'woff2',
         'svg',
         'eot',
       ],
