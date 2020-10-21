@@ -23,11 +23,6 @@ describe('Unit | Utility | query-builder/operator-query-block', function () {
     expect(OperatorQueryBlock.maxOperandsNumber).to.equal(Number.MAX_SAFE_INTEGER);
   });
 
-  it('creates new instance of itself via static "newInstance" method', function () {
-    const block = OperatorQueryBlock.newInstance();
-    expect(block).to.be.an.instanceOf(OperatorQueryBlock);
-  });
-
   it('can be cloned (has operands)', function () {
     const block = new OperatorQueryBlock('and');
     block.operands.pushObject({
@@ -37,6 +32,7 @@ describe('Unit | Utility | query-builder/operator-query-block', function () {
 
     expect(clonedBlock).to.not.equal(block);
     expect(clonedBlock.operator).to.equal('and');
+    expect(clonedBlock.operands).to.not.equal(block.operands);
     expect(clonedBlock.operands).to.have.length(1);
     expect(clonedBlock.operands[0]).to.equal('operandClone');
   });

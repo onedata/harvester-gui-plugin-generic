@@ -13,11 +13,6 @@ describe('Unit | Utility | query-builder/not-operator-query-block', function () 
     expect(NotOperatorQueryBlock.maxOperandsNumber).to.equal(1);
   });
 
-  it('creates new instance of itself via static "newInstance" method', function () {
-    const block = NotOperatorQueryBlock.newInstance();
-    expect(block).to.be.an.instanceOf(NotOperatorQueryBlock);
-  });
-
   it('can be cloned', function () {
     const block = new NotOperatorQueryBlock();
     block.operands.pushObject({

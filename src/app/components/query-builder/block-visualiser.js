@@ -1,3 +1,13 @@
+/**
+ * Is responsible for rendering any type of a query block. Delegates rendering to
+ * a component specific for a passed block.
+ *
+ * @module components/query-builder/block-visualiser
+ * @author Michał Borzęcki
+ * @copyright (C) 2020 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';

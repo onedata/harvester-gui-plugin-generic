@@ -15,17 +15,17 @@
     </div>
   {{else}}
     <div class="operators-section surround-section">
-      <h1>{{tt this "surroundHeader"}}</h1>
+      <h1>{{tt this "surroundWithOperatorHeader"}}</h1>
       <QueryBuilder::BlockSelector::OperatorSelector
-        @onOperatorSelected={{this.surround}}
+        @onOperatorSelected={{this.surroundWithOperator}}
       />
     </div>
     {{#if this.isEditBlockAnOperator}}
       <div class="operators-section change-to-section">
-        <h1>{{tt this "changeToHeader"}}</h1>
+        <h1>{{tt this "changeToOperatorHeader"}}</h1>
         <QueryBuilder::BlockSelector::OperatorSelector
-          @onOperatorSelected={{this.changeTo}}
-          @disabledOperators={{this.changeToDisabledOperators}}
+          @onOperatorSelected={{this.changeToOperator}}
+          @disabledOperators={{this.disabledOperatorsInChangeToSection}}
         />
       </div>
     {{/if}}

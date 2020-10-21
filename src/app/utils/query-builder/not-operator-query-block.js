@@ -1,6 +1,6 @@
 /**
  * NOT operator query block.
- * 
+ *
  * @module utils/query-builder/not-operator-query-block
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
@@ -17,12 +17,5 @@ export default class NotOperatorQueryBlock extends OperatorQueryBlock {
 
   constructor() {
     super('not');
-  }
-
-  /**
-   * @override
-   */
-  static newInstance() {
-    return new NotOperatorQueryBlock();
   }
 }

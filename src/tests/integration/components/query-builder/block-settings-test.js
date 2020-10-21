@@ -92,7 +92,6 @@ describe('Integration | Component | query-builder/block-settings', function () {
       await click('.ember-attacher .surround-section .operator-and');
       await waitUntil(() => !isVisible('.ember-attacher'), { timeout: 1000 });
 
-      expect(isVisible('.ember-attacher')).to.be.false;
       const blockMatcher = sinon.match.instanceOf(AndOperatorQueryBlock)
         .and(sinon.match.has('operands', [queryBlock]));
       expect(replaceSpy).to.be.calledOnce.and.to.be.calledWith(blockMatcher);
@@ -125,7 +124,6 @@ describe('Integration | Component | query-builder/block-settings', function () {
       await click('.ember-attacher .change-to-section .operator-and');
       await waitUntil(() => !isVisible('.ember-attacher'), { timeout: 1000 });
 
-      expect(isVisible('.ember-attacher')).to.be.false;
       const blockMatcher = sinon.match.instanceOf(AndOperatorQueryBlock)
         .and(sinon.match.has('operands', [condition]));
       expect(replaceSpy).to.be.calledOnce.and.to.be.calledWith(blockMatcher);

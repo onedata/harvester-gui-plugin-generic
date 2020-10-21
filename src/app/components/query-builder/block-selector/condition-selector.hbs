@@ -1,5 +1,5 @@
 <div class="condition-selector">
-  <div class="form-group form-group-full-line">
+  <div class="form-group form-group-whole-line">
     <PowerSelect
       @options={{this.indexProperties}}
       @selected={{this.selectedConditionProperty}}
@@ -39,7 +39,7 @@
       class="form-group-fill-line"
     />
   </div>
-  <div class="form-group-full-line">
+  <div class="form-group-whole-line">
     <BsButton
       class="accept-condition"
       disabled={{not this.isConditionDataValid}}

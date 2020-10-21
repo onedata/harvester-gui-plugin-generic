@@ -118,7 +118,7 @@ describe('Integration | Component | query-builder', function () {
       await click('.accept-condition');
       await click('.query-builder-condition-block .comparator-value');
       await fillIn('.query-builder-condition-block .comparator-value', '');
-      await triggerKeyEvent('.comparator-value', 'keydown', 27);
+      await triggerKeyEvent('.comparator-value', 'keydown', 'Escape');
 
       expect(this.element.querySelector('.submit-query')).to.not.have.attr('disabled');
     }

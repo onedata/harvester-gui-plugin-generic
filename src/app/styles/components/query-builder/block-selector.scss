@@ -63,7 +63,7 @@
     flex-shrink: 0;
   }
 
-  .form-group-full-line {
+  .form-group-whole-line {
     flex-basis: 100%;
     justify-content: flex-start;
   }
@@ -73,7 +73,7 @@
     flex-grow: 1;
     justify-content: flex-start;
   }
-  
+
   .date-editor {
     .input-group {
       flex-wrap: nowrap;
@@ -84,7 +84,7 @@
       border-bottom-left-radius: 0;
     }
   }
-  
+
   .flatpickr-wrapper {
     width: 100%;
   }

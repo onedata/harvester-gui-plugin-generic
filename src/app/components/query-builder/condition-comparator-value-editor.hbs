@@ -81,12 +81,12 @@
     {{/if}}
   </div>
 {{else}}
-  <samp
+  <span
     class="comparator-value comparator-value-view"
     {{on "click" this.onStartEdit}}
     ...attributes
   >
     {{this.viewModeComparatorValue}}
-  </samp>
+  </span>
 {{/if}}
 {{yield}}

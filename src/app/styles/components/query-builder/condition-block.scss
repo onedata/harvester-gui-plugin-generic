@@ -1,7 +1,7 @@
 .query-builder {
   .query-builder-condition-block {
     font-size: 80%;
-    align-items: baseline;
+    align-items: center;
 
     .special-property {
       font-style: italic;
@@ -13,8 +13,14 @@
       font-weight: bold;
     }
 
+    .property-comparison {
+      display: flex;
+      align-items: center;
+      min-width: 0;
+    }
+
     .comparator {
-      margin: 0 $spacer * 0.2;
+      margin-right: $spacer * 0.2;
     }
 
     .property-path,
@@ -23,6 +29,18 @@
       min-width: 0;
       word-wrap: break-word;
       line-height: 1;
+    }
+
+    .comparator-value {
+      margin-left: $spacer * 0.2;
+    }
+
+    .comparator-value-view {
+      @include font-monospace();
+    }
+
+    .form-group {
+      margin: 0;
     }
 
     .comparator-value-view:hover {

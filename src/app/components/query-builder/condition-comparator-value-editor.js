@@ -1,7 +1,7 @@
 /**
  * A component responsible for visualising and editing comparator values for condition
  * query blocks. Has three modes: view, edit and create
- * 
+ *
  * @module components/query-builder/condition-comparator-value-editor
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
@@ -131,7 +131,7 @@ extends Component {
   }
 
   /**
-   * @param {any} value 
+   * @param {any} value
    */
   @action
   valueChanged(value) {
@@ -157,7 +157,7 @@ extends Component {
   }
 
   /**
-   * @param {HTMLInputElement} inputElement 
+   * @param {HTMLInputElement} inputElement
    */
   @action
   textEditorInserted(inputElement) {
@@ -168,7 +168,7 @@ extends Component {
   }
 
   /**
-   * @param {HTMLDivElement} dropdownElement 
+   * @param {HTMLDivElement} dropdownElement
    */
   @action
   dropdownEditorInserted(dropdownElement) {
@@ -183,7 +183,7 @@ extends Component {
   }
 
   /**
-   * @param {HTMLButtonElement} btnElement 
+   * @param {HTMLButtonElement} btnElement
    */
   @action
   includeTimeBtnInserted(btnElement) {
@@ -196,9 +196,9 @@ extends Component {
   }
 
   /**
-   * @param {Array<Date>} selectedDates 
-   * @param {String} dateStr 
-   * @param {Flatpickr} instance 
+   * @param {Array<Date>} selectedDates
+   * @param {String} dateStr
+   * @param {Flatpickr} instance
    */
   @action
   flatpickrReady(selectedDates, dateStr, instance) {
@@ -225,7 +225,7 @@ extends Component {
    */
   @action
   keyDown(event) {
-    if (event.keyCode === 27) {
+    if (event.key === 'Escape') {
       this.onCancelEdit();
     }
   }

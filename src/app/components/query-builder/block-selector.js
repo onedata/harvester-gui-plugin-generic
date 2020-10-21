@@ -1,7 +1,7 @@
 /**
  * Contains options for query block. In 'create' mode allows to select new block, in 'edit'
  * mode has options for changing existing query blocks.
- * 
+ *
  * @module components/query-builder/block-selector
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
@@ -15,6 +15,7 @@ import OperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder
 import AndOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/and-operator-query-block';
 import OrOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/or-operator-query-block';
 import NotOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/not-operator-query-block';
+import { A } from '@ember/array';
 
 const allowedModes = ['create', 'edit'];
 const operatorClasses = {
@@ -72,32 +73,26 @@ export default class QueryBuilderBlockSelectorComponent extends Component {
   }
 
   /**
-   * List of disabled operators for 'change to' section
+   * List of disabled operators for 'change to operator' section
    * @type {Array<String>}
    */
-  get changeToDisabledOperators() {
+  get disabledOperatorsInChangeToSection() {
     const operatorNames = Object.keys(operatorClasses);
 
     if (!this.editBlock) {
       return operatorNames;
     }
 
-    const disabledOperators = [this.editBlock.operator];
-    operatorNames
-      .without(this.editBlock.operator)
-      .forEach(operatorName => {
-        if (
-          operatorClasses[operatorName].maxOperandsNumber < this.editBlock.operands.length
-        ) {
-          disabledOperators.push(operatorName);
-        }
-      });
-
-    return disabledOperators;
+    const editBlockOperator = this.editBlock.operator;
+    const editBlockOperandsCount = this.editBlock.operands.length;
+    return operatorNames.filter((operatorName) => {
+      return operatorName === editBlockOperator ||
+        operatorClasses[operatorName].maxOperandsNumber < editBlockOperandsCount;
+    });
   }
 
   /**
-   * @param {String} operatorName 
+   * @param {String} operatorName
    */
   @action
   operatorAdded(operatorName) {
@@ -105,9 +100,9 @@ export default class QueryBuilderBlockSelectorComponent extends Component {
   }
 
   /**
-   * @param {Utils.IndexProperty} property 
-   * @param {String} comparator 
-   * @param {any} comparatorValue 
+   * @param {Utils.IndexProperty} property
+   * @param {String} comparator
+   * @param {any} comparatorValue
    */
   @action
   conditionAdded(property, comparator, comparatorValue) {
@@ -116,10 +111,10 @@ export default class QueryBuilderBlockSelectorComponent extends Component {
   }
 
   /**
-   * @param {String} operatorName 
+   * @param {String} operatorName
    */
   @action
-  surround(operatorName) {
+  surroundWithOperator(operatorName) {
     if (!this.editBlock) {
       return;
     }
@@ -128,10 +123,10 @@ export default class QueryBuilderBlockSelectorComponent extends Component {
   }
 
   /**
-   * @param {String} operatorName 
+   * @param {String} operatorName
    */
   @action
-  changeTo(operatorName) {
+  changeToOperator(operatorName) {
     if (!this.editBlock) {
       return;
     }
@@ -143,15 +138,15 @@ export default class QueryBuilderBlockSelectorComponent extends Component {
   }
 
   /**
-   * @param {String} operatorName 
-   * @param {Array<Utils.QueryBuilder.QueryBlock>} initialOperands
+   * @param {String} operatorName
+   * @param {Array<Utils.QueryBuilder.QueryBlock>} [initialOperands=[]]
    * @returns {Utils.QueryBuilder.OperatorQueryBlock}
    */
   createOperatorBlock(operatorName, initialOperands = []) {
-    const normalizedInitialOperands = initialOperands || [];
-
     const newBlock = new operatorClasses[operatorName]();
-    newBlock.operands.pushObjects(normalizedInitialOperands);
+    if (initialOperands) {
+      newBlock.operands = A(initialOperands);
+    }
 
     return newBlock;
   }

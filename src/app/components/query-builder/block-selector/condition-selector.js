@@ -1,7 +1,7 @@
 /**
  * Provides controls to select condition parameters - property, comparator and
  * comparator value.
- * 
+ *
  * @module components/query-builder/block-selector/condition-selector
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
@@ -60,7 +60,7 @@ extends Component {
 
   /**
    * @type {Function}
-   * @param {Utils.IndexProperty} propertyType
+   * @param {Utils.IndexProperty} property
    * @param {String} comparator
    * @param {any} comparatorValue
    */
@@ -101,20 +101,23 @@ extends Component {
   }
 
   /**
-   * 
-   * @param {Utils.IndexProperty} indexProperty 
+   *
+   * @param {Utils.IndexProperty} indexProperty
    */
   @action
   conditionPropertyChanged(indexProperty) {
     this.selectedConditionProperty = indexProperty;
 
-    if (!this.comparators.includes(this.selectedConditionComparator)) {
+    if (
+      !this.selectedConditionComparator ||
+      !this.comparators.includes(this.selectedConditionComparator)
+    ) {
       this.conditionComparatorChanged(this.comparators[0]);
     }
   }
 
   /**
-   * @param {String} comparator 
+   * @param {String} comparator
    */
   @action
   conditionComparatorChanged(comparator) {
@@ -126,7 +129,7 @@ extends Component {
   }
 
   /**
-   * @param {any} value 
+   * @param {any} value
    */
   @action
   conditionComparatorValueChanged(value) {

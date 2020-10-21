@@ -154,7 +154,7 @@ describe('Integration | Component | query-results/pagination', function () {
           @onPageChange={{this.changeSpy}}
         />`);
         await fillIn('.active-page-number', rawValue);
-        await triggerKeyEvent('.active-page-number', 'keydown', 13);
+        await triggerKeyEvent('.active-page-number', 'keydown', 'Enter');
 
         expect(changeSpy).to.be.calledOnce.and.to.be.calledWith(notifiedValue);
       }

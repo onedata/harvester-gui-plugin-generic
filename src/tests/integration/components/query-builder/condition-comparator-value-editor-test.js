@@ -72,9 +72,9 @@ describe(
         value: 'abc def',
         viewValue: '"abc def"',
       }].forEach(({ comparator, value, viewValue, descriptionSuffix }) => {
-        const [propertyType, comparatorName] = comparator.split('.');
+        const [propertyType, comparatorType] = comparator.split('.');
         it(
-          `shows comparator value for "${comparatorName}" comparator for ${propertyType} property${descriptionSuffix || ''}`,
+          `shows comparator value for "${comparatorType}" comparator for ${propertyType} property${descriptionSuffix || ''}`,
           async function () {
             this.setProperties({
               comparator,
@@ -122,10 +122,10 @@ describe(
         comparator: 'anyProperty.hasPhrase',
         valueToInput: 'abc',
       }].forEach(({ comparator, valueToInput }) => {
-        const [propertyType, comparatorName] = comparator.split('.');
+        const [propertyType, comparatorType] = comparator.split('.');
 
         it(
-          `shows text input for "${comparatorName}" comparator for ${propertyType} property`,
+          `shows text input for "${comparatorType}" comparator for ${propertyType} property`,
           async function () {
             this.set('comparator', comparator);
 
@@ -140,7 +140,7 @@ describe(
         );
 
         it(
-          `calls "onValueChange" callback, when ${propertyType} property "${comparatorName}" condition value has changed`,
+          `calls "onValueChange" callback, when ${propertyType} property "${comparatorType}" condition value has changed`,
           async function () {
             const { changeSpy } = this.setProperties({
               comparator,
@@ -170,10 +170,10 @@ describe(
         toSelect: 'space2',
         selectedValue: spaces[1],
       }].forEach(({ comparator, options, toSelect, selectedValue }) => {
-        const [propertyType, comparatorName] = comparator.split('.');
+        const [propertyType, comparatorType] = comparator.split('.');
 
         it(
-          `shows dropdown for "${comparatorName}" comparator for ${propertyType} property`,
+          `shows dropdown for "${comparatorType}" comparator for ${propertyType} property`,
           async function () {
             this.set('comparator', comparator);
 
@@ -193,7 +193,7 @@ describe(
         );
 
         it(
-          `calls "onValueChange" callback, when ${propertyType} property "${comparatorName}" condition value has changed`,
+          `calls "onValueChange" callback, when ${propertyType} property "${comparatorType}" condition value has changed`,
           async function () {
             const { changeSpy } = this.setProperties({
               comparator,
@@ -310,11 +310,11 @@ describe(
         'keyword.is',
         'anyProperty.hasPhrase',
       ].forEach(comparator => {
-        const [propertyType, comparatorName] = comparator.split('.');
+        const [propertyType, comparatorType] = comparator.split('.');
         const beforeTest = testCase => testCase.set('comparator', comparator);
 
         it(
-          `has focused editor on init for "${comparatorName}" comparator for ${propertyType} property`,
+          `has focused editor on init for "${comparatorType}" comparator for ${propertyType} property`,
           async function () {
             beforeTest(this);
 
@@ -330,7 +330,7 @@ describe(
         );
 
         it(
-          `shows current comparator value for "${comparatorName}" comparator for ${propertyType} property`,
+          `shows current comparator value for "${comparatorType}" comparator for ${propertyType} property`,
           async function () {
             beforeTest(this);
 
@@ -345,7 +345,7 @@ describe(
         );
 
         it(
-          `closes editor and notifies about new value for "${comparatorName}" comparator for ${propertyType} property (close using Enter)`,
+          `closes editor and notifies about new value for "${comparatorType}" comparator for ${propertyType} property (close using Enter)`,
           async function () {
             beforeTest(this);
             const {
@@ -359,12 +359,12 @@ describe(
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="edit"
               @comparator={{this.comparator}}
-              @value={{this.value}}
+              @value="abc"
               @onValueChange={{this.changeSpy}}
               @onFinishEdit={{this.finishEditSpy}}
             />`);
             await fillIn('.comparator-value', 'def');
-            await triggerKeyEvent('.comparator-value', 'keydown', 13);
+            await triggerKeyEvent('.comparator-value', 'keydown', 'Enter');
 
             expect(changeSpy).to.be.calledWith('def');
             expect(finishEditSpy).to.be.calledOnce;
@@ -372,7 +372,7 @@ describe(
         );
 
         it(
-          `closes editor and notifies about new value for "${comparatorName}" comparator for ${propertyType} property (close using blur)`,
+          `closes editor and notifies about new value for "${comparatorType}" comparator for ${propertyType} property (close using blur)`,
           async function () {
             beforeTest(this);
             const {
@@ -386,7 +386,7 @@ describe(
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="edit"
               @comparator={{this.comparator}}
-              @value={{this.value}}
+              @value="abc"
               @onValueChange={{this.changeSpy}}
               @onFinishEdit={{this.finishEditSpy}}
             />`);
@@ -399,7 +399,7 @@ describe(
         );
 
         it(
-          `notifies about partial new value before close for "${comparatorName}" comparator for ${propertyType} property`,
+          `notifies about partial new value before close for "${comparatorType}" comparator for ${propertyType} property`,
           async function () {
             beforeTest(this);
             const {
@@ -413,7 +413,7 @@ describe(
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="edit"
               @comparator={{this.comparator}}
-              @value={{this.value}}
+              @value="abc"
               @onValueChange={{this.changeSpy}}
               @onFinishEdit={{this.finishEditSpy}}
             />`);
@@ -425,7 +425,7 @@ describe(
         );
 
         it(
-          `cancels editor on Escape key down for "${comparatorName}" comparator for ${propertyType} property`,
+          `cancels editor on Escape key down for "${comparatorType}" comparator for ${propertyType} property`,
           async function () {
             beforeTest(this);
             const {
@@ -439,11 +439,11 @@ describe(
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="edit"
               @comparator={{this.comparator}}
-              @value={{this.value}}
+              @value="abc"
               @onFinishEdit={{this.finishEditSpy}}
               @onCancelEdit={{this.cancelEditSpy}}
             />`);
-            await triggerKeyEvent('.comparator-value', 'keydown', 27);
+            await triggerKeyEvent('.comparator-value', 'keydown', 'Escape');
 
             expect(finishEditSpy).to.not.be.called;
             expect(cancelEditSpy).to.be.calledOnce;
@@ -451,7 +451,7 @@ describe(
         );
 
         it(
-          `does not add class "is-invalid" to the input by default for "${comparatorName}" comparator for ${propertyType} property`,
+          `does not add class "is-invalid" to the input by default for "${comparatorType}" comparator for ${propertyType} property`,
           async function () {
             beforeTest(this);
 
@@ -467,7 +467,7 @@ describe(
         );
 
         it(
-          `adds class "is-invalid" to the input if isValueInvalid is true for "${comparatorName}" comparator for ${propertyType} property`,
+          `adds class "is-invalid" to the input if isValueInvalid is true for "${comparatorType}" comparator for ${propertyType} property`,
           async function () {
             beforeTest(this);
 
@@ -506,14 +506,14 @@ describe(
         stringToSelect,
         selectionResult,
       }) => {
-        const [propertyType, comparatorName] = comparator.split('.');
+        const [propertyType, comparatorType] = comparator.split('.');
         const beforeTest = testCase => testCase.setProperties({
           comparator,
           value: initialValue,
         });
 
         it(
-          `has focused editor on init for "${comparatorName}" comparator for ${propertyType} property`,
+          `has focused editor on init for "${comparatorType}" comparator for ${propertyType} property`,
           async function () {
             beforeTest(this);
 
@@ -530,7 +530,7 @@ describe(
         );
 
         it(
-          `shows current comparator value for "${comparatorName}" comparator for ${propertyType} property`,
+          `shows current comparator value for "${comparatorType}" comparator for ${propertyType} property`,
           async function () {
             beforeTest(this);
 
@@ -547,7 +547,7 @@ describe(
         );
 
         it(
-          `shows expanded dropdown for "${comparatorName}" comparator for ${propertyType} property`,
+          `shows expanded dropdown for "${comparatorType}" comparator for ${propertyType} property`,
           async function () {
             beforeTest(this);
 
@@ -563,7 +563,7 @@ describe(
         );
 
         it(
-          `closes editor and notifies about new value for "${comparatorName}" comparator for ${propertyType} property`,
+          `closes editor and notifies about new value for "${comparatorType}" comparator for ${propertyType} property`,
           async function () {
             beforeTest(this);
             const {
@@ -589,7 +589,7 @@ describe(
         );
 
         it(
-          `closes editor for "${comparatorName}" comparator for ${propertyType} property on dropdown trigger click`,
+          `closes editor for "${comparatorType}" comparator for ${propertyType} property on dropdown trigger click`,
           async function () {
             beforeTest(this);
             const finishEditSpy = this.set('finishEditSpy', sinon.spy());

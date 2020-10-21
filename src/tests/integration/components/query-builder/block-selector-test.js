@@ -46,8 +46,9 @@ describe('Integration | Component | query-builder/block-selector', function () {
     });
 
     operatorsList.forEach(operatorName => {
+      const operatorNameUpper = operatorName.toUpperCase();
       it(
-        `calls "onBlockAdd" callback, when ${operatorName.toUpperCase()} operator has been clicked`,
+        `calls "onBlockAdd" callback, when ${operatorNameUpper} operator has been clicked`,
         async function () {
           const addSpy = this.set('addSpy', sinon.spy());
 
@@ -132,8 +133,9 @@ describe('Integration | Component | query-builder/block-selector', function () {
     );
 
     operatorsList.forEach(operatorName => {
+      const operatorNameUpper = operatorName.toUpperCase();
       it(
-        `calls "onBlockReplace" callback, when ${operatorName.toUpperCase()} operator in "surround" section has been clicked`,
+        `calls "onBlockReplace" callback, when ${operatorNameUpper} operator in "surround" section has been clicked`,
         async function () {
           const editBlock = this.get('editBlock');
           const replaceSpy = this.set('replaceSpy', sinon.spy());
@@ -187,6 +189,7 @@ describe('Integration | Component | query-builder/block-selector', function () {
     );
 
     operatorsList.forEach(operatorName => {
+      const operatorUpper = operatorName.toUpperCase();
       [{
         beforeFunc() {},
         descriptionSuffix: 'with no condition',
@@ -199,7 +202,7 @@ describe('Integration | Component | query-builder/block-selector', function () {
         descriptionSuffix: 'with single condition',
       }].forEach(({ beforeFunc, descriptionSuffix }) => {
         it(
-          `blocks "change to" ${operatorName.toUpperCase()} when editing ${operatorName.toUpperCase()} operator ${descriptionSuffix}`,
+          `blocks "change to" ${operatorUpper} when editing ${operatorUpper} operator ${descriptionSuffix}`,
           async function () {
             this.set('editBlock', new operatorBlockClasses[operatorName](operatorName));
             beforeFunc(this);
@@ -221,8 +224,9 @@ describe('Integration | Component | query-builder/block-selector', function () {
     });
 
     multiOperandOperatorsList.forEach(operatorName => {
+      const operatorUpper = operatorName.toUpperCase();
       it(
-        `blocks "change to" ${operatorName.toUpperCase()} and NOT when editing ${operatorName.toUpperCase()} operator with two conditions`,
+        `blocks "change to" ${operatorUpper} and NOT when editing ${operatorUpper} operator with two conditions`,
         async function () {
           const editBlock = this.set(
             'editBlock',
@@ -254,8 +258,10 @@ describe('Integration | Component | query-builder/block-selector', function () {
 
     operatorsList.forEach(sourceOperatorName => {
       operatorsList.without(sourceOperatorName).forEach(destinationOperatorName => {
+        const sourceOperatorNameUpper = sourceOperatorName.toUpperCase();
+        const destinationOperatorNameUper = destinationOperatorName.toUpperCase();
         it(
-          `changes ${sourceOperatorName.toUpperCase()} operator with single condition to ${destinationOperatorName.toUpperCase()} operator`,
+          `changes ${sourceOperatorNameUpper} operator with single condition to ${destinationOperatorNameUper} operator`,
           async function () {
             const editBlock = this.set(
               'editBlock',

@@ -64,8 +64,6 @@ describe('Integration | Component | query-builder/block-adder', function () {
     await click('.query-builder-block-adder');
     await click('.ember-attacher .operator-and');
     await waitUntil(() => !isVisible('.ember-attacher'), { timeout: 1000 });
-
-    expect(isVisible('.ember-attacher')).to.be.false;
   });
 
   it('closes block selector when condition has been choosen', async function () {
@@ -82,8 +80,6 @@ describe('Integration | Component | query-builder/block-adder', function () {
     await selectChoose('.comparator-value', 'false');
     await click('.accept-condition');
     await waitUntil(() => !isVisible('.ember-attacher'), { timeout: 1000 });
-
-    expect(isVisible('.ember-attacher')).to.be.false;
   });
 
   it('can be disabled', async function () {

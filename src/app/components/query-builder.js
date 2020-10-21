@@ -36,7 +36,8 @@ export default class QueryBuilderComponent extends Component {
   @tracked rootQueryBlock = new RootOperatorQueryBlock();
 
   /**
-   * Contains state of the condition blocks edition. Each state has only one field (for now):
+   * Contains state of the condition blocks edition. Each state has only one field
+   * (for now):
    * isValid: boolean.
    * @type {Map<Utils.QueryBuilder.ConditionQueryBlock,Object>}
    */
@@ -81,7 +82,7 @@ export default class QueryBuilderComponent extends Component {
   }
 
   /**
-   * @param {Utils.QueryBuilder.ConditionQueryBlock} conditionBlock 
+   * @param {Utils.QueryBuilder.ConditionQueryBlock} conditionBlock
    */
   @action
   onConditionEditionStart(conditionBlock) {
@@ -91,7 +92,7 @@ export default class QueryBuilderComponent extends Component {
   }
 
   /**
-   * @param {Utils.QueryBuilder.ConditionQueryBlock} conditionBlock 
+   * @param {Utils.QueryBuilder.ConditionQueryBlock} conditionBlock
    */
   @action
   onConditionEditionEnd(conditionBlock) {
@@ -115,7 +116,7 @@ export default class QueryBuilderComponent extends Component {
   }
 
   /**
-   * @param {Utils.QueryBuilder.QueryBlock} block 
+   * @param {Utils.QueryBuilder.QueryBlock} block
    */
   @action
   onBlockRemoved(block) {
@@ -140,7 +141,7 @@ export default class QueryBuilderComponent extends Component {
   }
 
   /**
-   * @param {Utils.IndexProperty} property 
+   * @param {Utils.IndexProperty} property
    * @returns {boolean}
    */
   isSupportedProperty(property) {

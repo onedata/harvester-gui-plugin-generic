@@ -1,7 +1,7 @@
 /**
  * Invoke the passed action if the invoking event is caused by the Enter key,
  * eg. onkeydown event.
- * 
+ *
  * See examples in tests.
  *
  * @module helpers/invoke-on-enter
@@ -13,8 +13,7 @@
 import { helper } from '@ember/component/helper';
 
 function _invoke(action, event) {
-  const keyCode = event.keyCode;
-  if (keyCode === 13 && typeof action === 'function') {
+  if (event.key === 'Enter' && typeof action === 'function') {
     event.stopPropagation();
     return action(event);
   }

@@ -9,11 +9,6 @@ describe('Unit | Utility | query-builder/and-operator-query-block', function () 
     expect(block.operator).to.equal('and');
   });
 
-  it('creates new instance of itself via static "newInstance" method', function () {
-    const block = AndOperatorQueryBlock.newInstance();
-    expect(block).to.be.an.instanceOf(AndOperatorQueryBlock);
-  });
-
   it('can be cloned', function () {
     const block = new AndOperatorQueryBlock();
     block.operands.pushObject({

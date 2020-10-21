@@ -19,7 +19,7 @@ describe('Integration | Helper | invoke-on-enter', function () {
         onkeydown={{invoke-on-enter (action myAction 1 2 3)}}
       >
     `);
-    await triggerKeyEvent('#invoke-on-enter-input', 'keydown', 13);
+    await triggerKeyEvent('#invoke-on-enter-input', 'keydown', 'Enter');
 
     expect(spy).to.be.calledOnce;
     expect(spy).to.be.calledWith(1, 2, 3);

@@ -1,4 +1,4 @@
 operatorsHeader: 'Operator'
 conditionHeader: 'Condition'
-surroundHeader: 'Surround with operator'
-changeToHeader: 'Change to operator'
+surroundWithOperatorHeader: 'Surround with operator'
+changeToOperatorHeader: 'Change to operator'
