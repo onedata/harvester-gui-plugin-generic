@@ -111,7 +111,7 @@ describe('Integration | Component | query-builder/operator-block', function () {
           await render(hbs `
             <QueryBuilder::OperatorBlock @queryBlock={{this.queryBlock}} />
           `);
-          await click(this.element.querySelector('.query-builder-block-adder'));
+          await click('.query-builder-block-adder');
           await click('.ember-attacher .operator-not');
 
           // 1 operand
