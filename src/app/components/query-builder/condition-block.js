@@ -1,6 +1,6 @@
 /**
  * Shows and allows to edit query conditon.
- * 
+ *
  * @module components/query-builder/condition-block
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
@@ -12,6 +12,12 @@ import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 import { defaultComparatorEditors } from 'harvester-gui-plugin-generic/utils/query-builder/condition-comparator-editors';
 
+/**
+ * @argument {Utils.QueryBuilder.ConditionQueryBlock} queryBlock
+ * @argument {Function} onConditionEditionStart
+ * @argument {Function} onConditionEditionEnd
+ * @argument {Function} onConditionEditionValidityChange
+ */
 export default class QueryBuilderConditionBlockComponent extends Component {
   /**
    * @type {String}
@@ -88,7 +94,7 @@ export default class QueryBuilderConditionBlockComponent extends Component {
   }
 
   /**
-   * @param {any} newValue 
+   * @param {any} newValue
    */
   @action
   comparatorValueChange(newValue) {

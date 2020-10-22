@@ -1,6 +1,6 @@
 /**
  * Visualizes a single operator block.
- * 
+ *
  * @module components/query-builder/operator-block
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
@@ -10,6 +10,14 @@
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
 
+/**
+ * @argument {Utils.QueryBuilder.OperatorQueryBlock} queryBlock
+ * @argument {Array<IndexProperty>} indexProperties
+ * @argument {Function} onConditionEditionStart
+ * @argument {Function} onConditionEditionEnd
+ * @argument {Function} onConditionEditionValidityChange
+ * @argument {Function} onBlockRemoved
+ */
 export default class QueryBuilderOperatorBlockComponent extends Component {
   /**
    * @type {String}
@@ -39,11 +47,11 @@ export default class QueryBuilderOperatorBlockComponent extends Component {
   }
 
   /**
-   * @param {Utils.QueryBuilder.QueryBlock} queryBlock 
+   * @param {Utils.QueryBuilder.QueryBlock} queryBlock
    */
   @action
   addBlock(queryBlock) {
-    this.args.queryBlock.operands.pushObject(queryBlock);
+    this.queryBlock.operands.pushObject(queryBlock);
   }
 
   /**
@@ -59,11 +67,11 @@ export default class QueryBuilderOperatorBlockComponent extends Component {
   }
 
   /**
-   * @param {Utils.QueryBuilder.QueryBlock} queryBlock 
+   * @param {Utils.QueryBuilder.QueryBlock} queryBlock
    */
   @action
   removeBlock(queryBlock) {
-    this.args.queryBlock.operands.removeObject(queryBlock);
+    this.queryBlock.operands.removeObject(queryBlock);
     this.onBlockRemoved(queryBlock);
   }
 }

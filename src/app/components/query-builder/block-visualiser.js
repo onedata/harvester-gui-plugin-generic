@@ -12,6 +12,16 @@ import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 
+/**
+ * @argument {Utils.QueryBuilder.ConditionQueryBlock} queryBlock
+ * @argument {Array<IndexProperty>} indexProperties
+ * @argument {Function} onConditionEditionStart
+ * @argument {Function} onConditionEditionEnd
+ * @argument {Function} onConditionEditionValidityChange
+ * @argument {Function} onBlockRemove
+ * @argument {Function} onBlockRemoved
+ * @argument {Function} onBlockReplace
+ */
 export default class QueryBuilderBlockVisualiserComponent extends Component {
   /**
    * @type {boolean}

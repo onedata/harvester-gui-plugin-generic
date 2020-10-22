@@ -16,6 +16,16 @@ import { next } from '@ember/runloop';
 import { inject as service } from '@ember/service';
 import { defaultComparatorEditors } from 'harvester-gui-plugin-generic/utils/query-builder/condition-comparator-editors';
 
+/**
+ * @argument {String} [mode]
+ * @argument {String} comparator
+ * @argument {Any} value
+ * @argument {Boolean} isValueInvalid
+ * @argument {Function} onValueChange
+ * @argument {Function} [onStartEdit]
+ * @argument {Function} [onFinishEdit]
+ * @argument {Function} [onCancelEdit]
+ */
 export default class QueryBuilderConditionComparatorValueEditorComponent
 extends Component {
   @service spacesProvider;

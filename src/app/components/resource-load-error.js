@@ -12,6 +12,9 @@ import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 import _ from 'lodash';
 
+/**
+ * @argument {any} [details] Error instance or any other value with error details
+ */
 export default class ResourceLoadErrorComponent extends Component {
   /**
    * @type {String}

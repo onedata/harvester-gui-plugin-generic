@@ -1,6 +1,6 @@
 /**
  * Shows query block settings
- * 
+ *
  * @module components/query-builder/block-settings
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
@@ -10,6 +10,12 @@
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
 
+/**
+ * @argument {Boolean} isShown
+ * @argument {Utils.QueryBlock} queryBlock
+ * @argument {Function} onSettingsClose
+ * @argument {Function} onBlockReplace
+ */
 export default class QueryBuilderBlockSettingsComponent extends Component {
   /**
    * @type {Function}
@@ -34,8 +40,8 @@ export default class QueryBuilderBlockSettingsComponent extends Component {
   }
 
   /**
-   * @param {Function} closeSelectorCallback 
-   * @param {Utils.QueryBuilder.QueryBlock} newBlock 
+   * @param {Function} closeSelectorCallback
+   * @param {Utils.QueryBuilder.QueryBlock} newBlock
    */
   @action
   blockReplace(closeSelectorCallback, newBlock) {

@@ -17,6 +17,12 @@ import {
   defaultComparatorEditors,
 } from 'harvester-gui-plugin-generic/utils/query-builder/condition-comparator-editors';
 
+/**
+ * @argument {Array<IndexProperty>} indexProperties
+ * @argument {Function} onConditionSelected
+ * @argument {Array<String>} [operators]
+ * @argument {Array<String>} [disabledOperators]
+ */
 export default class QueryBuilderBlockSelectorConditionSelectorComponent
 extends Component {
   @service spacesProvider;

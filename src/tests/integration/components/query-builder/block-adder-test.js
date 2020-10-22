@@ -59,14 +59,14 @@ describe('Integration | Component | query-builder/block-adder', function () {
       .and.to.be.calledWith(sinon.match.instanceOf(ConditionQueryBlock));
   });
 
-  it('closes block selector when operator has been choosen', async function () {
+  it('closes block selector when operator has been chosen', async function () {
     await render(hbs `<QueryBuilder::BlockAdder />`);
     await click('.query-builder-block-adder');
     await click('.ember-attacher .operator-and');
     await waitUntil(() => !isVisible('.ember-attacher'), { timeout: 1000 });
   });
 
-  it('closes block selector when condition has been choosen', async function () {
+  it('closes block selector when condition has been chosen', async function () {
     this.set('indexProperties', [{
       path: 'a.b',
       type: 'boolean',

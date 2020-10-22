@@ -19,6 +19,12 @@ const allowedPropertyTypes = [
   'number',
 ];
 
+/**
+ * @argument {Utils.Index} index
+ * @argument {Utils.IndexProperty} sortProperty
+ * @argument {String} sortDirection
+ * @argument {Function} onSortChange
+ */
 export default class QueryResultsSortSelectorComponent extends Component {
   @service intl;
 
@@ -80,7 +86,7 @@ export default class QueryResultsSortSelectorComponent extends Component {
   }
 
   /**
-   * @param {Utils.IndexProperty} selectedProperty 
+   * @param {Utils.IndexProperty} selectedProperty
    */
   @action
   sortPropertyChanged(selectedProperty) {
@@ -88,7 +94,7 @@ export default class QueryResultsSortSelectorComponent extends Component {
   }
 
   /**
-   * @param {String} newDirection 
+   * @param {String} newDirection
    */
   @action
   sortDirectionChanged(newDirection) {
@@ -96,8 +102,8 @@ export default class QueryResultsSortSelectorComponent extends Component {
   }
 
   /**
-   * @param {Utils.IndexProperty} property 
-   * @param {String} searchTerm 
+   * @param {Utils.IndexProperty} property
+   * @param {String} searchTerm
    * @returns {number}
    */
   @action

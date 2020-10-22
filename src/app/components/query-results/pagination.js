@@ -10,6 +10,13 @@
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
 
+/**
+ * @argument {Number} resultsCount
+ * @argument {Number} pageSize
+ * @argument {Number} activePageNumber
+ * @argument {Function} onPageChange
+ * @argument {Function} onPageSizeChange
+ */
 export default class QueryResultsPaginationComponent extends Component {
   /**
    * @type {String}

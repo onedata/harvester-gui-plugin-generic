@@ -1,7 +1,7 @@
 /**
  * Allows to select one of the operators. Specified ones can be disabled. Notifies about
  * selected operator using its name, not query block instance.
- * 
+ *
  * @module components/query-builder/block-selector/operator-selector
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
@@ -10,6 +10,11 @@
 
 import Component from '@glimmer/component';
 
+/**
+ * @argument {Function} onOperatorSelected
+ * @argument {Array<String>} [operators]
+ * @argument {Array<String>} [disabledOperators]
+ */
 export default class QueryBuilderBlockSelectorOperatorSelectorComponent
 extends Component {
   /**

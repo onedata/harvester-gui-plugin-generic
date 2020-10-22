@@ -24,6 +24,13 @@ const operatorClasses = {
   not: NotOperatorQueryBlock,
 };
 
+/**
+ * @argument {String} [mode]
+ * @argument {Array<IndexProperty>} indexProperties
+ * @argument {Utils.QueryBlock} editBlock
+ * @argument {Function} onBlockAdd
+ * @argument {Function} onBlockReplace
+ */
 export default class QueryBuilderBlockSelectorComponent extends Component {
   /**
    * @type {String}

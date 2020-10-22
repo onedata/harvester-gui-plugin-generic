@@ -24,6 +24,14 @@ const allowedPropertyTypes = [
   'anyProperty',
 ];
 
+/**
+ * @argument {Utils.Index} index
+ * @argument {Function} onPerformQuery
+ * @argument {Utils.IndexProperty} sortProperty
+ * @argument {String} sortDirection
+ * @argument {Function} onGenerateCurl
+ * @argument {Object} filteredProperties
+ */
 export default class QueryBuilderComponent extends Component {
   /**
    * @type {String}

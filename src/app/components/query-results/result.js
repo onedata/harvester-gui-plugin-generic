@@ -12,6 +12,10 @@ import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 import _ from 'lodash';
 
+/**
+ * @argument {Utils.QueryResult} queryResult
+ * @argument {Object} [filteredProperties]
+ */
 export default class QueryResultsResultComponent extends Component {
   /**
    * @type {String}

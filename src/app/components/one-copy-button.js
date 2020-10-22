@@ -15,6 +15,13 @@ import { inject as service } from '@ember/service';
 import { action } from '@ember/object';
 import { later, cancel } from '@ember/runloop';
 
+/**
+ * @argument {String} value Value to copy
+ * @argument {String} [mode] One of: button, input, textarea
+ * @argument {String} [hoverTip] Tip visible on hover
+ * @argument {String} [copiedTip] Tip visible when value has been copied
+ * @argument {String} [buttonClasses] Classes for copy button
+ */
 export default class ClipboardLineComponent extends Component {
   @service intl;
 
@@ -34,7 +41,6 @@ export default class ClipboardLineComponent extends Component {
   @tracked isCopiedNotificationVisible = false;
 
   /**
-   * Value to copy
    * @type {String}
    */
   get value() {
@@ -42,7 +48,6 @@ export default class ClipboardLineComponent extends Component {
   }
 
   /**
-   * One of: button, input, textarea
    * @type {String}
    */
   get mode() {

@@ -2,7 +2,7 @@
  * A selector, which allows to choose which properties should be visible or not.
  * No property selected should be interpreted as "all selected" (otherwise empty selection
  * would be useless).
- * 
+ *
  * @module components/query-results/filtered-properties-selector
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
@@ -15,6 +15,11 @@ import { tracked } from '@glimmer/tracking';
 import { A } from '@ember/array';
 import _ from 'lodash';
 
+/**
+ * @argument {Utils.QueryResult} queryResult
+ * @argument {Utils.Index} index
+ * @argument {Function} onSelectionChange
+ */
 export default class QueryResultsFilteredPropertiesSelectorComponent extends Component {
   /**
    * @type {String}
@@ -147,7 +152,7 @@ export default class QueryResultsFilteredPropertiesSelectorComponent extends Com
 
   calculateModelIfNeeded() {
     // Recalculate model only if query results have been changed
-    if (this.args.queryResults === this.lastQueryResults) {
+    if (this.queryResults === this.lastQueryResults) {
       return;
     }
 
@@ -191,7 +196,7 @@ export default class QueryResultsFilteredPropertiesSelectorComponent extends Com
 
     model.forEach(node => this.fixTreeSelectionState(node));
 
-    this.lastQueryResults = this.args.queryResults;
+    this.lastQueryResults = this.queryResults;
     this.lastPropertiesTree = newPropertiesTree;
     this.calculatedModel = model;
     this.calculatedFlatModel = A(flatModel);
@@ -200,7 +205,7 @@ export default class QueryResultsFilteredPropertiesSelectorComponent extends Com
   /**
    * Fixes (with recursion) selection state of the TreeNode - recalculates isChecked
    * and isIndeterminate according to the TreeNode leaves selection state.
-   * @param {TreeNode} node 
+   * @param {TreeNode} node
    */
   fixTreeSelectionState(node) {
     const children = node.children || [];

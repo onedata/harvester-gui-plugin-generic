@@ -10,6 +10,10 @@
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
 
+/**
+ * @argument {Array<IndexProperty>} indexProperties
+ * @argument {Function} onBlockAdd
+ */
 export default class QueryBuilderBlockAdderComponent extends Component {
   /**
    * @type {Function}
