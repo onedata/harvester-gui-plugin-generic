@@ -20,7 +20,7 @@ describe('Integration | Component | one-checkbox', function () {
 
     const checkboxNode = this.element.querySelector('.one-checkbox');
     expect(checkboxNode).to.have.class('checked');
-    expect(checkboxNode.querySelector('svg')).to.have.class('fa-check');
+    expect(checkboxNode.querySelector('.fa-icon')).to.have.class('fa-check');
   });
 
   it('shows value "false"', async function () {
@@ -28,7 +28,7 @@ describe('Integration | Component | one-checkbox', function () {
 
     const checkboxNode = this.element.querySelector('.one-checkbox');
     expect(checkboxNode).to.have.class('unchecked');
-    expect(checkboxNode.querySelector('svg')).to.not.exist;
+    expect(checkboxNode.querySelector('.fa-icon')).to.not.exist;
   });
 
   it('shows value "indeterminate"', async function () {
@@ -36,7 +36,7 @@ describe('Integration | Component | one-checkbox', function () {
 
     const checkboxNode = this.element.querySelector('.one-checkbox');
     expect(checkboxNode).to.have.class('indeterminate');
-    expect(checkboxNode.querySelector('svg')).to.have.class('fa-circle');
+    expect(checkboxNode.querySelector('.fa-icon')).to.have.class('fa-circle');
   });
 
   it('is enabled by default', async function () {
