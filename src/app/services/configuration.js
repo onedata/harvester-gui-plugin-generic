@@ -25,7 +25,7 @@ export default class ConfigurationService extends Service {
    * @returns {Promise}
    */
   reloadConfiguration() {
-    return this.get('appProxy').configRequest()
+    return this.appProxy.configRequest()
       .then(config => this.configuration = config)
       .catch(() => this.configuration = null);
   }

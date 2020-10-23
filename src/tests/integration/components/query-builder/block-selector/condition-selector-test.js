@@ -206,7 +206,7 @@ describe(
       />`);
       await clickTrigger('.property-selector');
 
-      const indexProperties = this.get('indexProperties');
+      const indexProperties = this.indexProperties;
       const options = this.element.querySelectorAll('.ember-power-select-option');
       expect(options).to.have.length(indexProperties.length);
       indexProperties.mapBy('path').forEach((path, index) =>
@@ -388,7 +388,7 @@ describe(
       'blocks "Add" button when space property "is" condition has empty condition value',
       async function () {
         // simulate no space to choose
-        this.get('spaces').clear();
+        this.spaces.clear();
         await render(hbs `<QueryBuilder::BlockSelector::ConditionSelector
           @indexProperties={{this.indexProperties}}
         />`);

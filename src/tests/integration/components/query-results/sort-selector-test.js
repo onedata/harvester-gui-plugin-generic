@@ -65,7 +65,7 @@ describe('Integration | Component | query-results/sort-selector', function () {
   it('notifies about sort direction change', async function () {
     const changeSpy = this.set('changeSpy', sinon.spy());
 
-    await render(hbs `<QueryResults::SortSelector 
+    await render(hbs `<QueryResults::SortSelector
       @index={{this.index}}
       @onSortChange={{this.changeSpy}}
     />`);
@@ -110,14 +110,14 @@ describe('Integration | Component | query-results/sort-selector', function () {
   it('notifies about sort property change', async function () {
     const changeSpy = this.set('changeSpy', sinon.spy());
 
-    await render(hbs `<QueryResults::SortSelector 
+    await render(hbs `<QueryResults::SortSelector
       @index={{this.index}}
       @onSortChange={{this.changeSpy}}
     />`);
     await selectChoose('.property-selector', 'a.b');
     const changeMatcher = sinon.match({
       direction: 'desc',
-      property: sinon.match.same(this.get('index').properties.a.properties.b),
+      property: sinon.match.same(this.index.properties.a.properties.b),
     });
     expect(changeSpy).to.be.calledOnce.and.to.be.calledWith(changeMatcher);
   });

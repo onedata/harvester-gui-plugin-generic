@@ -39,7 +39,7 @@ describe('Unit | Service | app-proxy', function () {
 
   it('loads parent application appProxy on init', function () {
     const service = this.owner.lookup('service:app-proxy');
-    expect(service.appProxy).to.equal(this.get('appProxy'));
+    expect(service.appProxy).to.equal(this.appProxy);
   });
 
   [
@@ -54,7 +54,7 @@ describe('Unit | Service | app-proxy', function () {
       function () {
         const service = this.owner.lookup('service:app-proxy');
         expect(service[injectedPropName])
-          .to.equal(this.get(`appProxy.${injectedPropName}`));
+          .to.equal(this.appProxy[injectedPropName]);
       }
     );
   });
@@ -63,11 +63,7 @@ describe('Unit | Service | app-proxy', function () {
     'tries to load appProxy continuously when it is not available on init',
     function () {
       this.fakeClock = sinon.useFakeTimers();
-      const {
-        windowMock,
-        appProxy,
-      } = this.getProperties('windowMock', 'appProxy');
-      windowMock.frameElement = {};
+      this.windowMock.frameElement = {};
       const promiseResolveSpy = sinon.spy();
 
       const service = this.owner.lookup('service:app-proxy');
@@ -79,9 +75,9 @@ describe('Unit | Service | app-proxy', function () {
       expect(service.appProxy).to.be.null;
       expect(promiseResolveSpy).to.be.not.called;
 
-      windowMock.frameElement.appProxy = appProxy;
+      this.windowMock.frameElement.appProxy = this.appProxy;
       this.fakeClock.tick(15);
-      expect(service.appProxy).to.equal(appProxy);
+      expect(service.appProxy).to.equal(this.appProxy);
       expect(promiseResolveSpy).to.be.calledOnce;
     }
   );

@@ -72,7 +72,7 @@ describe('Integration | Component | query-builder/block-selector', function () {
       />`);
       await clickTrigger('.property-selector');
 
-      const indexProperties = this.get('indexProperties');
+      const indexProperties = this.indexProperties;
       const options = this.element.querySelectorAll('.ember-power-select-option');
       expect(options).to.have.length(indexProperties.length);
       indexProperties.mapBy('path').forEach((path, index) =>
@@ -137,7 +137,7 @@ describe('Integration | Component | query-builder/block-selector', function () {
       it(
         `calls "onBlockReplace" callback, when ${operatorNameUpper} operator in "surround" section has been clicked`,
         async function () {
-          const editBlock = this.get('editBlock');
+          const editBlock = this.editBlock;
           const replaceSpy = this.set('replaceSpy', sinon.spy());
 
           await render(hbs `<QueryBuilder::BlockSelector

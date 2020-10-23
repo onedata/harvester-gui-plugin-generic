@@ -29,7 +29,7 @@ describe('Unit | Service | configuration', function () {
   it(
     'sets configuration property to null after failure of reloadConfiguration() call',
     function () {
-      this.get('configRequestStub').rejects('error');
+      this.configRequestStub.rejects('error');
       const service = this.owner.lookup('service:configuration');
 
       // Set to sth non-null to check if reload failure will clear it out

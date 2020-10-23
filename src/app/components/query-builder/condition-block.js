@@ -107,7 +107,9 @@ export default class QueryBuilderConditionBlockComponent extends Component {
 
   @action
   finishEdit() {
-    if (!this.isEditComparatorValueValid) {
+    // Added mode === view check, to avoid double render errors, when removed input sends
+    // blur event
+    if (!this.isEditComparatorValueValid || this.mode === 'view') {
       return;
     }
 

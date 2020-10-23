@@ -10,7 +10,6 @@
  */
 
 import Service from '@ember/service';
-import { get } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { Promise, resolve } from 'rsvp';
 import { later } from '@ember/runloop';
@@ -107,7 +106,8 @@ export default class AppProxyService extends Service {
    * @returns {Object}
    */
   loadAppProxy() {
-    return this.appProxy = get(this.getWindow(), 'frameElement.appProxy') || null;
+    const window = this.getWindow();
+    return this.appProxy = window.frameElement && window.frameElement.appProxy || null;
   }
 
   /**

@@ -202,7 +202,7 @@ describe('Integration | Component | query-results', function () {
     it(
       `shows correct number of pages for a large results set (${paginationPosition} pagination control)`,
       async function () {
-        this.get('queryResults').totalResultsCount = 50;
+        this.queryResults.totalResultsCount = 50;
         await render(hbs `<QueryResults @queryResultsPromise={{this.queryResultsPromise}}/>`);
 
         const pagesCount = this.element.querySelectorAll(
@@ -215,7 +215,7 @@ describe('Integration | Component | query-results', function () {
     it(
       `notifies about page change (${paginationPosition} pagination control)`,
       async function () {
-        this.get('queryResults').totalResultsCount = 50;
+        this.queryResults.totalResultsCount = 50;
         const changeSpy = this.set('changeSpy', sinon.spy());
 
         await render(hbs `<QueryResults
@@ -279,7 +279,7 @@ describe('Integration | Component | query-results', function () {
     await selectChoose('.property-selector', 'c.d');
     const changeMatcher = sinon.match({
       direction: 'desc',
-      property: sinon.match.same(this.get('index').properties.c.properties.d),
+      property: sinon.match.same(this.index.properties.c.properties.d),
     });
     expect(changeSpy).to.be.calledOnce.and.to.be.calledWith(changeMatcher);
   });
@@ -297,7 +297,7 @@ describe('Integration | Component | query-results', function () {
     await selectChoose('.direction-selector', 'asc');
     const changeMatcher = sinon.match({
       direction: 'asc',
-      property: sinon.match.same(this.get('index').properties.a.properties.b),
+      property: sinon.match.same(this.index.properties.a.properties.b),
     });
     expect(changeSpy).to.be.calledOnce.and.to.be.calledWith(changeMatcher);
   });

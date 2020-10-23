@@ -247,6 +247,6 @@ describe('Integration | Component | query-results/result', function () {
     />`);
 
     expect(this.element.querySelector('.json-textarea').textContent.trim())
-      .to.equal(JSON.stringify(this.get('queryResult').source, null, 2));
+      .to.equal(JSON.stringify(this.queryResult.source, null, 2));
   });
 });

@@ -49,16 +49,15 @@ describe('Integration | Component | content-index', function () {
   });
 
   it('shows only spinner when index schema is being loaded', async function () {
-    const dataRequestStub = this.get('dataRequestStub');
-    dataRequestStub.resetBehavior();
-    dataRequestStub.returns(new Promise(() => {}));
+    this.dataRequestStub.resetBehavior();
+    this.dataRequestStub.returns(new Promise(() => {}));
 
     await render(hbs `<ContentIndex/>`);
 
     const componentChildren = this.element.querySelectorAll('.content-index > *');
     expect(componentChildren).to.have.length(1);
     expect(componentChildren[0]).to.have.class('spinner-display');
-    expect(dataRequestStub).to.be.calledOnce
+    expect(this.dataRequestStub).to.be.calledOnce
       .and.to.be.calledWith(sinon.match({
         method: 'get',
         indexName,
@@ -68,10 +67,11 @@ describe('Integration | Component | content-index', function () {
   });
 
   it('shows error when index schema cannot be loaded', async function () {
-    const dataRequestStub = this.get('dataRequestStub');
-    dataRequestStub.resetBehavior();
+    this.dataRequestStub.resetBehavior();
     let rejectDataRequest;
-    dataRequestStub.returns(new Promise((resolve, reject) => rejectDataRequest = reject));
+    this.dataRequestStub.returns(
+      new Promise((resolve, reject) => rejectDataRequest = reject)
+    );
 
     await render(hbs `<ContentIndex/>`);
     rejectDataRequest('indexError');
@@ -128,11 +128,9 @@ describe('Integration | Component | content-index', function () {
   );
 
   it('shows results of initial query', async function () {
-    const dataRequestStub = this.get('dataRequestStub');
-
     await render(hbs `<ContentIndex/>`);
 
-    expect(dataRequestStub).to.be.calledTwice.and.to.be.calledWith(sinon.match({
+    expect(this.dataRequestStub).to.be.calledTwice.and.to.be.calledWith(sinon.match({
       method: 'post',
       indexName,
       path: '_search',
@@ -146,10 +144,9 @@ describe('Integration | Component | content-index', function () {
   });
 
   it('shows results spinner while initial query is pending', async function () {
-    const dataRequestStub = this.get('dataRequestStub');
-    dataRequestStub.resetBehavior();
-    stubIndexMappingRequest(dataRequestStub);
-    dataRequestStub.returns(new Promise(() => {}));
+    this.dataRequestStub.resetBehavior();
+    stubIndexMappingRequest(this.dataRequestStub);
+    this.dataRequestStub.returns(new Promise(() => {}));
 
     await render(hbs `<ContentIndex/>`);
 
@@ -157,11 +154,10 @@ describe('Integration | Component | content-index', function () {
   });
 
   it('shows results error when initial query failed', async function () {
-    const dataRequestStub = this.get('dataRequestStub');
-    dataRequestStub.resetBehavior();
-    stubIndexMappingRequest(dataRequestStub);
+    this.dataRequestStub.resetBehavior();
+    stubIndexMappingRequest(this.dataRequestStub);
     let rejectQuery;
-    dataRequestStub.returns(new Promise((resolve, reject) => rejectQuery = reject));
+    this.dataRequestStub.returns(new Promise((resolve, reject) => rejectQuery = reject));
 
     await render(hbs `<ContentIndex/>`);
     rejectQuery('queryError');
@@ -174,11 +170,9 @@ describe('Integration | Component | content-index', function () {
   });
 
   it('allows to perform custom query with conditions', async function () {
-    const dataRequestStub = this.get('dataRequestStub');
-
     await render(hbs `<ContentIndex/>`);
-    dataRequestStub.resetBehavior();
-    dataRequestStub.resolves({
+    this.dataRequestStub.resetBehavior();
+    this.dataRequestStub.resolves({
       hits: {
         total: {
           value: 1,
@@ -198,23 +192,22 @@ describe('Integration | Component | content-index', function () {
     await click('.accept-condition');
     await click('.submit-query');
 
-    expect(dataRequestStub).to.be.calledThrice.and.to.be.calledWith(sinon.match({
+    expect(this.dataRequestStub).to.be.calledThrice.and.to.be.calledWith(sinon.match({
       method: 'post',
       indexName,
       path: '_search',
       body: '{"from":0,"size":10,"sort":[{"_score":"desc"}],"query":{"bool":{"must":[{"term":{"a.b":{"value":"true"}}}]}}}',
     }));
+
     expect(this.element.querySelectorAll('.query-results-result')).to.have.length(1);
     expect(this.element.querySelector('.result-sample').textContent.trim())
       .to.equal('a: {b: true}');
   });
 
   it('shows spinner while loading custom query with conditions', async function () {
-    const dataRequestStub = this.get('dataRequestStub');
-
     await render(hbs `<ContentIndex/>`);
-    dataRequestStub.resetBehavior();
-    dataRequestStub.returns(new Promise(() => {}));
+    this.dataRequestStub.resetBehavior();
+    this.dataRequestStub.returns(new Promise(() => {}));
     await click('.query-builder-block-adder');
     await selectChoose('.ember-attacher .property-selector', 'a.b');
     await click('.accept-condition');
@@ -225,12 +218,10 @@ describe('Integration | Component | content-index', function () {
   });
 
   it('shows loading error when custom query with conditions failed', async function () {
-    const dataRequestStub = this.get('dataRequestStub');
-
     await render(hbs `<ContentIndex/>`);
-    dataRequestStub.resetBehavior();
+    this.dataRequestStub.resetBehavior();
     let rejectQuery;
-    dataRequestStub.returns(new Promise((resolve, reject) => rejectQuery = reject));
+    this.dataRequestStub.returns(new Promise((resolve, reject) => rejectQuery = reject));
     await click('.query-builder-block-adder');
     await selectChoose('.ember-attacher .property-selector', 'a.b');
     await click('.accept-condition');
@@ -246,13 +237,11 @@ describe('Integration | Component | content-index', function () {
   });
 
   it('allows to change sorting of results', async function () {
-    const dataRequestStub = this.get('dataRequestStub');
-
     await render(hbs `<ContentIndex/>`);
     await selectChoose('.query-results-sort-selector .property-selector', 'a.b');
     await selectChoose('.query-results-sort-selector .direction-selector', 'asc');
 
-    expect(dataRequestStub).to.have.callCount(4)
+    expect(this.dataRequestStub).to.have.callCount(4)
       .and.to.be.calledWith(sinon.match({
         method: 'post',
         indexName,
@@ -276,12 +265,10 @@ describe('Integration | Component | content-index', function () {
   });
 
   it('allows to change results page', async function () {
-    const dataRequestStub = this.get('dataRequestStub');
-
     await render(hbs `<ContentIndex/>`);
     await click('.next-page');
 
-    expect(dataRequestStub).to.be.calledThrice
+    expect(this.dataRequestStub).to.be.calledThrice
       .and.to.be.calledWith(sinon.match({
         method: 'post',
         indexName,
@@ -292,12 +279,10 @@ describe('Integration | Component | content-index', function () {
   });
 
   it('allows to change results page size', async function () {
-    const dataRequestStub = this.get('dataRequestStub');
-
     await render(hbs `<ContentIndex/>`);
     await selectChoose('.page-size-selector', '25');
 
-    expect(dataRequestStub).to.be.calledThrice
+    expect(this.dataRequestStub).to.be.calledThrice
       .and.to.be.calledWith(sinon.match({
         method: 'post',
         indexName,
@@ -309,13 +294,11 @@ describe('Integration | Component | content-index', function () {
   });
 
   it('resets page number on results page size change', async function () {
-    const dataRequestStub = this.get('dataRequestStub');
-
     await render(hbs `<ContentIndex/>`);
     await click('.next-page');
     await selectChoose('.page-size-selector', '25');
 
-    expect(dataRequestStub).to.have.callCount(4)
+    expect(this.dataRequestStub).to.have.callCount(4)
       .and.to.be.calledWith(sinon.match({
         method: 'post',
         indexName,
@@ -326,13 +309,11 @@ describe('Integration | Component | content-index', function () {
   });
 
   it('resets page number on sort property change', async function () {
-    const dataRequestStub = this.get('dataRequestStub');
-
     await render(hbs `<ContentIndex/>`);
     await click('.next-page');
     await selectChoose('.query-results-sort-selector .property-selector', 'a.b');
 
-    expect(dataRequestStub).to.have.callCount(4)
+    expect(this.dataRequestStub).to.have.callCount(4)
       .and.to.be.calledWith(sinon.match({
         method: 'post',
         indexName,
@@ -343,13 +324,11 @@ describe('Integration | Component | content-index', function () {
   });
 
   it('resets page number on sort direction change', async function () {
-    const dataRequestStub = this.get('dataRequestStub');
-
     await render(hbs `<ContentIndex/>`);
     await click('.next-page');
     await selectChoose('.query-results-sort-selector .direction-selector', 'asc');
 
-    expect(dataRequestStub).to.have.callCount(4)
+    expect(this.dataRequestStub).to.have.callCount(4)
       .and.to.be.calledWith(sinon.match({
         method: 'post',
         indexName,
@@ -362,8 +341,6 @@ describe('Integration | Component | content-index', function () {
   it(
     'generates curl command with custom conditions, sorting and filtered properties',
     async function () {
-      const dataCurlCommandRequestStub = this.get('dataCurlCommandRequestStub');
-
       await render(hbs `<ContentIndex/>`);
       await click('.query-builder-block-adder');
       await selectChoose('.ember-attacher .property-selector', 'a.b');
@@ -380,7 +357,7 @@ describe('Integration | Component | content-index', function () {
 
       expect(this.element.querySelector('.copy-textarea').textContent.trim())
         .to.equal('curl');
-      expect(dataCurlCommandRequestStub).to.be.calledOnce
+      expect(this.dataCurlCommandRequestStub).to.be.calledOnce
         .and.to.be.calledWith(sinon.match({
           method: 'post',
           indexName,
