@@ -3,7 +3,7 @@ import { describe, context, it } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
 import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
-import { click, fillIn } from '@ember/test-helpers';
+import { click, fillIn, blur } from '@ember/test-helpers';
 import AndOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/and-operator-query-block';
 import OrOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/or-operator-query-block';
 import NotOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/not-operator-query-block';
@@ -364,7 +364,7 @@ describe('Integration | Component | query-builder/operator-block', function () {
 
           await blur('.comparator-value');
           expect(editionStartSpy).to.be.calledOnce;
-          expect(editionEndSpy).to.not.calledOnce.and.to.be.calledWith(condition);
+          expect(editionEndSpy).to.be.calledOnce.and.to.be.calledWith(condition);
           expect(editionValidityChangeSpy).to.be.calledOnce;
         }
       );

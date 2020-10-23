@@ -11,13 +11,18 @@
     "test": "tests"
   },
   "scripts": {
-    "build": "ember build --environment=production",
+    "build": "ember build --environment=production --output-path=../rel",
+    "build:dev": "ember build --environment=development  --output-path=../rel",
+    "build-plugin": "npm run build && tar -czf ../plugin.tar.gz ../rel",
+    "build-plugin:dev": "npm run build:dev && tar -czf ../plugin.tar.gz ../rel",
     "lint:hbs": "ember-template-lint .",
     "lint:js": "eslint .",
     "start": "ember serve",
-    "test": "ember test",
     "deps": "npm install --no-package-lock",
-    "clean": "rm -rf tmp dist rel node_modules .sass-cache"
+    "clean": "rm -rf node_modules dist tmp ../rel ../plugin.tar.gz",
+    "test": "ember test",
+    "test:xvfb": "xvfb-run --server-args=\"-screen 0, 1366x768x24\" ember test",
+    "test:xvfb-xunit-output": "xvfb-run --server-args=\"-screen 0, 1366x768x24\" ember test -r xunit"
   },
   "devDependencies": {
     "@ember/optional-features": "1.3.0",
