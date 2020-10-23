@@ -2,7 +2,7 @@ SRC_DIR	 ?= src
 REL_DIR	 ?= rel
 XVFB_ARGS ?= --server-args="-screen 0, 1366x768x24"
 
-.PHONY: deps build_dev build_prod build_plugin_dev build_plugin_prod doc clean test test_xunit_output submodules
+.PHONY: deps build_dev build_prod build_plugin_dev build_plugin_prod doc clean test test_xvfb test_xvfb_xunit_output submodules
 
 all: build_dev
 
@@ -23,16 +23,16 @@ build_plugin_dev: build_dev
 build_plugin_prod: build_prod
 	tar -czf plugin.tar.gz $(REL_DIR)
 
-doc:
-	jsdoc -c $(SRC_DIR)/.jsdoc.conf $(SRC_DIR)/app
-
 clean:
 	cd $(SRC_DIR) && rm -rf node_modules dist tmp ../$(REL_DIR)/*
 
 test: deps
-	cd $(SRC_DIR) && xvfb-run ember test
+	cd $(SRC_DIR) && ember test
 
-test_xunit_output: deps
+test_xvfb: deps
+	cd $(SRC_DIR) && xvfb-run $(XVFB_ARGS) ember test
+
+test_xvfb_xunit_output: deps
 	cd $(SRC_DIR) && xvfb-run $(XVFB_ARGS) ember test -r xunit
 
 ##
