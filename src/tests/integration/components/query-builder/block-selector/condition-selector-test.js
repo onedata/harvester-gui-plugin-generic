@@ -264,17 +264,22 @@ describe(
           @indexProperties={{this.indexProperties}}
         />`);
         await selectChoose('.property-selector', propertyName);
-        await clickTrigger('.comparator-selector');
+        if (comparators.length > 1) {
+          await clickTrigger('.comparator-selector');
 
-        const options = this.element.querySelectorAll('.ember-power-select-option');
-        expect(options).to.have.length(comparators.length);
-        comparators.forEach(({ comparator }, index) =>
-          expect(options[index].textContent.trim())
-          .to.equal(comparatorTranslations[comparator])
-        );
-        expect(this.element.querySelector(
-          '.comparator-selector .ember-power-select-selected-item'
-        ).textContent.trim()).to.equal(comparatorTranslations[defaultComparator]);
+          const options = this.element.querySelectorAll('.ember-power-select-option');
+          expect(options).to.have.length(comparators.length);
+          comparators.forEach(({ comparator }, index) =>
+            expect(options[index].textContent.trim())
+            .to.equal(comparatorTranslations[comparator])
+          );
+          expect(this.element.querySelector(
+            '.comparator-selector .ember-power-select-selected-item'
+          ).textContent.trim()).to.equal(comparatorTranslations[defaultComparator]);
+        } else {
+          expect(this.element.querySelector('.comparator-selector').textContent.trim())
+            .to.equal(comparatorTranslations[comparators[0].comparator]);
+        }
       });
 
       comparators.forEach(({
@@ -296,10 +301,12 @@ describe(
             />`);
 
             await selectChoose('.property-selector', propertyName);
-            await selectChoose(
-              '.comparator-selector',
-              comparatorTranslations[comparator]
-            );
+            if (comparators.length > 1) {
+              await selectChoose(
+                '.comparator-selector',
+                comparatorTranslations[comparator]
+              );
+            }
             await inputValueCallback();
             await click('.accept-condition');
 

@@ -19,16 +19,22 @@
   <div class="comparator-main-container">
     {{#if this.comparators.length}}
       <div class="form-group form-group-no-shrink">
-        <PowerSelect
-          @options={{this.comparators}}
-          @selected={{this.selectedConditionComparator}}
-          @onChange={{this.conditionComparatorChanged}}
-          @renderInPlace={{true}}
-          class="comparator-selector"
-          as |comparator|
-        >
-          {{tt this (concat "comparators." comparator)}}
-        </PowerSelect>
+        {{#if (gt this.comparators.length 1)}}
+          <PowerSelect
+            @options={{this.comparators}}
+            @selected={{this.selectedConditionComparator}}
+            @onChange={{this.conditionComparatorChanged}}
+            @renderInPlace={{true}}
+            class="comparator-selector"
+            as |comparator|
+          >
+            {{tt this (concat "comparators." comparator)}}
+          </PowerSelect>
+        {{else}}
+          <span class="comparator-selector">
+            {{tt this (concat "comparators." this.comparators.[0])}}
+          </span>
+        {{/if}}
       </div>
     {{/if}}
     <QueryBuilder::ConditionComparatorValueEditor
