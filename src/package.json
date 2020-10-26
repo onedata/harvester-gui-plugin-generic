@@ -1,11 +1,11 @@
 {
   "name": "harvester-gui-plugin-generic",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "private": true,
   "description": "Default harvester GUI plugin for Onezone",
   "repository": "",
   "license": "MIT",
-  "author": "",
+  "author": "Michał Borzęcki",
   "directories": {
     "doc": "doc",
     "test": "tests"
