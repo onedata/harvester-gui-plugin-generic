@@ -26,7 +26,23 @@ describe('Integration | Component | query-builder/block-adder', function () {
     expect(isVisible('.ember-attacher')).to.be.true;
     expect(this.element.querySelector('.ember-attacher .query-builder-block-selector'))
       .to.exist;
+    expect(this.element.querySelector('.ember-attacher .condition-selector'))
+      .to.exist;
   });
+
+  it(
+    'shows block selector without condition selector when clicked and "hideConditionCreation" is true',
+    async function () {
+      await render(hbs `<QueryBuilder::BlockAdder @hideConditionCreation={{true}} />`);
+
+      await click('.query-builder-block-adder');
+      expect(isVisible('.ember-attacher')).to.be.true;
+      expect(this.element.querySelector('.ember-attacher .query-builder-block-selector'))
+        .to.exist;
+      expect(this.element.querySelector('.ember-attacher .condition-selector'))
+        .to.not.exist;
+    }
+  );
 
   it('passess through information about selected operator', async function () {
     const addSpy = this.set('addSpy', sinon.spy());

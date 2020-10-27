@@ -51,6 +51,12 @@
     }
   }
 
+  .query-builder-block-visualiser {
+    + .query-builder-block-adder {
+      margin-left: $spacer * 0.4;
+    }
+  }
+
   .block-label {
     font-size: 80%;
     text-transform: uppercase;

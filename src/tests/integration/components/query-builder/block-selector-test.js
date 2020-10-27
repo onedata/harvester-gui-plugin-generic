@@ -103,6 +103,18 @@ describe('Integration | Component | query-builder/block-selector', function () {
       }
     );
 
+    it(
+      'does not render condition selector when "hideConditionCreation" is true',
+      async function () {
+        await render(hbs `<QueryBuilder::BlockSelector
+          @mode="create"
+          @hideConditionCreation={{true}}
+        />`);
+
+        expect(this.element.querySelector('.condition-selector')).to.not.exist;
+      }
+    );
+
     it('does not render edit-specific sections', async function () {
       await render(hbs `<QueryBuilder::BlockSelector @mode="create"/>`);
 

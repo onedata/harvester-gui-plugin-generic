@@ -180,10 +180,10 @@ describe('Integration | Component | query-builder/operator-block', function () {
             expect(this.element.querySelectorAll(
               '.query-builder-block .query-builder-block'
             )).to.have.length(1);
-            // 1 adder...
+            // 1 adder... (or 2 if operator is "root")
             expect(this.element.querySelectorAll('.query-builder-block-adder'))
-              .to.have.length(1);
-            // ... but from operand, not parent block
+              .to.have.length(operatorName === 'root' ? 2 : 1);
+            // ... where 1 is from operand
             expect(this.element.querySelectorAll(
               '.query-builder-block .query-builder-block .query-builder-block-adder'
             )).to.exist;
@@ -204,10 +204,10 @@ describe('Integration | Component | query-builder/operator-block', function () {
           expect(this.element.querySelectorAll(
             '.query-builder-block .query-builder-block'
           )).to.have.length(1);
-          // 1 adder...
+          // 1 adder... (or 2 if operator is "root")
           expect(this.element.querySelectorAll('.query-builder-block-adder'))
-            .to.have.length(1);
-          // ... but from operand, not parent block
+            .to.have.length(operatorName === 'root' ? 2 : 1);
+          // ... where 1 is from operand
           expect(this.element.querySelectorAll(
             '.query-builder-block .query-builder-block .query-builder-block-adder'
           )).to.exist;
@@ -225,6 +225,42 @@ describe('Integration | Component | query-builder/operator-block', function () {
 
             expect(this.element.querySelector('.block-prefix-label')).to.not.exist;
           });
+
+          it(
+            'allows to surround existing operand with an operator via block-adder',
+            async function () {
+              const queryBlock =
+                this.set('queryBlock', new operatorBlockClasses[operatorName]());
+
+              await render(hbs `
+                <QueryBuilder::OperatorBlock @queryBlock={{this.queryBlock}} />
+              `);
+              await click('.query-builder-block-adder');
+              await click('.ember-attacher .operator-not');
+              await click('.query-builder-block-adder.surround-root');
+
+              expect(this.element.querySelector('.ember-attacher .condition-selector'))
+                .to.not.exist;
+
+              await click('.ember-attacher .operator-and');
+
+              expect(this.element.querySelectorAll('.query-builder-block'))
+                .to.have.length(3);
+              const surroundingBlock =
+                this.element.querySelector('.query-builder-block .query-builder-block');
+              expect(surroundingBlock).to.have.class('and-operator-block');
+              const innerBlock = this.element.querySelector(
+                '.query-builder-block .query-builder-block .query-builder-block'
+              );
+              expect(innerBlock).to.have.class('not-operator-block');
+              expect(queryBlock.operands[0]).to.be.an.instanceOf(AndOperatorQueryBlock);
+              expect(queryBlock.operands[0].operands[0])
+                .to.be.an.instanceOf(NotOperatorQueryBlock);
+              expect(
+                this.element.querySelector('.query-builder-block-adder.surround-root')
+              ).to.exist;
+            }
+          );
         } else {
           it('shows operator name', async function () {
             this.set('queryBlock', new operatorBlockClasses[operatorName]());

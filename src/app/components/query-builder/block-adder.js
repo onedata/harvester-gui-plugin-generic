@@ -11,8 +11,9 @@ import Component from '@glimmer/component';
 import { action } from '@ember/object';
 
 /**
- * @argument {Array<IndexProperty>} indexProperties
+ * @argument {Array<IndexProperty>} [indexProperties]
  * @argument {Function} onBlockAdd
+ * @argument {Boolean} [hideConditionCreation]
  */
 export default class QueryBuilderBlockAdderComponent extends Component {
   /**
@@ -21,6 +22,13 @@ export default class QueryBuilderBlockAdderComponent extends Component {
    */
   get onBlockAdd() {
     return this.args.onBlockAdd || (() => {});
+  }
+
+  /**
+   * @type {Boolean}
+   */
+  get hideConditionCreation() {
+    return Boolean(this.args.hideConditionCreation);
   }
 
   /**

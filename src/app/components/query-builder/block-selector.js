@@ -26,7 +26,8 @@ const operatorClasses = {
 
 /**
  * @argument {String} [mode]
- * @argument {Array<IndexProperty>} indexProperties
+ * @argument {Array<IndexProperty>} [indexProperties]
+ * @argument {Boolean} [hideConditionCreation]
  * @argument {Utils.QueryBlock} editBlock
  * @argument {Function} onBlockAdd
  * @argument {Function} onBlockReplace
@@ -47,6 +48,10 @@ export default class QueryBuilderBlockSelectorComponent extends Component {
    */
   get mode() {
     return this.allowedModes.includes(this.args.mode) ? this.args.mode : allowedModes[0];
+  }
+
+  get hideConditionCreation() {
+    return Boolean(this.args.hideConditionCreation);
   }
 
   /**

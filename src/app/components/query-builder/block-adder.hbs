@@ -16,6 +16,7 @@
   >
     <QueryBuilder::BlockSelector
       @mode="create"
+      @hideConditionCreation={{this.hideConditionCreation}}
       @indexProperties={{@indexProperties}}
       @onBlockAdd={{fn this.addBlock popover.hide}}
     />
