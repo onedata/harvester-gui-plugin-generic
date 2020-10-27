@@ -36,14 +36,14 @@
           </span>
         {{/if}}
       </div>
+      <QueryBuilder::ConditionComparatorValueEditor
+        @mode="create"
+        @comparator={{this.selectedConditionComparator}}
+        @value={{this.conditionComparatorValue}}
+        @onValueChange={{this.conditionComparatorValueChanged}}
+        class="form-group-fill-line"
+      />
     {{/if}}
-    <QueryBuilder::ConditionComparatorValueEditor
-      @mode="create"
-      @comparator={{this.selectedConditionComparator}}
-      @value={{this.conditionComparatorValue}}
-      @onValueChange={{this.conditionComparatorValueChanged}}
-      class="form-group-fill-line"
-    />
   </div>
   <div class="form-group-whole-line">
     <BsButton

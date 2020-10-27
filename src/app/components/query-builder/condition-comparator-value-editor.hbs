@@ -1,4 +1,12 @@
-{{#if (or (eq this.mode "create") (eq this.mode "edit"))}}
+{{#if (eq this.mode "view")}}
+  <span
+    class="comparator-value comparator-value-view"
+    {{on "click" this.onStartEdit}}
+    ...attributes
+  >
+    {{this.viewModeComparatorValue}}
+  </span>
+{{else}}
   <div class="form-group comparator-value-editor {{this.comparatorEditor.type}}-editor" ...attributes>
     {{#if (or
       (eq this.comparatorEditor.type "dropdown")
@@ -81,13 +89,5 @@
       </div>
     {{/if}}
   </div>
-{{else}}
-  <span
-    class="comparator-value comparator-value-view"
-    {{on "click" this.onStartEdit}}
-    ...attributes
-  >
-    {{this.viewModeComparatorValue}}
-  </span>
 {{/if}}
 {{yield}}

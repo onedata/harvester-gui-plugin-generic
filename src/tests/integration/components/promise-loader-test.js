@@ -83,4 +83,42 @@ describe('Integration | Component | promise-loader', function () {
 
     expect(spy).to.be.calledOnce.and.to.be.calledWith('test');
   });
+
+  it('allows to use custom template for "pending" promise state', async function () {
+    this.set('promise', new Promise(() => {}));
+    await render(hbs `
+      <PromiseLoader
+        @promise={{this.promise}}
+        @useCustomPending={{true}}
+        as |result state|
+      >
+        {{#if (eq state "pending")}}
+          <div class="loading-test"></div>
+        {{/if}}
+      </PromiseLoader>
+    `);
+
+    expect(this.element.querySelector('.loading-test')).to.exist;
+  });
+
+  it('allows to use custom template for "rejected" promise state', async function () {
+    let rejectCallback;
+    this.set('promise', new Promise((resolve, reject) => rejectCallback = reject));
+
+    await render(hbs `
+      <PromiseLoader
+        @promise={{this.promise}}
+        @useCustomRejected={{true}}
+        as |result state|
+      >
+        {{#if (eq state "rejected")}}
+          <div class="error-test"></div>
+        {{/if}}
+      </PromiseLoader>
+    `);
+    rejectCallback('test');
+    await settled();
+
+    expect(this.element.querySelector('.error-test')).to.exist;
+  });
 });

@@ -16,6 +16,8 @@ import { next } from '@ember/runloop';
 import { inject as service } from '@ember/service';
 import { defaultComparatorEditors } from 'harvester-gui-plugin-generic/utils/query-builder/condition-comparator-editors';
 
+const possibleModes = ['view', 'edit', 'create'];
+
 /**
  * @argument {String} [mode]
  * @argument {String} comparator
@@ -50,7 +52,7 @@ extends Component {
    * @type {String}
    */
   get mode() {
-    return this.args.mode || 'view';
+    return possibleModes.includes(this.args.mode) ? this.args.mode : 'view';
   }
 
   /**

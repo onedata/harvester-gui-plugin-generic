@@ -6,7 +6,7 @@ import hbs from 'htmlbars-inline-precompile';
 import QueryResults from 'harvester-gui-plugin-generic/utils/query-results';
 import { click } from '@ember/test-helpers';
 import { selectChoose } from 'ember-power-select/test-support/helpers';
-import { all as allFulfilled, resolve } from 'rsvp';
+import { all as allFulfilled, resolve, Promise } from 'rsvp';
 import sinon from 'sinon';
 import Index from 'harvester-gui-plugin-generic/utils/index';
 
@@ -85,6 +85,31 @@ describe('Integration | Component | query-results', function () {
     expect(results).to.have.length(2);
     expect(results[0].textContent).to.contain('anotherText');
     expect(results[1].textContent).to.contain('someText2');
+  });
+
+  it(
+    'shows "loading" placeholder view when query results are loading',
+    async function () {
+      this.set('queryResultsPromise', new Promise(() => {}));
+
+      await render(hbs `<QueryResults @queryResultsPromise={{this.queryResultsPromise}}/>`);
+
+      expect(this.element.querySelector('.query-results-placeholder'))
+        .to.have.class('mode-loading');
+    }
+  );
+
+  it('shows "empty" placeholder view when query results are empty', async function () {
+    this.set('queryResultsPromise', resolve(new QueryResults({
+      hits: {
+        hits: [],
+      },
+    })));
+
+    await render(hbs `<QueryResults @queryResultsPromise={{this.queryResultsPromise}}/>`);
+
+    expect(this.element.querySelector('.query-results-placeholder'))
+      .to.have.class('mode-empty');
   });
 
   it('filters properties', async function () {
