@@ -35,7 +35,7 @@ describe('Integration | Component | query-builder/block-visualiser', function ()
   it(
     'renders condition block according to the passed block spec',
     async function () {
-      this.set('block', new ConditionQueryBlock());
+      this.set('block', new ConditionQueryBlock({ path: 'a' }, 'boolean.is', 'true'));
 
       await render(hbs `<QueryBuilder::BlockVisualiser @queryBlock={{this.block}} />`);
 

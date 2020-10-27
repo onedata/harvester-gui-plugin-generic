@@ -8,8 +8,33 @@
   }
 
   h1 {
-    font-size: 100%;
+    font-size: 110%;
     font-weight: bold;
+    margin-bottom: $spacer * 0.8;
+  }
+
+  .or-line {
+    display: flex;
+    align-items: center;
+    margin: $spacer * 0.5 0;
+    color: $gray-600;
+    font-size: 110%;
+
+    &::before,
+    &::after {
+      content: '';
+      border-top: 1px solid $input-border-color;
+      flex-grow: 1;
+      margin-top: 0.1em;
+    }
+
+    &::before {
+      margin-right: $spacer * 0.5;
+    }
+
+    &::after {
+      margin-left: $spacer * 0.5;
+    }
   }
 
   .btn, .form-control {
@@ -65,13 +90,15 @@
 
   .form-group-whole-line {
     flex-basis: 100%;
-    justify-content: flex-start;
   }
 
   .form-group-fill-line {
     margin-left: $spacer * 0.5;
     flex-grow: 1;
-    justify-content: flex-start;
+  }
+
+  .condition-selector > .form-group:last-child {
+    margin-bottom: 0;
   }
 
   .date-editor {
@@ -87,9 +114,5 @@
 
   .flatpickr-wrapper {
     width: 100%;
-  }
-
-  .accept-condition {
-    display: block;
   }
 }

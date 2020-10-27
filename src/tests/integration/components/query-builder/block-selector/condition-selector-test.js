@@ -226,12 +226,12 @@ describe(
       expect(options[0].textContent.trim()).to.equal('boolProp');
     });
 
-    it('blocks "Add" button when no property is selected', async function () {
+    it('hides "Add" button when no property is selected', async function () {
       await render(hbs `<QueryBuilder::BlockSelector::ConditionSelector
         @indexProperties={{this.indexProperties}}
       />`);
 
-      expect(this.element.querySelector('.accept-condition')).to.have.attr('disabled');
+      expect(this.element.querySelector('.accept-condition')).to.not.exist;
     });
 
     it('does not show comparator selector on init', async function () {

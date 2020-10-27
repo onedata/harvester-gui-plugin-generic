@@ -38,6 +38,20 @@
     }
   }
 
+  .query-builder-block-visualiser.has-open-settings {
+    > .query-builder-block {
+      background: repeating-linear-gradient(
+        135deg,
+        darken($color-light-blue, 3%),
+        darken($color-light-blue, 3%) 4px,
+        darken($color-light-blue, 8%) 4px,
+        darken($color-light-blue, 8%) 8px
+      );
+      // background-color: darken($color-light-blue, 10%);
+      border: 1px solid darken($color-light-blue, 30%);
+    }
+  }
+
   .block-label {
     font-size: 80%;
     text-transform: uppercase;
