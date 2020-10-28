@@ -9,7 +9,11 @@
     <span class="left-col-icon">
       <FaIcon @icon="external-link-alt"/>
     </span>
-    {{tt this "goToFileLink" fileName=@queryResult.fileName}}
+    {{#if @queryResult.fileName}}
+      {{tt this "goToFileLink" fileName=@queryResult.fileName}}
+    {{else}}
+      {{tt this "goToFileLinkWithoutName"}}
+    {{/if}}
   </a> |
   <OneCopyButton
     @value={{@queryResult.fileId}}

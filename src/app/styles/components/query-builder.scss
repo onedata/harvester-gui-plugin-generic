@@ -10,6 +10,7 @@
     flex-basis: 100%;
     min-width: 0;
     margin-right: $spacer * 0.5;
+    padding: ($input-padding-y - $spacer * 0.3) ($input-padding-x - $spacer * 0.2);
   }
 
   .query-builder-block {
@@ -18,16 +19,16 @@
     align-items: center;
     flex-wrap: wrap;
     min-width: 0;
-    padding: 0 $spacer * 0.1;
+    padding: $spacer * 0.3 $spacer * 0.1 0 $spacer * 0.1;
 
     &:not(.root-block) {
       background-color: $color-light-blue;
       border: 1px solid darken($color-light-blue, 20%);
       border-radius: $input-border-radius-sm;
+    }
 
-      > * {
-        margin: $spacer * 0.3 $spacer * 0.2;
-      }
+    > * {
+      margin: 0 $spacer * 0.2 $spacer * 0.3 $spacer * 0.2;
     }
   }
 
@@ -51,12 +52,6 @@
     }
   }
 
-  .query-builder-block-visualiser {
-    + .query-builder-block-adder {
-      margin-left: $spacer * 0.4;
-    }
-  }
-
   .block-label {
     font-size: 80%;
     text-transform: uppercase;
@@ -64,11 +59,11 @@
   }
 
   .block-prefix-label {
-    margin-right: $spacer * 0.2;
+    margin-right: $spacer * 0.3 $spacer * 0.2 $spacer * 0.2 0;
   }
 
   .block-infix-label {
-    margin: 0 $spacer * 0.2;
+    margin: 0 $spacer * 0.2 $spacer * 0.3 $spacer * 0.2;
   }
 
   .property-path, .comparator, .comparator-value {

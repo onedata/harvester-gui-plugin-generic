@@ -68,6 +68,20 @@ describe('Integration | Component | query-results/result', function () {
     expect(linkNode).to.have.attr('href', 'fileUrl');
   });
 
+  it(
+    'shows "Go to file" link without file name, when name is not available',
+    async function () {
+      this.queryResult.fileName = undefined;
+
+      await render(hbs `<QueryResults::Result @queryResult={{this.queryResult}}/>`);
+
+      const linkNode = this.element.querySelector('.go-to-file-link');
+      expect(linkNode).to.exist;
+      expect(linkNode.textContent.trim()).to.equal('Go to source file');
+      expect(linkNode).to.have.attr('href', 'fileUrl');
+    }
+  );
+
   it('has copy button with file id', async function () {
     await render(hbs `<QueryResults::Result @queryResult={{this.queryResult}}/>`);
 

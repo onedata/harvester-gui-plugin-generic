@@ -21,6 +21,8 @@
 
     .comparator {
       margin-right: $spacer * 0.2;
+      flex-shrink: 0;
+      white-space: nowrap;
     }
 
     .property-path,
