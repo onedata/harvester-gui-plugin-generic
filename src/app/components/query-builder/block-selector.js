@@ -28,9 +28,10 @@ const operatorClasses = {
  * @argument {String} [mode]
  * @argument {Array<IndexProperty>} [indexProperties]
  * @argument {Boolean} [hideConditionCreation]
- * @argument {Utils.QueryBlock} editBlock
- * @argument {Function} onBlockAdd
- * @argument {Function} onBlockReplace
+ * @argument {Utils.QueryBlock} [editBlock]
+ * @argument {Utils.OperatorQueryBlock} [editParentBlock]
+ * @argument {Function} [onBlockAdd]
+ * @argument {Function} [onBlockReplace]
  */
 export default class QueryBuilderBlockSelectorComponent extends Component {
   /**
@@ -51,7 +52,7 @@ export default class QueryBuilderBlockSelectorComponent extends Component {
   }
 
   get hideConditionCreation() {
-    return Boolean(this.args.hideConditionCreation);
+    return this.mode === 'edit' || Boolean(this.args.hideConditionCreation);
   }
 
   /**
@@ -59,6 +60,13 @@ export default class QueryBuilderBlockSelectorComponent extends Component {
    */
   get editBlock() {
     return this.args.editBlock || null;
+  }
+
+  /**
+   * @type {Utils.QueryBuilder.OperatorQueryBlock}
+   */
+  get editParentBlock() {
+    return this.args.editParentBlock || null;
   }
 
   /**
@@ -92,15 +100,29 @@ export default class QueryBuilderBlockSelectorComponent extends Component {
     const operatorNames = Object.keys(operatorClasses);
 
     if (!this.editBlock) {
-      return operatorNames;
+      return [...operatorNames, 'none'];
     }
 
     const editBlockOperator = this.editBlock.operator;
     const editBlockOperandsCount = this.editBlock.operands.length;
-    return operatorNames.filter((operatorName) => {
+    const disabledOperators = operatorNames.filter((operatorName) => {
       return operatorName === editBlockOperator ||
         operatorClasses[operatorName].maxOperandsNumber < editBlockOperandsCount;
     });
+
+    const parentBlockMaxOperands = this.editParentBlock &&
+      this.editParentBlock.constructor.maxOperandsNumber;
+    const parentBlockOperandsCount = this.editParentBlock &&
+      this.editParentBlock.operands.length;
+    if (
+      !this.editParentBlock ||
+      !(this.editBlock instanceof OperatorQueryBlock) ||
+      parentBlockMaxOperands < (parentBlockOperandsCount - 1) + editBlockOperandsCount
+    ) {
+      disabledOperators.push('none');
+    }
+
+    return disabledOperators;
   }
 
   /**
@@ -131,7 +153,7 @@ export default class QueryBuilderBlockSelectorComponent extends Component {
       return;
     }
 
-    this.onBlockReplace(this.createOperatorBlock(operatorName, [this.editBlock]));
+    this.onBlockReplace([this.createOperatorBlock(operatorName, [this.editBlock])]);
   }
 
   /**
@@ -143,10 +165,14 @@ export default class QueryBuilderBlockSelectorComponent extends Component {
       return;
     }
 
-    this.onBlockReplace(this.createOperatorBlock(
-      operatorName,
-      this.editBlock.operands
-    ));
+    if (operatorName === 'none') {
+      this.onBlockReplace(this.editBlock.operands);
+    } else {
+      this.onBlockReplace([this.createOperatorBlock(
+        operatorName,
+        this.editBlock.operands
+      )]);
+    }
   }
 
   /**

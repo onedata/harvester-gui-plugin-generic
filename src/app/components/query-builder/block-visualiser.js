@@ -13,7 +13,8 @@ import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 
 /**
- * @argument {Utils.QueryBuilder.ConditionQueryBlock} queryBlock
+ * @argument {Utils.QueryBuilder.QueryBlock} queryBlock
+ * @argument {Utils.QueryBuilder.OperatorQueryBlock} parentQueryBlock
  * @argument {Array<IndexProperty>} indexProperties
  * @argument {Function} onConditionEditionStart
  * @argument {Function} onConditionEditionEnd

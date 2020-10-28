@@ -2,3 +2,6 @@ operators:
   and: 'and'
   or: 'or'
   not: 'not'
+  none: 'none'
+operatorTips:
+  none: 'Will move nested expressions to a parent operator.'

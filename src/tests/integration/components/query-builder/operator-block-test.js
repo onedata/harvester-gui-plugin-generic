@@ -356,6 +356,89 @@ describe('Integration | Component | query-builder/operator-block', function () {
       });
 
       it(
+        'removes nested NOT operator (with no children) from parent operator when using "change to" "NONE"',
+        async function () {
+          const queryBlock =
+            this.set('queryBlock', new operatorBlockClasses[operatorName]());
+
+          await render(hbs `<QueryBuilder::OperatorBlock
+            @queryBlock={{this.queryBlock}}
+          />`);
+          await click('.query-builder-block-adder');
+          await click('.ember-attacher .operator-not');
+          await click('.query-builder-block-visualiser');
+          await click('.ember-attacher .change-to-section .operator-none');
+
+          const blocks = this.element.querySelectorAll('.query-builder-block');
+          expect(blocks).to.have.length(1);
+          expect(blocks[0]).to.have.class(`${operatorName}-operator-block`);
+          expect(queryBlock.operands).to.have.length(0);
+        }
+      );
+
+      it(
+        'extracts nested NOT operator (with single child) to parent operator when using "change to" "NONE"',
+        async function () {
+          const queryBlock =
+            this.set('queryBlock', new operatorBlockClasses[operatorName]());
+
+          await render(hbs `<QueryBuilder::OperatorBlock
+            @queryBlock={{this.queryBlock}}
+          />`);
+          await click('.query-builder-block-adder');
+          await click('.ember-attacher .operator-not');
+          await click('.query-builder-block-adder');
+          await click('.ember-attacher .operator-and');
+          await click('.query-builder-block-visualiser');
+          await click('.ember-attacher .change-to-section .operator-none');
+
+          const blocks = this.element.querySelectorAll('.query-builder-block');
+          expect(blocks).to.have.length(2);
+          expect(blocks[0]).to.have.class(`${operatorName}-operator-block`);
+          expect(blocks[1]).to.have.class('and-operator-block');
+          expect(queryBlock.operands).to.have.length(1);
+          expect(queryBlock.operands[0]).to.be.an.instanceOf(AndOperatorQueryBlock);
+          expect(queryBlock.operands[0].operands).to.have.length(0);
+        }
+      );
+
+      it(
+        `${isMultiOperandOperator ? 'extracts' : 'does not allow to extract' } nested AND operator (with two child) to parent operator when using "change to" "NONE"`,
+        async function () {
+          const queryBlock =
+            this.set('queryBlock', new operatorBlockClasses[operatorName]());
+
+          await render(hbs `<QueryBuilder::OperatorBlock
+            @queryBlock={{this.queryBlock}}
+          />`);
+          await click('.query-builder-block-adder');
+          await click('.ember-attacher .operator-and');
+          await click('.query-builder-block-adder');
+          await click('.ember-attacher .operator-not');
+          await click('.and-operator-block > .query-builder-block-adder');
+          await click('.ember-attacher .operator-not');
+          await click('.query-builder-block-visualiser');
+
+          if (isMultiOperandOperator) {
+            await click('.ember-attacher .change-to-section .operator-none');
+
+            const blocks = this.element.querySelectorAll('.query-builder-block');
+            expect(blocks).to.have.length(3);
+            [operatorName, 'not', 'not'].forEach((renderedOperatorName, index) =>
+              expect(blocks[index]).to.have.class(`${renderedOperatorName}-operator-block`)
+            );
+            expect(queryBlock.operands).to.have.length(2);
+            expect(queryBlock.operands[0]).to.be.an.instanceOf(NotOperatorQueryBlock);
+            expect(queryBlock.operands[1]).to.be.an.instanceOf(NotOperatorQueryBlock);
+          } else {
+            expect(this.element.querySelector(
+              '.ember-attacher .change-to-section .operator-none'
+            )).to.have.attr('disabled');
+          }
+        }
+      );
+
+      it(
         'propagates edition-related notifications from condition blocks',
         async function () {
           const {

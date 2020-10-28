@@ -22,6 +22,7 @@
         <h1>{{tt this "changeToOperatorHeader"}}</h1>
         <QueryBuilder::BlockSelector::OperatorSelector
           @onOperatorSelected={{this.changeToOperator}}
+          @operators={{array 'and' 'or' 'not' 'none'}}
           @disabledOperators={{this.disabledOperatorsInChangeToSection}}
         />
       </div>

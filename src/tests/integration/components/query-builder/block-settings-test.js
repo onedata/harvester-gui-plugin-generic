@@ -39,20 +39,69 @@ describe('Integration | Component | query-builder/block-settings', function () {
     expect(blockSelector).to.have.class('edit-block-selector');
   });
 
-  it('shows block selector (operator block variant)', async function () {
-    this.set('queryBlock', new NotOperatorQueryBlock());
+  // Checking state of "NONE" "change to" to check if parentQueryBlock is passed to nested
+  // components.
+  it(
+    'shows block selector (operator block variant with blocked "NONE" "change to")',
+    async function () {
+      const {
+        queryBlock,
+        parentQueryBlock,
+      } = this.setProperties({
+        queryBlock: new NotOperatorQueryBlock(),
+        parentQueryBlock: new NotOperatorQueryBlock(),
+      });
+      queryBlock.operands.push(
+        new NotOperatorQueryBlock(),
+        new NotOperatorQueryBlock()
+      );
+      parentQueryBlock.operands.push(queryBlock);
 
-    await render(hbs `<QueryBuilder::BlockSettings
-      @queryBlock={{this.queryBlock}}
-      @isShown={{true}}
-    />`);
+      await render(hbs `<QueryBuilder::BlockSettings
+        @queryBlock={{this.queryBlock}}
+        @parentQueryBlock={{this.parentQueryBlock}}
+        @isShown={{true}}
+      />`);
 
-    const blockSelector =
-      this.element.querySelector('.ember-attacher .query-builder-block-selector');
-    expect(blockSelector).to.exist;
-    // only operator blocks have "change to" section
-    expect(blockSelector.querySelector('.change-to-section')).to.exist;
-  });
+      const blockSelector =
+        this.element.querySelector('.ember-attacher .query-builder-block-selector');
+      expect(blockSelector).to.exist;
+      // only operator blocks have "change to" section
+      expect(blockSelector.querySelector('.change-to-section')).to.exist;
+      expect(blockSelector.querySelector('.operator-none')).to.have.attr('disabled');
+    }
+  );
+
+  it(
+    'shows block selector (operator block variant with unlocked "NONE" "change to")',
+    async function () {
+      const {
+        queryBlock,
+        parentQueryBlock,
+      } = this.setProperties({
+        queryBlock: new NotOperatorQueryBlock(),
+        parentQueryBlock: new AndOperatorQueryBlock(),
+      });
+      queryBlock.operands.push(
+        new NotOperatorQueryBlock(),
+        new NotOperatorQueryBlock()
+      );
+      parentQueryBlock.operands.push(queryBlock);
+
+      await render(hbs `<QueryBuilder::BlockSettings
+        @queryBlock={{this.queryBlock}}
+        @parentQueryBlock={{this.parentQueryBlock}}
+        @isShown={{true}}
+      />`);
+
+      const blockSelector =
+        this.element.querySelector('.ember-attacher .query-builder-block-selector');
+      expect(blockSelector).to.exist;
+      // only operator blocks have "change to" section
+      expect(blockSelector.querySelector('.change-to-section')).to.exist;
+      expect(blockSelector.querySelector('.operator-none')).to.not.have.attr('disabled');
+    }
+  );
 
   it('shows block selector (condition block variant)', async function () {
     this.set('queryBlock', new ConditionQueryBlock());
@@ -94,7 +143,7 @@ describe('Integration | Component | query-builder/block-settings', function () {
 
       const blockMatcher = sinon.match.instanceOf(AndOperatorQueryBlock)
         .and(sinon.match.has('operands', [queryBlock]));
-      expect(replaceSpy).to.be.calledOnce.and.to.be.calledWith(blockMatcher);
+      expect(replaceSpy).to.be.calledOnce.and.to.be.calledWith([blockMatcher]);
       expect(closeSpy).to.be.calledOnce;
     }
   );
@@ -126,7 +175,7 @@ describe('Integration | Component | query-builder/block-settings', function () {
 
       const blockMatcher = sinon.match.instanceOf(AndOperatorQueryBlock)
         .and(sinon.match.has('operands', [condition]));
-      expect(replaceSpy).to.be.calledOnce.and.to.be.calledWith(blockMatcher);
+      expect(replaceSpy).to.be.calledOnce.and.to.be.calledWith([blockMatcher]);
       expect(closeSpy).to.be.calledOnce;
     }
   );

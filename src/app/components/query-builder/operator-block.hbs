@@ -5,6 +5,7 @@
     {{/if}}
     {{#if @queryBlock.operands.firstObject}}
       <QueryBuilder::BlockVisualiser
+        @parentQueryBlock={{@queryBlock}}
         @queryBlock={{@queryBlock.operands.firstObject}}
         @indexProperties={{@indexProperties}}
         @onBlockReplace={{fn this.replaceBlock @queryBlock.operands.firstObject}}
@@ -30,6 +31,7 @@
   {{else}}
     {{#each @queryBlock.operands as |operandBlock|}}
       <QueryBuilder::BlockVisualiser
+        @parentQueryBlock={{@queryBlock}}
         @queryBlock={{operandBlock}}
         @indexProperties={{@indexProperties}}
         @onBlockReplace={{fn this.replaceBlock operandBlock}}

@@ -8,6 +8,7 @@ import { click } from '@ember/test-helpers';
 import AndOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/and-operator-query-block';
 import OrOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/or-operator-query-block';
 import NotOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/not-operator-query-block';
+import RootOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/root-operator-query-block';
 import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/condition-query-block';
 import { clickTrigger, selectChoose } from 'ember-power-select/test-support/helpers';
 
@@ -18,6 +19,7 @@ const operatorBlockClasses = {
   and: AndOperatorQueryBlock,
   or: OrOperatorQueryBlock,
   not: NotOperatorQueryBlock,
+  root: RootOperatorQueryBlock,
 };
 
 describe('Integration | Component | query-builder/block-selector', function () {
@@ -162,13 +164,13 @@ describe('Integration | Component | query-builder/block-selector', function () {
           await click(`.surround-section .operator-${operatorName}`);
           const blockMatcher = sinon.match.instanceOf(operatorBlockClasses[operatorName])
             .and(sinon.match.has('operands', [editBlock]));
-          expect(replaceSpy).to.be.calledOnce.and.to.be.calledWith(blockMatcher);
+          expect(replaceSpy).to.be.calledOnce.and.to.be.calledWith([blockMatcher]);
         }
       );
     });
 
     it(
-      'renders three operators: AND, OR and NOT in "change to" section',
+      'renders four operators: AND, OR, NOT and NONE in "change to" section',
       async function () {
         await render(hbs `<QueryBuilder::BlockSelector
           @mode="edit"
@@ -178,8 +180,8 @@ describe('Integration | Component | query-builder/block-selector', function () {
         const operators = this.element.querySelectorAll(
           '.change-to-section .operator-selector .operator'
         );
-        expect(operators).to.have.length(3);
-        operatorsList.forEach((operatorName, index) => {
+        expect(operators).to.have.length(4);
+        [...operatorsList, 'none'].forEach((operatorName, index) => {
           const operator = operators[index];
           expect(operator.textContent.trim()).to.equal(operatorName);
         });
@@ -216,7 +218,7 @@ describe('Integration | Component | query-builder/block-selector', function () {
         it(
           `blocks "change to" ${operatorUpper} when editing ${operatorUpper} operator ${descriptionSuffix}`,
           async function () {
-            this.set('editBlock', new operatorBlockClasses[operatorName](operatorName));
+            this.set('editBlock', new operatorBlockClasses[operatorName]());
             beforeFunc(this);
 
             await render(hbs `<QueryBuilder::BlockSelector
@@ -242,7 +244,7 @@ describe('Integration | Component | query-builder/block-selector', function () {
         async function () {
           const editBlock = this.set(
             'editBlock',
-            new operatorBlockClasses[operatorName](operatorName)
+            new operatorBlockClasses[operatorName]()
           );
           const conditionBlock = new ConditionQueryBlock();
           editBlock.operands.pushObjects([conditionBlock, conditionBlock]);
@@ -269,15 +271,15 @@ describe('Integration | Component | query-builder/block-selector', function () {
     });
 
     operatorsList.forEach(sourceOperatorName => {
+      const sourceOperatorNameUpper = sourceOperatorName.toUpperCase();
       operatorsList.without(sourceOperatorName).forEach(destinationOperatorName => {
-        const sourceOperatorNameUpper = sourceOperatorName.toUpperCase();
-        const destinationOperatorNameUper = destinationOperatorName.toUpperCase();
+        const destinationOperatorNameUpper = destinationOperatorName.toUpperCase();
         it(
-          `changes ${sourceOperatorNameUpper} operator with single condition to ${destinationOperatorNameUper} operator`,
+          `changes ${sourceOperatorNameUpper} operator with single condition to ${destinationOperatorNameUpper} operator`,
           async function () {
             const editBlock = this.set(
               'editBlock',
-              new operatorBlockClasses[sourceOperatorName](sourceOperatorName)
+              new operatorBlockClasses[sourceOperatorName]()
             );
             const conditionBlock = new ConditionQueryBlock();
             editBlock.operands.pushObject(conditionBlock);
@@ -293,9 +295,89 @@ describe('Integration | Component | query-builder/block-selector', function () {
             const blockMatcher = sinon.match
               .instanceOf(operatorBlockClasses[destinationOperatorName])
               .and(sinon.match.has('operands', [conditionBlock]));
-            expect(replaceSpy).to.be.calledOnce.and.to.be.calledWith(blockMatcher);
+            expect(replaceSpy).to.be.calledOnce.and.to.be.calledWith([blockMatcher]);
           }
         );
+      });
+
+      // Test scenario: create parentOperator with nested editOperator. Then add
+      // `nestedBlockCount` NOT operators to editOperator. Then try to use "change to"
+      // "NONE" on editOperator and check results.
+      [...operatorsList, 'root'].forEach(parentOperatorName => {
+        const parentOperatorNameUpper = parentOperatorName.toUpperCase();
+        [{
+          nestedBlockCount: 0,
+          disabled: false,
+        }, {
+          nestedBlockCount: 1,
+          disabled: false,
+        }, {
+          nestedBlockCount: 2,
+          // For some types of parents, change to "NONE" with multiple operands is not
+          // allowed (example: try to move two operands from AND to NOT operator -
+          // it's impossible).
+          disabled: [
+            ...singleOperandOperatorsList,
+            'root',
+          ].includes(parentOperatorName),
+        }].forEach(({ nestedBlockCount, disabled }) => {
+          if (
+            nestedBlockCount > 1 &&
+            singleOperandOperatorsList.includes(sourceOperatorName)
+          ) {
+            // Cannot create so much nested blocks for given source operator -> this test
+            // case is impossible in real app.
+            return;
+          }
+
+          let description;
+          if (!nestedBlockCount) {
+            description =
+              `removes ${sourceOperatorNameUpper} operator (with no children) from ${parentOperatorNameUpper} parent operator when using "change to" "NONE"`;
+          } else {
+            description =
+              `${disabled ? 'does not allow to extract' : 'extracts'} ${nestedBlockCount} nested elements in ${sourceOperatorNameUpper} operator to ${parentOperatorNameUpper} parent operator using "change to" "NONE"`;
+          }
+
+          it(description, async function () {
+            const {
+              editBlock,
+              parentBlock,
+              replaceSpy,
+            } = this.setProperties({
+              editBlock: new operatorBlockClasses[sourceOperatorName](),
+              parentBlock: new operatorBlockClasses[parentOperatorName](),
+              replaceSpy: sinon.spy(),
+            });
+            parentBlock.operands.push(editBlock);
+
+            const nestedOperands = [];
+            for (let i = 0; i < nestedBlockCount; i++) {
+              nestedOperands.push(new NotOperatorQueryBlock());
+            }
+            editBlock.operands = [...nestedOperands];
+
+            await render(hbs `<QueryBuilder::BlockSelector
+              @mode="edit"
+              @editBlock={{this.editBlock}}
+              @editParentBlock={{this.parentBlock}}
+              @onBlockReplace={{this.replaceSpy}}
+            />`);
+
+            const noneOperatorBtn =
+              this.element.querySelector('.change-to-section .operator-none');
+            if (disabled) {
+              expect(noneOperatorBtn).to.have.attr('disabled');
+              return;
+            } else {
+              expect(noneOperatorBtn).to.not.have.attr('disabled');
+            }
+
+            await click(noneOperatorBtn);
+
+            expect(replaceSpy).to.be.calledOnce.and.to.be.calledWith(nestedOperands);
+          });
+        });
       });
     });
 

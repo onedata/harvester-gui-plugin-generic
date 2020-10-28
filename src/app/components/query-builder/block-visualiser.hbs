@@ -14,6 +14,7 @@
   }}
     <QueryBuilder::BlockSettings
       @queryBlock={{@queryBlock}}
+      @parentQueryBlock={{@parentQueryBlock}}
       @onBlockReplace={{@onBlockReplace}}
       @isShown={{this.areSettingsVisible}}
       @onSettingsClose={{this.onSettingsClose}}
@@ -21,6 +22,7 @@
     <BsButton
       @onClick={{@onBlockRemove}}
       @type="danger"
+      @bubble={{true}}
       class="block-button remove-block clickable"
     >
       <FaIcon @icon="times" />

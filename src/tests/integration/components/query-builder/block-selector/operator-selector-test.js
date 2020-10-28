@@ -1,25 +1,45 @@
 import { expect } from 'chai';
-import { describe, it } from 'mocha';
+import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
 import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import sinon from 'sinon';
 import { click } from '@ember/test-helpers';
 
-const allowedOperatorsList = ['and', 'or', 'not'];
+const allowedOperatorsList = ['and', 'or', 'not', 'none'];
+const defaultVisibleOperatorsList = allowedOperatorsList.without('none');
 
 describe(
   'Integration | Component | query-builder/block-selector/operator-selector',
   function () {
     setupRenderingTest();
 
+    beforeEach(function () {
+      this.set('allOperators', allowedOperatorsList);
+    });
+
     it(
-      `renders three operators: ${allowedOperatorsList.map(s => s.toUpperCase()).join(', ')} by default`,
+      `renders three operators: ${defaultVisibleOperatorsList.map(s => s.toUpperCase()).join(', ')} by default`,
       async function () {
         await render(hbs `<QueryBuilder::BlockSelector::OperatorSelector/>`);
 
         const operators = this.element.querySelectorAll('.operator-selector .operator');
         expect(operators).to.have.length(3);
+        defaultVisibleOperatorsList.forEach((operatorName, index) =>
+          checkOperatorButton(operators[index], operatorName)
+        );
+      }
+    );
+
+    it(
+      `renders all operators: ${allowedOperatorsList.map(s => s.toUpperCase()).join(', ')} when specified`,
+      async function () {
+        await render(hbs `<QueryBuilder::BlockSelector::OperatorSelector
+          @operators={{this.allOperators}}
+        />`);
+
+        const operators = this.element.querySelectorAll('.operator-selector .operator');
+        expect(operators).to.have.length(4);
         allowedOperatorsList.forEach((operatorName, index) =>
           checkOperatorButton(operators[index], operatorName)
         );
@@ -33,6 +53,7 @@ describe(
           const addSpy = this.set('addSpy', sinon.spy());
 
           await render(hbs `<QueryBuilder::BlockSelector::OperatorSelector
+            @operators={{this.allOperators}}
             @onOperatorSelected={{this.addSpy}}
           />`);
 
@@ -86,14 +107,16 @@ describe(
       'disables specified operators',
       async function () {
         await render(hbs `<QueryBuilder::BlockSelector::OperatorSelector
+          @operators={{this.allOperators}}
           @disabledOperators={{array "and" "or"}}
         />`);
 
         expect(this.element.querySelectorAll(
           '.operator-selector .operator[disabled]'
         )).to.have.length(2);
-        expect(this.element.querySelector('.operator-selector .operator-not'))
-          .to.not.have.attr('disabled');
+        ['not', 'none'].forEach(operatorName => expect(this.element.querySelector(
+          `.operator-selector .operator-${operatorName}`
+        )).to.not.have.attr('disabled'));
       }
     );
   }

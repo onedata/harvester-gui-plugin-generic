@@ -9,6 +9,7 @@
  */
 
 import Component from '@glimmer/component';
+import { inject as service } from '@ember/service';
 
 /**
  * @argument {Function} onOperatorSelected
@@ -17,6 +18,8 @@ import Component from '@glimmer/component';
  */
 export default class QueryBuilderBlockSelectorOperatorSelectorComponent
 extends Component {
+  @service intl;
+
   /**
    * @type {String}
    */
@@ -25,7 +28,12 @@ extends Component {
   /**
    * @type {Array<String>}
    */
-  validOperators = ['and', 'or', 'not'];
+  validOperators = ['and', 'or', 'not', 'none'];
+
+  /**
+   * @type {Array<String>}
+   */
+  operatorsWithTip = ['none'];
 
   /**
    * @type {Array<String>}
@@ -33,7 +41,7 @@ extends Component {
   get operators() {
     return this.args.operators ?
       this.args.operators.filter(operator => this.validOperators.includes(operator)) :
-      this.validOperators;
+      this.validOperators.without('none');
   }
 
   /**
@@ -52,11 +60,13 @@ extends Component {
   }
 
   /**
-   * @type {Array<{ name: String, disabled: boolean }>}
+   * @type {Array<{ name: String, tip: SafeString, disabled: boolean }>}
    */
   get operatorsSpec() {
     return this.operators.map(operatorName => ({
       name: operatorName,
+      tip: this.operatorsWithTip.includes(operatorName) ?
+        this.intl.t(`${this.intlPrefix}.operatorTips.${operatorName}`) : undefined,
       disabled: this.disabledOperators.includes(operatorName),
     }));
   }

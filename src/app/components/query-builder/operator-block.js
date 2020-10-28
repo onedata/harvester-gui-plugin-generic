@@ -61,7 +61,7 @@ export default class QueryBuilderOperatorBlockComponent extends Component {
       // existing operand. Adding next conditions to the root block is not allowed.
       if (queryBlock instanceof OperatorQueryBlock) {
         queryBlock.operands = [this.queryBlock.operands[0]];
-        this.replaceBlock(this.queryBlock.operands[0], queryBlock);
+        this.replaceBlock(this.queryBlock.operands[0], [queryBlock]);
       }
     } else {
       this.queryBlock.operands.pushObject(queryBlock);
@@ -70,13 +70,13 @@ export default class QueryBuilderOperatorBlockComponent extends Component {
 
   /**
    * @param {Utils.QueryBuilder.QueryBlock} oldBlock
-   * @param {Utils.QueryBuilder.QueryBlock} newBlock
+   * @param {Array<Utils.QueryBuilder.QueryBlock>} newBlocks
    */
   @action
-  replaceBlock(oldBlock, newBlock) {
+  replaceBlock(oldBlock, newBlocks) {
     const oldBlockIndex = this.queryBlock.operands.indexOf(oldBlock);
     if (oldBlockIndex >= 0) {
-      this.queryBlock.operands.replace(oldBlockIndex, 1, [newBlock]);
+      this.queryBlock.operands.replace(oldBlockIndex, 1, newBlocks);
     }
   }
 

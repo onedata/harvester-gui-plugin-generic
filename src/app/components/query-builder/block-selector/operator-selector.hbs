@@ -10,6 +10,9 @@
         @onClick={{fn this.onOperatorSelected operator.name}}
       >
         {{tt this (concat "operators." operator.name)}}
+        {{#if operator.tip}}
+          <BsTooltip @title={{operator.tip}}/>
+        {{/if}}
       </BsButton>
     </li>
   {{/each}}

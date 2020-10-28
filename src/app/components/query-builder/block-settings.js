@@ -13,6 +13,7 @@ import { action } from '@ember/object';
 /**
  * @argument {Boolean} isShown
  * @argument {Utils.QueryBlock} queryBlock
+ * @argument {Utils.OperatorQueryBlock} parentQueryBlock
  * @argument {Function} onSettingsClose
  * @argument {Function} onBlockReplace
  */
@@ -34,18 +35,25 @@ export default class QueryBuilderBlockSettingsComponent extends Component {
 
   @action
   popoverVisibilityChange(isShown) {
-    if (!isShown) {
+    if (!isShown && this.isShown) {
       this.onSettingsClose();
     }
   }
 
   /**
    * @param {Function} closeSelectorCallback
-   * @param {Utils.QueryBuilder.QueryBlock} newBlock
+   * @param {Array<Utils.QueryBuilder.QueryBlock>} newBlocks
    */
   @action
-  blockReplace(closeSelectorCallback, newBlock) {
+  blockReplace(closeSelectorCallback, newBlocks) {
     closeSelectorCallback();
-    this.onBlockReplace(newBlock);
+
+    // Immediate notify about close and not wait for animation.
+    // Fixes issue with reopening block settings after removing block via "None" operator.
+    // In that situation parent was not notified about closed selector, because
+    // event origin block was destroyed before hiding selector animation end.
+    this.onSettingsClose();
+
+    this.onBlockReplace(newBlocks);
   }
 }
