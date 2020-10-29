@@ -14,7 +14,8 @@ import { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 import {
   defaultComparators,
-  defaultComparatorEditors,
+  defaultComparatorValidators,
+  defaultComparatorValues,
 } from 'harvester-gui-plugin-generic/utils/query-builder/condition-comparator-editors';
 
 /**
@@ -55,7 +56,12 @@ extends Component {
   /**
    * @type {Object}
    */
-  @tracked comparatorEditorsSet = defaultComparatorEditors;
+  @tracked comparatorValidatorsSet = defaultComparatorValidators;
+
+  /**
+   * @type {Object}
+   */
+  @tracked comparatorDefaultValuesSet = defaultComparatorValues;
 
   /**
    * @type {Array<IndexProperty>}
@@ -88,18 +94,25 @@ extends Component {
   }
 
   /**
-   * @type {Object}
+   * @type {Function}
    */
-  get comparatorEditor() {
-    return this.comparatorEditorsSet[this.selectedConditionComparator];
+  get comparatorValidator() {
+    return this.comparatorValidatorsSet[this.selectedConditionComparator];
+  }
+
+  /**
+   * @type {Function}
+   */
+  get comparatorDefaultValue() {
+    return this.comparatorDefaultValuesSet[this.selectedConditionComparator];
   }
 
   /**
    * @type {boolean}
    */
   get isConditionComparatorValueValid() {
-    return this.comparatorEditor ?
-      this.comparatorEditor.isValidValue(this.conditionComparatorValue) : false;
+    return this.comparatorValidator ?
+      this.comparatorValidator(this.conditionComparatorValue) : false;
   }
 
   /**
@@ -109,6 +122,12 @@ extends Component {
     return this.selectedConditionProperty &&
       this.selectedConditionComparator &&
       this.isConditionComparatorValueValid;
+  }
+
+  constructor() {
+    super(...arguments);
+
+    defaultComparatorValues['space.is'] = () => this.spacesProvider.spaces[0];
   }
 
   /**
@@ -135,7 +154,7 @@ extends Component {
     this.selectedConditionComparator = comparator;
 
     if (!this.isConditionComparatorValueValid) {
-      this.conditionComparatorValueChanged(this.comparatorEditor.defaultValue());
+      this.conditionComparatorValueChanged(this.comparatorDefaultValue());
     }
   }
 

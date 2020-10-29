@@ -10,7 +10,7 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
-import { defaultComparatorEditors } from 'harvester-gui-plugin-generic/utils/query-builder/condition-comparator-editors';
+import { defaultComparatorValidators } from 'harvester-gui-plugin-generic/utils/query-builder/condition-comparator-editors';
 
 /**
  * @argument {Utils.QueryBuilder.ConditionQueryBlock} queryBlock
@@ -37,7 +37,7 @@ export default class QueryBuilderConditionBlockComponent extends Component {
   /**
    * @type {Object}
    */
-  @tracked comparatorEditorsSet = defaultComparatorEditors;
+  @tracked comparatorValidatorsSet = defaultComparatorValidators;
 
   /**
    * @type {Utils.QueryBuilder.ConditionQueryBlock}
@@ -72,18 +72,18 @@ export default class QueryBuilderConditionBlockComponent extends Component {
   }
 
   /**
-   * @type {Object}
+   * @type {Function}
    */
-  get comparatorEditor() {
-    return this.comparatorEditorsSet[this.queryBlock.comparator];
+  get comparatorValidator() {
+    return this.comparatorValidatorsSet[this.queryBlock.comparator];
   }
 
   /**
    * @type {boolean}
    */
   get isEditComparatorValueValid() {
-    return this.comparatorEditor ?
-      this.comparatorEditor.isValidValue(this.editComparatorValue) : false;
+    return this.comparatorValidator ?
+      this.comparatorValidator(this.editComparatorValue) : false;
   }
 
   @action
