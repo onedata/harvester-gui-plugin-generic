@@ -13,8 +13,8 @@
   "scripts": {
     "build": "ember build --environment=production --output-path=../rel",
     "build:dev": "ember build --environment=development  --output-path=../rel",
-    "build-plugin": "npm run build && tar -czf ../plugin.tar.gz ../rel",
-    "build-plugin:dev": "npm run build:dev && tar -czf ../plugin.tar.gz ../rel",
+    "build-plugin": "npm run build && cd .. &&  tar -czf plugin.tar.gz rel",
+    "build-plugin:dev": "npm run build:dev && cd .. && tar -czf plugin.tar.gz rel",
     "lint:hbs": "ember-template-lint .",
     "lint:js": "eslint .",
     "start": "ember serve",
