@@ -1,7 +1,7 @@
 /**
  * Builds queries to elasticsearch. The content of the query depends on properties:
  * - `mainQueryBlock` - a query block instance obtained from query builder. It should be
- *   a meaningfull block (so not the root block, but its first operand),
+ *   a meaningful block (so not the root block, but its first operand),
  * - `visibleContent` - a properties tree, that indicates which properties should be
  *   included in the response
  * - `sortProperty` - property used to sort
@@ -9,7 +9,7 @@
  * - `resultsFrom` and `resultsSize` - range of the results to fetch
  * Notice that this class only builds a query and does not execute it.
  * `buildQuery()` method returns an object ready to be used as a body of the query request.
- * 
+ *
  * @module utils/elasticsearch-query-builder
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
@@ -25,7 +25,7 @@ import moment from 'moment';
 export default class ElasticsearchQueryBuilder {
   /**
    * The main query block from the query builder. NOTE: It is NOT a RootQueryBlock but the
-   * first operand of it. 
+   * first operand of it.
    * @type {Utils.QueryBuilder.OperatorQueryBlock}
    */
   mainQueryBlock = null;

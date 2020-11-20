@@ -16,7 +16,7 @@ import { later } from '@ember/runloop';
 import { tracked } from '@glimmer/tracking';
 import ENV from 'harvester-gui-plugin-generic/config/environment';
 
-export default class AppProxyService extends Service {
+class AppProxyService extends Service {
   /**
    * @type {Object}
    */
@@ -71,22 +71,6 @@ export default class AppProxyService extends Service {
    */
   @reads('appProxy.spacesRequest') spacesRequest;
 
-  /**
-   * Fake window object used in test environment. It is a very simple mock - to make it
-   * more suitable for specific tests, stub `getWindow()` method.
-   */
-  _testWindow = {
-    frameElement: {
-      appProxy: {
-        dataRequest: () => resolve({}),
-        dataCurlCommandRequest: () => resolve(''),
-        configRequest: () => resolve({}),
-        fileBrowserUrlRequest: () => resolve(''),
-        spacesRequest: () => resolve([]),
-      },
-    },
-  };
-
   constructor() {
     super(...arguments);
 
@@ -99,7 +83,7 @@ export default class AppProxyService extends Service {
    * @returns {Window}
    */
   getWindow() {
-    return ENV.environment === 'test' ? this._testWindow : window;
+    return window;
   }
 
   /**
@@ -125,3 +109,30 @@ export default class AppProxyService extends Service {
     });
   }
 }
+
+/**
+ * Fake window object used in test environment. It is a very simple mock - to make it
+ * more suitable for specific tests, stub `getWindow()` method.
+ */
+const testWindow = {
+  frameElement: {
+    appProxy: {
+      dataRequest: () => resolve({}),
+      dataCurlCommandRequest: () => resolve(''),
+      configRequest: () => resolve({}),
+      fileBrowserUrlRequest: () => resolve(''),
+      spacesRequest: () => resolve([]),
+    },
+  },
+};
+
+class TestAppProxyService extends AppProxyService {
+  /**
+   * @override
+   */
+  getWindow() {
+    return testWindow;
+  }
+}
+
+export default (ENV.environment === 'test' ? TestAppProxyService : AppProxyService);

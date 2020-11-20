@@ -136,7 +136,7 @@ describe('Integration | Component | query-builder/block-settings', function () {
         @queryBlock={{this.queryBlock}}
         @onBlockReplace={{this.replaceSpy}}
         @onSettingsClose={{this.closeSpy}}
-        @isShown={{true}}
+        @isShown={{this.isShown}}
       />`);
       await click('.ember-attacher .surround-section .operator-and');
       await waitUntil(() => !isVisible('.ember-attacher'), { timeout: 1000 });
@@ -168,7 +168,7 @@ describe('Integration | Component | query-builder/block-settings', function () {
         @queryBlock={{this.queryBlock}}
         @onBlockReplace={{this.replaceSpy}}
         @onSettingsClose={{this.closeSpy}}
-        @isShown={{true}}
+        @isShown={{this.isShown}}
       />`);
       await click('.ember-attacher .change-to-section .operator-and');
       await waitUntil(() => !isVisible('.ember-attacher'), { timeout: 1000 });

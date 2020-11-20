@@ -130,6 +130,7 @@ describe('Integration | Component | content-index', function () {
   it('shows results of initial query', async function () {
     await render(hbs `<ContentIndex/>`);
 
+    // #1 request: getting spaces list, #2 request: fetching initial query results
     expect(this.dataRequestStub).to.be.calledTwice.and.to.be.calledWith(sinon.match({
       method: 'post',
       indexName,
@@ -171,7 +172,7 @@ describe('Integration | Component | content-index', function () {
 
   it('allows to perform custom query with conditions', async function () {
     await render(hbs `<ContentIndex/>`);
-    this.dataRequestStub.resetBehavior();
+    this.dataRequestStub.reset();
     this.dataRequestStub.resolves({
       hits: {
         total: {
@@ -192,7 +193,7 @@ describe('Integration | Component | content-index', function () {
     await click('.accept-condition');
     await click('.submit-query');
 
-    expect(this.dataRequestStub).to.be.calledThrice.and.to.be.calledWith(sinon.match({
+    expect(this.dataRequestStub).to.be.calledOnce.and.to.be.calledWith(sinon.match({
       method: 'post',
       indexName,
       path: '_search',
@@ -238,10 +239,11 @@ describe('Integration | Component | content-index', function () {
 
   it('allows to change sorting of results', async function () {
     await render(hbs `<ContentIndex/>`);
+    this.dataRequestStub.resetHistory();
     await selectChoose('.query-results-sort-selector .property-selector', 'a.b');
     await selectChoose('.query-results-sort-selector .direction-selector', 'asc');
 
-    expect(this.dataRequestStub).to.have.callCount(4)
+    expect(this.dataRequestStub).to.be.calledTwice
       .and.to.be.calledWith(sinon.match({
         method: 'post',
         indexName,
@@ -266,9 +268,10 @@ describe('Integration | Component | content-index', function () {
 
   it('allows to change results page', async function () {
     await render(hbs `<ContentIndex/>`);
+    this.dataRequestStub.resetHistory();
     await click('.next-page');
 
-    expect(this.dataRequestStub).to.be.calledThrice
+    expect(this.dataRequestStub).to.be.calledOnce
       .and.to.be.calledWith(sinon.match({
         method: 'post',
         indexName,
@@ -280,9 +283,10 @@ describe('Integration | Component | content-index', function () {
 
   it('allows to change results page size', async function () {
     await render(hbs `<ContentIndex/>`);
+    this.dataRequestStub.resetHistory();
     await selectChoose('.page-size-selector', '25');
 
-    expect(this.dataRequestStub).to.be.calledThrice
+    expect(this.dataRequestStub).to.be.calledOnce
       .and.to.be.calledWith(sinon.match({
         method: 'post',
         indexName,
@@ -295,10 +299,11 @@ describe('Integration | Component | content-index', function () {
 
   it('resets page number on results page size change', async function () {
     await render(hbs `<ContentIndex/>`);
+    this.dataRequestStub.resetHistory();
     await click('.next-page');
     await selectChoose('.page-size-selector', '25');
 
-    expect(this.dataRequestStub).to.have.callCount(4)
+    expect(this.dataRequestStub).to.be.calledTwice
       .and.to.be.calledWith(sinon.match({
         method: 'post',
         indexName,
@@ -310,10 +315,11 @@ describe('Integration | Component | content-index', function () {
 
   it('resets page number on sort property change', async function () {
     await render(hbs `<ContentIndex/>`);
+    this.dataRequestStub.resetHistory();
     await click('.next-page');
     await selectChoose('.query-results-sort-selector .property-selector', 'a.b');
 
-    expect(this.dataRequestStub).to.have.callCount(4)
+    expect(this.dataRequestStub).to.be.calledTwice
       .and.to.be.calledWith(sinon.match({
         method: 'post',
         indexName,
@@ -325,10 +331,11 @@ describe('Integration | Component | content-index', function () {
 
   it('resets page number on sort direction change', async function () {
     await render(hbs `<ContentIndex/>`);
+    this.dataRequestStub.resetHistory();
     await click('.next-page');
     await selectChoose('.query-results-sort-selector .direction-selector', 'asc');
 
-    expect(this.dataRequestStub).to.have.callCount(4)
+    expect(this.dataRequestStub).to.be.calledTwice
       .and.to.be.calledWith(sinon.match({
         method: 'post',
         indexName,

@@ -1,7 +1,7 @@
 /**
  * Represents an index property or field. Is used to represent a hierarchy of index
  * properties using `parentProperty` and `properties` fields.
- * 
+ *
  * @module utils/index-property
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
@@ -58,14 +58,14 @@ export default class IndexProperty extends IndexPropertyCollection {
    * @type {String}
    */
   get path() {
-    const parentPath = (this.parentProperty && this.parentProperty.path) || '';
+    const parentPath = this.parentProperty?.path || '';
     return (parentPath ? `${parentPath}.` : '') + this.name;
   }
 
   /**
-   * @param {Utils.IndexProperty} parentProperty 
-   * @param {String} name 
-   * @param {Object} rawMapping 
+   * @param {Utils.IndexProperty} parentProperty
+   * @param {String} name
+   * @param {Object} rawMapping
    * @param {boolean} [isField=false]
    */
   constructor(parentProperty, name, rawMapping, isField = false) {

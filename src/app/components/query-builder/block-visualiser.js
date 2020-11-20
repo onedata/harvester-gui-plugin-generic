@@ -43,14 +43,7 @@ export default class QueryBuilderBlockVisualiserComponent extends Component {
   clicked(event) {
     // Query blocks are nested. We need to find the origin (deepest) visualiser element,
     // that is on the path of the event bubbling.
-    let closestVisualiserElement = event.target;
-    while (
-      closestVisualiserElement &&
-      !closestVisualiserElement.matches('.query-builder-block-visualiser') &&
-      closestVisualiserElement !== document.body
-    ) {
-      closestVisualiserElement = closestVisualiserElement.parentElement;
-    }
+    const closestVisualiserElement = event.target.closest('.query-builder-block-visualiser');
 
     this.areSettingsVisible = !event.target.matches('.clickable, .clickable *') &&
       closestVisualiserElement === this.element;

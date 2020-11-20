@@ -59,7 +59,7 @@ export default class ClipboardLineComponent extends Component {
    * @type {String}
    */
   get hoverTip() {
-    return this.args.hoverTip || this.intl.t(this.intlPrefix + '.defaultHoverTip');
+    return this.args.hoverTip || this.intl.tt(this, 'defaultHoverTip');
   }
 
   /**
@@ -67,7 +67,14 @@ export default class ClipboardLineComponent extends Component {
    * @type {String}
    */
   get copiedTip() {
-    return this.args.copiedTip || this.intl.t(this.intlPrefix + '.defaultCopiedTip');
+    return this.args.copiedTip || this.intl.tt(this, 'defaultCopiedTip');
+  }
+
+  /**
+   * @type {String}
+   */
+  get buttonClasses() {
+    return this.args.buttonClasses || '';
   }
 
   /**
@@ -78,16 +85,9 @@ export default class ClipboardLineComponent extends Component {
     return guidFor(this) + '-input';
   }
 
-  /**
-   * Classes for copy button
-   */
-  get buttonClasses() {
-    let classes = this.args.buttonClasses || '';
-    if (this.mode !== 'button') {
-      classes += ' input-button';
-
-    }
-    return classes;
+  willDestroy() {
+    super.willDestroy(...arguments);
+    cancel(this.copiedNotificationTimer);
   }
 
   @action

@@ -82,7 +82,7 @@ export default class QueryResultsSortSelectorComponent extends Component {
    * @type {String}
    */
   get queryScorePropertyTranslation() {
-    return this.intl.t(this.intlPrefix + '.queryScoreProperty');
+    return this.intl.tt(this, 'queryScoreProperty');
   }
 
   /**

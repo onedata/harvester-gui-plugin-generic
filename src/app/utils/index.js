@@ -3,7 +3,7 @@
  * data inside indexed JSONs. Properties are structures in a tree-like manner - each
  * property may have nested subproperties (like in JSON object).
  * Is built using index schema (mapping) returned by Elasticsearch.
- * 
+ *
  * @module utils/index
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
@@ -32,12 +32,10 @@ export default class Index extends IndexPropertyCollection {
 
     if (rawMapping) {
       const propertiesMapping =
-        _.cloneDeep(_.get(this.rawMapping, 'mappings.properties', {}));
+        _.cloneDeep(this.rawMapping?.mappings?.properties || {});
 
       // Remove special onedata properties, as they will be added later
-      if (propertiesMapping.__onedata &&
-        propertiesMapping.__onedata.properties &&
-        propertiesMapping.__onedata.properties.spaceId) {
+      if (propertiesMapping?.__onedata?.properties?.spaceId) {
         delete propertiesMapping.__onedata.properties.spaceId;
         if (Object.keys(propertiesMapping.__onedata.properties).length === 0) {
           delete propertiesMapping.__onedata;
@@ -83,7 +81,7 @@ export default class Index extends IndexPropertyCollection {
   }
 
   /**
-   * @overrides
+   * @override
    */
   extractProperties() {
     super.extractProperties(...arguments);
@@ -101,7 +99,7 @@ export default class Index extends IndexPropertyCollection {
    * @returns {Object}
    */
   getPropertiesTree() {
-    const propertiesMapping = _.get(this.rawMapping, 'mappings.properties', {});
+    const propertiesMapping = this.rawMapping?.mappings?.properties || {};
     const propertiesTree = {};
 
     const propertiesObjectsQueue = [propertiesMapping];

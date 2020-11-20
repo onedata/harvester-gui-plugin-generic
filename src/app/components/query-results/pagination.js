@@ -88,12 +88,12 @@ export default class QueryResultsPaginationComponent extends Component {
 
   @action
   goToPrevPage() {
-    this.onPageChange(Math.max(this.activePageNumber - 1, 1));
+    this.onPageChange(this.normalizePageNumber(this.activePageNumber - 1));
   }
 
   @action
   goToNextPage() {
-    this.onPageChange(Math.min(this.activePageNumber + 1, this.pagesCount));
+    this.onPageChange(this.normalizePageNumber(this.activePageNumber + 1));
   }
 
   @action

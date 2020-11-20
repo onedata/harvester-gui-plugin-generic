@@ -36,16 +36,19 @@ describe('Integration | Component | query-builder/block-selector', function () {
       }]);
     });
 
-    it('renders three operators: AND, OR and NOT', async function () {
-      await render(hbs `<QueryBuilder::BlockSelector @mode="create"/>`);
+    it(
+      `renders operators ${operatorsList.map(s => s.toUpperCase()).join(', ')}`,
+      async function () {
+        await render(hbs `<QueryBuilder::BlockSelector @mode="create"/>`);
 
-      const operators = this.element.querySelectorAll('.operator-selector .operator');
-      expect(operators).to.have.length(3);
-      operatorsList.forEach((operatorName, index) => {
-        const operator = operators[index];
-        expect(operator.textContent.trim()).to.equal(operatorName);
-      });
-    });
+        const operators = this.element.querySelectorAll('.operator-selector .operator');
+        expect(operators).to.have.length(3);
+        operatorsList.forEach((operatorName, index) => {
+          const operator = operators[index];
+          expect(operator.textContent.trim()).to.equal(operatorName);
+        });
+      }
+    );
 
     operatorsList.forEach(operatorName => {
       const operatorNameUpper = operatorName.toUpperCase();
@@ -131,7 +134,7 @@ describe('Integration | Component | query-builder/block-selector', function () {
     });
 
     it(
-      'renders three operators: AND, OR and NOT in "surround" section',
+      `renders operators ${operatorsList.map(s => s.toUpperCase()).join(', ')} in "surround" section`,
       async function () {
         await render(hbs `<QueryBuilder::BlockSelector @mode="edit"/>`);
 

@@ -5,11 +5,7 @@
   "description": "Default harvester GUI plugin for Onezone",
   "repository": "",
   "license": "MIT",
-  "author": "Michał Borzęcki",
-  "directories": {
-    "doc": "doc",
-    "test": "tests"
-  },
+  "author": "ACK CYFRONET AGH",
   "scripts": {
     "build": "ember build --environment=production --output-path=../rel",
     "build:dev": "ember build --environment=development  --output-path=../rel",

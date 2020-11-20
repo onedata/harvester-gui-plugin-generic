@@ -10,7 +10,6 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
-import _ from 'lodash';
 
 /**
  * @argument {any} [details] Error instance or any other value with error details
@@ -33,7 +32,7 @@ export default class ResourceLoadErrorComponent extends Component {
     // Not using `instanceof Error` because some errors may come from the parent
     // Onezone window, which has different Error class that will not match this
     // window Error class.
-    if (_.get(this.args.details || {}, 'constructor.name') === 'Error') {
+    if (this.args.details?.constructor?.name === 'Error') {
       return this.args.details.message;
     } else {
       return JSON.stringify(this.args.details, null, 2);

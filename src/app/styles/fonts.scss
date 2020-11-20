@@ -1,12 +1,8 @@
 /// Import OpenSans Regular
 @font-face {
   font-family: 'Open Sans';
-  src: url('OpenSans-Regular-webfont.eot');
   src: local('Open Sans'), local('OpenSans'),
-       url($root-url + 'fonts/opensans/OpenSans-Regular-webfont.eot?#iefix') format('embedded-opentype'),
-       url($root-url + 'fonts/opensans/OpenSans-Regular-webfont.woff') format('woff'),
-       url($root-url + 'fonts/opensans/OpenSans-Regular-webfont.ttf') format('truetype'),
-       url($root-url + 'fonts/opensans/OpenSans-Regular-webfont.svg#open_sansregular') format('svg');
+       url($root-url + 'fonts/opensans/OpenSans-Regular-webfont.woff') format('woff');
   font-weight: normal;
   font-style: normal;
 }
@@ -18,12 +14,8 @@
 /// Import OpenSans Semibold
 @font-face {
   font-family: 'Open Sans Semibold';
-  src: url('OpenSans-Semibold-webfont.eot');
   src: local('Open Sans Semibold'), local('OpenSans Semibold'), local('OpenSansSemibold'),
-       url($root-url + 'fonts/opensans/OpenSans-Semibold-webfont.eot?#iefix') format('embedded-opentype'),
-       url($root-url + 'fonts/opensans/OpenSans-Semibold-webfont.woff') format('woff'),
-       url($root-url + 'fonts/opensans/OpenSans-Semibold-webfont.ttf') format('truetype'),
-       url($root-url + 'fonts/opensans/OpenSans-Semibold-webfont.svg#open_sanssemibold') format('svg');
+       url($root-url + 'fonts/opensans/OpenSans-Semibold-webfont.woff') format('woff');
   font-weight: normal;
   font-style: normal;
 }
@@ -35,12 +27,8 @@
 /// Import OpenSans Bold
 @font-face {
   font-family: 'Open Sans';
-  src: url('OpenSans-Bold-webfont.eot');
   src: local('Open Sans'), local('OpenSans'),
-       url($root-url + 'fonts/opensans/OpenSans-Bold-webfont.eot?#iefix') format('embedded-opentype'),
-       url($root-url + 'fonts/opensans/OpenSans-Bold-webfont.woff') format('woff'),
-       url($root-url + 'fonts/opensans/OpenSans-Bold-webfont.ttf') format('truetype'),
-       url($root-url + 'fonts/opensans/OpenSans-Bold-webfont.svg#open_sansbold') format('svg');
+       url($root-url + 'fonts/opensans/OpenSans-Bold-webfont.woff') format('woff');
   font-weight: bold;
   font-style: normal;
 }
@@ -56,7 +44,6 @@
   font-style: normal;
   font-weight: normal;
   src: local('Source Code Pro Regular'), local('SourceCodePro-Regular'),
-       url($root-url + 'fonts/sourcecodepro/source-code-pro-regular.woff2') format('woff2'),
        url($root-url + 'fonts/sourcecodepro/source-code-pro-regular.woff') format('woff');
 }
 
@@ -70,7 +57,6 @@
   font-style: normal;
   font-weight: bold;
   src: local('Source Code Pro Bold'), local('SourceCodePro-Bold'),
-       url($root-url + 'fonts/sourcecodepro/source-code-pro-bold.woff2') format('woff2'),
        url($root-url + 'fonts/sourcecodepro/source-code-pro-bold.woff') format('woff');
 }
 
@@ -85,7 +71,6 @@
   font-style: italic;
   font-weight: normal;
   src: local('Source Code Pro Medium Italic'), local('SourceCodePro-MediumIt'),
-       url($root-url + 'fonts/sourcecodepro/source-code-pro-italic.woff2') format('woff2'),
        url($root-url + 'fonts/sourcecodepro/source-code-pro-italic.woff') format('woff');
 }
 
@@ -95,7 +80,6 @@
   font-style: italic;
   font-weight: bold;
   src: local('Source Code Pro Bold Italic'), local('SourceCodePro-BoldIt'),
-       url($root-url + 'fonts/sourcecodepro/source-code-pro-bold-italic.woff2') format('woff2'),
        url($root-url + 'fonts/sourcecodepro/source-code-pro-bold-italic.woff') format('woff');
 }
 

@@ -2,7 +2,7 @@
  * Represents a single Elasticsearch query result. To parse results, `parseHelpers`
  * should be provided in constructor. For now only one parse helper is needed:
  * `fileBrowserUrlRequest` - generates file browser URL for given file ID.
- * 
+ *
  * @module utils/query-results
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
@@ -10,11 +10,12 @@
  */
 
 import { tracked } from '@glimmer/tracking';
-import _ from 'lodash';
 
 export default class QueryResult {
   /**
    * Object with key -> value: helperName -> function
+   * For now only one helper is supported:
+   * fileBrowserUrlRequest(fileId: String): Promise<String> // resolves to file url
    * @type {Object}
    */
   parseHelpers = {};
@@ -46,8 +47,8 @@ export default class QueryResult {
   @tracked fileBrowserUrl = '';
 
   /**
-   * @param {Object} rawObject 
-   * @param {Object} parseHelpers 
+   * @param {Object} rawObject
+   * @param {Object} parseHelpers see parseHelpers property doc
    */
   constructor(rawObject, parseHelpers) {
     this.parseHelpers = parseHelpers || {};
@@ -56,15 +57,13 @@ export default class QueryResult {
 
   /**
    * Parses raw result and persists it in instance properties
-   * @param {Object} rawObject 
+   * @param {Object} rawObject
    */
   fillInWithRawResult(rawObject) {
     this.rawObject = rawObject;
-    const normalizedRawObject = rawObject || {};
-
-    this.source = normalizedRawObject._source;
-    this.fileId = normalizedRawObject._id;
-    this.fileName = _.get(normalizedRawObject._source || {}, '__onedata.fileName');
+    this.source = rawObject?._source;
+    this.fileId = rawObject?._id;
+    this.fileName = rawObject?._source?.__onedata?.fileName;
 
     this.loadFileBrowserUrl();
   }

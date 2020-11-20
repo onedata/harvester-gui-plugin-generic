@@ -66,7 +66,7 @@ extends Component {
     return this.operators.map(operatorName => ({
       name: operatorName,
       tip: this.operatorsWithTip.includes(operatorName) ?
-        this.intl.t(`${this.intlPrefix}.operatorTips.${operatorName}`) : undefined,
+        this.intl.tt(this, `operatorTips.${operatorName}`) : undefined,
       disabled: this.disabledOperators.includes(operatorName),
     }));
   }

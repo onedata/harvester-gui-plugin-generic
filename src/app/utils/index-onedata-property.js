@@ -1,8 +1,8 @@
 /**
  * Represents a special, "Onedata" property. It should correspond to the values
- * inside __onedata key. Onedfata properties are not nested and should have
+ * inside `__onedata` key. Oneddata properties are not nested and should have
  * no subproperties.
- * 
+ *
  * @module utils/index-onedata-property
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH

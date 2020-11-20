@@ -19,6 +19,13 @@ import { action } from '@ember/object';
  */
 export default class QueryBuilderBlockSettingsComponent extends Component {
   /**
+   * @type {Boolean}
+   */
+  get isShown() {
+    return this.args.isShown;
+  }
+
+  /**
    * @type {Function}
    */
   get onSettingsClose() {

@@ -133,10 +133,7 @@ describe(
         @index={{this.index}}
       />`);
       await click('.show-properties-selector');
-      // expand all nodes
-      await allFulfilled([...this.element.querySelectorAll('.toggle-icon')].map(element =>
-        click(element)
-      ));
+      await expandAllNodes(this);
 
       const allLabels = this.element.querySelectorAll('.tree-label');
       const rootLevelLabels = this.element.querySelectorAll(
@@ -173,10 +170,7 @@ describe(
         @index={{this.index}}
       />`);
       await click('.show-properties-selector');
-      // expand all nodes
-      await allFulfilled([...this.element.querySelectorAll('.toggle-icon')].map(element =>
-        click(element)
-      ));
+      await expandAllNodes(this);
 
       [...this.element.querySelectorAll('.one-checkbox')]
       .forEach(checkbox => expect(checkbox).to.not.have.class('checked'));
@@ -274,10 +268,7 @@ describe(
           @onSelectionChange={{this.changeSpy}}
         />`);
         await click('.show-properties-selector');
-        // expand all nodes
-        await allFulfilled([...this.element.querySelectorAll('.toggle-icon')]
-          .map(element => click(element))
-        );
+        await expandAllNodes(this);
         const firstBranchLastCheckbox = this.element.querySelectorAll(
           '.tree > .tree-branch > .tree-node:nth-child(2) > .tree-branch .one-checkbox'
         )[1];
@@ -329,10 +320,7 @@ describe(
         @index={{this.index}}
       />`);
       await click('.show-properties-selector');
-      // expand all nodes
-      await allFulfilled([...this.element.querySelectorAll('.toggle-icon')]
-        .map(element => click(element))
-      );
+      await expandAllNodes(this);
       this.set('queryResults', this.queryResults2);
 
       const secondBranchLastNode = this.element.querySelectorAll(
@@ -346,7 +334,7 @@ describe(
     });
 
     it(
-      'updates properties set after query results change (parent property was completly checked)',
+      'updates properties set after query results change (parent property was completely checked)',
       async function () {
         this.set('queryResults', this.queryResults1);
         await render(hbs `<QueryResults::FilteredPropertiesSelector
@@ -354,10 +342,7 @@ describe(
           @index={{this.index}}
         />`);
         await click('.show-properties-selector');
-        // expand all nodes
-        await allFulfilled([...this.element.querySelectorAll('.toggle-icon')]
-          .map(element => click(element))
-        );
+        await expandAllNodes(this);
         await click(
           '.tree > .tree-branch > .tree-node:nth-child(2) > .tree-children .one-checkbox'
         );
@@ -375,3 +360,9 @@ describe(
     );
   }
 );
+
+async function expandAllNodes(testCase) {
+  await allFulfilled([...testCase.element.querySelectorAll('.toggle-icon')]
+    .map(element => click(element))
+  );
+}

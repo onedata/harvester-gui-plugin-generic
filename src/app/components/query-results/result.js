@@ -31,7 +31,7 @@ export default class QueryResultsResultComponent extends Component {
    * @type {Object}
    */
   get rawData() {
-    return this.args.queryResult && this.args.queryResult.source || {};
+    return this.args.queryResult?.source || {};
   }
 
   /**

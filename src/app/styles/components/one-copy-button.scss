@@ -16,20 +16,27 @@
     color: $body-color;
   }
 
-  .input-button {
-    border: 0;
-    position: absolute;
-    right: $spacer * 0.2;
-    top: 50%;
-    transform: translateY(-50%);
-    background: radial-gradient(circle, rgba(253, 253, 253, 1) 0%, rgba(253, 253, 253, 0) 80%);
-    font-size: 120%;
-    outline: none;
+  &.mode-input,
+  &.mode-textarea {
+    .copy-btn {
+      position: absolute;
+      right: $spacer * 0.2;
+      border: 0;
+      background: radial-gradient(circle, rgba(253, 253, 253, 1) 0%, rgba(253, 253, 253, 0) 80%);
+      font-size: 120%;
+      outline: none;
+    }
+  }
+
+  &.mode-input {
+    .copy-btn {
+      top: 50%;
+      transform: translateY(-50%);
+    }
   }
 
   &.mode-textarea {
-    .input-button {
-      top: initial;
+    .copy-btn {
       width: 2em;
       height: 2em;
       bottom: 0;
