@@ -4,7 +4,7 @@ import { setupRenderingTest } from 'ember-mocha';
 import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import QueryResults from 'harvester-gui-plugin-generic/utils/query-results';
-import Index from 'harvester-gui-plugin-generic/utils/index';
+import EsIndex from 'harvester-gui-plugin-generic/utils/es-index';
 import { click } from '@ember/test-helpers';
 import { all as allFulfilled } from 'rsvp';
 import sinon from 'sinon';
@@ -53,7 +53,7 @@ describe(
             }],
           },
         }),
-        index: new Index({
+        index: new EsIndex({
           mappings: {
             properties: {
               a: {

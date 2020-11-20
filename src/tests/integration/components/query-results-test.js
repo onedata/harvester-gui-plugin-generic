@@ -8,7 +8,7 @@ import { click } from '@ember/test-helpers';
 import { selectChoose } from 'ember-power-select/test-support/helpers';
 import { all as allFulfilled, resolve, Promise } from 'rsvp';
 import sinon from 'sinon';
-import Index from 'harvester-gui-plugin-generic/utils/index';
+import EsIndex from 'harvester-gui-plugin-generic/utils/es-index';
 
 describe('Integration | Component | query-results', function () {
   setupRenderingTest();
@@ -45,7 +45,7 @@ describe('Integration | Component | query-results', function () {
     this.setProperties({
       queryResults,
       queryResultsPromise: resolve(queryResults),
-      index: new Index({
+      index: new EsIndex({
         mappings: {
           properties: {
             a: {
@@ -126,7 +126,7 @@ describe('Integration | Component | query-results', function () {
     await click(firstBranchLastCheckbox);
 
     const resultSamples = this.element.querySelectorAll('.result-sample');
-    expect(resultSamples[0].textContent.trim()).to.equal('');
+    expect(resultSamples[0].textContent.trim()).to.equal('No match.');
     expect(resultSamples[1].textContent.trim()).to.equal('a: [{bb: false}]');
   });
 
@@ -215,7 +215,10 @@ describe('Integration | Component | query-results', function () {
     it(
       `shows correct number of pages for a small results set (${paginationPosition} pagination control)`,
       async function () {
-        await render(hbs `<QueryResults @queryResultsPromise={{this.queryResultsPromise}}/>`);
+        await render(hbs `<QueryResults
+          @queryResultsPromise={{this.queryResultsPromise}}
+          @pageSize={{10}}
+        />`);
 
         const pagesCount = this.element.querySelectorAll(
           '.query-results-pagination .pages-count'
@@ -228,7 +231,10 @@ describe('Integration | Component | query-results', function () {
       `shows correct number of pages for a large results set (${paginationPosition} pagination control)`,
       async function () {
         this.queryResults.totalResultsCount = 50;
-        await render(hbs `<QueryResults @queryResultsPromise={{this.queryResultsPromise}}/>`);
+        await render(hbs `<QueryResults
+          @queryResultsPromise={{this.queryResultsPromise}}
+          @pageSize={{10}}
+        />`);
 
         const pagesCount = this.element.querySelectorAll(
           '.query-results-pagination .pages-count'
@@ -245,6 +251,7 @@ describe('Integration | Component | query-results', function () {
 
         await render(hbs `<QueryResults
           @queryResultsPromise={{this.queryResultsPromise}}
+          @pageSize={{10}}
           @onPageChange={{this.changeSpy}}
         />`);
         const nextBtn = this.element.querySelectorAll(
@@ -263,6 +270,7 @@ describe('Integration | Component | query-results', function () {
 
         await render(hbs `<QueryResults
           @queryResultsPromise={{this.queryResultsPromise}}
+          @pageSize={{10}}
           @onPageSizeChange={{this.changeSpy}}
         />`);
         const pageSizeSelector = this.element.querySelectorAll(

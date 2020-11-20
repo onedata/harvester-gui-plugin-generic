@@ -1,16 +1,16 @@
 /**
  * Represents a special "any property" property and does not exist in a real index mapping.
  * It is used to build queries with a condition for any property.
- * 
- * @module utils/index-any-property
+ *
+ * @module utils/es-index-any-property
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import IndexProperty from 'harvester-gui-plugin-generic/utils/index-property';
+import EsIndexProperty from 'harvester-gui-plugin-generic/utils/es-index-property';
 
-export default class IndexAnyProperty extends IndexProperty {
+export default class EsIndexAnyProperty extends EsIndexProperty {
   /**
    * @override
    */

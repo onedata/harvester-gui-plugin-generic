@@ -31,6 +31,13 @@ extends Component {
   validOperators = ['and', 'or', 'not', 'none'];
 
   /**
+   * @type {Object}
+   */
+  operatorsIcons = {
+    none: 'level-up-alt',
+  };
+
+  /**
    * @type {Array<String>}
    */
   operatorsWithTip = ['none'];
@@ -39,9 +46,16 @@ extends Component {
    * @type {Array<String>}
    */
   get operators() {
-    return this.args.operators ?
+    let operators = this.args.operators ?
       this.args.operators.filter(operator => this.validOperators.includes(operator)) :
       this.validOperators.without('none');
+
+    // Do not show NONE operator, if it is disabled.
+    if (this.disabledOperators.includes('none')) {
+      operators = operators.without('none');
+    }
+
+    return operators;
   }
 
   /**
@@ -68,6 +82,7 @@ extends Component {
       tip: this.operatorsWithTip.includes(operatorName) ?
         this.intl.tt(this, `operatorTips.${operatorName}`) : undefined,
       disabled: this.disabledOperators.includes(operatorName),
+      icon: this.operatorsIcons[operatorName],
     }));
   }
 }

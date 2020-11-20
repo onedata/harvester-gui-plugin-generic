@@ -134,7 +134,7 @@ export default class QueryBuilderBlockSelectorComponent extends Component {
   }
 
   /**
-   * @param {Utils.IndexProperty} property
+   * @param {Utils.EsIndexProperty} property
    * @param {String} comparator
    * @param {any} comparatorValue
    */

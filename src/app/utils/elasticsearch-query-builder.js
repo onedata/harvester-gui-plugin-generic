@@ -1,7 +1,7 @@
 /**
  * Builds queries to elasticsearch. The content of the query depends on properties:
- * - `mainQueryBlock` - a query block instance obtained from query builder. It should be
- *   a meaningful block (so not the root block, but its first operand),
+ * - `mainQueryBlock` - a query block instance obtained from the query builder. In most
+ *   cases it will be an instance of `RootOperatorQueryBlock`
  * - `visibleContent` - a properties tree, that indicates which properties should be
  *   included in the response
  * - `sortProperty` - property used to sort
@@ -21,11 +21,11 @@ import OrOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-build
 import NotOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/not-operator-query-block';
 import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/condition-query-block';
 import moment from 'moment';
+import RootOperatorQueryBlock from './query-builder/root-operator-query-block';
 
 export default class ElasticsearchQueryBuilder {
   /**
-   * The main query block from the query builder. NOTE: It is NOT a RootQueryBlock but the
-   * first operand of it.
+   * The main query block from the query builder.
    * @type {Utils.QueryBuilder.OperatorQueryBlock}
    */
   mainQueryBlock = null;
@@ -39,7 +39,7 @@ export default class ElasticsearchQueryBuilder {
 
   /**
    * {} (no property) means _score
-   * @type {Utils.IndexProperty}
+   * @type {Utils.EsIndexProperty}
    */
   sortProperty = {};
 
@@ -88,7 +88,9 @@ export default class ElasticsearchQueryBuilder {
   }
 
   convertBlock(block) {
-    if (block instanceof NotOperatorQueryBlock) {
+    if (block instanceof RootOperatorQueryBlock) {
+      return this.convertBlock(block.operands[0]);
+    } else if (block instanceof NotOperatorQueryBlock) {
       return this.convertNotOperator(block);
     } else if (block instanceof AndOperatorQueryBlock) {
       return this.convertAndOperator(block);
@@ -359,7 +361,7 @@ export default class ElasticsearchQueryBuilder {
 }
 
 /**
- * Converts moment object to the corresponding number of milliseconds since the epoch.
+ * Converts moment object to a corresponding number of milliseconds since the epoch.
  * It also converts timezoned moment objects to the utc time zone. Example:
  * 01.01.2020 10:00 (UTC+2) will be converted to the millis since the epoch
  * for 01.01.2020 10:00 (UTC) - the information about the time zone is dropped.

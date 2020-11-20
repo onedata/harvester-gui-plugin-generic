@@ -3,7 +3,7 @@ import { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 import QueryResults from 'harvester-gui-plugin-generic/utils/query-results';
-import Index from 'harvester-gui-plugin-generic/utils/index';
+import EsIndex from 'harvester-gui-plugin-generic/utils/es-index';
 import ElasticsearchQueryBuilder from 'harvester-gui-plugin-generic/utils/elasticsearch-query-builder';
 
 export default class ContentIndexComponent extends Component {
@@ -25,14 +25,13 @@ export default class ContentIndexComponent extends Component {
     this.indexPromise = this.elasticsearch.getMapping()
       .then(response => {
         this.performQuery();
-        return new Index(Object.values(response)[0]);
+        return new EsIndex(Object.values(response)[0]);
       });
   }
 
   @action
   performQuery(rootBlock) {
-    const mainOperand = rootBlock && rootBlock.operands[0];
-    this.queryBuilder.mainQueryBlock = mainOperand ? mainOperand.clone() : mainOperand;
+    this.queryBuilder.mainQueryBlock = rootBlock && rootBlock.clone();
     this.activePageNumber = 1;
     this.updateQueryBuilderResultsRange();
     this.queryElasticsearch();

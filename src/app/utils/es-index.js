@@ -4,19 +4,19 @@
  * property may have nested subproperties (like in JSON object).
  * Is built using index schema (mapping) returned by Elasticsearch.
  *
- * @module utils/index
+ * @module utils/es-index
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import IndexPropertyCollection from 'harvester-gui-plugin-generic/utils/index-property-collection';
-import IndexProperty from 'harvester-gui-plugin-generic/utils/index-property';
-import IndexOnedataProperty from 'harvester-gui-plugin-generic/utils/index-onedata-property';
-import IndexAnyProperty from 'harvester-gui-plugin-generic/utils/index-any-property';
+import EsIndexPropertyCollection from 'harvester-gui-plugin-generic/utils/es-index-property-collection';
+import EsIndexProperty from 'harvester-gui-plugin-generic/utils/es-index-property';
+import EsIndexOnedataProperty from 'harvester-gui-plugin-generic/utils/es-index-onedata-property';
+import EsIndexAnyProperty from 'harvester-gui-plugin-generic/utils/es-index-any-property';
 import _ from 'lodash';
 
-export default class Index extends IndexPropertyCollection {
+export default class EsIndex extends EsIndexPropertyCollection {
   /**
    * @type {Object}
    */
@@ -50,14 +50,14 @@ export default class Index extends IndexPropertyCollection {
    * @override
    */
   constructProperty(name, rawPropertyMapping) {
-    return new IndexProperty(null, name, rawPropertyMapping);
+    return new EsIndexProperty(null, name, rawPropertyMapping);
   }
 
   /**
    * Produces flattened array of properties from index properties (tree).
-   * @param {Array<Utils.IndexProperty>} [properties] array of properties to flatten.
+   * @param {Array<Utils.EsIndexProperty>} [properties] array of properties to flatten.
    *   Should be omitted in public API call - is used only for recursion purposes.
-   * @returns {Array<Utils.IndexProperty>}
+   * @returns {Array<Utils.EsIndexProperty>}
    */
   getFlattenedProperties(properties = undefined) {
     let propertiesToFlatten = properties;
@@ -71,12 +71,10 @@ export default class Index extends IndexPropertyCollection {
 
     const flattenedProperties = [];
     // DFS strategy of flattening
-    propertiesToFlatten.forEach(property => {
-      flattenedProperties.push(
-        property,
-        ...this.getFlattenedProperties(Object.values(property.properties))
-      );
-    });
+    propertiesToFlatten.forEach(property => flattenedProperties.push(
+      property,
+      ...this.getFlattenedProperties(Object.values(property.properties))
+    ));
     return flattenedProperties;
   }
 
@@ -88,8 +86,8 @@ export default class Index extends IndexPropertyCollection {
 
     // Special Onedata properties
     this.properties['__onedata.space'] =
-      new IndexOnedataProperty(null, '__onedata.space');
-    this.properties['__anyProperty'] = new IndexAnyProperty();
+      new EsIndexOnedataProperty(null, '__onedata.space');
+    this.properties['__anyProperty'] = new EsIndexAnyProperty();
   }
 
   /**

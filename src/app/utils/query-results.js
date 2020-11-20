@@ -81,7 +81,7 @@ export default class QueryResults {
     const rawResults = this.results.mapBy('source').compact();
     const propertiesTree = {};
 
-    rawResults.forEach(rawResult => {
+    for (const rawResult of rawResults) {
       const rawQueue = [rawResult];
       const treeTargetQueue = [propertiesTree];
 
@@ -102,7 +102,7 @@ export default class QueryResults {
           }
         }
       }
-    });
+    }
 
     return propertiesTree;
   }

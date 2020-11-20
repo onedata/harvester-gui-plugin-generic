@@ -1,10 +1,10 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
-import IndexAnyProperty from 'harvester-gui-plugin-generic/utils/index-any-property';
+import EsIndexAnyProperty from 'harvester-gui-plugin-generic/utils/es-index-any-property';
 
-describe('Unit | Utility | index-any-property', function () {
+describe('Unit | Utility | es-index-any-property', function () {
   it('properly instantiates', function () {
-    const property = new IndexAnyProperty(null);
+    const property = new EsIndexAnyProperty(null);
     expect(property.name).to.be.undefined;
     expect(property.type).to.equal('anyProperty');
     expect(property.isField).to.equal(false);

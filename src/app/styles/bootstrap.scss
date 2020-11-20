@@ -24,6 +24,10 @@
   }
 }
 
+.modal-content {
+  box-shadow: $modal-content-box-shadow-sm-up;
+}
+
 .modal-header, .modal-footer {
   border: 0;
 }

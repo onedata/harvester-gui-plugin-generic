@@ -15,7 +15,7 @@ import QueryResults from 'harvester-gui-plugin-generic/utils/query-results';
 /**
  * @argument {Promise<Utils.QueryResults>} queryResultsPromise
  * @argument {Utils.Index} index
- * @argument {Utils.IndexProperty} sortProperty
+ * @argument {Utils.EsIndexProperty} sortProperty
  * @argument {String} sortDirection
  * @argument {Number} activePageNumber
  * @argument {Function} onSortChange
@@ -52,7 +52,7 @@ export default class QueryResultsComponent extends Component {
   }
 
   /**
-   * @type {Utils.IndexProperty}
+   * @type {Utils.EsIndexProperty}
    */
   get sortProperty() {
     return this.args.sortProperty || {};
@@ -74,7 +74,7 @@ export default class QueryResultsComponent extends Component {
 
   /**
    * @type {Function}
-   * @param {Utils.IndexProperty} sortSpec.property
+   * @param {Utils.EsIndexProperty} sortSpec.property
    * @param {String} sortSpec.direction
    */
   get onSortChange() {

@@ -2,13 +2,13 @@
  * Represents an index property or field. Is used to represent a hierarchy of index
  * properties using `parentProperty` and `properties` fields.
  *
- * @module utils/index-property
+ * @module utils/es-index-property
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import IndexPropertyCollection from 'harvester-gui-plugin-generic/utils/index-property-collection';
+import EsIndexPropertyCollection from 'harvester-gui-plugin-generic/utils/es-index-property-collection';
 
 const numberTypes = [
   'long',
@@ -21,10 +21,10 @@ const numberTypes = [
   'scaled_float',
 ];
 
-export default class IndexProperty extends IndexPropertyCollection {
+export default class EsIndexProperty extends EsIndexPropertyCollection {
   /**
    * May be null if there is no parent property
-   * @type {Utils.IndexProperty}
+   * @type {Utils.EsIndexProperty}
    */
   parentProperty = undefined;
 
@@ -63,7 +63,7 @@ export default class IndexProperty extends IndexPropertyCollection {
   }
 
   /**
-   * @param {Utils.IndexProperty} parentProperty
+   * @param {Utils.EsIndexProperty} parentProperty
    * @param {String} name
    * @param {Object} rawMapping
    * @param {boolean} [isField=false]
@@ -91,6 +91,6 @@ export default class IndexProperty extends IndexPropertyCollection {
    * @override
    */
   constructProperty(name, rawPropertyMapping, isField) {
-    return new IndexProperty(this, name, rawPropertyMapping, isField);
+    return new EsIndexProperty(this, name, rawPropertyMapping, isField);
   }
 }

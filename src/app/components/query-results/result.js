@@ -151,11 +151,21 @@ export default class QueryResultsResultComponent extends Component {
   }
 
   getSortedJsonObjectKeys(obj) {
-    const keys = Object.keys(obj).sort();
-    return [
-      ...keys.filter(k => !k.startsWith('_')),
-      // move properties starting with the underscore to the end
-      ...keys.filter(k => k.startsWith('_')),
-    ];
+    // Sort keys and move properties starting with the underscore to the end
+    return Object.keys(obj).sort((a, b) => {
+      const a0 = a[0];
+      const b0 = b[0];
+      if (a === b) {
+        return 0;
+      } else if (a0 !== '_' && b0 === '_') {
+        return -1;
+      } else if (a0 === '_' && b0 !== '_') {
+        return 1;
+      } else if (a < b) {
+        return -1;
+      } else {
+        return 1;
+      }
+    });
   }
 }

@@ -3,15 +3,15 @@
  * inside `__onedata` key. Oneddata properties are not nested and should have
  * no subproperties.
  *
- * @module utils/index-onedata-property
+ * @module utils/es-index-onedata-property
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import IndexProperty from 'harvester-gui-plugin-generic/utils/index-property';
+import EsIndexProperty from 'harvester-gui-plugin-generic/utils/es-index-property';
 
-export default class IndexOnedataProperty extends IndexProperty {
+export default class EsIndexOnedataProperty extends EsIndexProperty {
   /**
    * @override
    */

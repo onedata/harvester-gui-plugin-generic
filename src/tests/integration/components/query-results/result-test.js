@@ -14,9 +14,6 @@ describe('Integration | Component | query-results/result', function () {
     this.set('queryResult', new QueryResult({
       _id: 'file123',
       _source: {
-        a: {
-          b: true,
-        },
         c: 'someText',
         e: {
           f: 'anotherText',
@@ -46,6 +43,10 @@ describe('Integration | Component | query-results/result', function () {
         },
         __onedata: {
           fileName: 'abc.txt',
+        },
+        // "a" key is at the end to test keys sorting
+        a: {
+          b: true,
         },
       },
     }, {
@@ -174,7 +175,7 @@ describe('Integration | Component | query-results/result', function () {
         },
       },
     },
-    json: '',
+    json: 'No match.',
   }].forEach(({ description, filteredProperties, json }) => {
     it(description, async function () {
       this.set('filteredProperties', filteredProperties);

@@ -21,7 +21,7 @@ const allowedPropertyTypes = [
 
 /**
  * @argument {Utils.Index} index
- * @argument {Utils.IndexProperty} sortProperty
+ * @argument {Utils.EsIndexProperty} sortProperty
  * @argument {String} sortDirection
  * @argument {Function} onSortChange
  */
@@ -34,7 +34,7 @@ export default class QueryResultsSortSelectorComponent extends Component {
   intlPrefix = 'components.query-results.sort-selector';
 
   /**
-   * @type {Array<Utils.IndexProperty>}
+   * @type {Array<Utils.EsIndexProperty>}
    */
   get indexProperties() {
     const properties = !this.index ? [] : this.index.getFlattenedProperties()
@@ -55,7 +55,7 @@ export default class QueryResultsSortSelectorComponent extends Component {
   }
 
   /**
-   * @type {Utils.IndexProperty}
+   * @type {Utils.EsIndexProperty}
    */
   get sortProperty() {
     return this.args.sortProperty || {};
@@ -71,7 +71,7 @@ export default class QueryResultsSortSelectorComponent extends Component {
 
   /**
    * @type {Function}
-   * @param {Utils.IndexProperty} sortSpec.property
+   * @param {Utils.EsIndexProperty} sortSpec.property
    * @param {String} sortSpec.direction
    */
   get onSortChange() {
@@ -86,7 +86,7 @@ export default class QueryResultsSortSelectorComponent extends Component {
   }
 
   /**
-   * @param {Utils.IndexProperty} selectedProperty
+   * @param {Utils.EsIndexProperty} selectedProperty
    */
   @action
   sortPropertyChanged(selectedProperty) {
@@ -102,7 +102,7 @@ export default class QueryResultsSortSelectorComponent extends Component {
   }
 
   /**
-   * @param {Utils.IndexProperty} property
+   * @param {Utils.EsIndexProperty} property
    * @param {String} searchTerm
    * @returns {number}
    */

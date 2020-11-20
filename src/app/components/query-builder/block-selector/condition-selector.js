@@ -34,7 +34,7 @@ extends Component {
   intlPrefix = 'components.query-builder.block-selector.condition-selector';
 
   /**
-   * @type {Utils.IndexProperty}
+   * @type {Utils.EsIndexProperty}
    */
   @tracked selectedConditionProperty;
 
@@ -72,7 +72,7 @@ extends Component {
 
   /**
    * @type {Function}
-   * @param {Utils.IndexProperty} property
+   * @param {Utils.EsIndexProperty} property
    * @param {String} comparator
    * @param {any} comparatorValue
    */
@@ -132,7 +132,7 @@ extends Component {
 
   /**
    *
-   * @param {Utils.IndexProperty} indexProperty
+   * @param {Utils.EsIndexProperty} indexProperty
    */
   @action
   conditionPropertyChanged(indexProperty) {

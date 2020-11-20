@@ -7,6 +7,7 @@
 
 $white:    #fff !default;
 $gray-100: #f8f9fa !default;
+$gray-100: #fcfcfc;
 $gray-200: #e9ecef !default;
 $gray-300: #dee2e6 !default;
 $gray-400: #ced4da !default;
@@ -977,8 +978,10 @@ $modal-content-border-radius:       $border-radius-lg !default;
 $modal-content-inner-border-radius: subtract($modal-content-border-radius, $modal-content-border-width) !default;
 $modal-content-box-shadow-xs:       0 .25rem .5rem rgba($black, .5) !default;
 $modal-content-box-shadow-sm-up:    0 .5rem 1rem rgba($black, .5) !default;
+$modal-content-box-shadow-sm-up:    0 0 .5rem 0 rgba($black, .3);
 
 $modal-backdrop-bg:                 $black !default;
+$modal-backdrop-bg:                 $gray-100;
 $modal-backdrop-opacity:            .5 !default;
 $modal-header-border-color:         $border-color !default;
 $modal-footer-border-color:         $modal-header-border-color !default;

@@ -5,13 +5,13 @@ import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { typeInSearch, clickTrigger, selectChoose } from 'ember-power-select/test-support/helpers';
 import sinon from 'sinon';
-import Index from 'harvester-gui-plugin-generic/utils/index';
+import EsIndex from 'harvester-gui-plugin-generic/utils/es-index';
 
 describe('Integration | Component | query-results/sort-selector', function () {
   setupRenderingTest();
 
   beforeEach(function () {
-    this.set('index', new Index({
+    this.set('index', new EsIndex({
       mappings: {
         properties: {
           a: {

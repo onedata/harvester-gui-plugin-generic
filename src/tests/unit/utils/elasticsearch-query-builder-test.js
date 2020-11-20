@@ -5,12 +5,13 @@ import AndOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-buil
 import OrOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/or-operator-query-block';
 import NotOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/not-operator-query-block';
 import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/condition-query-block';
-import IndexProperty from 'harvester-gui-plugin-generic/utils/index-property';
-import IndexOnedataProperty from 'harvester-gui-plugin-generic/utils/index-onedata-property';
-import IndexAnyProperty from 'harvester-gui-plugin-generic/utils/index-any-property';
+import EsIndexProperty from 'harvester-gui-plugin-generic/utils/es-index-property';
+import EsIndexOnedataProperty from 'harvester-gui-plugin-generic/utils/es-index-onedata-property';
+import EsIndexAnyProperty from 'harvester-gui-plugin-generic/utils/es-index-any-property';
+import RootOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/root-operator-query-block';
 
 const exampleBooleanConditionBlock = new ConditionQueryBlock(
-  new IndexProperty(new IndexProperty(null, 'a'), 'b'),
+  new EsIndexProperty(new EsIndexProperty(null, 'a'), 'b'),
   'boolean.is',
   'true'
 );
@@ -23,7 +24,7 @@ const exampleBooleanConditionQuery = {
 };
 
 const exampleTextContainsConditionBlock = new ConditionQueryBlock(
-  new IndexProperty(new IndexProperty(null, 'e'), 'f'),
+  new EsIndexProperty(new EsIndexProperty(null, 'e'), 'f'),
   'text.contains',
   'a | b'
 );
@@ -36,7 +37,7 @@ const exampleTextContainsConditionQuery = {
 };
 
 const exampleNumberEqualsConditionBlock = new ConditionQueryBlock(
-  new IndexProperty(new IndexProperty(null, 'g'), 'h'),
+  new EsIndexProperty(new EsIndexProperty(null, 'g'), 'h'),
   'number.eq',
   '2'
 );
@@ -50,7 +51,7 @@ const exampleNumberEqualsConditionQuery = {
 };
 
 const exampleKeywordIsConditionBlock = new ConditionQueryBlock(
-  new IndexProperty(new IndexProperty(null, 'i'), 'j'),
+  new EsIndexProperty(new EsIndexProperty(null, 'i'), 'j'),
   'keyword.is',
   'abc'
 );
@@ -63,7 +64,7 @@ const exampleKeywordIsConditionQuery = {
 };
 
 const exampleDateLteConditionBlock = new ConditionQueryBlock(
-  new IndexProperty(new IndexProperty(null, 'k'), 'l'),
+  new EsIndexProperty(new EsIndexProperty(null, 'k'), 'l'),
   'date.lte', {
     timeEnabled: true,
     datetime: new Date(2020, 0, 2, 12, 10, 40),
@@ -79,7 +80,7 @@ const exampleDateLteConditionQuery = {
 };
 
 const exampleSpaceConditionBlock = new ConditionQueryBlock(
-  new IndexOnedataProperty(null, 'space'),
+  new EsIndexOnedataProperty(null, 'space'),
   'space.is', {
     id: 'space1Id',
     name: 'space1',
@@ -94,7 +95,7 @@ const exampleSpaceConditionQuery = {
 };
 
 const exampleAnyPropertyConditionBlock = new ConditionQueryBlock(
-  new IndexAnyProperty(),
+  new EsIndexAnyProperty(),
   'anyProperty.hasPhrase',
   'abc def'
 );
@@ -148,9 +149,11 @@ const exampleOrOperatorQuery = {
   },
 };
 
-const exampleNestedOperatorsBlock = new NotOperatorQueryBlock();
-exampleNestedOperatorsBlock.operands.pushObject(new OrOperatorQueryBlock());
-exampleNestedOperatorsBlock.operands[0].operands.pushObjects([
+const exampleNestedOperatorsBlock = new RootOperatorQueryBlock();
+const exampleNestedOperatorsBlockInner = new NotOperatorQueryBlock();
+exampleNestedOperatorsBlock.operands.pushObject(exampleNestedOperatorsBlockInner);
+exampleNestedOperatorsBlockInner.operands.pushObject(new OrOperatorQueryBlock());
+exampleNestedOperatorsBlockInner.operands[0].operands.pushObjects([
   exampleAndOperatorBlock,
   exampleOrOperatorBlock,
 ]);
@@ -218,7 +221,7 @@ describe('Unit | Utility | elasticsearch-query-builder', function () {
       `converts number "${operator}" condition`,
       function () {
         const conditionBlock = new ConditionQueryBlock(
-          new IndexProperty(new IndexProperty(null, 'a'), 'b'),
+          new EsIndexProperty(new EsIndexProperty(null, 'a'), 'b'),
           `number.${operator}`,
           '2'
         );
@@ -309,7 +312,7 @@ describe('Unit | Utility | elasticsearch-query-builder', function () {
         `converts date "${name}" condition (timeEnabled ${timeEnabled})`,
         function () {
           const conditionBlock = new ConditionQueryBlock(
-            new IndexProperty(new IndexProperty(null, 'a'), 'b'),
+            new EsIndexProperty(new EsIndexProperty(null, 'a'), 'b'),
             `date.${name}`, {
               timeEnabled,
               datetime: new Date(2020, 0, 2, 12, 10, 40),
@@ -454,7 +457,7 @@ describe('Unit | Utility | elasticsearch-query-builder', function () {
 
   it('allows to specify custom sorting', function () {
     const esQueryBuilder = new ElasticsearchQueryBuilder();
-    esQueryBuilder.sortProperty = new IndexProperty(new IndexProperty(null, 'x'), 'y');
+    esQueryBuilder.sortProperty = new EsIndexProperty(new EsIndexProperty(null, 'x'), 'y');
     esQueryBuilder.sortDirection = 'asc';
 
     const result = esQueryBuilder.buildQuery();

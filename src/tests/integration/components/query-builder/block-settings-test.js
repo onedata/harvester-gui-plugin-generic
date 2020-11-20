@@ -68,7 +68,7 @@ describe('Integration | Component | query-builder/block-settings', function () {
       expect(blockSelector).to.exist;
       // only operator blocks have "change to" section
       expect(blockSelector.querySelector('.change-to-section')).to.exist;
-      expect(blockSelector.querySelector('.operator-none')).to.have.attr('disabled');
+      expect(blockSelector.querySelector('.operator-none')).to.not.exist;
     }
   );
 

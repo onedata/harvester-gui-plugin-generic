@@ -27,7 +27,7 @@ const allowedPropertyTypes = [
 /**
  * @argument {Utils.Index} index
  * @argument {Function} onPerformQuery
- * @argument {Utils.IndexProperty} sortProperty
+ * @argument {Utils.EsIndexProperty} sortProperty
  * @argument {String} sortDirection
  * @argument {Function} onGenerateCurl
  * @argument {Object} filteredProperties
@@ -60,7 +60,7 @@ export default class QueryBuilderComponent extends Component {
   }
 
   /**
-   * @type {Array<Utils.IndexProperty>}
+   * @type {Array<Utils.EsIndexProperty>}
    */
   get indexProperties() {
     const allProperties =
@@ -140,16 +140,14 @@ export default class QueryBuilderComponent extends Component {
       }
     }
 
-    for (const condition of flattenedConditionsList) {
-      this.editedConditions.delete(condition);
-    }
+    flattenedConditionsList.forEach(condition => this.editedConditions.delete(condition));
 
     // trigger change
     this.editedConditions = this.editedConditions;
   }
 
   /**
-   * @param {Utils.IndexProperty} property
+   * @param {Utils.EsIndexProperty} property
    * @returns {boolean}
    */
   isSupportedProperty(property) {

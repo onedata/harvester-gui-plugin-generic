@@ -3,7 +3,13 @@
     <div class="left-col-icon">
       <FaIcon @icon={{if isExpanded "caret-down" "caret-right"}} @size="lg"/>
     </div>
-    <samp class="result-sample">{{{this.readableJson}}}</samp>
+    <samp class="result-sample">
+      {{#if this.readableJson}}
+        {{{this.readableJson}}}
+      {{else}}
+        <em class="empty-result-sample">{{tt this "noJsonMatch"}}</em>
+      {{/if}}
+    </samp>
   </div>
   <a class="go-to-file-link" href={{@queryResult.fileBrowserUrl}} target="_blank">
     <span class="left-col-icon">

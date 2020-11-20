@@ -8,13 +8,13 @@ import { click, fillIn, triggerKeyEvent } from '@ember/test-helpers';
 import { selectChoose, clickTrigger } from 'ember-power-select/test-support/helpers';
 import RootOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/root-operator-query-block';
 import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/condition-query-block';
-import Index from 'harvester-gui-plugin-generic/utils/index';
+import EsIndex from 'harvester-gui-plugin-generic/utils/es-index';
 
 describe('Integration | Component | query-builder', function () {
   setupRenderingTest();
 
   beforeEach(function () {
-    this.set('index', new Index({
+    this.set('index', new EsIndex({
       mappings: {
         properties: {
           a: {

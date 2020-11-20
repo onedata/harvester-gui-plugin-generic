@@ -1,17 +1,17 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
-import IndexPropertyCollection from 'harvester-gui-plugin-generic/utils/index-property-collection';
+import EsIndexPropertyCollection from 'harvester-gui-plugin-generic/utils/es-index-property-collection';
 
-describe('Unit | Utility | index-property-collection', function () {
+describe('Unit | Utility | es-index-property-collection', function () {
   it('has "properties" field equal to empty object on init', function () {
-    const collection = new IndexPropertyCollection();
+    const collection = new EsIndexPropertyCollection();
     expect(collection.properties).to.deep.equal({});
   });
 
   it(
     'creates properties instances based on passed properties raw object and places it in "properties" field',
     function () {
-      const collection = new IndexPropertyCollection();
+      const collection = new EsIndexPropertyCollection();
 
       const field1Def = { type: 'text' };
       const field2Def = { type: 'object' };

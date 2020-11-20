@@ -433,7 +433,7 @@ describe('Integration | Component | query-builder/operator-block', function () {
           } else {
             expect(this.element.querySelector(
               '.ember-attacher .change-to-section .operator-none'
-            )).to.have.attr('disabled');
+            )).to.not.exist;
           }
         }
       );

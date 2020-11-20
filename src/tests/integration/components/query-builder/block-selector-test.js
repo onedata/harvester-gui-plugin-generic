@@ -175,9 +175,11 @@ describe('Integration | Component | query-builder/block-selector', function () {
     it(
       'renders four operators: AND, OR, NOT and NONE in "change to" section',
       async function () {
+        this.set('parentBlock', new AndOperatorQueryBlock());
         await render(hbs `<QueryBuilder::BlockSelector
           @mode="edit"
           @editBlock={{this.editBlock}}
+          @editParentBlock={{this.parentBlock}}
         />`);
 
         const operators = this.element.querySelectorAll(
@@ -310,20 +312,20 @@ describe('Integration | Component | query-builder/block-selector', function () {
         const parentOperatorNameUpper = parentOperatorName.toUpperCase();
         [{
           nestedBlockCount: 0,
-          disabled: false,
+          notAllowed: false,
         }, {
           nestedBlockCount: 1,
-          disabled: false,
+          notAllowed: false,
         }, {
           nestedBlockCount: 2,
           // For some types of parents, change to "NONE" with multiple operands is not
           // allowed (example: try to move two operands from AND to NOT operator -
           // it's impossible).
-          disabled: [
+          notAllowed: [
             ...singleOperandOperatorsList,
             'root',
           ].includes(parentOperatorName),
-        }].forEach(({ nestedBlockCount, disabled }) => {
+        }].forEach(({ nestedBlockCount, notAllowed }) => {
           if (
             nestedBlockCount > 1 &&
             singleOperandOperatorsList.includes(sourceOperatorName)
@@ -339,7 +341,7 @@ describe('Integration | Component | query-builder/block-selector', function () {
               `removes ${sourceOperatorNameUpper} operator (with no children) from ${parentOperatorNameUpper} parent operator when using "change to" "NONE"`;
           } else {
             description =
-              `${disabled ? 'does not allow to extract' : 'extracts'} ${nestedBlockCount} nested elements in ${sourceOperatorNameUpper} operator to ${parentOperatorNameUpper} parent operator using "change to" "NONE"`;
+              `${notAllowed ? 'does not allow to extract' : 'extracts'} ${nestedBlockCount} nested elements in ${sourceOperatorNameUpper} operator to ${parentOperatorNameUpper} parent operator using "change to" "NONE"`;
           }
 
           it(description, async function () {
@@ -369,8 +371,8 @@ describe('Integration | Component | query-builder/block-selector', function () {
 
             const noneOperatorBtn =
               this.element.querySelector('.change-to-section .operator-none');
-            if (disabled) {
-              expect(noneOperatorBtn).to.have.attr('disabled');
+            if (notAllowed) {
+              expect(noneOperatorBtn).to.not.exist;
               return;
             } else {
               expect(noneOperatorBtn).to.not.have.attr('disabled');
