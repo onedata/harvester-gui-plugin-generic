@@ -14,7 +14,7 @@ describe('Integration | Component | query-results', function () {
   setupRenderingTest();
 
   beforeEach(function () {
-    const queryResults = new QueryResults({
+    this.queryResults = new QueryResults({
       hits: {
         total: {
           value: 2,
@@ -42,39 +42,36 @@ describe('Integration | Component | query-results', function () {
         }],
       },
     });
-    this.setProperties({
-      queryResults,
-      queryResultsPromise: resolve(queryResults),
-      index: new EsIndex({
-        mappings: {
-          properties: {
-            a: {
-              type: 'object',
-              properties: {
-                b: {
-                  type: 'boolean',
-                },
+    this.queryResultsPromise = resolve(this.queryResults);
+    this.index = new EsIndex({
+      mappings: {
+        properties: {
+          a: {
+            type: 'object',
+            properties: {
+              b: {
+                type: 'boolean',
               },
             },
-            c: {
-              type: 'text',
-              fields: {
-                d: {
-                  type: 'keyword',
-                },
+          },
+          c: {
+            type: 'text',
+            fields: {
+              d: {
+                type: 'keyword',
               },
             },
-            e: {
-              type: 'nested',
-              properties: {
-                f: {
-                  type: 'text',
-                },
+          },
+          e: {
+            type: 'nested',
+            properties: {
+              f: {
+                type: 'text',
               },
             },
           },
         },
-      }),
+      },
     });
   });
 
@@ -90,7 +87,7 @@ describe('Integration | Component | query-results', function () {
   it(
     'shows "loading" placeholder view when query results are loading',
     async function () {
-      this.set('queryResultsPromise', new Promise(() => {}));
+      this.queryResultsPromise = new Promise(() => {});
 
       await render(hbs `<QueryResults @queryResultsPromise={{this.queryResultsPromise}}/>`);
 
@@ -100,11 +97,11 @@ describe('Integration | Component | query-results', function () {
   );
 
   it('shows "empty" placeholder view when query results are empty', async function () {
-    this.set('queryResultsPromise', resolve(new QueryResults({
+    this.queryResultsPromise = resolve(new QueryResults({
       hits: {
         hits: [],
       },
-    })));
+    }));
 
     await render(hbs `<QueryResults @queryResultsPromise={{this.queryResultsPromise}}/>`);
 
@@ -131,18 +128,18 @@ describe('Integration | Component | query-results', function () {
   });
 
   it('does not notify about changed filtered properties on init', async function () {
-    const changeSpy = this.set('changeSpy', sinon.spy());
+    this.changeSpy = sinon.spy();
 
     await render(hbs `<QueryResults
       @queryResultsPromise={{this.queryResultsPromise}}
       @onFilteredPropertiesChange={{this.changeSpy}}
     />`);
 
-    expect(changeSpy).to.not.be.called;
+    expect(this.changeSpy).to.not.be.called;
   });
 
   it('notifies about changed filtered properties', async function () {
-    const changeSpy = this.set('changeSpy', sinon.spy());
+    this.changeSpy = sinon.spy();
 
     await render(hbs `<QueryResults
       @queryResultsPromise={{this.queryResultsPromise}}
@@ -151,8 +148,8 @@ describe('Integration | Component | query-results', function () {
     await click('.show-properties-selector');
     await click('.select-all');
 
-    expect(changeSpy).to.be.calledOnce;
-    expect(changeSpy.lastCall.args[0]).to.deep.equal({
+    expect(this.changeSpy).to.be.calledOnce;
+    expect(this.changeSpy.lastCall.args[0]).to.deep.equal({
       a: {
         b: {},
         bb: {},
@@ -165,11 +162,11 @@ describe('Integration | Component | query-results', function () {
   });
 
   it('has no pagination controls when query results are empty', async function () {
-    this.set('queryResultsPromise', resolve(new QueryResults({
+    this.queryResultsPromise = resolve(new QueryResults({
       hits: {
         hits: [],
       },
-    })));
+    }));
 
     await render(hbs `<QueryResults @queryResultsPromise={{this.queryResultsPromise}}/>`);
 
@@ -247,7 +244,7 @@ describe('Integration | Component | query-results', function () {
       `notifies about page change (${paginationPosition} pagination control)`,
       async function () {
         this.queryResults.totalResultsCount = 50;
-        const changeSpy = this.set('changeSpy', sinon.spy());
+        this.changeSpy = sinon.spy();
 
         await render(hbs `<QueryResults
           @queryResultsPromise={{this.queryResultsPromise}}
@@ -259,14 +256,14 @@ describe('Integration | Component | query-results', function () {
         )[index];
         await click(nextBtn);
 
-        expect(changeSpy).to.be.calledOnce.and.to.be.calledWith(2);
+        expect(this.changeSpy).to.be.calledOnce.and.to.be.calledWith(2);
       }
     );
 
     it(
       `notifies about page size change (${paginationPosition} pagination control)`,
       async function () {
-        const changeSpy = this.set('changeSpy', sinon.spy());
+        this.changeSpy = sinon.spy();
 
         await render(hbs `<QueryResults
           @queryResultsPromise={{this.queryResultsPromise}}
@@ -278,7 +275,7 @@ describe('Integration | Component | query-results', function () {
         )[index];
         await selectChoose(pageSizeSelector, '50');
 
-        expect(changeSpy).to.be.calledOnce.and.to.be.calledWith(50);
+        expect(this.changeSpy).to.be.calledOnce.and.to.be.calledWith(50);
       }
     );
   });
@@ -300,7 +297,8 @@ describe('Integration | Component | query-results', function () {
   });
 
   it('notifies about sort property change', async function () {
-    const changeSpy = this.set('changeSpy', sinon.spy());
+    this.changeSpy = sinon.spy();
+
     await render(hbs `<QueryResults
       @index={{this.index}}
       @queryResultsPromise={{this.queryResultsPromise}}
@@ -314,11 +312,12 @@ describe('Integration | Component | query-results', function () {
       direction: 'desc',
       property: sinon.match.same(this.index.properties.c.properties.d),
     });
-    expect(changeSpy).to.be.calledOnce.and.to.be.calledWith(changeMatcher);
+    expect(this.changeSpy).to.be.calledOnce.and.to.be.calledWith(changeMatcher);
   });
 
   it('notifies about sort direction change', async function () {
-    const changeSpy = this.set('changeSpy', sinon.spy());
+    this.changeSpy = sinon.spy();
+
     await render(hbs `<QueryResults
       @index={{this.index}}
       @queryResultsPromise={{this.queryResultsPromise}}
@@ -332,6 +331,6 @@ describe('Integration | Component | query-results', function () {
       direction: 'asc',
       property: sinon.match.same(this.index.properties.a.properties.b),
     });
-    expect(changeSpy).to.be.calledOnce.and.to.be.calledWith(changeMatcher);
+    expect(this.changeSpy).to.be.calledOnce.and.to.be.calledWith(changeMatcher);
   });
 });

@@ -18,22 +18,17 @@ describe('Integration | Component | content-index', function () {
     sinon.stub(SpacesProvider.prototype, 'fetchElasticsearchSpaces')
       .resolves([]);
 
-    const dataRequestStub = sinon.stub();
-    stubIndexMappingRequest(dataRequestStub);
-    stubQueryRequest(dataRequestStub);
-    const dataCurlCommandRequestStub = sinon.stub().resolves('curl');
+    this.dataRequestStub = sinon.stub();
+    stubIndexMappingRequest(this.dataRequestStub);
+    stubQueryRequest(this.dataRequestStub);
+    this.dataCurlCommandRequestStub = sinon.stub().resolves('curl');
 
     sinon.stub(this.owner.lookup('service:app-proxy'), 'dataRequest')
-      .get(() => dataRequestStub);
+      .get(() => this.dataRequestStub);
     sinon.stub(this.owner.lookup('service:app-proxy'), 'dataCurlCommandRequest')
-      .get(() => dataCurlCommandRequestStub);
+      .get(() => this.dataCurlCommandRequestStub);
     sinon.stub(this.owner.lookup('service:app-proxy'), 'fileBrowserUrlRequest')
       .get(() => (fileId => resolve(`${fileId}url`)));
-
-    this.setProperties({
-      dataRequestStub,
-      dataCurlCommandRequestStub,
-    });
   });
 
   afterEach(function () {

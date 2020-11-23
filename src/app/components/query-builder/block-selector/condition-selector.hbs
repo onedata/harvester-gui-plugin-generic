@@ -38,6 +38,7 @@
       </div>
       <QueryBuilder::ConditionComparatorValueEditor
         @mode="create"
+        @valuesBuilder={{@valuesBuilder}}
         @comparator={{this.selectedConditionComparator}}
         @value={{this.conditionComparatorValue}}
         @onValueChange={{this.conditionComparatorValueChanged}}

@@ -14,7 +14,7 @@ describe('Integration | Component | query-builder/block-settings', function () {
   setupRenderingTest();
 
   it('does not show block selector when "isShown" is false', async function () {
-    this.set('queryBlock', new NotOperatorQueryBlock());
+    this.queryBlock = new NotOperatorQueryBlock();
 
     await render(hbs `<QueryBuilder::BlockSettings
       @queryBlock={{this.queryBlock}}
@@ -25,7 +25,7 @@ describe('Integration | Component | query-builder/block-settings', function () {
   });
 
   it('shows block selector when "isShown" is true', async function () {
-    this.set('queryBlock', new NotOperatorQueryBlock());
+    this.queryBlock = new NotOperatorQueryBlock();
 
     await render(hbs `<QueryBuilder::BlockSettings
       @queryBlock={{this.queryBlock}}
@@ -44,18 +44,13 @@ describe('Integration | Component | query-builder/block-settings', function () {
   it(
     'shows block selector (operator block variant with blocked "NONE" "change to")',
     async function () {
-      const {
-        queryBlock,
-        parentQueryBlock,
-      } = this.setProperties({
-        queryBlock: new NotOperatorQueryBlock(),
-        parentQueryBlock: new NotOperatorQueryBlock(),
-      });
-      queryBlock.operands.push(
+      this.queryBlock = new NotOperatorQueryBlock();
+      this.parentQueryBlock = new NotOperatorQueryBlock();
+      this.queryBlock.operands.push(
         new NotOperatorQueryBlock(),
         new NotOperatorQueryBlock()
       );
-      parentQueryBlock.operands.push(queryBlock);
+      this.parentQueryBlock.operands.push(this.queryBlock);
 
       await render(hbs `<QueryBuilder::BlockSettings
         @queryBlock={{this.queryBlock}}
@@ -75,18 +70,13 @@ describe('Integration | Component | query-builder/block-settings', function () {
   it(
     'shows block selector (operator block variant with unlocked "NONE" "change to")',
     async function () {
-      const {
-        queryBlock,
-        parentQueryBlock,
-      } = this.setProperties({
-        queryBlock: new NotOperatorQueryBlock(),
-        parentQueryBlock: new AndOperatorQueryBlock(),
-      });
-      queryBlock.operands.push(
+      this.queryBlock = new NotOperatorQueryBlock();
+      this.parentQueryBlock = new AndOperatorQueryBlock();
+      this.queryBlock.operands.push(
         new NotOperatorQueryBlock(),
         new NotOperatorQueryBlock()
       );
-      parentQueryBlock.operands.push(queryBlock);
+      this.parentQueryBlock.operands.push(this.queryBlock);
 
       await render(hbs `<QueryBuilder::BlockSettings
         @queryBlock={{this.queryBlock}}
@@ -104,7 +94,7 @@ describe('Integration | Component | query-builder/block-settings', function () {
   );
 
   it('shows block selector (condition block variant)', async function () {
-    this.set('queryBlock', new ConditionQueryBlock());
+    this.queryBlock = new ConditionQueryBlock();
 
     await render(hbs `<QueryBuilder::BlockSettings
       @queryBlock={{this.queryBlock}}
@@ -121,16 +111,10 @@ describe('Integration | Component | query-builder/block-settings', function () {
   it(
     'notifies about selected "surround" operator and then closes block selector',
     async function () {
-      const {
-        queryBlock,
-        replaceSpy,
-        closeSpy,
-      } = this.setProperties({
-        queryBlock: new NotOperatorQueryBlock(),
-        replaceSpy: sinon.spy(),
-        closeSpy: sinon.stub().callsFake(() => this.set('isShown', false)),
-        isShown: true,
-      });
+      this.queryBlock = new NotOperatorQueryBlock();
+      this.replaceSpy = sinon.spy();
+      this.closeSpy = sinon.stub().callsFake(() => this.isShown = false);
+      this.isShown = true;
 
       await render(hbs `<QueryBuilder::BlockSettings
         @queryBlock={{this.queryBlock}}
@@ -142,27 +126,21 @@ describe('Integration | Component | query-builder/block-settings', function () {
       await waitUntil(() => !isVisible('.ember-attacher'), { timeout: 1000 });
 
       const blockMatcher = sinon.match.instanceOf(AndOperatorQueryBlock)
-        .and(sinon.match.has('operands', [queryBlock]));
-      expect(replaceSpy).to.be.calledOnce.and.to.be.calledWith([blockMatcher]);
-      expect(closeSpy).to.be.calledOnce;
+        .and(sinon.match.has('operands', [this.queryBlock]));
+      expect(this.replaceSpy).to.be.calledOnce.and.to.be.calledWith([blockMatcher]);
+      expect(this.closeSpy).to.be.calledOnce;
     }
   );
 
   it(
     'notifies about selected "change to" operator and then closes block selector',
     async function () {
-      const {
-        queryBlock,
-        replaceSpy,
-        closeSpy,
-      } = this.setProperties({
-        queryBlock: new NotOperatorQueryBlock(),
-        replaceSpy: sinon.spy(),
-        closeSpy: sinon.stub().callsFake(() => this.set('isShown', false)),
-        isShown: true,
-      });
+      this.queryBlock = new NotOperatorQueryBlock();
+      this.replaceSpy = sinon.spy();
+      this.closeSpy = sinon.stub().callsFake(() => this.isShown = false);
+      this.isShown = true;
       const condition = new ConditionQueryBlock();
-      queryBlock.operands.pushObject(condition);
+      this.queryBlock.operands.pushObject(condition);
 
       await render(hbs `<QueryBuilder::BlockSettings
         @queryBlock={{this.queryBlock}}
@@ -175,8 +153,8 @@ describe('Integration | Component | query-builder/block-settings', function () {
 
       const blockMatcher = sinon.match.instanceOf(AndOperatorQueryBlock)
         .and(sinon.match.has('operands', [condition]));
-      expect(replaceSpy).to.be.calledOnce.and.to.be.calledWith([blockMatcher]);
-      expect(closeSpy).to.be.calledOnce;
+      expect(this.replaceSpy).to.be.calledOnce.and.to.be.calledWith([blockMatcher]);
+      expect(this.closeSpy).to.be.calledOnce;
     }
   );
 });

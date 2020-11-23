@@ -8,6 +8,7 @@
       class="clickable"
       @mode={{this.mode}}
       @comparator={{@queryBlock.comparator}}
+      @valuesBuilder={{@valuesBuilder}}
       @value={{if (eq this.mode "edit") this.editComparatorValue @queryBlock.comparatorValue}}
       @isValueInvalid={{not this.isEditComparatorValueValid}}
       @onStartEdit={{this.startEdit}}

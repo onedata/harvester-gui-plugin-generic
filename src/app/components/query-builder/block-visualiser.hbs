@@ -6,6 +6,7 @@
 >
   {{#component (concat "query-builder/" @queryBlock.constructor.renderer)
     queryBlock=@queryBlock
+    valuesBuilder=@valuesBuilder
     indexProperties=@indexProperties
     onConditionEditionStart=@onConditionEditionStart
     onConditionEditionEnd=@onConditionEditionEnd

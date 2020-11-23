@@ -10,10 +10,10 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
-import { defaultComparatorValidators } from 'harvester-gui-plugin-generic/utils/query-builder/condition-comparator-editors';
 
 /**
  * @argument {Utils.QueryBuilder.ConditionQueryBlock} queryBlock
+ * @argument {Utils.QueryValueComponentsBuilder} valuesBuilder
  * @argument {Function} onConditionEditionStart
  * @argument {Function} onConditionEditionEnd
  * @argument {Function} onConditionEditionValidityChange
@@ -35,15 +35,17 @@ export default class QueryBuilderConditionBlockComponent extends Component {
   @tracked editComparatorValue = null;
 
   /**
-   * @type {Object}
-   */
-  @tracked comparatorValidatorsSet = defaultComparatorValidators;
-
-  /**
    * @type {Utils.QueryBuilder.ConditionQueryBlock}
    */
   get queryBlock() {
     return this.args.queryBlock || {};
+  }
+
+  /**
+   * @type {Utils.QueryValueComponentsBuilder}
+   */
+  get valuesBuilder() {
+    return this.args.valuesBuilder || [];
   }
 
   /**
@@ -75,15 +77,14 @@ export default class QueryBuilderConditionBlockComponent extends Component {
    * @type {Function}
    */
   get comparatorValidator() {
-    return this.comparatorValidatorsSet[this.queryBlock.comparator];
+    return this.valuesBuilder.getValidatorFor(this.queryBlock.comparator);
   }
 
   /**
    * @type {boolean}
    */
   get isEditComparatorValueValid() {
-    return this.comparatorValidator ?
-      this.comparatorValidator(this.editComparatorValue) : false;
+    return this.comparatorValidator(this.editComparatorValue);
   }
 
   @action

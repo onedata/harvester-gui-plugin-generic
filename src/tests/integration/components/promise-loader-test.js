@@ -11,7 +11,7 @@ describe('Integration | Component | promise-loader', function () {
   setupRenderingTest();
 
   it('yields result of fulfilled promise', async function () {
-    this.set('promise', resolve('test'));
+    this.promise = resolve('test');
     await render(hbs `
       <PromiseLoader @promise={{this.promise}} as |result|>
         {{result}}
@@ -22,7 +22,7 @@ describe('Integration | Component | promise-loader', function () {
   });
 
   it('shows spinner when promise is pending', async function () {
-    this.set('promise', new Promise(() => {}));
+    this.promise = new Promise(() => {});
     await render(hbs `
       <PromiseLoader @promise={{this.promise}} as |result|>
         {{result}}
@@ -34,7 +34,7 @@ describe('Integration | Component | promise-loader', function () {
 
   it('shows error from rejected promise', async function () {
     let rejectCallback;
-    this.set('promise', new Promise((resolve, reject) => rejectCallback = reject));
+    this.promise = new Promise((resolve, reject) => rejectCallback = reject);
 
     await render(hbs `
       <PromiseLoader @promise={{this.promise}} as |result|>
@@ -51,27 +51,22 @@ describe('Integration | Component | promise-loader', function () {
   });
 
   it('notifies about promise resolve', async function () {
-    const spy = sinon.spy();
-    this.setProperties({
-      promise: resolve('test'),
-      spy,
-    });
+    this.spy = sinon.spy();
+    this.promise = resolve('test');
+
     await render(hbs `
       <PromiseLoader @promise={{this.promise}} @onResolve={{this.spy}} as |result|>
         {{result}}
       </PromiseLoader>
     `);
 
-    expect(spy).to.be.calledOnce.and.to.be.calledWith('test');
+    expect(this.spy).to.be.calledOnce.and.to.be.calledWith('test');
   });
 
   it('notifies about promise reject', async function () {
-    const spy = sinon.spy();
+    this.spy = sinon.spy();
     let rejectCallback;
-    this.setProperties({
-      promise: new Promise((resolve, reject) => rejectCallback = reject),
-      spy,
-    });
+    this.promise = new Promise((resolve, reject) => rejectCallback = reject);
 
     await render(hbs `
       <PromiseLoader @promise={{this.promise}} @onReject={{this.spy}} as |result|>
@@ -81,11 +76,12 @@ describe('Integration | Component | promise-loader', function () {
     rejectCallback('test');
     await settled();
 
-    expect(spy).to.be.calledOnce.and.to.be.calledWith('test');
+    expect(this.spy).to.be.calledOnce.and.to.be.calledWith('test');
   });
 
   it('allows to use custom template for "pending" promise state', async function () {
-    this.set('promise', new Promise(() => {}));
+    this.promise = new Promise(() => {});
+
     await render(hbs `
       <PromiseLoader
         @promise={{this.promise}}
@@ -103,7 +99,7 @@ describe('Integration | Component | promise-loader', function () {
 
   it('allows to use custom template for "rejected" promise state', async function () {
     let rejectCallback;
-    this.set('promise', new Promise((resolve, reject) => rejectCallback = reject));
+    this.promise = new Promise((resolve, reject) => rejectCallback = reject);
 
     await render(hbs `
       <PromiseLoader

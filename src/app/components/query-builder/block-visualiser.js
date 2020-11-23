@@ -15,6 +15,7 @@ import { action } from '@ember/object';
 /**
  * @argument {Utils.QueryBuilder.QueryBlock} queryBlock
  * @argument {Utils.QueryBuilder.OperatorQueryBlock} parentQueryBlock
+ * @argument {Utils.QueryValueComponentsBuilder} valuesBuilder
  * @argument {Array<IndexProperty>} indexProperties
  * @argument {Function} onConditionEditionStart
  * @argument {Function} onConditionEditionEnd

@@ -14,6 +14,7 @@ import RootOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-bui
 
 /**
  * @argument {Utils.QueryBuilder.OperatorQueryBlock} queryBlock
+ * @argument {Utils.QueryValueComponentsBuilder} valuesBuilder
  * @argument {Array<IndexProperty>} indexProperties
  * @argument {Function} onConditionEditionStart
  * @argument {Function} onConditionEditionEnd

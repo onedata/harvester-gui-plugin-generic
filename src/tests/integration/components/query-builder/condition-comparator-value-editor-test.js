@@ -9,6 +9,7 @@ import { click, fillIn, blur, triggerKeyEvent } from '@ember/test-helpers';
 import { isFlatpickrOpen, setFlatpickrDate, closeFlatpickrDate } from 'ember-flatpickr/test-support/helpers';
 import moment from 'moment';
 import SpacesProvider from 'harvester-gui-plugin-generic/services/spaces-provider';
+import QueryValueComponentsBuilder from 'harvester-gui-plugin-generic/utils/query-value-components-builder';
 
 const mathOperators = ['eq', 'lt', 'lte', 'gt', 'gte'];
 
@@ -30,6 +31,7 @@ describe(
         this.spaces = spaces;
       });
       this.owner.lookup('service:spaces-provider').reloadSpaces();
+      this.valuesBuilder = new QueryValueComponentsBuilder(spaces);
     });
 
     afterEach(function () {
@@ -42,7 +44,7 @@ describe(
       [{
         comparator: 'boolean.is',
         value: 'false',
-        viewValue: '"false"',
+        viewValue: 'false',
       }, {
         comparator: 'text.contains',
         value: 'a | b',
@@ -50,7 +52,7 @@ describe(
       }, {
         comparator: 'number.eq',
         value: '2',
-        viewValue: '"2"',
+        viewValue: '2',
       }, {
         comparator: 'date.eq',
         value: { timeEnabled: false, datetime: new Date(2020, 0, 2) },
@@ -83,6 +85,7 @@ describe(
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="view"
+              @valuesBuilder={{this.valuesBuilder}}
               @comparator={{this.comparator}}
               @value={{this.value}}
             />`);
@@ -98,6 +101,7 @@ describe(
 
         await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
           @mode="view"
+          @valuesBuilder={{this.valuesBuilder}}
           @comparator="boolean.is"
           @value="false"
           @onStartEdit={{this.onStartEditSpy}}
@@ -131,6 +135,7 @@ describe(
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="create"
+              @valuesBuilder={{this.valuesBuilder}}
               @comparator={{this.comparator}}
             />`);
 
@@ -149,6 +154,7 @@ describe(
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="create"
+              @valuesBuilder={{this.valuesBuilder}}
               @comparator={{this.comparator}}
               @onValueChange={{this.changeSpy}}
             />`);
@@ -179,6 +185,7 @@ describe(
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="create"
+              @valuesBuilder={{this.valuesBuilder}}
               @comparator={{this.comparator}}
             />`);
             await clickTrigger('.comparator-value');
@@ -202,6 +209,7 @@ describe(
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="create"
+              @valuesBuilder={{this.valuesBuilder}}
               @comparator={{this.comparator}}
               @onValueChange={{this.changeSpy}}
             />`);
@@ -225,6 +233,7 @@ describe(
             });
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="create"
+              @valuesBuilder={{this.valuesBuilder}}
               @comparator={{this.comparator}}
               @value={{this.value}}
             />`);
@@ -252,6 +261,7 @@ describe(
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="create"
+              @valuesBuilder={{this.valuesBuilder}}
               @comparator={{this.comparator}}
               @value={{this.value}}
               @onValueChange={{this.changeSpy}}
@@ -284,6 +294,7 @@ describe(
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="create"
+              @valuesBuilder={{this.valuesBuilder}}
               @comparator={{this.comparator}}
               @value={{this.value}}
               @onValueChange={{this.changeSpy}}
@@ -320,6 +331,7 @@ describe(
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="edit"
+              @valuesBuilder={{this.valuesBuilder}}
               @comparator={{this.comparator}}
               @value="abc"
             />`);
@@ -336,6 +348,7 @@ describe(
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="edit"
+              @valuesBuilder={{this.valuesBuilder}}
               @comparator={{this.comparator}}
               @value="abc"
             />`);
@@ -358,6 +371,7 @@ describe(
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="edit"
+              @valuesBuilder={{this.valuesBuilder}}
               @comparator={{this.comparator}}
               @value="abc"
               @onValueChange={{this.changeSpy}}
@@ -385,6 +399,7 @@ describe(
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="edit"
+              @valuesBuilder={{this.valuesBuilder}}
               @comparator={{this.comparator}}
               @value="abc"
               @onValueChange={{this.changeSpy}}
@@ -412,6 +427,7 @@ describe(
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="edit"
+              @valuesBuilder={{this.valuesBuilder}}
               @comparator={{this.comparator}}
               @value="abc"
               @onValueChange={{this.changeSpy}}
@@ -438,6 +454,7 @@ describe(
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="edit"
+              @valuesBuilder={{this.valuesBuilder}}
               @comparator={{this.comparator}}
               @value="abc"
               @onFinishEdit={{this.finishEditSpy}}
@@ -457,6 +474,7 @@ describe(
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="edit"
+              @valuesBuilder={{this.valuesBuilder}}
               @comparator={{this.comparator}}
               @value="abc"
             />`);
@@ -473,6 +491,7 @@ describe(
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="edit"
+              @valuesBuilder={{this.valuesBuilder}}
               @comparator={{this.comparator}}
               @isValueInvalid={{true}}
               @value="abc"
@@ -519,6 +538,7 @@ describe(
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="edit"
+              @valuesBuilder={{this.valuesBuilder}}
               @comparator={{this.comparator}}
               @value="abc"
             />`);
@@ -536,6 +556,7 @@ describe(
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="edit"
+              @valuesBuilder={{this.valuesBuilder}}
               @comparator={{this.comparator}}
               @value={{this.value}}
             />`);
@@ -553,6 +574,7 @@ describe(
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="edit"
+              @valuesBuilder={{this.valuesBuilder}}
               @comparator={{this.comparator}}
               @value={{this.value}}
             />`);
@@ -576,6 +598,7 @@ describe(
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="edit"
+              @valuesBuilder={{this.valuesBuilder}}
               @comparator={{this.comparator}}
               @value={{this.value}}
               @onValueChange={{this.changeSpy}}
@@ -596,6 +619,7 @@ describe(
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="edit"
+              @valuesBuilder={{this.valuesBuilder}}
               @comparator={{this.comparator}}
               @value={{this.value}}
               @onFinishEdit={{this.finishEditSpy}}
@@ -617,6 +641,7 @@ describe(
 
           await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
             @mode="edit"
+            @valuesBuilder={{this.valuesBuilder}}
             @comparator="date.lt"
             @value={{this.value}}
           />`);
@@ -645,6 +670,7 @@ describe(
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="edit"
+              @valuesBuilder={{this.valuesBuilder}}
               @comparator={{this.comparator}}
               @value={{this.value}}
               @onFinishEdit={{this.finishEditSpy}}
@@ -673,6 +699,7 @@ describe(
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="edit"
+              @valuesBuilder={{this.valuesBuilder}}
               @comparator={{this.comparator}}
               @value={{this.value}}
               @onValueChange={{this.valueChangeStub}}
@@ -708,6 +735,7 @@ describe(
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="edit"
+              @valuesBuilder={{this.valuesBuilder}}
               @comparator={{this.comparator}}
               @value={{this.value}}
               @onValueChange={{this.valueChangeSpy}}

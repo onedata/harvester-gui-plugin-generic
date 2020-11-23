@@ -9,12 +9,13 @@ import { selectChoose, clickTrigger } from 'ember-power-select/test-support/help
 import RootOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/root-operator-query-block';
 import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/condition-query-block';
 import EsIndex from 'harvester-gui-plugin-generic/utils/es-index';
+import QueryValueComponentsBuilder from 'harvester-gui-plugin-generic/utils/query-value-components-builder';
 
 describe('Integration | Component | query-builder', function () {
   setupRenderingTest();
 
   beforeEach(function () {
-    this.set('index', new EsIndex({
+    this.index = new EsIndex({
       mappings: {
         properties: {
           a: {
@@ -43,7 +44,8 @@ describe('Integration | Component | query-builder', function () {
           },
         },
       },
-    }));
+    });
+    this.valuesBuilder = new QueryValueComponentsBuilder([]);
   });
 
   it('has class "query-builder', async function () {
@@ -53,7 +55,10 @@ describe('Integration | Component | query-builder', function () {
   });
 
   it('filters list of available index properties to supported ones', async function () {
-    await render(hbs `<QueryBuilder @index={{this.index}}/>`);
+    await render(hbs `<QueryBuilder
+      @index={{this.index}}
+      @valuesBuilder={{this.valuesBuilder}}
+    />`);
     await click('.query-builder-block-adder');
     await clickTrigger('.property-selector');
 
@@ -65,9 +70,10 @@ describe('Integration | Component | query-builder', function () {
   });
 
   it('calls "onPerformQuery" after submit button press', async function () {
-    const submitSpy = this.set('submitSpy', sinon.spy());
+    this.submitSpy = sinon.spy();
 
     await render(hbs `<QueryBuilder
+      @valuesBuilder={{this.valuesBuilder}}
       @onPerformQuery={{this.submitSpy}}
       @index={{this.index}}
     />`);
@@ -78,13 +84,16 @@ describe('Integration | Component | query-builder', function () {
 
     const queryMatcher = sinon.match.instanceOf(RootOperatorQueryBlock)
       .and(sinon.match.has('operands', [sinon.match.instanceOf(ConditionQueryBlock)]));
-    expect(submitSpy).to.be.calledOnce.and.be.calledWith(queryMatcher);
+    expect(this.submitSpy).to.be.calledOnce.and.be.calledWith(queryMatcher);
   });
 
   it(
     'does not disable submit button when edited condition has valid value',
     async function () {
-      await render(hbs `<QueryBuilder @index={{this.index}}/>`);
+      await render(hbs `<QueryBuilder
+        @index={{this.index}}
+        @valuesBuilder={{this.valuesBuilder}}
+      />`);
       await click('.query-builder-block-adder');
       await selectChoose('.property-selector', 'c.d');
       await fillIn('.ember-attacher .comparator-value', 'abc');
@@ -97,7 +106,10 @@ describe('Integration | Component | query-builder', function () {
   );
 
   it('disables submit button when edited condition has invalid value', async function () {
-    await render(hbs `<QueryBuilder @index={{this.index}}/>`);
+    await render(hbs `<QueryBuilder
+      @index={{this.index}}
+      @valuesBuilder={{this.valuesBuilder}}
+    />`);
     await click('.query-builder-block-adder');
     await selectChoose('.property-selector', 'c.d');
     await fillIn('.ember-attacher .comparator-value', 'abc');
@@ -111,7 +123,10 @@ describe('Integration | Component | query-builder', function () {
   it(
     'enables submit button when edited condition had invalid value and then the edition was cancelled',
     async function () {
-      await render(hbs `<QueryBuilder @index={{this.index}}/>`);
+      await render(hbs `<QueryBuilder
+        @index={{this.index}}
+        @valuesBuilder={{this.valuesBuilder}}
+      />`);
       await click('.query-builder-block-adder');
       await selectChoose('.property-selector', 'c.d');
       await fillIn('.ember-attacher .comparator-value', 'abc');
@@ -127,7 +142,10 @@ describe('Integration | Component | query-builder', function () {
   it(
     'enables submit button when edited condition had invalid value and then the condition was deleted',
     async function () {
-      await render(hbs `<QueryBuilder @index={{this.index}}/>`);
+      await render(hbs `<QueryBuilder
+        @index={{this.index}}
+        @valuesBuilder={{this.valuesBuilder}}
+      />`);
       await click('.query-builder-block-adder');
       await selectChoose('.property-selector', 'c.d');
       await fillIn('.ember-attacher .comparator-value', 'abc');
@@ -143,7 +161,10 @@ describe('Integration | Component | query-builder', function () {
   it(
     'enables submit button when edited condition had invalid value and then the containing operator was deleted',
     async function () {
-      await render(hbs `<QueryBuilder @index={{this.index}}/>`);
+      await render(hbs `<QueryBuilder
+        @index={{this.index}}
+        @valuesBuilder={{this.valuesBuilder}}
+      />`);
       await click('.query-builder-block-adder');
       await click('.operator-not');
       await click('.query-builder-block-adder');
@@ -161,19 +182,18 @@ describe('Integration | Component | query-builder', function () {
   it(
     'shows CURL request content on "generate request" button click',
     async function () {
-      const { generateCurlStub } = this.setProperties({
-        generateCurlStub: sinon.stub().resolves('curl!'),
-        filteredProperties: {
-          a: {
-            b: {},
-          },
-          c: {},
+      this.generateCurlStub = sinon.stub().resolves('curl!');
+      this.filteredProperties = {
+        a: {
+          b: {},
         },
-        sortProperty: { path: 'e.f' },
-        sortDirection: 'asc',
-      });
+        c: {},
+      };
+      this.sortProperty = { path: 'e.f' };
+      this.sortDirection = 'asc';
 
       await render(hbs `<QueryBuilder
+        @valuesBuilder={{this.valuesBuilder}}
         @onGenerateCurl={{this.generateCurlStub}}
         @filteredProperties={{this.filteredProperties}}
         @sortProperty={{this.sortProperty}}
@@ -185,8 +205,8 @@ describe('Integration | Component | query-builder', function () {
       await click('.accept-condition');
       await click('.generate-query-request');
 
-      expect(generateCurlStub).to.be.calledOnce;
-      expect(generateCurlStub.lastCall.args[0]).to.deep.equal({
+      expect(this.generateCurlStub).to.be.calledOnce;
+      expect(this.generateCurlStub.lastCall.args[0]).to.deep.equal({
         from: 0,
         size: 10,
         sort: [{

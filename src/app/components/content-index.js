@@ -5,12 +5,15 @@ import { action } from '@ember/object';
 import QueryResults from 'harvester-gui-plugin-generic/utils/query-results';
 import EsIndex from 'harvester-gui-plugin-generic/utils/es-index';
 import ElasticsearchQueryBuilder from 'harvester-gui-plugin-generic/utils/elasticsearch-query-builder';
+import QueryValueComponentsBuilder from 'harvester-gui-plugin-generic/utils/query-value-components-builder';
 
 export default class ContentIndexComponent extends Component {
   @service elasticsearch;
   @service appProxy;
+  @service spacesProvider;
 
   @tracked indexPromise;
+  @tracked queryValuesBuilder;
   @tracked queryResultsPromise;
   @tracked filteredProperties = {};
   @tracked sortProperty = {};
@@ -22,6 +25,7 @@ export default class ContentIndexComponent extends Component {
 
   constructor() {
     super(...arguments);
+    this.queryValuesBuilder = new QueryValueComponentsBuilder(this.spacesProvider.spaces);
     this.indexPromise = this.elasticsearch.getMapping()
       .then(response => {
         this.performQuery();

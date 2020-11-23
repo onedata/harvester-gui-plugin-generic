@@ -25,6 +25,7 @@ const allowedPropertyTypes = [
 ];
 
 /**
+ * @argument {Utils.QueryValueComponentsBuilder} valuesBuilder
  * @argument {Utils.Index} index
  * @argument {Function} onPerformQuery
  * @argument {Utils.EsIndexProperty} sortProperty

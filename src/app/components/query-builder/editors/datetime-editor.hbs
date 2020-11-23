@@ -1,0 +1,46 @@
+<div class="input-group">
+  <div class="input-group-prepend">
+    <BsButton
+      @size="sm"
+      @type="secondary"
+      @outline={{true}}
+      class="include-time {{if this.value.timeEnabled "active"}}"
+      onClick={{fn this.valueChanged (not this.value.timeEnabled)}}
+      {{did-insert this.includeTimeBtnInserted}}
+      {{will-destroy this.includeTimeBtnDestroyed}}
+    >
+      <FaIcon @icon="clock"/>
+      <BsTooltip @title={{tt this "includeTimeInDate"}}/>
+    </BsButton>
+  </div>
+  {{#if this.includeTimeBtnElement}}
+    {{#if this.value.timeEnabled}}
+      <EmberFlatpickr
+        @date={{readonly this.value.datetime}}
+        @onChange={{this.valueChanged}}
+        @onClose={{this.flatpickrClose}}
+        @onReady={{this.flatpickrReady}}
+        @ignoredFocusElements={{array includeTimeBtnElement}}
+        @static={{true}}
+        @altFormat="Y-m-d H:i:S"
+        @altInput={{true}}
+        @altInputClass="comparator-value form-control form-control-sm"
+        @enableTime={{true}}
+        @time_24hr={{true}}
+        @enableSeconds={{true}}
+      />
+    {{else}}
+      <EmberFlatpickr
+        @date={{readonly this.value.datetime}}
+        @onChange={{this.valueChanged}}
+        @onClose={{this.flatpickrClose}}
+        @onReady={{this.flatpickrReady}}
+        @ignoredFocusElements={{array includeTimeBtnElement}}
+        @static={{true}}
+        @altFormat="Y-m-d"
+        @altInput={{true}}
+        @altInputClass="comparator-value form-control form-control-sm"
+      />
+    {{/if}}
+  {{/if}}
+</div>

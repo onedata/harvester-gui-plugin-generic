@@ -9,6 +9,7 @@ import moment from 'moment';
 import SpacesProvider from 'harvester-gui-plugin-generic/services/spaces-provider';
 import { typeInSearch, clickTrigger, selectChoose } from 'ember-power-select/test-support/helpers';
 import { setFlatpickrDate } from 'ember-flatpickr/test-support/helpers';
+import QueryValueComponentsBuilder from 'harvester-gui-plugin-generic/utils/query-value-components-builder';
 
 const numberComparators = [{
   operator: 'eq',
@@ -184,6 +185,7 @@ describe(
           path: 'any property',
           type: 'anyProperty',
         }],
+        valuesBuilder: new QueryValueComponentsBuilder(spaces),
       });
 
       fakeClock = sinon.useFakeTimers({
@@ -202,6 +204,7 @@ describe(
 
     it('lists index properties in dropdown', async function () {
       await render(hbs `<QueryBuilder::BlockSelector::ConditionSelector
+        @valuesBuilder={{this.valuesBuilder}}
         @indexProperties={{this.indexProperties}}
       />`);
       await clickTrigger('.property-selector');
@@ -216,6 +219,7 @@ describe(
 
     it('filters index properties in dropdown', async function () {
       await render(hbs `<QueryBuilder::BlockSelector::ConditionSelector
+        @valuesBuilder={{this.valuesBuilder}}
         @indexProperties={{this.indexProperties}}
       />`);
       await clickTrigger('.property-selector');
@@ -228,6 +232,7 @@ describe(
 
     it('hides "Add" button when no property is selected', async function () {
       await render(hbs `<QueryBuilder::BlockSelector::ConditionSelector
+        @valuesBuilder={{this.valuesBuilder}}
         @indexProperties={{this.indexProperties}}
       />`);
 
@@ -236,6 +241,7 @@ describe(
 
     it('does not show comparator selector on init', async function () {
       await render(hbs `<QueryBuilder::BlockSelector::ConditionSelector
+        @valuesBuilder={{this.valuesBuilder}}
         @indexProperties={{this.indexProperties}}
       />`);
 
@@ -244,6 +250,7 @@ describe(
 
     it('shows comparator selector when property is selected', async function () {
       await render(hbs `<QueryBuilder::BlockSelector::ConditionSelector
+        @valuesBuilder={{this.valuesBuilder}}
         @indexProperties={{this.indexProperties}}
       />`);
       await selectChoose('.property-selector', 'boolProp');
@@ -261,6 +268,7 @@ describe(
     }) => {
       it(`shows comparators for ${propertyType} property`, async function () {
         await render(hbs `<QueryBuilder::BlockSelector::ConditionSelector
+          @valuesBuilder={{this.valuesBuilder}}
           @indexProperties={{this.indexProperties}}
         />`);
         await selectChoose('.property-selector', propertyName);
@@ -296,6 +304,7 @@ describe(
             const selectedSpy = this.set('selectedSpy', sinon.spy());
 
             await render(hbs `<QueryBuilder::BlockSelector::ConditionSelector
+              @valuesBuilder={{this.valuesBuilder}}
               @onConditionSelected={{this.selectedSpy}}
               @indexProperties={{this.indexProperties}}
             />`);
@@ -326,6 +335,7 @@ describe(
           `sets default comparator value for "${comparatorType}" comparator for ${propertyType} property`,
           async function () {
             await render(hbs `<QueryBuilder::BlockSelector::ConditionSelector
+              @valuesBuilder={{this.valuesBuilder}}
               @indexProperties={{this.indexProperties}}
             />`);
             await selectChoose('.property-selector', propertyName);
@@ -341,6 +351,7 @@ describe(
           `${isAddEnabledForDefaults ? 'does not block' : 'blocks'} "Add" button when ${propertyType} property "${comparatorType}" condition has default comparator value`,
           async function () {
             await render(hbs `<QueryBuilder::BlockSelector::ConditionSelector
+              @valuesBuilder={{this.valuesBuilder}}
               @indexProperties={{this.indexProperties}}
             />`);
 
@@ -362,6 +373,7 @@ describe(
         `blocks "Add" button when number property "${operator}" condition has a non-number condition value`,
         async function () {
           await render(hbs `<QueryBuilder::BlockSelector::ConditionSelector
+            @valuesBuilder={{this.valuesBuilder}}
             @indexProperties={{this.indexProperties}}
           />`);
 
@@ -379,6 +391,7 @@ describe(
         `sets default comparator value for "${operator}" comparator for date property (time enabled)`,
         async function () {
           await render(hbs `<QueryBuilder::BlockSelector::ConditionSelector
+            @valuesBuilder={{this.valuesBuilder}}
             @indexProperties={{this.indexProperties}}
           />`);
           await selectChoose('.property-selector', 'dateProp');
@@ -397,6 +410,7 @@ describe(
         // simulate no space to choose
         this.spaces.clear();
         await render(hbs `<QueryBuilder::BlockSelector::ConditionSelector
+          @valuesBuilder={{this.valuesBuilder}}
           @indexProperties={{this.indexProperties}}
         />`);
 

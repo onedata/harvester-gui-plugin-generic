@@ -10,15 +10,10 @@
 
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
-import { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
-import {
-  defaultComparators,
-  defaultComparatorValidators,
-  defaultComparatorValues,
-} from 'harvester-gui-plugin-generic/utils/query-builder/condition-comparator-editors';
 
 /**
+ * @argument {Utils.QueryValueComponentsBuilder} [valuesBuilder]
  * @argument {Array<IndexProperty>} indexProperties
  * @argument {Function} onConditionSelected
  * @argument {Array<String>} [operators]
@@ -26,7 +21,6 @@ import {
  */
 export default class QueryBuilderBlockSelectorConditionSelectorComponent
 extends Component {
-  @service spacesProvider;
 
   /**
    * @type {String}
@@ -49,19 +43,11 @@ extends Component {
   @tracked conditionComparatorValue;
 
   /**
-   * @type {Object}
+   * @type {Utils.QueryValueComponentsBuilder}
    */
-  @tracked comparatorsSet = defaultComparators;
-
-  /**
-   * @type {Object}
-   */
-  @tracked comparatorValidatorsSet = defaultComparatorValidators;
-
-  /**
-   * @type {Object}
-   */
-  @tracked comparatorDefaultValuesSet = defaultComparatorValues;
+  get valuesBuilder() {
+    return this.args.valuesBuilder || [];
+  }
 
   /**
    * @type {Array<IndexProperty>}
@@ -84,35 +70,28 @@ extends Component {
    * @type {Array<String>}
    */
   get comparators() {
-    if (this.selectedConditionProperty) {
-      const propertyType = this.selectedConditionProperty.type;
-      if (this.comparatorsSet[propertyType]) {
-        return this.comparatorsSet[propertyType];
-      }
-    }
-    return [];
+    return this.valuesBuilder.getComparatorsFor(this.selectedConditionProperty?.type);
   }
 
   /**
    * @type {Function}
    */
   get comparatorValidator() {
-    return this.comparatorValidatorsSet[this.selectedConditionComparator];
+    return this.valuesBuilder.getValidatorFor(this.selectedConditionComparator);
   }
 
   /**
    * @type {Function}
    */
   get comparatorDefaultValue() {
-    return this.comparatorDefaultValuesSet[this.selectedConditionComparator];
+    return this.valuesBuilder.getDefaultValueFor(this.selectedConditionComparator);
   }
 
   /**
    * @type {boolean}
    */
   get isConditionComparatorValueValid() {
-    return this.comparatorValidator ?
-      this.comparatorValidator(this.conditionComparatorValue) : false;
+    return this.comparatorValidator(this.conditionComparatorValue);
   }
 
   /**
@@ -122,12 +101,6 @@ extends Component {
     return this.selectedConditionProperty &&
       this.selectedConditionComparator &&
       this.isConditionComparatorValueValid;
-  }
-
-  constructor() {
-    super(...arguments);
-
-    defaultComparatorValues['space.is'] = () => this.spacesProvider.spaces[0];
   }
 
   /**
@@ -154,7 +127,7 @@ extends Component {
     this.selectedConditionComparator = comparator;
 
     if (!this.isConditionComparatorValueValid) {
-      this.conditionComparatorValueChanged(this.comparatorDefaultValue());
+      this.conditionComparatorValueChanged(this.comparatorDefaultValue);
     }
   }
 

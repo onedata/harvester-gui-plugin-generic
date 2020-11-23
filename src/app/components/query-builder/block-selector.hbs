@@ -4,6 +4,7 @@
       <div class="condition-section">
         <h1>{{tt this "conditionHeader"}}</h1>
         <QueryBuilder::BlockSelector::ConditionSelector
+          @valuesBuilder={{@valuesBuilder}}
           @indexProperties={{@indexProperties}}
           @onConditionSelected={{this.conditionAdded}}
         />

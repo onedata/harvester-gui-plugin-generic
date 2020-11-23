@@ -11,6 +11,7 @@ import NotOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-buil
 import RootOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/root-operator-query-block';
 import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/condition-query-block';
 import { clickTrigger, selectChoose } from 'ember-power-select/test-support/helpers';
+import QueryValueComponentsBuilder from 'harvester-gui-plugin-generic/utils/query-value-components-builder';
 
 const multiOperandOperatorsList = ['and', 'or'];
 const singleOperandOperatorsList = ['not'];
@@ -27,19 +28,25 @@ describe('Integration | Component | query-builder/block-selector', function () {
 
   context('in "create" mode', function () {
     beforeEach(function () {
-      this.set('indexProperties', [{
-        path: 'boolProp',
-        type: 'boolean',
-      }, {
-        path: 'textProp',
-        type: 'text',
-      }]);
+      this.setProperties({
+        valuesBuilder: new QueryValueComponentsBuilder([]),
+        indexProperties: [{
+          path: 'boolProp',
+          type: 'boolean',
+        }, {
+          path: 'textProp',
+          type: 'text',
+        }],
+      });
     });
 
     it(
       `renders operators ${operatorsList.map(s => s.toUpperCase()).join(', ')}`,
       async function () {
-        await render(hbs `<QueryBuilder::BlockSelector @mode="create"/>`);
+        await render(hbs `<QueryBuilder::BlockSelector
+          @mode="create"
+          @valuesBuilder={{this.valuesBuilder}}
+        />`);
 
         const operators = this.element.querySelectorAll('.operator-selector .operator');
         expect(operators).to.have.length(3);
@@ -59,6 +66,7 @@ describe('Integration | Component | query-builder/block-selector', function () {
 
           await render(hbs `<QueryBuilder::BlockSelector
             @mode="create"
+            @valuesBuilder={{this.valuesBuilder}}
             @onBlockAdd={{this.addSpy}}
           />`);
           expect(addSpy).to.not.be.called;
@@ -73,6 +81,7 @@ describe('Integration | Component | query-builder/block-selector', function () {
     it('lists index properties in dropdown', async function () {
       await render(hbs `<QueryBuilder::BlockSelector
         @mode="create"
+        @valuesBuilder={{this.valuesBuilder}}
         @indexProperties={{this.indexProperties}}
       />`);
       await clickTrigger('.property-selector');
@@ -92,6 +101,7 @@ describe('Integration | Component | query-builder/block-selector', function () {
 
         await render(hbs `<QueryBuilder::BlockSelector
           @mode="create"
+          @valuesBuilder={{this.valuesBuilder}}
           @onBlockAdd={{this.addSpy}}
           @indexProperties={{this.indexProperties}}
         />`);
@@ -113,6 +123,7 @@ describe('Integration | Component | query-builder/block-selector', function () {
       async function () {
         await render(hbs `<QueryBuilder::BlockSelector
           @mode="create"
+          @valuesBuilder={{this.valuesBuilder}}
           @hideConditionCreation={{true}}
         />`);
 
@@ -121,7 +132,10 @@ describe('Integration | Component | query-builder/block-selector', function () {
     );
 
     it('does not render edit-specific sections', async function () {
-      await render(hbs `<QueryBuilder::BlockSelector @mode="create"/>`);
+      await render(hbs `<QueryBuilder::BlockSelector
+        @mode="create"
+        @valuesBuilder={{this.valuesBuilder}}
+      />`);
 
       expect(this.element.querySelector('.surround-section')).to.not.exist;
       expect(this.element.querySelector('.change-to-section')).to.not.exist;

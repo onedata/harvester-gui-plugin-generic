@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { describe, it } from 'mocha';
+import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
 import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
@@ -9,18 +9,23 @@ import sinon from 'sinon';
 import { selectChoose } from 'ember-power-select/test-support/helpers';
 import AndOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/and-operator-query-block';
 import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/condition-query-block';
+import QueryValueComponentsBuilder from 'harvester-gui-plugin-generic/utils/query-value-components-builder';
 
 describe('Integration | Component | query-builder/block-adder', function () {
   setupRenderingTest();
 
+  beforeEach(function () {
+    this.valuesBuilder = new QueryValueComponentsBuilder([]);
+  });
+
   it('has class "query-builder-block-adder"', async function () {
-    await render(hbs `<QueryBuilder::BlockAdder />`);
+    await render(hbs `<QueryBuilder::BlockAdder @valuesBuilder={{this.valuesBuilder}}/>`);
 
     expect(this.element.querySelectorAll('.query-builder-block-adder')).to.have.length(1);
   });
 
   it('shows block selector on click', async function () {
-    await render(hbs `<QueryBuilder::BlockAdder />`);
+    await render(hbs `<QueryBuilder::BlockAdder @valuesBuilder={{this.valuesBuilder}}/>`);
 
     await click('.query-builder-block-adder');
     expect(isVisible('.ember-attacher')).to.be.true;
@@ -33,7 +38,10 @@ describe('Integration | Component | query-builder/block-adder', function () {
   it(
     'shows block selector without condition selector when clicked and "hideConditionCreation" is true',
     async function () {
-      await render(hbs `<QueryBuilder::BlockAdder @hideConditionCreation={{true}} />`);
+      await render(hbs `<QueryBuilder::BlockAdder
+        @valuesBuilder={{this.valuesBuilder}}
+        @hideConditionCreation={{true}}
+      />`);
 
       await click('.query-builder-block-adder');
       expect(isVisible('.ember-attacher')).to.be.true;
@@ -45,24 +53,29 @@ describe('Integration | Component | query-builder/block-adder', function () {
   );
 
   it('passess through information about selected operator', async function () {
-    const addSpy = this.set('addSpy', sinon.spy());
+    this.addSpy = sinon.spy();
 
-    await render(hbs `<QueryBuilder::BlockAdder @onBlockAdd={{this.addSpy}} />`);
+    await render(hbs `<QueryBuilder::BlockAdder
+      @valuesBuilder={{this.valuesBuilder}}
+      @onBlockAdd={{this.addSpy}}
+    />`);
+
     await click('.query-builder-block-adder');
     await click('.ember-attacher .operator-and');
 
-    expect(addSpy).to.be.calledOnce
+    expect(this.addSpy).to.be.calledOnce
       .and.to.be.calledWith(sinon.match.instanceOf(AndOperatorQueryBlock));
   });
 
   it('passess through information about new condition', async function () {
-    this.set('indexProperties', [{
+    this.indexProperties = [{
       path: 'a.b',
       type: 'boolean',
-    }]);
-    const addSpy = this.set('addSpy', sinon.spy());
+    }];
+    this.addSpy = sinon.spy();
 
     await render(hbs `<QueryBuilder::BlockAdder
+      @valuesBuilder={{this.valuesBuilder}}
       @indexProperties={{this.indexProperties}}
       @onBlockAdd={{this.addSpy}}
     />`);
@@ -71,24 +84,25 @@ describe('Integration | Component | query-builder/block-adder', function () {
     await selectChoose('.comparator-value', 'false');
     await click('.accept-condition');
 
-    expect(addSpy).to.be.calledOnce
+    expect(this.addSpy).to.be.calledOnce
       .and.to.be.calledWith(sinon.match.instanceOf(ConditionQueryBlock));
   });
 
   it('closes block selector when operator has been chosen', async function () {
-    await render(hbs `<QueryBuilder::BlockAdder />`);
+    await render(hbs `<QueryBuilder::BlockAdder @valuesBuilder={{this.valuesBuilder}}/>`);
     await click('.query-builder-block-adder');
     await click('.ember-attacher .operator-and');
     await waitUntil(() => !isVisible('.ember-attacher'), { timeout: 1000 });
   });
 
   it('closes block selector when condition has been chosen', async function () {
-    this.set('indexProperties', [{
+    this.indexProperties = [{
       path: 'a.b',
       type: 'boolean',
-    }]);
+    }];
 
     await render(hbs `<QueryBuilder::BlockAdder
+      @valuesBuilder={{this.valuesBuilder}}
       @indexProperties={{this.indexProperties}}
     />`);
     await click('.query-builder-block-adder');

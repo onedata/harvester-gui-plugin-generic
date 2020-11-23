@@ -11,6 +11,7 @@ import Component from '@glimmer/component';
 import { action } from '@ember/object';
 
 /**
+ * @argument {Utils.QueryValueComponentsBuilder} valuesBuilder
  * @argument {Array<IndexProperty>} [indexProperties]
  * @argument {Function} onBlockAdd
  * @argument {Boolean} [hideConditionCreation]

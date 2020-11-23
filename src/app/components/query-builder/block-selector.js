@@ -26,6 +26,7 @@ const operatorClasses = {
 
 /**
  * @argument {String} [mode]
+ * @argument {Utils.QueryValueComponentsBuilder} [valuesBuilder]
  * @argument {Array<IndexProperty>} [indexProperties]
  * @argument {Boolean} [hideConditionCreation]
  * @argument {Utils.QueryBlock} [editBlock]

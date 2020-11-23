@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { describe, context, it } from 'mocha';
+import { describe, context, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
 import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
@@ -10,6 +10,7 @@ import NotOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-buil
 import RootOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/root-operator-query-block';
 import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/condition-query-block';
 import sinon from 'sinon';
+import QueryValueComponentsBuilder from 'harvester-gui-plugin-generic/utils/query-value-components-builder';
 
 const multiOperandOperatorsList = ['and', 'or'];
 const singleOperandOperatorsList = ['not', 'root'];
@@ -23,6 +24,10 @@ const operatorBlockClasses = {
 
 describe('Integration | Component | query-builder/operator-block', function () {
   setupRenderingTest();
+
+  beforeEach(function () {
+    this.valuesBuilder = new QueryValueComponentsBuilder([]);
+  });
 
   it(
     'has classes "query-builder-block" and "query-builder-operator-block"',
@@ -108,9 +113,10 @@ describe('Integration | Component | query-builder/operator-block', function () {
           const queryBlock =
             this.set('queryBlock', new operatorBlockClasses[operatorName]());
 
-          await render(hbs `
-            <QueryBuilder::OperatorBlock @queryBlock={{this.queryBlock}} />
-          `);
+          await render(hbs `<QueryBuilder::OperatorBlock
+            @queryBlock={{this.queryBlock}}
+            @valuesBuilder={{this.valuesBuilder}}
+          />`);
           await click('.query-builder-block-adder');
           await click('.ember-attacher .operator-not');
 
@@ -195,7 +201,10 @@ describe('Integration | Component | query-builder/operator-block', function () {
             this.set('queryBlock', new operatorBlockClasses[operatorName]());
 
           await render(hbs `
-            <QueryBuilder::OperatorBlock @queryBlock={{this.queryBlock}} />
+            <QueryBuilder::OperatorBlock
+              @queryBlock={{this.queryBlock}}
+              @valuesBuilder={{this.valuesBuilder}}
+            />
           `);
           await click('.query-builder-block-adder');
           await click('.ember-attacher .operator-not');
@@ -232,9 +241,10 @@ describe('Integration | Component | query-builder/operator-block', function () {
               const queryBlock =
                 this.set('queryBlock', new operatorBlockClasses[operatorName]());
 
-              await render(hbs `
-                <QueryBuilder::OperatorBlock @queryBlock={{this.queryBlock}} />
-              `);
+              await render(hbs `<QueryBuilder::OperatorBlock
+                @queryBlock={{this.queryBlock}}
+                @valuesBuilder={{this.valuesBuilder}}
+              />`);
               await click('.query-builder-block-adder');
               await click('.ember-attacher .operator-not');
               await click('.query-builder-block-adder.surround-root');
@@ -286,6 +296,7 @@ describe('Integration | Component | query-builder/operator-block', function () {
 
         await render(hbs `<QueryBuilder::OperatorBlock
           @queryBlock={{this.queryBlock}}
+          @valuesBuilder={{this.valuesBuilder}}
           @onBlockRemoved={{this.removedSpy}}
         />`);
         await click('.query-builder-block-adder');
@@ -307,9 +318,10 @@ describe('Integration | Component | query-builder/operator-block', function () {
         const queryBlock =
           this.set('queryBlock', new operatorBlockClasses[operatorName]());
 
-        await render(hbs `
-          <QueryBuilder::OperatorBlock @queryBlock={{this.queryBlock}} />
-        `);
+        await render(hbs `<QueryBuilder::OperatorBlock
+          @queryBlock={{this.queryBlock}}
+          @valuesBuilder={{this.valuesBuilder}}
+        />`);
         await click('.query-builder-block-adder');
         await click('.ember-attacher .operator-not');
         await click('.query-builder-block-visualiser');
@@ -332,9 +344,10 @@ describe('Integration | Component | query-builder/operator-block', function () {
         const queryBlock =
           this.set('queryBlock', new operatorBlockClasses[operatorName]());
 
-        await render(hbs `
-          <QueryBuilder::OperatorBlock @queryBlock={{this.queryBlock}} />
-        `);
+        await render(hbs `<QueryBuilder::OperatorBlock
+          @queryBlock={{this.queryBlock}}
+          @valuesBuilder={{this.valuesBuilder}}
+        />`);
         await click('.query-builder-block-adder');
         await click('.ember-attacher .operator-not');
         await click('.query-builder-block-adder');
@@ -363,6 +376,7 @@ describe('Integration | Component | query-builder/operator-block', function () {
 
           await render(hbs `<QueryBuilder::OperatorBlock
             @queryBlock={{this.queryBlock}}
+            @valuesBuilder={{this.valuesBuilder}}
           />`);
           await click('.query-builder-block-adder');
           await click('.ember-attacher .operator-not');
@@ -384,6 +398,7 @@ describe('Integration | Component | query-builder/operator-block', function () {
 
           await render(hbs `<QueryBuilder::OperatorBlock
             @queryBlock={{this.queryBlock}}
+            @valuesBuilder={{this.valuesBuilder}}
           />`);
           await click('.query-builder-block-adder');
           await click('.ember-attacher .operator-not');
@@ -410,6 +425,7 @@ describe('Integration | Component | query-builder/operator-block', function () {
 
           await render(hbs `<QueryBuilder::OperatorBlock
             @queryBlock={{this.queryBlock}}
+            @valuesBuilder={{this.valuesBuilder}}
           />`);
           await click('.query-builder-block-adder');
           await click('.ember-attacher .operator-and');
@@ -460,6 +476,7 @@ describe('Integration | Component | query-builder/operator-block', function () {
 
           await render(hbs `
             <QueryBuilder::OperatorBlock
+              @valuesBuilder={{this.valuesBuilder}}
               @queryBlock={{this.queryBlock}}
               @onConditionEditionStart={{this.editionStartSpy}}
               @onConditionEditionEnd={{this.editionEndSpy}}
