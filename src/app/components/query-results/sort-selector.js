@@ -10,6 +10,7 @@
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
 import { inject as service } from '@ember/service';
+import { htmlSafe } from '@ember/template';
 
 // Only properties of types below are sortable
 const allowedPropertyTypes = [
@@ -83,6 +84,16 @@ export default class QueryResultsSortSelectorComponent extends Component {
    */
   get queryScorePropertyTranslation() {
     return this.intl.tt(this, 'queryScoreProperty');
+  }
+
+  /**
+   * @type {SafeString}
+   */
+  get propertySelectorStyle() {
+    const ems = Math.min(Math.max(
+      ...this.indexProperties.filterBy('path').map(({ path }) => path.length * 0.8), 8
+    ), 25);
+    return htmlSafe(`width: ${ems}em`);
   }
 
   /**

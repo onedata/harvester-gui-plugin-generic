@@ -15,6 +15,13 @@
   .btn {
     border: 0;
     padding: 3px 5px;
+
+    .fa-icon {
+      position: relative;
+      top: -0.1em;
+      line-height: 0;
+      vertical-align: middle;
+    }
   }
 
   .pages-counter-container {
@@ -45,11 +52,5 @@
 
   .per-page-label {
     white-space: nowrap;
-  }
-
-  .last-page, .first-page {
-    svg {
-      height: 1.25em;
-    }
   }
 }

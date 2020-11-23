@@ -12,6 +12,10 @@
         @sortDirection={{this.sortDirection}}
         @onSortChange={{this.onSortChange}}
       />
+      <div class="header-line-breaker"></div>
+      <div class="results-counter">
+        Results: {{this.queryResults.totalResultsCount}}
+      </div>
       <QueryResults::Pagination
         @resultsCount={{this.queryResults.totalResultsCount}}
         @activePageNumber={{this.activePageNumber}}

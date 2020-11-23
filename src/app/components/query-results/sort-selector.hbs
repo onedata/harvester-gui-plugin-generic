@@ -8,6 +8,7 @@
     @searchEnabled={{true}}
     @matcher={{this.propertiesDropdownMatcher}}
     class="property-selector"
+    style={{this.propertySelectorStyle}}
     as |property|
   >
     {{or property.path this.queryScorePropertyTranslation}}
