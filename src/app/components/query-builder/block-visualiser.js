@@ -31,6 +31,11 @@ export default class QueryBuilderBlockVisualiserComponent extends Component {
   @tracked areSettingsVisible = false;
 
   /**
+   * @type {boolean}
+   */
+  @tracked isRemoveButtonHovered = false;
+
+  /**
    * @type {HTMLDivElement}
    */
   element = null;
@@ -53,5 +58,13 @@ export default class QueryBuilderBlockVisualiserComponent extends Component {
   @action
   onSettingsClose() {
     this.areSettingsVisible = false;
+  }
+
+  /**
+   * @param {Boolean} hoverState true if hovered
+   */
+  @action
+  removeButtonHoverChange(hoverState) {
+    this.isRemoveButtonHovered = hoverState;
   }
 }

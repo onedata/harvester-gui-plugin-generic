@@ -1,5 +1,5 @@
 operatorsHeader: 'Insert operator'
 conditionHeader: 'Add condition'
-surroundWithOperatorHeader: 'Surround with operator'
-changeToOperatorHeader: 'Change to operator'
+surroundWithOperatorHeader: 'Expand with operator'
+changeToOperatorHeader: 'Replace operator(s)'
 orLineText: 'or'

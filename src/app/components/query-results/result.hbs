@@ -31,14 +31,14 @@
   <BsCollapse @collapsed={{not this.isExpanded}} class="result-representations-collapse">
     <BsTab class="result-representations" as |tab|>
       <tab.pane @title={{tt this "tableTabTitle"}}>
-        <div class="properties-table">
+        <dl class="properties-table">
           {{#each this.propertiesForTable as |property|}}
             <div class="property">
-              <samp class="property-name">{{{property.key}}}</samp>
-              <samp class="property-value">{{{property.value}}}</samp>
+              <dt class="property-name">{{{property.key}}}</dt>
+              <dd class="property-value">{{{property.value}}}</dd>
             </div>
           {{/each}}
-        </div>
+        </dl>
       </tab.pane>
       <tab.pane @title={{tt this "jsonTabTitle"}}>
         <textarea

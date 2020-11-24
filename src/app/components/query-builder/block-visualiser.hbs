@@ -1,5 +1,5 @@
 <div
-  class="query-builder-block-visualiser {{if this.areSettingsVisible "has-open-settings"}}"
+  class="query-builder-block-visualiser {{if this.areSettingsVisible "has-open-settings"}} {{if this.isRemoveButtonHovered "has-remove-hovered"}}"
   {{add-direct-hover-class}}
   {{on "click" clicked}}
   {{did-insert this.didInsert}}
@@ -25,6 +25,7 @@
       @type="danger"
       @bubble={{true}}
       class="block-button remove-block clickable"
+      {{on-hover this.removeButtonHoverChange}}
     >
       <FaIcon @icon="times" />
     </BsButton>

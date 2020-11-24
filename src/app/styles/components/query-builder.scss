@@ -52,6 +52,19 @@
     }
   }
 
+  .query-builder-block-visualiser.has-remove-hovered {
+    > .query-builder-block {
+      background: repeating-linear-gradient(
+        135deg,
+        lighten($color-red, 8%),
+        lighten($color-red, 8%) 4px,
+        darken($color-red, 12%) 4px,
+        darken($color-red, 12%) 8px
+      );
+      border: 1px solid darken($color-red, 30%);
+    }
+  }
+
   .block-label {
     font-size: 80%;
     text-transform: uppercase;
@@ -78,11 +91,5 @@
     border: 0;
     color: darken($color-light-blue, 30%);
     font-size: 0.6rem;
-  }
-
-  .remove-block {
-    &:hover {
-      color: $danger;
-    }
   }
 }
