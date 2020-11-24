@@ -82,12 +82,16 @@ describe(
             },
           },
         }),
+        filteredProperties: {},
+        changeSpy: sinon.spy(newProps => this.set('filteredProperties', newProps)),
       });
     });
 
     it('has class "filtered-properties-selector', async function () {
       await render(hbs `<QueryResults::FilteredPropertiesSelector
         @queryResults={{this.queryResults1}}
+        @filteredProperties={{this.filteredProperties}}
+        @onSelectionChange={{this.changeSpy}}
       />`);
 
       expect(this.element.querySelector('.filtered-properties-selector')).to.exist;
@@ -96,7 +100,9 @@ describe(
     it('does not render properties tree on init', async function () {
       await render(hbs `<QueryResults::FilteredPropertiesSelector
         @queryResults={{this.queryResults1}}
+        @filteredProperties={{this.filteredProperties}}
         @index={{this.index}}
+        @onSelectionChange={{this.changeSpy}}
       />`);
 
       expect(this.element.querySelector('.tree')).to.not.exist;
@@ -107,7 +113,9 @@ describe(
       async function () {
         await render(hbs `<QueryResults::FilteredPropertiesSelector
           @queryResults={{this.queryResults1}}
+          @filteredProperties={{this.filteredProperties}}
           @index={{this.index}}
+          @onSelectionChange={{this.changeSpy}}
         />`);
         await click('.show-properties-selector');
 
@@ -121,7 +129,9 @@ describe(
     it('has all nested properties collapsed', async function () {
       await render(hbs `<QueryResults::FilteredPropertiesSelector
         @queryResults={{this.queryResults1}}
+        @filteredProperties={{this.filteredProperties}}
         @index={{this.index}}
+        @onSelectionChange={{this.changeSpy}}
       />`);
 
       expect(this.element.querySelector('.tree-branch .tree-branch')).to.not.exist;
@@ -130,7 +140,9 @@ describe(
     it('renders properties from results and index', async function () {
       await render(hbs `<QueryResults::FilteredPropertiesSelector
         @queryResults={{this.queryResults1}}
+        @filteredProperties={{this.filteredProperties}}
         @index={{this.index}}
+        @onSelectionChange={{this.changeSpy}}
       />`);
       await click('.show-properties-selector');
       await expandAllNodes(this);
@@ -167,7 +179,9 @@ describe(
     it('has all properties deselected on init', async function () {
       await render(hbs `<QueryResults::FilteredPropertiesSelector
         @queryResults={{this.queryResults1}}
+        @filteredProperties={{this.filteredProperties}}
         @index={{this.index}}
+        @onSelectionChange={{this.changeSpy}}
       />`);
       await click('.show-properties-selector');
       await expandAllNodes(this);
@@ -179,7 +193,9 @@ describe(
     it('renders buttons "Select all" and "Deselect all"', async function () {
       await render(hbs `<QueryResults::FilteredPropertiesSelector
         @queryResults={{this.queryResults1}}
+        @filteredProperties={{this.filteredProperties}}
         @index={{this.index}}
+        @onSelectionChange={{this.changeSpy}}
       />`);
       await click('.show-properties-selector');
 
@@ -194,7 +210,9 @@ describe(
     it('allows to select all using "Select all" button', async function () {
       await render(hbs `<QueryResults::FilteredPropertiesSelector
         @queryResults={{this.queryResults1}}
+        @filteredProperties={{this.filteredProperties}}
         @index={{this.index}}
+        @onSelectionChange={{this.changeSpy}}
       />`);
       await click('.show-properties-selector');
       await click('.select-all');
@@ -206,7 +224,9 @@ describe(
     it('allows to deselect all using "Deselect all" button', async function () {
       await render(hbs `<QueryResults::FilteredPropertiesSelector
         @queryResults={{this.queryResults1}}
+        @filteredProperties={{this.filteredProperties}}
         @index={{this.index}}
+        @onSelectionChange={{this.changeSpy}}
       />`);
       await click('.show-properties-selector');
       await click('.select-all');
@@ -217,17 +237,17 @@ describe(
     });
 
     it('notifies about changed properties after "select all" click', async function () {
-      const changeSpy = this.set('changeSpy', sinon.spy());
       await render(hbs `<QueryResults::FilteredPropertiesSelector
         @queryResults={{this.queryResults1}}
+        @filteredProperties={{this.filteredProperties}}
         @index={{this.index}}
         @onSelectionChange={{this.changeSpy}}
       />`);
       await click('.show-properties-selector');
       await click('.select-all');
 
-      expect(changeSpy).to.be.calledOnce;
-      expect(changeSpy.lastCall.args[0]).to.deep.equal({
+      expect(this.changeSpy).to.be.calledOnce;
+      expect(this.changeSpy.lastCall.args[0]).to.deep.equal({
         __onedata: {
           spaceId: {},
         },
@@ -244,9 +264,9 @@ describe(
     });
 
     it('notifies about changed properties after "deselect all" click', async function () {
-      const changeSpy = this.set('changeSpy', sinon.spy());
       await render(hbs `<QueryResults::FilteredPropertiesSelector
         @queryResults={{this.queryResults1}}
+        @filteredProperties={{this.filteredProperties}}
         @index={{this.index}}
         @onSelectionChange={{this.changeSpy}}
       />`);
@@ -254,16 +274,16 @@ describe(
       await click('.select-all');
       await click('.deselect-all');
 
-      expect(changeSpy).to.be.calledTwice;
-      expect(changeSpy.lastCall.args[0]).to.deep.equal({});
+      expect(this.changeSpy).to.be.calledTwice;
+      expect(this.changeSpy.lastCall.args[0]).to.deep.equal({});
     });
 
     it(
       'notifies about changed properties after nested node checkbox click',
       async function () {
-        const changeSpy = this.set('changeSpy', sinon.spy());
         await render(hbs `<QueryResults::FilteredPropertiesSelector
           @queryResults={{this.queryResults1}}
+          @filteredProperties={{this.filteredProperties}}
           @index={{this.index}}
           @onSelectionChange={{this.changeSpy}}
         />`);
@@ -274,8 +294,8 @@ describe(
         )[1];
         await click(firstBranchLastCheckbox);
 
-        expect(changeSpy).to.be.calledOnce;
-        expect(changeSpy.lastCall.args[0]).to.deep.equal({
+        expect(this.changeSpy).to.be.calledOnce;
+        expect(this.changeSpy.lastCall.args[0]).to.deep.equal({
           a: {
             bb: {},
           },
@@ -288,7 +308,9 @@ describe(
       async function () {
         await render(hbs `<QueryResults::FilteredPropertiesSelector
           @queryResults={{this.queryResults1}}
+          @filteredProperties={{this.filteredProperties}}
           @index={{this.index}}
+          @onSelectionChange={{this.changeSpy}}
         />`);
 
         const counter =
@@ -302,7 +324,9 @@ describe(
       async function () {
         await render(hbs `<QueryResults::FilteredPropertiesSelector
           @queryResults={{this.queryResults1}}
+          @filteredProperties={{this.filteredProperties}}
           @index={{this.index}}
+          @onSelectionChange={{this.changeSpy}}
         />`);
         await click('.show-properties-selector');
         await click('.select-all');
@@ -317,7 +341,9 @@ describe(
       this.set('queryResults', this.queryResults1);
       await render(hbs `<QueryResults::FilteredPropertiesSelector
         @queryResults={{this.queryResults}}
+        @filteredProperties={{this.filteredProperties}}
         @index={{this.index}}
+        @onSelectionChange={{this.changeSpy}}
       />`);
       await click('.show-properties-selector');
       await expandAllNodes(this);
@@ -339,7 +365,9 @@ describe(
         this.set('queryResults', this.queryResults1);
         await render(hbs `<QueryResults::FilteredPropertiesSelector
           @queryResults={{this.queryResults}}
+          @filteredProperties={{this.filteredProperties}}
           @index={{this.index}}
+          @onSelectionChange={{this.changeSpy}}
         />`);
         await click('.show-properties-selector');
         await expandAllNodes(this);
