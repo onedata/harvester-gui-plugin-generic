@@ -5,7 +5,7 @@ import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import QueryResults from 'harvester-gui-plugin-generic/utils/query-results';
 import EsIndex from 'harvester-gui-plugin-generic/utils/es-index';
-import { click } from '@ember/test-helpers';
+import { click, waitUntil } from '@ember/test-helpers';
 import { all as allFulfilled } from 'rsvp';
 import sinon from 'sinon';
 import { isVisible } from 'ember-attacher';
@@ -118,10 +118,10 @@ describe(
           @onSelectionChange={{this.changeSpy}}
         />`);
         await click('.show-properties-selector');
+        await waitUntil(() => isVisible('.ember-attacher'));
 
         expect(this.element.querySelector('.show-properties-selector').textContent)
           .to.contain('Filter properties');
-        expect(isVisible('.ember-attacher')).to.be.true;
         expect(this.element.querySelector('.tree')).to.exist;
       }
     );

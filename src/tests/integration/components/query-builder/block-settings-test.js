@@ -31,8 +31,8 @@ describe('Integration | Component | query-builder/block-settings', function () {
       @queryBlock={{this.queryBlock}}
       @isShown={{true}}
     />`);
+    await waitUntil(() => isVisible('.ember-attacher'));
 
-    expect(isVisible('.ember-attacher')).to.be.true;
     const blockSelector =
       this.element.querySelector('.ember-attacher .query-builder-block-selector');
     expect(blockSelector).to.exist;
@@ -123,7 +123,7 @@ describe('Integration | Component | query-builder/block-settings', function () {
         @isShown={{this.isShown}}
       />`);
       await click('.ember-attacher .surround-section .operator-and');
-      await waitUntil(() => !isVisible('.ember-attacher'), { timeout: 1000 });
+      await waitUntil(() => !isVisible('.ember-attacher'));
 
       const blockMatcher = sinon.match.instanceOf(AndOperatorQueryBlock)
         .and(sinon.match.has('operands', [this.queryBlock]));
@@ -149,7 +149,7 @@ describe('Integration | Component | query-builder/block-settings', function () {
         @isShown={{this.isShown}}
       />`);
       await click('.ember-attacher .change-to-section .operator-and');
-      await waitUntil(() => !isVisible('.ember-attacher'), { timeout: 1000 });
+      await waitUntil(() => !isVisible('.ember-attacher'));
 
       const blockMatcher = sinon.match.instanceOf(AndOperatorQueryBlock)
         .and(sinon.match.has('operands', [condition]));

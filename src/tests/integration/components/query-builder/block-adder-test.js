@@ -28,7 +28,7 @@ describe('Integration | Component | query-builder/block-adder', function () {
     await render(hbs `<QueryBuilder::BlockAdder @valuesBuilder={{this.valuesBuilder}}/>`);
 
     await click('.query-builder-block-adder');
-    expect(isVisible('.ember-attacher')).to.be.true;
+    await waitUntil(() => isVisible('.ember-attacher'));
     expect(this.element.querySelector('.ember-attacher .query-builder-block-selector'))
       .to.exist;
     expect(this.element.querySelector('.ember-attacher .condition-selector'))
@@ -44,7 +44,7 @@ describe('Integration | Component | query-builder/block-adder', function () {
       />`);
 
       await click('.query-builder-block-adder');
-      expect(isVisible('.ember-attacher')).to.be.true;
+      await waitUntil(() => isVisible('.ember-attacher'));
       expect(this.element.querySelector('.ember-attacher .query-builder-block-selector'))
         .to.exist;
       expect(this.element.querySelector('.ember-attacher .condition-selector'))
@@ -92,7 +92,7 @@ describe('Integration | Component | query-builder/block-adder', function () {
     await render(hbs `<QueryBuilder::BlockAdder @valuesBuilder={{this.valuesBuilder}}/>`);
     await click('.query-builder-block-adder');
     await click('.ember-attacher .operator-and');
-    await waitUntil(() => !isVisible('.ember-attacher'), { timeout: 1000 });
+    await waitUntil(() => !isVisible('.ember-attacher'));
   });
 
   it('closes block selector when condition has been chosen', async function () {
@@ -109,7 +109,7 @@ describe('Integration | Component | query-builder/block-adder', function () {
     await selectChoose('.property-selector', 'a.b');
     await selectChoose('.comparator-value', 'false');
     await click('.accept-condition');
-    await waitUntil(() => !isVisible('.ember-attacher'), { timeout: 1000 });
+    await waitUntil(() => !isVisible('.ember-attacher'));
   });
 
   it('can be disabled', async function () {
