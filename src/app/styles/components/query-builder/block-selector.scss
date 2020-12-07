@@ -98,7 +98,7 @@
     margin-bottom: 0;
   }
 
-  .date-editor {
+  .datetime-editor {
     .input-group {
       flex-wrap: nowrap;
     }
@@ -111,5 +111,9 @@
 
   .flatpickr-wrapper {
     width: 100%;
+  }
+
+  .add-btn-container {
+    text-align: right;
   }
 }

@@ -9,6 +9,7 @@
 
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
+import { next } from '@ember/runloop';
 import QueryBuilderEditorsEditorBaseComponent from 'harvester-gui-plugin-generic/components/query-builder/editors/editor-base';
 
 /**
@@ -70,7 +71,7 @@ extends QueryBuilderEditorsEditorBaseComponent {
   @action
   flatpickrReady(selectedDates, dateStr, instance) {
     if (this.params.initiallyFocused) {
-      instance.open();
+      next(() => !this.isDestroyed && instance.open());
     }
   }
 

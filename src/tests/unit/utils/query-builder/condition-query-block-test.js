@@ -18,6 +18,11 @@ describe('Unit | Utility | query-builder/condition-query-block', function () {
     expect(ConditionQueryBlock.renderer).to.equal('condition-block');
   });
 
+  it('has "level" field set to 1', function () {
+    const block = new ConditionQueryBlock();
+    expect(block.level).to.equal(1);
+  });
+
   it('can be cloned', function () {
     const indexProperty = new EsIndexProperty(null, 'prop', { type: 'text' });
     const block = new ConditionQueryBlock(indexProperty, 'text.contains', 'test');

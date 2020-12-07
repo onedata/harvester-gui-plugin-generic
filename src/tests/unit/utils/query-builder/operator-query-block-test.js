@@ -19,6 +19,20 @@ describe('Unit | Utility | query-builder/operator-query-block', function () {
     expect(OperatorQueryBlock.renderer).to.equal('operator-block');
   });
 
+  it('has "level" field set to 1, when there are no nested block', function () {
+    const block = new OperatorQueryBlock();
+    expect(block.level).to.equal(1);
+  });
+
+  it(
+    'has "level" field set to the max subblock level + 1, when there are nested blocks',
+    function () {
+      const block = new OperatorQueryBlock();
+      block.operands.pushObjects([{ level: 2 }, { level: 5 }, { level: 3 }]);
+      expect(block.level).to.equal(6);
+    }
+  );
+
   it('has "maxOperandsNumber" static field set to max integer', function () {
     expect(OperatorQueryBlock.maxOperandsNumber).to.equal(Number.MAX_SAFE_INTEGER);
   });

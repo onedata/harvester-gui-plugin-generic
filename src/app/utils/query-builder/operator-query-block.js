@@ -34,6 +34,17 @@ export default class OperatorQueryBlock extends QueryBlock {
   @tracked operands = A();
 
   /**
+   * @override
+   */
+  get level() {
+    if (!this.operands.length) {
+      return 1;
+    } else {
+      return Math.max(...this.operands.mapBy('level')) + 1;
+    }
+  }
+
+  /**
    * @param {String} operator
    */
   constructor(operator = null) {

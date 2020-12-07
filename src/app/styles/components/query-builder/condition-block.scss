@@ -11,6 +11,7 @@
       font-size: 100%;
       color: $body-color;
       font-weight: bold;
+      margin-top: -0.1 * $spacer;
     }
 
     .property-comparison {
@@ -33,7 +34,8 @@
       line-height: 1;
     }
 
-    .comparator-value {
+    .comparator-value-view,
+    .comparator-value-editor {
       margin-left: $spacer * 0.2;
     }
 

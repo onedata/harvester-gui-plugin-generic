@@ -16,6 +16,7 @@ import RootOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-bui
  * @argument {Utils.QueryBuilder.OperatorQueryBlock} queryBlock
  * @argument {Utils.QueryValueComponentsBuilder} valuesBuilder
  * @argument {Array<IndexProperty>} indexProperties
+ * @argument {Number} level
  * @argument {Function} onConditionEditionStart
  * @argument {Function} onConditionEditionEnd
  * @argument {Function} onConditionEditionValidityChange
@@ -47,6 +48,14 @@ export default class QueryBuilderOperatorBlockComponent extends Component {
    */
   get hasSingleOperandOperator() {
     return this.queryBlock && this.queryBlock.constructor.maxOperandsNumber === 1;
+  }
+
+  /**
+   * @type {Number}
+   */
+  get nestedBlocksLevel() {
+    return typeof this.args.level === 'number' ?
+      this.args.level - 1 : this.queryBlock.level - 1;
   }
 
   /**

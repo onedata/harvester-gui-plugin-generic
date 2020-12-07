@@ -9,6 +9,7 @@
         @queryBlock={{@queryBlock.operands.firstObject}}
         @valuesBuilder={{@valuesBuilder}}
         @indexProperties={{@indexProperties}}
+        @level={{this.nestedBlocksLevel}}
         @onBlockReplace={{fn this.replaceBlock @queryBlock.operands.firstObject}}
         @onBlockRemove={{fn this.removeBlock @queryBlock.operands.firstObject}}
         @onConditionEditionStart={{@onConditionEditionStart}}
@@ -37,6 +38,7 @@
         @parentQueryBlock={{@queryBlock}}
         @queryBlock={{operandBlock}}
         @indexProperties={{@indexProperties}}
+        @level={{this.nestedBlocksLevel}}
         @valuesBuilder={{@valuesBuilder}}
         @onBlockReplace={{fn this.replaceBlock operandBlock}}
         @onBlockRemove={{fn this.removeBlock operandBlock}}
