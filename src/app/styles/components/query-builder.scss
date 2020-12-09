@@ -91,7 +91,7 @@ $query-block-hover-darken: 8%;
   .block-label {
     margin-bottom: $spacer * 0.2;
     @include font-monospace();
-    font-size: 80%;
+    font-size: $small-font-size;
     text-transform: uppercase;
     line-height: 1;
   }

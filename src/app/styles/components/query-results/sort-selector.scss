@@ -1,7 +1,7 @@
 .query-results-sort-selector {
   display: flex;
   align-items: center;
-  font-size: 85%;
+  font-size: $small-font-size;
 
   .sort-by-label {
     white-space: nowrap;

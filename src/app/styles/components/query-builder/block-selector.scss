@@ -1,7 +1,7 @@
 .query-builder-block-selector {
   background-color: white;
   padding: $spacer * 0.8;
-  font-size: 80%;
+  font-size: $small-font-size;
 
   &.with-conditions {
     width: 280px;
@@ -57,6 +57,14 @@
   .operator {
     margin-right: $spacer * 0.25;
     text-transform: uppercase;
+
+    .fa-icon {
+      margin-left: $spacer * 0.2;
+    }
+  }
+
+  .operator-none {
+    border-style: dashed;
   }
 
   .ember-power-select-trigger {
