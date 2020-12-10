@@ -1,7 +1,7 @@
 /**
  * Contains options for query block. In 'create' mode allows to select new block, in 'edit'
  * mode has options for changing existing query blocks.
- * 
+ *
  * @module components/query-builder/block-selector
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
@@ -15,6 +15,7 @@ import OperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder
 import AndOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/and-operator-query-block';
 import OrOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/or-operator-query-block';
 import NotOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/not-operator-query-block';
+import { A } from '@ember/array';
 
 const allowedModes = ['create', 'edit'];
 const operatorClasses = {
@@ -23,6 +24,16 @@ const operatorClasses = {
   not: NotOperatorQueryBlock,
 };
 
+/**
+ * @argument {String} [mode]
+ * @argument {Utils.QueryValueComponentsBuilder} [valuesBuilder]
+ * @argument {Array<IndexProperty>} [indexProperties]
+ * @argument {Boolean} [hideConditionCreation]
+ * @argument {Utils.QueryBlock} [editBlock]
+ * @argument {Utils.OperatorQueryBlock} [editParentBlock]
+ * @argument {Function} [onBlockAdd]
+ * @argument {Function} [onBlockReplace]
+ */
 export default class QueryBuilderBlockSelectorComponent extends Component {
   /**
    * @type {String}
@@ -41,11 +52,22 @@ export default class QueryBuilderBlockSelectorComponent extends Component {
     return this.allowedModes.includes(this.args.mode) ? this.args.mode : allowedModes[0];
   }
 
+  get hideConditionCreation() {
+    return this.mode === 'edit' || Boolean(this.args.hideConditionCreation);
+  }
+
   /**
    * @type {Utils.QueryBuilder.QueryBlock}
    */
   get editBlock() {
     return this.args.editBlock || null;
+  }
+
+  /**
+   * @type {Utils.QueryBuilder.OperatorQueryBlock}
+   */
+  get editParentBlock() {
+    return this.args.editParentBlock || null;
   }
 
   /**
@@ -72,32 +94,40 @@ export default class QueryBuilderBlockSelectorComponent extends Component {
   }
 
   /**
-   * List of disabled operators for 'change to' section
+   * List of disabled operators for 'change to operator' section
    * @type {Array<String>}
    */
-  get changeToDisabledOperators() {
+  get disabledOperatorsInChangeToSection() {
     const operatorNames = Object.keys(operatorClasses);
 
     if (!this.editBlock) {
-      return operatorNames;
+      return [...operatorNames, 'none'];
     }
 
-    const disabledOperators = [this.editBlock.operator];
-    operatorNames
-      .without(this.editBlock.operator)
-      .forEach(operatorName => {
-        if (
-          operatorClasses[operatorName].maxOperandsNumber < this.editBlock.operands.length
-        ) {
-          disabledOperators.push(operatorName);
-        }
-      });
+    const editBlockOperator = this.editBlock.operator;
+    const editBlockOperandsCount = this.editBlock.operands.length;
+    const disabledOperators = operatorNames.filter((operatorName) => {
+      return operatorName === editBlockOperator ||
+        operatorClasses[operatorName].maxOperandsNumber < editBlockOperandsCount;
+    });
+
+    const parentBlockMaxOperands = this.editParentBlock &&
+      this.editParentBlock.constructor.maxOperandsNumber;
+    const parentBlockOperandsCount = this.editParentBlock &&
+      this.editParentBlock.operands.length;
+    if (
+      !this.editParentBlock ||
+      !(this.editBlock instanceof OperatorQueryBlock) ||
+      parentBlockMaxOperands < (parentBlockOperandsCount - 1) + editBlockOperandsCount
+    ) {
+      disabledOperators.push('none');
+    }
 
     return disabledOperators;
   }
 
   /**
-   * @param {String} operatorName 
+   * @param {String} operatorName
    */
   @action
   operatorAdded(operatorName) {
@@ -105,9 +135,9 @@ export default class QueryBuilderBlockSelectorComponent extends Component {
   }
 
   /**
-   * @param {Utils.IndexProperty} property 
-   * @param {String} comparator 
-   * @param {any} comparatorValue 
+   * @param {Utils.EsIndexProperty} property
+   * @param {String} comparator
+   * @param {any} comparatorValue
    */
   @action
   conditionAdded(property, comparator, comparatorValue) {
@@ -116,42 +146,46 @@ export default class QueryBuilderBlockSelectorComponent extends Component {
   }
 
   /**
-   * @param {String} operatorName 
+   * @param {String} operatorName
    */
   @action
-  surround(operatorName) {
+  surroundWithOperator(operatorName) {
     if (!this.editBlock) {
       return;
     }
 
-    this.onBlockReplace(this.createOperatorBlock(operatorName, [this.editBlock]));
+    this.onBlockReplace([this.createOperatorBlock(operatorName, [this.editBlock])]);
   }
 
   /**
-   * @param {String} operatorName 
+   * @param {String} operatorName
    */
   @action
-  changeTo(operatorName) {
+  changeToOperator(operatorName) {
     if (!this.editBlock) {
       return;
     }
 
-    this.onBlockReplace(this.createOperatorBlock(
-      operatorName,
-      this.editBlock.operands
-    ));
+    if (operatorName === 'none') {
+      this.onBlockReplace(this.editBlock.operands);
+    } else {
+      this.onBlockReplace([this.createOperatorBlock(
+        operatorName,
+        this.editBlock.operands
+      )]);
+    }
   }
 
   /**
-   * @param {String} operatorName 
-   * @param {Array<Utils.QueryBuilder.QueryBlock>} initialOperands
+   * @param {String} operatorName
+   * @param {Array<Utils.QueryBuilder.QueryBlock>} [initialOperands=[]]
    * @returns {Utils.QueryBuilder.OperatorQueryBlock}
    */
   createOperatorBlock(operatorName, initialOperands = []) {
-    const normalizedInitialOperands = initialOperands || [];
-
     const newBlock = new operatorClasses[operatorName]();
-    newBlock.operands.pushObjects(normalizedInitialOperands);
+    if (initialOperands) {
+      newBlock.operands = A(initialOperands);
+    }
 
     return newBlock;
   }

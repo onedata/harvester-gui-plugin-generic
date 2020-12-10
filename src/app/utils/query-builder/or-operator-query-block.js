@@ -1,6 +1,6 @@
 /**
  * OR operator query block.
- * 
+ *
  * @module utils/query-builder/or-operator-query-block
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
@@ -12,12 +12,5 @@ import OperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder
 export default class OrOperatorQueryBlock extends OperatorQueryBlock {
   constructor() {
     super('or');
-  }
-
-  /**
-   * @override
-   */
-  static newInstance() {
-    return new OrOperatorQueryBlock();
   }
 }

@@ -1,7 +1,7 @@
 /**
  * Provides controls to select condition parameters - property, comparator and
  * comparator value.
- * 
+ *
  * @module components/query-builder/block-selector/condition-selector
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
@@ -9,17 +9,18 @@
  */
 
 import Component from '@glimmer/component';
-import { action, get } from '@ember/object';
-import { inject as service } from '@ember/service';
+import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
-import {
-  defaultComparators,
-  defaultComparatorEditors,
-} from 'harvester-gui-plugin-generic/utils/query-builder/condition-comparator-editors';
 
+/**
+ * @argument {Utils.QueryValueComponentsBuilder} [valuesBuilder]
+ * @argument {Array<IndexProperty>} indexProperties
+ * @argument {Function} onConditionSelected
+ * @argument {Array<String>} [operators]
+ * @argument {Array<String>} [disabledOperators]
+ */
 export default class QueryBuilderBlockSelectorConditionSelectorComponent
 extends Component {
-  @service spacesProvider;
 
   /**
    * @type {String}
@@ -27,7 +28,7 @@ extends Component {
   intlPrefix = 'components.query-builder.block-selector.condition-selector';
 
   /**
-   * @type {Utils.IndexProperty}
+   * @type {Utils.EsIndexProperty}
    */
   @tracked selectedConditionProperty;
 
@@ -42,14 +43,11 @@ extends Component {
   @tracked conditionComparatorValue;
 
   /**
-   * @type {Object}
+   * @type {Utils.QueryValueComponentsBuilder}
    */
-  @tracked comparatorsSet = defaultComparators;
-
-  /**
-   * @type {Object}
-   */
-  @tracked comparatorEditorsSet = defaultComparatorEditors;
+  get valuesBuilder() {
+    return this.args.valuesBuilder || [];
+  }
 
   /**
    * @type {Array<IndexProperty>}
@@ -60,7 +58,7 @@ extends Component {
 
   /**
    * @type {Function}
-   * @param {Utils.IndexProperty} propertyType
+   * @param {Utils.EsIndexProperty} property
    * @param {String} comparator
    * @param {any} comparatorValue
    */
@@ -72,23 +70,28 @@ extends Component {
    * @type {Array<String>}
    */
   get comparators() {
-    const propertyType = get(this, 'selectedConditionProperty.type');
-    return this.comparatorsSet[propertyType] || [];
+    return this.valuesBuilder.getComparatorsFor(this.selectedConditionProperty?.type);
   }
 
   /**
-   * @type {Object}
+   * @type {Function}
    */
-  get comparatorEditor() {
-    return this.comparatorEditorsSet[this.selectedConditionComparator];
+  get comparatorValidator() {
+    return this.valuesBuilder.getValidatorFor(this.selectedConditionComparator);
+  }
+
+  /**
+   * @type {Function}
+   */
+  get comparatorDefaultValue() {
+    return this.valuesBuilder.getDefaultValueFor(this.selectedConditionComparator);
   }
 
   /**
    * @type {boolean}
    */
   get isConditionComparatorValueValid() {
-    return this.comparatorEditor ?
-      this.comparatorEditor.isValidValue(this.conditionComparatorValue) : false;
+    return this.comparatorValidator(this.conditionComparatorValue);
   }
 
   /**
@@ -101,32 +104,35 @@ extends Component {
   }
 
   /**
-   * 
-   * @param {Utils.IndexProperty} indexProperty 
+   *
+   * @param {Utils.EsIndexProperty} indexProperty
    */
   @action
   conditionPropertyChanged(indexProperty) {
     this.selectedConditionProperty = indexProperty;
 
-    if (!this.comparators.includes(this.selectedConditionComparator)) {
+    if (
+      !this.selectedConditionComparator ||
+      !this.comparators.includes(this.selectedConditionComparator)
+    ) {
       this.conditionComparatorChanged(this.comparators[0]);
     }
   }
 
   /**
-   * @param {String} comparator 
+   * @param {String} comparator
    */
   @action
   conditionComparatorChanged(comparator) {
     this.selectedConditionComparator = comparator;
 
     if (!this.isConditionComparatorValueValid) {
-      this.conditionComparatorValueChanged(this.comparatorEditor.defaultValue());
+      this.conditionComparatorValueChanged(this.comparatorDefaultValue);
     }
   }
 
   /**
-   * @param {any} value 
+   * @param {any} value
    */
   @action
   conditionComparatorValueChanged(value) {

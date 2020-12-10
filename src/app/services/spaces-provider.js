@@ -13,7 +13,6 @@
  */
 
 import Service, { inject as service } from '@ember/service';
-import { get } from '@ember/object';
 import { all as allFulfilled } from 'rsvp';
 import { tracked } from '@glimmer/tracking';
 import Space from 'harvester-gui-plugin-generic/utils/space';
@@ -72,7 +71,7 @@ export default class SpacesProviderService extends Service {
         },
       },
     }).then(results => {
-      const buckets = get(results || {}, 'aggregations.spaceIds.buckets') || [];
+      const buckets = results?.aggregations?.spaceIds?.buckets || [];
       return buckets.map(({ key: id }) => new Space(id, `ID: ${id}`));
     }).catch(() => []);
   }

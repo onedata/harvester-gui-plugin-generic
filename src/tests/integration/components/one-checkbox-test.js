@@ -20,7 +20,7 @@ describe('Integration | Component | one-checkbox', function () {
 
     const checkboxNode = this.element.querySelector('.one-checkbox');
     expect(checkboxNode).to.have.class('checked');
-    expect(checkboxNode.querySelector('svg')).to.have.class('fa-check');
+    expect(checkboxNode.querySelector('.fa-icon')).to.have.class('fa-check');
   });
 
   it('shows value "false"', async function () {
@@ -28,7 +28,7 @@ describe('Integration | Component | one-checkbox', function () {
 
     const checkboxNode = this.element.querySelector('.one-checkbox');
     expect(checkboxNode).to.have.class('unchecked');
-    expect(checkboxNode.querySelector('svg')).to.not.exist;
+    expect(checkboxNode.querySelector('.fa-icon')).to.not.exist;
   });
 
   it('shows value "indeterminate"', async function () {
@@ -36,7 +36,7 @@ describe('Integration | Component | one-checkbox', function () {
 
     const checkboxNode = this.element.querySelector('.one-checkbox');
     expect(checkboxNode).to.have.class('indeterminate');
-    expect(checkboxNode.querySelector('svg')).to.have.class('fa-circle');
+    expect(checkboxNode.querySelector('.fa-icon')).to.have.class('fa-circle');
   });
 
   it('is enabled by default', async function () {
@@ -71,10 +71,8 @@ describe('Integration | Component | one-checkbox', function () {
     next: true,
   }].forEach(({ prev, next }) => {
     it(`notifies about value change from "${prev}" to "${next}"`, async function () {
-      const { changeSpy } = this.setProperties({
-        initialValue: prev,
-        changeSpy: sinon.spy(),
-      });
+      this.initialValue = prev;
+      this.changeSpy = sinon.spy();
 
       await render(hbs `<OneCheckbox
         @value={{this.initialValue}}
@@ -82,12 +80,12 @@ describe('Integration | Component | one-checkbox', function () {
       />`);
       await click('.one-checkbox');
 
-      expect(changeSpy).to.be.calledOnce.and.to.be.calledWith(next);
+      expect(this.changeSpy).to.be.calledOnce.and.to.be.calledWith(next);
     });
   });
 
   it('can be changed using associated label', async function () {
-    const changeSpy = this.set('changeSpy', sinon.spy());
+    this.changeSpy = sinon.spy();
 
     await render(hbs `
       <label class="label" for="my-id">click me</label>
@@ -99,6 +97,6 @@ describe('Integration | Component | one-checkbox', function () {
     `);
     await click('.label');
 
-    expect(changeSpy).to.be.calledOnce.and.to.be.calledWith(false);
+    expect(this.changeSpy).to.be.calledOnce.and.to.be.calledWith(false);
   });
 });

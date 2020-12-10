@@ -10,6 +10,13 @@
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
 
+/**
+ * @argument {Number} resultsCount
+ * @argument {Number} pageSize
+ * @argument {Number} activePageNumber
+ * @argument {Function} onPageChange
+ * @argument {Function} onPageSizeChange
+ */
 export default class QueryResultsPaginationComponent extends Component {
   /**
    * @type {String}
@@ -81,12 +88,12 @@ export default class QueryResultsPaginationComponent extends Component {
 
   @action
   goToPrevPage() {
-    this.onPageChange(Math.max(this.activePageNumber - 1, 1));
+    this.onPageChange(this.normalizePageNumber(this.activePageNumber - 1));
   }
 
   @action
   goToNextPage() {
-    this.onPageChange(Math.min(this.activePageNumber + 1, this.pagesCount));
+    this.onPageChange(this.normalizePageNumber(this.activePageNumber + 1));
   }
 
   @action

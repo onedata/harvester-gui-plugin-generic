@@ -1,6 +1,7 @@
 {
   "onedata": {
-    "version": "0.0.1",
+    "name": "Generic",
+    "version": "1.0.0",
     "defaultGuiConfiguration": {},
     "indices": [
       {

@@ -24,6 +24,15 @@ const allowedPropertyTypes = [
   'anyProperty',
 ];
 
+/**
+ * @argument {Utils.QueryValueComponentsBuilder} valuesBuilder
+ * @argument {Utils.Index} index
+ * @argument {Function} onPerformQuery
+ * @argument {Utils.EsIndexProperty} sortProperty
+ * @argument {String} sortDirection
+ * @argument {Function} onGenerateCurl
+ * @argument {Object} filteredProperties
+ */
 export default class QueryBuilderComponent extends Component {
   /**
    * @type {String}
@@ -36,7 +45,8 @@ export default class QueryBuilderComponent extends Component {
   @tracked rootQueryBlock = new RootOperatorQueryBlock();
 
   /**
-   * Contains state of the condition blocks edition. Each state has only one field (for now):
+   * Contains state of the condition blocks edition. Each state has only one field
+   * (for now):
    * isValid: boolean.
    * @type {Map<Utils.QueryBuilder.ConditionQueryBlock,Object>}
    */
@@ -51,7 +61,7 @@ export default class QueryBuilderComponent extends Component {
   }
 
   /**
-   * @type {Array<Utils.IndexProperty>}
+   * @type {Array<Utils.EsIndexProperty>}
    */
   get indexProperties() {
     const allProperties =
@@ -81,7 +91,7 @@ export default class QueryBuilderComponent extends Component {
   }
 
   /**
-   * @param {Utils.QueryBuilder.ConditionQueryBlock} conditionBlock 
+   * @param {Utils.QueryBuilder.ConditionQueryBlock} conditionBlock
    */
   @action
   onConditionEditionStart(conditionBlock) {
@@ -91,7 +101,7 @@ export default class QueryBuilderComponent extends Component {
   }
 
   /**
-   * @param {Utils.QueryBuilder.ConditionQueryBlock} conditionBlock 
+   * @param {Utils.QueryBuilder.ConditionQueryBlock} conditionBlock
    */
   @action
   onConditionEditionEnd(conditionBlock) {
@@ -115,7 +125,7 @@ export default class QueryBuilderComponent extends Component {
   }
 
   /**
-   * @param {Utils.QueryBuilder.QueryBlock} block 
+   * @param {Utils.QueryBuilder.QueryBlock} block
    */
   @action
   onBlockRemoved(block) {
@@ -131,16 +141,14 @@ export default class QueryBuilderComponent extends Component {
       }
     }
 
-    for (const condition of flattenedConditionsList) {
-      this.editedConditions.delete(condition);
-    }
+    flattenedConditionsList.forEach(condition => this.editedConditions.delete(condition));
 
     // trigger change
     this.editedConditions = this.editedConditions;
   }
 
   /**
-   * @param {Utils.IndexProperty} property 
+   * @param {Utils.EsIndexProperty} property
    * @returns {boolean}
    */
   isSupportedProperty(property) {

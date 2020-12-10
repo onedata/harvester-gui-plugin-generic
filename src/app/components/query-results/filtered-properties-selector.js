@@ -2,7 +2,7 @@
  * A selector, which allows to choose which properties should be visible or not.
  * No property selected should be interpreted as "all selected" (otherwise empty selection
  * would be useless).
- * 
+ *
  * @module components/query-results/filtered-properties-selector
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
@@ -15,6 +15,11 @@ import { tracked } from '@glimmer/tracking';
 import { A } from '@ember/array';
 import _ from 'lodash';
 
+/**
+ * @argument {Utils.QueryResult} queryResult
+ * @argument {Utils.Index} index
+ * @argument {Function} onSelectionChange
+ */
 export default class QueryResultsFilteredPropertiesSelectorComponent extends Component {
   /**
    * @type {String}
@@ -30,6 +35,11 @@ export default class QueryResultsFilteredPropertiesSelectorComponent extends Com
    * @type {Object}
    */
   lastPropertiesTree = {};
+
+  /**
+   * @type {Object}
+   */
+  lastFilteredProperties = {};
 
   /**
    * @type {Array<TreeNode>}
@@ -58,6 +68,13 @@ export default class QueryResultsFilteredPropertiesSelectorComponent extends Com
    */
   get index() {
     return this.args.index;
+  }
+
+  /**
+   * @type {Object}
+   */
+  get filteredProperties() {
+    return this.args.filteredProperties || {};
   }
 
   /**
@@ -146,61 +163,93 @@ export default class QueryResultsFilteredPropertiesSelectorComponent extends Com
   }
 
   calculateModelIfNeeded() {
-    // Recalculate model only if query results have been changed
-    if (this.args.queryResults === this.lastQueryResults) {
-      return;
-    }
+    let newModel = null;
+    let newFlatModel = null;
 
-    const resultsPropertiesTree = this.queryResults ?
-      this.queryResults.getPropertiesTree() : {};
-    const schemaPropertiesTree = this.index ? this.index.getPropertiesTree() : {};
-    const newPropertiesTree =
-      _.merge({}, this.lastPropertiesTree, resultsPropertiesTree, schemaPropertiesTree);
-    const model = [];
-    const flatModel = [];
+    // Recalculate model structure only if query results have been changed
+    if (this.queryResults !== this.lastQueryResults) {
+      const resultsPropertiesTree = this.queryResults ?
+        this.queryResults.getPropertiesTree() : {};
+      const schemaPropertiesTree = this.index ? this.index.getPropertiesTree() : {};
+      const newPropertiesTree =
+        _.merge({}, this.lastPropertiesTree, resultsPropertiesTree, schemaPropertiesTree);
+      newModel = [];
+      newFlatModel = [];
 
-    const propertiesSubtreeQueue = [newPropertiesTree];
-    const modelChildrenTargetQueue = [model];
-    const oldModelChildrenTargetQueue = [this.calculatedModel];
-    let uniqueId = 0;
+      const propertiesSubtreeQueue = [newPropertiesTree];
+      const modelChildrenTargetQueue = [newModel];
+      const oldModelChildrenTargetQueue = [this.calculatedModel];
+      let uniqueId = 0;
 
-    while (propertiesSubtreeQueue.length) {
-      const modelChildrenTarget = modelChildrenTargetQueue.pop();
-      const oldModelChildrenTarget = oldModelChildrenTargetQueue.pop();
-      const propertiesSubtree = propertiesSubtreeQueue.pop();
+      while (propertiesSubtreeQueue.length) {
+        const modelChildrenTarget = modelChildrenTargetQueue.pop();
+        const oldModelChildrenTarget = oldModelChildrenTargetQueue.pop();
+        const propertiesSubtree = propertiesSubtreeQueue.pop();
 
-      for (const key of Object.keys(propertiesSubtree).sort()) {
-        const oldModelNode = oldModelChildrenTarget.findBy('name', key);
-        const oldModelChildren = oldModelNode ? oldModelNode.children : [];
+        for (const key of Object.keys(propertiesSubtree).sort()) {
+          const oldModelNode = oldModelChildrenTarget.findBy('name', key);
+          const oldModelChildren = oldModelNode ? oldModelNode.children : [];
 
-        const newModelNode = new TreeNode();
-        newModelNode.id = uniqueId++;
-        newModelNode.name = key;
-        newModelNode.isChecked = oldModelNode ? oldModelNode.isChecked : false;
-        newModelNode.isIndeterminate =
-          oldModelNode ? oldModelNode.isIndeterminate : false;
-        newModelNode.isExpanded = oldModelNode ? oldModelNode.isExpanded : false;
-        modelChildrenTarget.push(newModelNode);
+          const newModelNode = new TreeNode();
+          newModelNode.id = uniqueId++;
+          newModelNode.name = key;
+          newModelNode.isExpanded = oldModelNode ? oldModelNode.isExpanded : false;
+          modelChildrenTarget.push(newModelNode);
 
-        flatModel.push(newModelNode);
-        propertiesSubtreeQueue.push(propertiesSubtree[key]);
-        modelChildrenTargetQueue.push(newModelNode.children);
-        oldModelChildrenTargetQueue.push(oldModelChildren);
+          newFlatModel.push(newModelNode);
+          propertiesSubtreeQueue.push(propertiesSubtree[key]);
+          modelChildrenTargetQueue.push(newModelNode.children);
+          oldModelChildrenTargetQueue.push(oldModelChildren);
+        }
       }
+
+      this.lastQueryResults = this.queryResults;
+      this.lastPropertiesTree = newPropertiesTree;
     }
 
-    model.forEach(node => this.fixTreeSelectionState(node));
+    // Recalculate model selection only if structure or filtered properties have changed
+    if (newModel || this.lastFilteredProperties !== this.filteredProperties) {
+      if (!newModel) {
+        newModel = this.calculatedModel;
+      }
 
-    this.lastQueryResults = this.args.queryResults;
-    this.lastPropertiesTree = newPropertiesTree;
-    this.calculatedModel = model;
-    this.calculatedFlatModel = A(flatModel);
+      const filteredPropertiesQueue = [this.filteredProperties];
+      const modelQueue = [{ children: newModel }];
+
+      while (filteredPropertiesQueue.length) {
+        const filteredPropertiesNode = filteredPropertiesQueue.pop();
+        const modelNode = modelQueue.pop();
+
+        const filteredPropertiesNodeKeys = Object.keys(filteredPropertiesNode);
+        if (filteredPropertiesNodeKeys.length && modelNode.children.length) {
+          for (const nodeKey of filteredPropertiesNodeKeys) {
+            const modelNodeForNodeKey = modelNode.children.findBy('name', nodeKey);
+            if (modelNodeForNodeKey) {
+              filteredPropertiesQueue.push(filteredPropertiesNode[nodeKey]);
+              modelQueue.push(modelNodeForNodeKey);
+            }
+          }
+        } else if (modelNode.children !== newModel) {
+          this.markModelNodeAsChecked(modelNode);
+        }
+      }
+
+      newModel.forEach(node => this.fixTreeSelectionState(node));
+      this.lastFilteredProperties = this.filteredProperties;
+    }
+
+    if (newModel) {
+      this.calculatedModel = newModel;
+    }
+    if (newFlatModel) {
+      this.calculatedFlatModel = A(newFlatModel);
+    }
   }
 
   /**
    * Fixes (with recursion) selection state of the TreeNode - recalculates isChecked
    * and isIndeterminate according to the TreeNode leaves selection state.
-   * @param {TreeNode} node 
+   * @param {TreeNode} node
    */
   fixTreeSelectionState(node) {
     const children = node.children || [];
@@ -208,11 +257,19 @@ export default class QueryResultsFilteredPropertiesSelectorComponent extends Com
       children.forEach(subnode => this.fixTreeSelectionState(subnode));
       const childrenCheckedState = children.mapBy('isChecked');
       const childrenIndeterminateState = children.mapBy('isIndeterminate');
-      node.isChecked = !childrenCheckedState.includes(false);
-      node.isIndeterminate = !node.isChecked && (
+      const isChecked = !childrenCheckedState.includes(false);
+      const isIndeterminate = !isChecked && (
         childrenCheckedState.includes(true) || childrenIndeterminateState.includes(true)
       );
+      node.isChecked = isChecked;
+      node.isIndeterminate = isIndeterminate;
     }
+  }
+
+  markModelNodeAsChecked(modelNode) {
+    modelNode.isChecked = true;
+    modelNode.isIndeterminate = false;
+    modelNode.children.forEach(child => this.markModelNodeAsChecked(child));
   }
 }
 

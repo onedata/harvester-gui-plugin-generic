@@ -1,6 +1,6 @@
 <AttachPopover
   @showOn=""
-  @hideOn="clickout"
+  @hideOn="clickout click"
   @interactive={{true}}
   @arrow={{true}}
   @placement="auto"
@@ -12,6 +12,7 @@
   <QueryBuilder::BlockSelector
     @mode="edit"
     @editBlock={{@queryBlock}}
+    @editParentBlock={{@parentQueryBlock}}
     @onBlockReplace={{fn this.blockReplace popover.hide}}
   />
 </AttachPopover>

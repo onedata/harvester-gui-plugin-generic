@@ -1,7 +1,7 @@
 /**
  * An operator query block base class. Aggregates operands, which may be conditions or
  * another operators.
- * 
+ *
  * @module utils/query-builder/operator-query-block
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
@@ -34,7 +34,18 @@ export default class OperatorQueryBlock extends QueryBlock {
   @tracked operands = A();
 
   /**
-   * @param {String} operator 
+   * @override
+   */
+  get level() {
+    if (!this.operands.length) {
+      return 1;
+    } else {
+      return Math.max(...this.operands.mapBy('level')) + 1;
+    }
+  }
+
+  /**
+   * @param {String} operator
    */
   constructor(operator = null) {
     super(...arguments);
@@ -43,30 +54,22 @@ export default class OperatorQueryBlock extends QueryBlock {
   }
 
   /**
-   * Creates new instances of the class. It's a template method used by cloning mechanism.
-   * @returns {Utils.QueryBuilder.OperatorQueryBlock}
-   */
-  static newInstance() {
-    return new OperatorQueryBlock();
-  }
-
-  /**
    * @override
    */
   clone() {
-    const clonedBlock = this.constructor.newInstance();
+    const clonedBlock = new this.constructor();
     clonedBlock.operator = this.operator;
-    clonedBlock.operands.pushObjects(this.cloneOperands());
+    clonedBlock.operands = this.cloneOperands();
 
     return clonedBlock;
   }
 
   /**
-   * @returns {Array<Utils.QueryBuilder.QueryBlock>}
+   * @returns {Ember.Array<Utils.QueryBuilder.QueryBlock>}
    */
   cloneOperands() {
-    return this.operands.map(operand =>
+    return A(this.operands.map(operand =>
       operand && typeof operand.clone === 'function' ? operand.clone() : operand
-    );
+    ));
   }
 }

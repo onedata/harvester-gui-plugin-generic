@@ -9,11 +9,4 @@ export default class RootOperatorQueryBlock extends OperatorQueryBlock {
   constructor() {
     super('root');
   }
-
-  /**
-   * @override
-   */
-  static newInstance() {
-    return new RootOperatorQueryBlock();
-  }
 }

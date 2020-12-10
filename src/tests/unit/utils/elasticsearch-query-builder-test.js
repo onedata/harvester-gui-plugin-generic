@@ -5,12 +5,13 @@ import AndOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-buil
 import OrOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/or-operator-query-block';
 import NotOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/not-operator-query-block';
 import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/condition-query-block';
-import IndexProperty from 'harvester-gui-plugin-generic/utils/index-property';
-import IndexOnedataProperty from 'harvester-gui-plugin-generic/utils/index-onedata-property';
-import IndexAnyProperty from 'harvester-gui-plugin-generic/utils/index-any-property';
+import EsIndexProperty from 'harvester-gui-plugin-generic/utils/es-index-property';
+import EsIndexOnedataProperty from 'harvester-gui-plugin-generic/utils/es-index-onedata-property';
+import EsIndexAnyProperty from 'harvester-gui-plugin-generic/utils/es-index-any-property';
+import RootOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/root-operator-query-block';
 
 const exampleBooleanConditionBlock = new ConditionQueryBlock(
-  new IndexProperty(new IndexProperty(null, 'a'), 'b'),
+  new EsIndexProperty(new EsIndexProperty(null, 'a'), 'b'),
   'boolean.is',
   'true'
 );
@@ -23,7 +24,7 @@ const exampleBooleanConditionQuery = {
 };
 
 const exampleTextContainsConditionBlock = new ConditionQueryBlock(
-  new IndexProperty(new IndexProperty(null, 'e'), 'f'),
+  new EsIndexProperty(new EsIndexProperty(null, 'e'), 'f'),
   'text.contains',
   'a | b'
 );
@@ -36,7 +37,7 @@ const exampleTextContainsConditionQuery = {
 };
 
 const exampleNumberEqualsConditionBlock = new ConditionQueryBlock(
-  new IndexProperty(new IndexProperty(null, 'g'), 'h'),
+  new EsIndexProperty(new EsIndexProperty(null, 'g'), 'h'),
   'number.eq',
   '2'
 );
@@ -50,7 +51,7 @@ const exampleNumberEqualsConditionQuery = {
 };
 
 const exampleKeywordIsConditionBlock = new ConditionQueryBlock(
-  new IndexProperty(new IndexProperty(null, 'i'), 'j'),
+  new EsIndexProperty(new EsIndexProperty(null, 'i'), 'j'),
   'keyword.is',
   'abc'
 );
@@ -63,7 +64,7 @@ const exampleKeywordIsConditionQuery = {
 };
 
 const exampleDateLteConditionBlock = new ConditionQueryBlock(
-  new IndexProperty(new IndexProperty(null, 'k'), 'l'),
+  new EsIndexProperty(new EsIndexProperty(null, 'k'), 'l'),
   'date.lte', {
     timeEnabled: true,
     datetime: new Date(2020, 0, 2, 12, 10, 40),
@@ -79,7 +80,7 @@ const exampleDateLteConditionQuery = {
 };
 
 const exampleSpaceConditionBlock = new ConditionQueryBlock(
-  new IndexOnedataProperty(null, 'space'),
+  new EsIndexOnedataProperty(null, 'space'),
   'space.is', {
     id: 'space1Id',
     name: 'space1',
@@ -94,7 +95,7 @@ const exampleSpaceConditionQuery = {
 };
 
 const exampleAnyPropertyConditionBlock = new ConditionQueryBlock(
-  new IndexAnyProperty(),
+  new EsIndexAnyProperty(),
   'anyProperty.hasPhrase',
   'abc def'
 );
@@ -148,9 +149,11 @@ const exampleOrOperatorQuery = {
   },
 };
 
-const exampleNestedOperatorsBlock = new NotOperatorQueryBlock();
-exampleNestedOperatorsBlock.operands.pushObject(new OrOperatorQueryBlock());
-exampleNestedOperatorsBlock.operands[0].operands.pushObjects([
+const exampleNestedOperatorsBlock = new RootOperatorQueryBlock();
+const exampleNestedOperatorsBlockInner = new NotOperatorQueryBlock();
+exampleNestedOperatorsBlock.operands.pushObject(exampleNestedOperatorsBlockInner);
+exampleNestedOperatorsBlockInner.operands.pushObject(new OrOperatorQueryBlock());
+exampleNestedOperatorsBlockInner.operands[0].operands.pushObjects([
   exampleAndOperatorBlock,
   exampleOrOperatorBlock,
 ]);
@@ -183,71 +186,48 @@ function fullQuery(conditionQuery) {
 }
 
 describe('Unit | Utility | elasticsearch-query-builder', function () {
-  it('converts boolean "is" condition', function () {
-    const esQueryBuilder = new ElasticsearchQueryBuilder();
-    esQueryBuilder.mainQueryBlock = exampleBooleanConditionBlock;
-    const result = esQueryBuilder.buildQuery();
-
-    expect(result).to.deep.equal(fullQuery(exampleBooleanConditionQuery));
+  checkBlockConversion({
+    name: 'boolean "is" condition',
+    block: exampleBooleanConditionBlock,
+    expectedQuery: exampleBooleanConditionQuery,
   });
 
-  it(
-    'converts text "contains" condition',
-    function () {
-      const esQueryBuilder = new ElasticsearchQueryBuilder();
-      esQueryBuilder.mainQueryBlock = exampleTextContainsConditionBlock;
-      const result = esQueryBuilder.buildQuery();
+  checkBlockConversion({
+    name: 'text "contains" condition',
+    block: exampleTextContainsConditionBlock,
+    expectedQuery: exampleTextContainsConditionQuery,
+  });
 
-      expect(result).to.deep.equal(fullQuery(exampleTextContainsConditionQuery));
-    }
-  );
-
-  it(
-    'converts number "eq" condition',
-    function () {
-      const esQueryBuilder = new ElasticsearchQueryBuilder();
-      esQueryBuilder.mainQueryBlock = exampleNumberEqualsConditionBlock;
-      const result = esQueryBuilder.buildQuery();
-
-      expect(result).to.deep.equal(fullQuery(exampleNumberEqualsConditionQuery));
-    }
-  );
+  checkBlockConversion({
+    name: 'number "eq" condition',
+    block: exampleNumberEqualsConditionBlock,
+    expectedQuery: exampleNumberEqualsConditionQuery,
+  });
 
   ['lt', 'lte', 'gt', 'gte'].forEach(operator => {
-    it(
-      `converts number "${operator}" condition`,
-      function () {
-        const conditionBlock = new ConditionQueryBlock(
-          new IndexProperty(new IndexProperty(null, 'a'), 'b'),
-          `number.${operator}`,
-          '2'
-        );
-
-        const esQueryBuilder = new ElasticsearchQueryBuilder();
-        esQueryBuilder.mainQueryBlock = conditionBlock;
-        const result = esQueryBuilder.buildQuery();
-
-        expect(result).to.deep.equal(fullQuery({
-          range: {
-            'a.b': {
-              [operator]: 2,
-            },
-          },
-        }));
-      }
+    const conditionBlock = new ConditionQueryBlock(
+      new EsIndexProperty(new EsIndexProperty(null, 'a'), 'b'),
+      `number.${operator}`,
+      '2'
     );
+    checkBlockConversion({
+      name: `number "${operator}" condition`,
+      block: conditionBlock,
+      expectedQuery: {
+        range: {
+          'a.b': {
+            [operator]: 2,
+          },
+        },
+      },
+    });
   });
 
-  it(
-    'converts keyword "is" condition',
-    function () {
-      const esQueryBuilder = new ElasticsearchQueryBuilder();
-      esQueryBuilder.mainQueryBlock = exampleKeywordIsConditionBlock;
-      const result = esQueryBuilder.buildQuery();
-
-      expect(result).to.deep.equal(fullQuery(exampleKeywordIsConditionQuery));
-    }
-  );
+  checkBlockConversion({
+    name: 'keyword "is" condition',
+    block: exampleKeywordIsConditionBlock,
+    expectedQuery: exampleKeywordIsConditionQuery,
+  });
 
   [{
     name: 'eq',
@@ -305,71 +285,56 @@ describe('Unit | Utility | elasticsearch-query-builder', function () {
     },
   }].forEach(({ name, timeDisabledCompare, timeEnabledCompare }) => {
     [true, false].forEach(timeEnabled => {
-      it(
-        `converts date "${name}" condition (timeEnabled ${timeEnabled})`,
-        function () {
-          const conditionBlock = new ConditionQueryBlock(
-            new IndexProperty(new IndexProperty(null, 'a'), 'b'),
-            `date.${name}`, {
-              timeEnabled,
-              datetime: new Date(2020, 0, 2, 12, 10, 40),
-            }
-          );
-
-          const esQueryBuilder = new ElasticsearchQueryBuilder();
-          esQueryBuilder.mainQueryBlock = conditionBlock;
-          const result = esQueryBuilder.buildQuery();
-
-          expect(result).to.deep.equal(fullQuery({
-            range: {
-              'a.b': Object.assign({ format: 'epoch_millis' },
-                timeEnabled ? timeEnabledCompare : timeDisabledCompare
-              ),
-            },
-          }));
+      const conditionBlock = new ConditionQueryBlock(
+        new EsIndexProperty(new EsIndexProperty(null, 'a'), 'b'),
+        `date.${name}`, {
+          timeEnabled,
+          datetime: new Date(2020, 0, 2, 12, 10, 40),
         }
       );
+
+      checkBlockConversion({
+        name: `date "${name}" condition (timeEnabled ${timeEnabled})`,
+        block: conditionBlock,
+        expectedQuery: {
+          range: {
+            'a.b': Object.assign({ format: 'epoch_millis' },
+              timeEnabled ? timeEnabledCompare : timeDisabledCompare
+            ),
+          },
+        },
+      });
     });
   });
 
-  it('converts space "is" condition', function () {
-    const esQueryBuilder = new ElasticsearchQueryBuilder();
-    esQueryBuilder.mainQueryBlock = exampleSpaceConditionBlock;
-    const result = esQueryBuilder.buildQuery();
-
-    expect(result).to.deep.equal(fullQuery(exampleSpaceConditionQuery));
+  checkBlockConversion({
+    name: 'space "is" condition',
+    block: exampleSpaceConditionBlock,
+    expectedQuery: exampleSpaceConditionQuery,
   });
 
-  it('converts anyProperty "hasPhrase" condition', function () {
-    const esQueryBuilder = new ElasticsearchQueryBuilder();
-    esQueryBuilder.mainQueryBlock = exampleAnyPropertyConditionBlock;
-    const result = esQueryBuilder.buildQuery();
-
-    expect(result).to.deep.equal(fullQuery(exampleAnyPropertyConditionQuery));
+  checkBlockConversion({
+    name: 'anyProperty "hasPhrase" condition',
+    block: exampleAnyPropertyConditionBlock,
+    expectedQuery: exampleAnyPropertyConditionQuery,
   });
 
-  it('converts NOT operator', function () {
-    const esQueryBuilder = new ElasticsearchQueryBuilder();
-    esQueryBuilder.mainQueryBlock = exampleNotOperatorBlock;
-
-    const result = esQueryBuilder.buildQuery();
-    expect(result).to.deep.equal(fullQuery(exampleNotOperatorQuery));
+  checkBlockConversion({
+    name: 'NOT operator',
+    block: exampleNotOperatorBlock,
+    expectedQuery: exampleNotOperatorQuery,
   });
 
-  it('converts AND operator', function () {
-    const esQueryBuilder = new ElasticsearchQueryBuilder();
-    esQueryBuilder.mainQueryBlock = exampleAndOperatorBlock;
-
-    const result = esQueryBuilder.buildQuery();
-    expect(result).to.deep.equal(fullQuery(exampleAndOperatorQuery));
+  checkBlockConversion({
+    name: 'AND operator',
+    block: exampleAndOperatorBlock,
+    expectedQuery: exampleAndOperatorQuery,
   });
 
-  it('converts OR operator', function () {
-    const esQueryBuilder = new ElasticsearchQueryBuilder();
-    esQueryBuilder.mainQueryBlock = exampleOrOperatorBlock;
-
-    const result = esQueryBuilder.buildQuery();
-    expect(result).to.deep.equal(fullQuery(exampleOrOperatorQuery));
+  checkBlockConversion({
+    name: 'OR operator',
+    block: exampleOrOperatorBlock,
+    expectedQuery: exampleOrOperatorQuery,
   });
 
   it('constructs complete query for nested operators example', function () {
@@ -454,7 +419,7 @@ describe('Unit | Utility | elasticsearch-query-builder', function () {
 
   it('allows to specify custom sorting', function () {
     const esQueryBuilder = new ElasticsearchQueryBuilder();
-    esQueryBuilder.sortProperty = new IndexProperty(new IndexProperty(null, 'x'), 'y');
+    esQueryBuilder.sortProperty = new EsIndexProperty(new EsIndexProperty(null, 'x'), 'y');
     esQueryBuilder.sortDirection = 'asc';
 
     const result = esQueryBuilder.buildQuery();
@@ -467,3 +432,13 @@ describe('Unit | Utility | elasticsearch-query-builder', function () {
     ));
   });
 });
+
+function checkBlockConversion({ name, block, expectedQuery }) {
+  it(`converts ${name}`, function () {
+    const esQueryBuilder = new ElasticsearchQueryBuilder();
+    esQueryBuilder.mainQueryBlock = block;
+    const result = esQueryBuilder.buildQuery();
+
+    expect(result).to.deep.equal(fullQuery(expectedQuery));
+  });
+}

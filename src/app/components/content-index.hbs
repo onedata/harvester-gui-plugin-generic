@@ -1,7 +1,7 @@
 <div class="content-index">
   <PromiseLoader @promise={{this.indexPromise}} as |index|>
     <QueryBuilder
-      @query={{this.query}}
+      @valuesBuilder={{this.queryValuesBuilder}}
       @filteredProperties={{this.filteredProperties}}
       @sortProperty={{this.sortProperty}}
       @sortDirection={{this.sortDirection}}

@@ -1,6 +1,6 @@
 /**
  * A base class for query builder blocks.
- * 
+ *
  * @module utils/query-builder/query-block
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
@@ -14,6 +14,15 @@ export default class QueryBlock {
    * @type {String}
    */
   static renderer = null;
+
+  /**
+   * Number used to indicate at which level (counting from the deepest inner block to
+   * the root block) is current block;
+   * @type {Number}
+   */
+  get level() {
+    return 1;
+  }
 
   /**
    * @virtual

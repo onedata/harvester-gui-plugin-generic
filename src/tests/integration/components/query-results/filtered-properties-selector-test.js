@@ -4,8 +4,8 @@ import { setupRenderingTest } from 'ember-mocha';
 import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import QueryResults from 'harvester-gui-plugin-generic/utils/query-results';
-import Index from 'harvester-gui-plugin-generic/utils/index';
-import { click } from '@ember/test-helpers';
+import EsIndex from 'harvester-gui-plugin-generic/utils/es-index';
+import { click, waitUntil } from '@ember/test-helpers';
 import { all as allFulfilled } from 'rsvp';
 import sinon from 'sinon';
 import { isVisible } from 'ember-attacher';
@@ -53,7 +53,7 @@ describe(
             }],
           },
         }),
-        index: new Index({
+        index: new EsIndex({
           mappings: {
             properties: {
               a: {
@@ -82,12 +82,16 @@ describe(
             },
           },
         }),
+        filteredProperties: {},
+        changeSpy: sinon.spy(newProps => this.set('filteredProperties', newProps)),
       });
     });
 
     it('has class "filtered-properties-selector', async function () {
       await render(hbs `<QueryResults::FilteredPropertiesSelector
         @queryResults={{this.queryResults1}}
+        @filteredProperties={{this.filteredProperties}}
+        @onSelectionChange={{this.changeSpy}}
       />`);
 
       expect(this.element.querySelector('.filtered-properties-selector')).to.exist;
@@ -96,7 +100,9 @@ describe(
     it('does not render properties tree on init', async function () {
       await render(hbs `<QueryResults::FilteredPropertiesSelector
         @queryResults={{this.queryResults1}}
+        @filteredProperties={{this.filteredProperties}}
         @index={{this.index}}
+        @onSelectionChange={{this.changeSpy}}
       />`);
 
       expect(this.element.querySelector('.tree')).to.not.exist;
@@ -107,13 +113,15 @@ describe(
       async function () {
         await render(hbs `<QueryResults::FilteredPropertiesSelector
           @queryResults={{this.queryResults1}}
+          @filteredProperties={{this.filteredProperties}}
           @index={{this.index}}
+          @onSelectionChange={{this.changeSpy}}
         />`);
         await click('.show-properties-selector');
+        await waitUntil(() => isVisible('.ember-attacher'));
 
         expect(this.element.querySelector('.show-properties-selector').textContent)
           .to.contain('Filter properties');
-        expect(isVisible('.ember-attacher')).to.be.true;
         expect(this.element.querySelector('.tree')).to.exist;
       }
     );
@@ -121,7 +129,9 @@ describe(
     it('has all nested properties collapsed', async function () {
       await render(hbs `<QueryResults::FilteredPropertiesSelector
         @queryResults={{this.queryResults1}}
+        @filteredProperties={{this.filteredProperties}}
         @index={{this.index}}
+        @onSelectionChange={{this.changeSpy}}
       />`);
 
       expect(this.element.querySelector('.tree-branch .tree-branch')).to.not.exist;
@@ -130,13 +140,12 @@ describe(
     it('renders properties from results and index', async function () {
       await render(hbs `<QueryResults::FilteredPropertiesSelector
         @queryResults={{this.queryResults1}}
+        @filteredProperties={{this.filteredProperties}}
         @index={{this.index}}
+        @onSelectionChange={{this.changeSpy}}
       />`);
       await click('.show-properties-selector');
-      // expand all nodes
-      await allFulfilled([...this.element.querySelectorAll('.toggle-icon')].map(element =>
-        click(element)
-      ));
+      await expandAllNodes(this);
 
       const allLabels = this.element.querySelectorAll('.tree-label');
       const rootLevelLabels = this.element.querySelectorAll(
@@ -170,13 +179,12 @@ describe(
     it('has all properties deselected on init', async function () {
       await render(hbs `<QueryResults::FilteredPropertiesSelector
         @queryResults={{this.queryResults1}}
+        @filteredProperties={{this.filteredProperties}}
         @index={{this.index}}
+        @onSelectionChange={{this.changeSpy}}
       />`);
       await click('.show-properties-selector');
-      // expand all nodes
-      await allFulfilled([...this.element.querySelectorAll('.toggle-icon')].map(element =>
-        click(element)
-      ));
+      await expandAllNodes(this);
 
       [...this.element.querySelectorAll('.one-checkbox')]
       .forEach(checkbox => expect(checkbox).to.not.have.class('checked'));
@@ -185,7 +193,9 @@ describe(
     it('renders buttons "Select all" and "Deselect all"', async function () {
       await render(hbs `<QueryResults::FilteredPropertiesSelector
         @queryResults={{this.queryResults1}}
+        @filteredProperties={{this.filteredProperties}}
         @index={{this.index}}
+        @onSelectionChange={{this.changeSpy}}
       />`);
       await click('.show-properties-selector');
 
@@ -200,7 +210,9 @@ describe(
     it('allows to select all using "Select all" button', async function () {
       await render(hbs `<QueryResults::FilteredPropertiesSelector
         @queryResults={{this.queryResults1}}
+        @filteredProperties={{this.filteredProperties}}
         @index={{this.index}}
+        @onSelectionChange={{this.changeSpy}}
       />`);
       await click('.show-properties-selector');
       await click('.select-all');
@@ -212,7 +224,9 @@ describe(
     it('allows to deselect all using "Deselect all" button', async function () {
       await render(hbs `<QueryResults::FilteredPropertiesSelector
         @queryResults={{this.queryResults1}}
+        @filteredProperties={{this.filteredProperties}}
         @index={{this.index}}
+        @onSelectionChange={{this.changeSpy}}
       />`);
       await click('.show-properties-selector');
       await click('.select-all');
@@ -223,17 +237,17 @@ describe(
     });
 
     it('notifies about changed properties after "select all" click', async function () {
-      const changeSpy = this.set('changeSpy', sinon.spy());
       await render(hbs `<QueryResults::FilteredPropertiesSelector
         @queryResults={{this.queryResults1}}
+        @filteredProperties={{this.filteredProperties}}
         @index={{this.index}}
         @onSelectionChange={{this.changeSpy}}
       />`);
       await click('.show-properties-selector');
       await click('.select-all');
 
-      expect(changeSpy).to.be.calledOnce;
-      expect(changeSpy.lastCall.args[0]).to.deep.equal({
+      expect(this.changeSpy).to.be.calledOnce;
+      expect(this.changeSpy.lastCall.args[0]).to.deep.equal({
         __onedata: {
           spaceId: {},
         },
@@ -250,9 +264,9 @@ describe(
     });
 
     it('notifies about changed properties after "deselect all" click', async function () {
-      const changeSpy = this.set('changeSpy', sinon.spy());
       await render(hbs `<QueryResults::FilteredPropertiesSelector
         @queryResults={{this.queryResults1}}
+        @filteredProperties={{this.filteredProperties}}
         @index={{this.index}}
         @onSelectionChange={{this.changeSpy}}
       />`);
@@ -260,31 +274,28 @@ describe(
       await click('.select-all');
       await click('.deselect-all');
 
-      expect(changeSpy).to.be.calledTwice;
-      expect(changeSpy.lastCall.args[0]).to.deep.equal({});
+      expect(this.changeSpy).to.be.calledTwice;
+      expect(this.changeSpy.lastCall.args[0]).to.deep.equal({});
     });
 
     it(
       'notifies about changed properties after nested node checkbox click',
       async function () {
-        const changeSpy = this.set('changeSpy', sinon.spy());
         await render(hbs `<QueryResults::FilteredPropertiesSelector
           @queryResults={{this.queryResults1}}
+          @filteredProperties={{this.filteredProperties}}
           @index={{this.index}}
           @onSelectionChange={{this.changeSpy}}
         />`);
         await click('.show-properties-selector');
-        // expand all nodes
-        await allFulfilled([...this.element.querySelectorAll('.toggle-icon')]
-          .map(element => click(element))
-        );
+        await expandAllNodes(this);
         const firstBranchLastCheckbox = this.element.querySelectorAll(
           '.tree > .tree-branch > .tree-node:nth-child(2) > .tree-branch .one-checkbox'
         )[1];
         await click(firstBranchLastCheckbox);
 
-        expect(changeSpy).to.be.calledOnce;
-        expect(changeSpy.lastCall.args[0]).to.deep.equal({
+        expect(this.changeSpy).to.be.calledOnce;
+        expect(this.changeSpy.lastCall.args[0]).to.deep.equal({
           a: {
             bb: {},
           },
@@ -297,7 +308,9 @@ describe(
       async function () {
         await render(hbs `<QueryResults::FilteredPropertiesSelector
           @queryResults={{this.queryResults1}}
+          @filteredProperties={{this.filteredProperties}}
           @index={{this.index}}
+          @onSelectionChange={{this.changeSpy}}
         />`);
 
         const counter =
@@ -311,7 +324,9 @@ describe(
       async function () {
         await render(hbs `<QueryResults::FilteredPropertiesSelector
           @queryResults={{this.queryResults1}}
+          @filteredProperties={{this.filteredProperties}}
           @index={{this.index}}
+          @onSelectionChange={{this.changeSpy}}
         />`);
         await click('.show-properties-selector');
         await click('.select-all');
@@ -323,22 +338,16 @@ describe(
     );
 
     it('updates properties set after query results change', async function () {
-      const {
-        queryResults1,
-        queryResults2,
-      } = this.getProperties('queryResults1', 'queryResults2');
-
-      this.set('queryResults', queryResults1);
+      this.set('queryResults', this.queryResults1);
       await render(hbs `<QueryResults::FilteredPropertiesSelector
         @queryResults={{this.queryResults}}
+        @filteredProperties={{this.filteredProperties}}
         @index={{this.index}}
+        @onSelectionChange={{this.changeSpy}}
       />`);
       await click('.show-properties-selector');
-      // expand all nodes
-      await allFulfilled([...this.element.querySelectorAll('.toggle-icon')]
-        .map(element => click(element))
-      );
-      this.set('queryResults', queryResults2);
+      await expandAllNodes(this);
+      this.set('queryResults', this.queryResults2);
 
       const secondBranchLastNode = this.element.querySelectorAll(
         '.tree > .tree-branch > .tree-node:nth-child(2) > .tree-branch .tree-node'
@@ -351,27 +360,21 @@ describe(
     });
 
     it(
-      'updates properties set after query results change (parent property was completly checked)',
+      'updates properties set after query results change (parent property was completely checked)',
       async function () {
-        const {
-          queryResults1,
-          queryResults2,
-        } = this.getProperties('queryResults1', 'queryResults2');
-
-        this.set('queryResults', queryResults1);
+        this.set('queryResults', this.queryResults1);
         await render(hbs `<QueryResults::FilteredPropertiesSelector
           @queryResults={{this.queryResults}}
+          @filteredProperties={{this.filteredProperties}}
           @index={{this.index}}
+          @onSelectionChange={{this.changeSpy}}
         />`);
         await click('.show-properties-selector');
-        // expand all nodes
-        await allFulfilled([...this.element.querySelectorAll('.toggle-icon')]
-          .map(element => click(element))
-        );
+        await expandAllNodes(this);
         await click(
           '.tree > .tree-branch > .tree-node:nth-child(2) > .tree-children .one-checkbox'
         );
-        this.set('queryResults', queryResults2);
+        this.set('queryResults', this.queryResults2);
 
         const secondBranchGroupCheckbox = this.element.querySelector(
           '.tree > .tree-branch > .tree-node:nth-child(2) > .tree-children .one-checkbox'
@@ -385,3 +388,9 @@ describe(
     );
   }
 );
+
+async function expandAllNodes(testCase) {
+  await allFulfilled([...testCase.element.querySelectorAll('.toggle-icon')]
+    .map(element => click(element))
+  );
+}

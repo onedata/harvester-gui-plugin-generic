@@ -3,7 +3,7 @@
  * when it is hovered directly. Hovering directly means that the element is hovered and
  * has no other elements inside, which are also hovered directly (have the `className` in
  * class list).
- * 
+ *
  * @module modifiers/add-direct-hover-class
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
@@ -14,11 +14,6 @@ import Modifier from 'ember-modifier';
 import { action } from '@ember/object';
 
 export default class AddDirectHoverClassModifier extends Modifier {
-  /**
-   * @type {boolean}
-   */
-  isHovered = false;
-
   /**
    * @type {String}
    */
@@ -56,18 +51,11 @@ export default class AddDirectHoverClassModifier extends Modifier {
 
   /**
    * Changes hovered state and adds classes to the element.
-   * @param {boolean} newState 
+   * @param {boolean} newState
    */
   changeHoverState(newState) {
-    if (newState === this.isHovered) {
-      return;
-    }
-
-    this.isHovered = newState;
-    if (newState) {
-      this.element.classList.add(this.className);
-    } else {
-      this.element.classList.remove(this.className);
+    if (this.element.classList.contains(this.className) !== newState) {
+      this.element.classList.toggle(this.className, newState);
     }
   }
 }

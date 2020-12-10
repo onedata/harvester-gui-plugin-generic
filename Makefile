@@ -2,38 +2,38 @@ SRC_DIR	 ?= src
 REL_DIR	 ?= rel
 XVFB_ARGS ?= --server-args="-screen 0, 1366x768x24"
 
-.PHONY: deps build_dev build_prod build_plugin_dev build_plugin_prod doc clean test test_xunit_output submodules
+.PHONY: deps build_dev build_prod build_plugin_dev build_plugin_prod doc clean test test_xvfb test_xvfb_xunit_output submodules
 
-all: build_dev
+all: build_plugin_dev
 
-rel: build_prod
+rel: build_plugin_prod
 
 deps:
-	cd $(SRC_DIR) && npm install --no-package-lock
+	cd $(SRC_DIR) && npm run-script deps
 
 build_dev: deps
-	cd $(SRC_DIR) && ember build --environment=development --output-path=../$(REL_DIR)
+	cd $(SRC_DIR) && npm run-script build:dev
 
 build_prod: deps
-	cd $(SRC_DIR) && ember build --environment=production --output-path=../$(REL_DIR)
+	cd $(SRC_DIR) && npm run-script build
 
-build_plugin_dev: build_dev
-	tar -czf plugin.tar.gz $(REL_DIR)
+build_plugin_dev: deps
+	cd $(SRC_DIR) && npm run-script build-plugin:dev
 
-build_plugin_prod: build_prod
-	tar -czf plugin.tar.gz $(REL_DIR)
-
-doc:
-	jsdoc -c $(SRC_DIR)/.jsdoc.conf $(SRC_DIR)/app
+build_plugin_prod: deps
+	cd $(SRC_DIR) && npm run-script build-plugin
 
 clean:
-	cd $(SRC_DIR) && rm -rf node_modules dist tmp ../$(REL_DIR)/*
+	cd $(SRC_DIR) && npm run-script clean
 
 test: deps
-	cd $(SRC_DIR) && xvfb-run ember test
+	cd $(SRC_DIR) && npm run-script test
 
-test_xunit_output: deps
-	cd $(SRC_DIR) && xvfb-run $(XVFB_ARGS) ember test -r xunit
+test_xvfb: deps
+	cd $(SRC_DIR) && npm run-script test:xvfb
+
+test_xvfb_xunit_output: deps
+	cd $(SRC_DIR) && npm run-script test:xvfb-xunit-output
 
 ##
 ## Submodules

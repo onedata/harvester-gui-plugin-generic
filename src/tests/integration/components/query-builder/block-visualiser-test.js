@@ -7,6 +7,7 @@ import AndOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-buil
 import OrOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/or-operator-query-block';
 import NotOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/not-operator-query-block';
 import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/condition-query-block';
+import QueryValueComponentsBuilder from 'harvester-gui-plugin-generic/utils/query-value-components-builder';
 
 const operatorBlockClasses = {
   and: AndOperatorQueryBlock,
@@ -21,7 +22,7 @@ describe('Integration | Component | query-builder/block-visualiser', function ()
     it(
       `renders ${operatorName.toUpperCase()} operator block according to the passed block spec`,
       async function () {
-        this.set('block', new operatorBlockClasses[operatorName]());
+        this.block = new operatorBlockClasses[operatorName]();
 
         await render(hbs `<QueryBuilder::BlockVisualiser @queryBlock={{this.block}} />`);
 
@@ -35,9 +36,13 @@ describe('Integration | Component | query-builder/block-visualiser', function ()
   it(
     'renders condition block according to the passed block spec',
     async function () {
-      this.set('block', new ConditionQueryBlock());
+      this.block = new ConditionQueryBlock({ path: 'a' }, 'boolean.is', 'true');
+      this.valuesBuilder = new QueryValueComponentsBuilder([]);
 
-      await render(hbs `<QueryBuilder::BlockVisualiser @queryBlock={{this.block}} />`);
+      await render(hbs `<QueryBuilder::BlockVisualiser
+        @queryBlock={{this.block}}
+        @valuesBuilder={{this.valuesBuilder}}
+      />`);
 
       expect(this.element.querySelector('.query-builder-condition-block')).to.exist;
     }

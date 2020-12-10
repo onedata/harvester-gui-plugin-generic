@@ -1,18 +1,21 @@
-// import { expect } from 'chai';
+import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-// import { render } from '@ember/test-helpers';
-// import hbs from 'htmlbars-inline-precompile';
+import { render } from '@ember/test-helpers';
+import hbs from 'htmlbars-inline-precompile';
+import sinon from 'sinon';
 
 describe('Integration | Helper | tt', function () {
   setupRenderingTest();
 
-  // Replace this with your real tests.
   it('renders', async function () {
-    // this.set('inputValue', '1234');
+    this.context = { intlPrefix: 'a.b' };
+    sinon.stub(this.owner.lookup('service:intl'), 't')
+      .withArgs('a.b.mytranslation', sinon.match({}))
+      .returns('my translation');
 
-    // await render(hbs`{{tt inputValue}}`);
+    await render(hbs `{{tt context "mytranslation"}}`);
 
-    // expect(this.element.textContent.trim()).to.equal('1234');
+    expect(this.element.textContent.trim()).to.equal('my translation');
   });
 });

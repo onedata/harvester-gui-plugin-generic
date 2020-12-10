@@ -13,6 +13,12 @@ import { guidFor } from '@ember/object/internals';
 
 const possibleValues = [true, false, 'indeterminate'];
 
+/**
+ * @argument {Boolean|String} value true, false or 'indeterminate'
+ * @argument {String} [inputId]
+ * @argument {Boolean} [disabled]
+ * @argument {Function} [onChange]
+ */
 export default class OneCheckboxComponent extends Component {
   /**
    * @type {String}

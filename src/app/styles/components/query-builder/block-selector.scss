@@ -1,24 +1,46 @@
 .query-builder-block-selector {
   background-color: white;
   padding: $spacer * 0.8;
-  font-size: 80%;
+  font-size: $small-font-size;
 
-  &.create-block-selector {
+  &.with-conditions {
     width: 280px;
   }
 
   h1 {
-    font-size: 100%;
+    font-size: 110%;
     font-weight: bold;
+    margin-bottom: $spacer * 0.8;
+  }
+
+  .or-line {
+    display: flex;
+    align-items: center;
+    margin: $spacer * 0.5 0;
+    color: $gray-600;
+    font-size: 110%;
+
+    &::before,
+    &::after {
+      content: '';
+      border-top: 1px solid $input-border-color;
+      flex-grow: 1;
+      margin-top: 0.1em;
+    }
+
+    &::before {
+      margin-right: $spacer * 0.5;
+    }
+
+    &::after {
+      margin-left: $spacer * 0.5;
+    }
   }
 
   .btn, .form-control {
     font-size: inherit;
   }
 
-  .operators-section:not(:last-child) {
-    margin-bottom: $spacer;
-  }
 
   .operator-selector {
     display: flex;
@@ -27,14 +49,22 @@
     list-style-type: none;
   }
 
-  .comparator-main-container,
-  .comparator-additional-container {
+  .comparator-main-container {
     display: flex;
+    align-items: center;
   }
 
   .operator {
     margin-right: $spacer * 0.25;
     text-transform: uppercase;
+
+    .fa-icon {
+      margin-left: $spacer * 0.2;
+    }
+  }
+
+  .operator-none {
+    border-style: dashed;
   }
 
   .ember-power-select-trigger {
@@ -63,18 +93,20 @@
     flex-shrink: 0;
   }
 
-  .form-group-full-line {
+  .form-group-whole-line {
     flex-basis: 100%;
-    justify-content: flex-start;
   }
 
   .form-group-fill-line {
     margin-left: $spacer * 0.5;
     flex-grow: 1;
-    justify-content: flex-start;
   }
-  
-  .date-editor {
+
+  .condition-selector > .form-group:last-child {
+    margin-bottom: 0;
+  }
+
+  .datetime-editor {
     .input-group {
       flex-wrap: nowrap;
     }
@@ -84,12 +116,12 @@
       border-bottom-left-radius: 0;
     }
   }
-  
+
   .flatpickr-wrapper {
     width: 100%;
   }
 
-  .accept-condition {
-    display: block;
+  .add-btn-container {
+    text-align: right;
   }
 }

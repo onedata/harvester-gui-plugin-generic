@@ -1,0 +1,4 @@
+loading:
+  status: 'Searching...'
+empty:
+  status: 'No matching results.'

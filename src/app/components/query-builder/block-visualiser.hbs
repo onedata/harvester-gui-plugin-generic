@@ -1,30 +1,37 @@
 <div
-  class="query-builder-block-visualiser"
+  class="query-builder-block-visualiser {{if this.areSettingsVisible "has-open-settings"}} {{if this.isRemoveButtonHovered "has-remove-hovered"}}"
   {{add-direct-hover-class}}
   {{on "click" clicked}}
   {{did-insert this.didInsert}}
 >
-  {{#component (concat "query-builder/" @queryBlock.constructor.renderer)
-    queryBlock=@queryBlock
-    indexProperties=@indexProperties
-    onConditionEditionStart=@onConditionEditionStart
-    onConditionEditionEnd=@onConditionEditionEnd
-    onConditionEditionValidityChange=@onConditionEditionValidityChange
-    onBlockRemoved=@onBlockRemoved
-  }}
-    <QueryBuilder::BlockSettings
+  {{#let (concat "query-builder/" @queryBlock.constructor.renderer) as |BlockRenderer|}}
+    <BlockRenderer
+      class={{concat "block-level-" @level}}
       @queryBlock={{@queryBlock}}
-      @onBlockReplace={{@onBlockReplace}}
-      @isShown={{this.areSettingsVisible}}
-      @onSettingsClose={{this.onSettingsClose}}
-      class="block-button"
-    />
-    <BsButton
-      @onClick={{@onBlockRemove}}
-      @type="danger"
-      class="block-button remove-block clickable"
+      @valuesBuilder={{@valuesBuilder}}
+      @indexProperties={{@indexProperties}}
+      @level={{@level}}
+      @onConditionEditionStart={{@onConditionEditionStart}}
+      @onConditionEditionEnd={{@onConditionEditionEnd}}
+      @onConditionEditionValidityChange={{@onConditionEditionValidityChange}}
+      @onBlockRemoved={{@onBlockRemoved}}
     >
-      <FaIcon @icon="times" />
-    </BsButton>
-  {{/component}}
+      <QueryBuilder::BlockSettings
+        @queryBlock={{@queryBlock}}
+        @parentQueryBlock={{@parentQueryBlock}}
+        @onBlockReplace={{@onBlockReplace}}
+        @isShown={{this.areSettingsVisible}}
+        @onSettingsClose={{this.onSettingsClose}}
+      />
+      <BsButton
+        @onClick={{@onBlockRemove}}
+        @type="danger"
+        @bubble={{true}}
+        class="block-button remove-block clickable"
+        {{on-hover this.removeButtonHoverChange}}
+      >
+        <FaIcon @icon="times" />
+      </BsButton>
+    </BlockRenderer>
+  {{/let}}
 </div>

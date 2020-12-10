@@ -1,7 +1,7 @@
 /**
  * Generates CURL command, which would perform a query equivalent to the active query parameters
  * (conditions, sorting, etc.).
- * 
+ *
  * @module components/query-builder/curl-generator
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
@@ -14,6 +14,13 @@ import { tracked } from '@glimmer/tracking';
 import { resolve } from 'rsvp';
 import ElasticsearchQueryBuilder from 'harvester-gui-plugin-generic/utils/elasticsearch-query-builder';
 
+/**
+ * @argument {Function} onGenerateCurl
+ * @argument {Utils.QueryBuilder.RootOperatorQueryBlock} rootQueryBlock
+ * @argument {Object} filteredProperties
+ * @argument {Utils.EsIndexProperty} sortProperty
+ * @argument {String} sortDirection
+ */
 export default class QueryBuilderCurlGeneratorComponent extends Component {
   /**
    * @type {String}
@@ -59,7 +66,7 @@ export default class QueryBuilderCurlGeneratorComponent extends Component {
   }
 
   /**
-   * @type {Utils.IndexProperty}
+   * @type {Utils.EsIndexProperty}
    */
   get sortProperty() {
     return this.args.sortProperty || null;
@@ -84,8 +91,7 @@ export default class QueryBuilderCurlGeneratorComponent extends Component {
   }
 
   regenerateCurl() {
-    this.queryBuilder.mainQueryBlock =
-      this.rootQueryBlock && this.rootQueryBlock.operands[0];
+    this.queryBuilder.mainQueryBlock = this.rootQueryBlock;
     this.queryBuilder.visibleContent = this.filteredProperties;
     this.queryBuilder.sortProperty = this.sortProperty;
     this.queryBuilder.sortDirection = this.sortDirection;

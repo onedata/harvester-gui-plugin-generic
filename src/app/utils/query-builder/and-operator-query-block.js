@@ -1,6 +1,6 @@
 /**
  * AND operator query block.
- * 
+ *
  * @module utils/query-builder/and-operator-query-block
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
@@ -12,12 +12,5 @@ import OperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder
 export default class AndOperatorQueryBlock extends OperatorQueryBlock {
   constructor() {
     super('and');
-  }
-
-  /**
-   * @override
-   */
-  static newInstance() {
-    return new AndOperatorQueryBlock();
   }
 }

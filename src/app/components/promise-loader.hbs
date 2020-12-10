@@ -5,18 +5,26 @@
   as |await|
 >
   <await.Pending>
-    <EmberSpinner
-      @scale={{or @spinnerScale 1}}
-      @lines={{12}}
-      @length={{12}}
-    />
+    {{#if @useCustomPending}}
+      {{yield null "pending"}}
+    {{else}}
+      <EmberSpinner
+        @scale={{or @spinnerScale 1}}
+        @lines={{12}}
+        @length={{12}}
+      />
+    {{/if}}
   </await.Pending>
 
   <await.Fulfilled as |promiseData|>
-    {{yield promiseData}}
+    {{yield promiseData "fulfilled"}}
   </await.Fulfilled>
 
   <await.Rejected as |error|>
-    <ResourceLoadError @details={{error}}/>
+    {{#if @useCustomRejected}}
+      {{yield error "rejected"}}
+    {{else}}
+      <ResourceLoadError @details={{error}}/>
+    {{/if}}
   </await.Rejected>
 </Await>

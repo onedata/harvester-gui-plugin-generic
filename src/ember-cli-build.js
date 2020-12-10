@@ -2,6 +2,8 @@
 
 const EmberApp = require('ember-cli/lib/broccoli/ember-app');
 const fs = require('fs');
+const funnel = require('broccoli-funnel');
+const merge = require('broccoli-merge-trees');
 
 module.exports = function (defaults) {
   const app = new EmberApp(defaults, {
@@ -28,6 +30,7 @@ module.exports = function (defaults) {
       whitelist: [
         'bs-button',
         'bs-collapse',
+        'bs-dropdown',
         'bs-modal',
         'bs-tab',
         'bs-tooltip',
@@ -51,5 +54,10 @@ module.exports = function (defaults) {
   fs.copyFileSync('app/manifest.json', 'public/manifest.json');
   app.import('node_modules/abortcontroller-polyfill/dist/abortcontroller-polyfill-only.js');
 
-  return app.toTree();
+  const fontAwesomeFonts = funnel('./node_modules/@fortawesome/fontawesome-free/webfonts', {
+    destDir: 'assets/fonts/fontawesome',
+    include: ['fa-solid-*'],
+  });
+
+  return merge([app.toTree(), fontAwesomeFonts]);
 };

@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "module": "es6",
+    "target": "es2017",
+    "experimentalDecorators": true,
+    "baseUrl": ".",
+    "paths": {
+        "harvester-gui-plugin-generic/*": ["app/*"]
+    }
+  },
+  "exclude": [
+    "node_modules",
+    "tmp",
+    "dist"
+  ]
+}

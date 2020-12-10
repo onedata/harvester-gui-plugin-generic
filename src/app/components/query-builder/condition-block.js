@@ -1,6 +1,6 @@
 /**
  * Shows and allows to edit query conditon.
- * 
+ *
  * @module components/query-builder/condition-block
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
@@ -10,8 +10,14 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
-import { defaultComparatorEditors } from 'harvester-gui-plugin-generic/utils/query-builder/condition-comparator-editors';
 
+/**
+ * @argument {Utils.QueryBuilder.ConditionQueryBlock} queryBlock
+ * @argument {Utils.QueryValueComponentsBuilder} valuesBuilder
+ * @argument {Function} onConditionEditionStart
+ * @argument {Function} onConditionEditionEnd
+ * @argument {Function} onConditionEditionValidityChange
+ */
 export default class QueryBuilderConditionBlockComponent extends Component {
   /**
    * @type {String}
@@ -29,15 +35,17 @@ export default class QueryBuilderConditionBlockComponent extends Component {
   @tracked editComparatorValue = null;
 
   /**
-   * @type {Object}
-   */
-  @tracked comparatorEditorsSet = defaultComparatorEditors;
-
-  /**
    * @type {Utils.QueryBuilder.ConditionQueryBlock}
    */
   get queryBlock() {
     return this.args.queryBlock || {};
+  }
+
+  /**
+   * @type {Utils.QueryValueComponentsBuilder}
+   */
+  get valuesBuilder() {
+    return this.args.valuesBuilder || [];
   }
 
   /**
@@ -66,18 +74,17 @@ export default class QueryBuilderConditionBlockComponent extends Component {
   }
 
   /**
-   * @type {Object}
+   * @type {Function}
    */
-  get comparatorEditor() {
-    return this.comparatorEditorsSet[this.queryBlock.comparator];
+  get comparatorValidator() {
+    return this.valuesBuilder.getValidatorFor(this.queryBlock.comparator);
   }
 
   /**
    * @type {boolean}
    */
   get isEditComparatorValueValid() {
-    return this.comparatorEditor ?
-      this.comparatorEditor.isValidValue(this.editComparatorValue) : false;
+    return this.comparatorValidator(this.editComparatorValue);
   }
 
   @action
@@ -88,7 +95,7 @@ export default class QueryBuilderConditionBlockComponent extends Component {
   }
 
   /**
-   * @param {any} newValue 
+   * @param {any} newValue
    */
   @action
   comparatorValueChange(newValue) {
@@ -101,7 +108,9 @@ export default class QueryBuilderConditionBlockComponent extends Component {
 
   @action
   finishEdit() {
-    if (!this.isEditComparatorValueValid) {
+    // Added mode === view check, to avoid double render errors, when removed input sends
+    // blur event
+    if (!this.isEditComparatorValueValid || this.mode === 'view') {
       return;
     }
 

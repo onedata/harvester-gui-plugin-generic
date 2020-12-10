@@ -24,6 +24,10 @@
     overflow: hidden;
   }
 
+  .empty-result-sample {
+    opacity: 0.4;
+  }
+
   .file-id-copier {
     color: $body-color;
     svg {
@@ -47,8 +51,10 @@
   }
 
   .properties-table {
+    @include font-monospace();
     max-height: 30em * $line-height-base;
     overflow-y: auto;
+    margin: 0;
   }
 
   .property {
@@ -62,7 +68,7 @@
     &:first-child {
       padding-top: 0;
     }
-    
+
     &:last-child {
       padding-bottom: 0;
     }
@@ -80,6 +86,7 @@
   .property-value {
     flex-grow: 1;
     min-width: 0;
+    margin: 0;
   }
 
   .json-textarea {

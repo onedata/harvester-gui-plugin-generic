@@ -7,7 +7,7 @@
   <FaIcon @icon="plus" />
   <AttachPopover
     @showOn="click"
-    @hideOn="clickout"
+    @hideOn="clickout click"
     @interactive={{true}}
     @arrow={{true}}
     @placement="auto"
@@ -16,6 +16,8 @@
   >
     <QueryBuilder::BlockSelector
       @mode="create"
+      @valuesBuilder={{@valuesBuilder}}
+      @hideConditionCreation={{this.hideConditionCreation}}
       @indexProperties={{@indexProperties}}
       @onBlockAdd={{fn this.addBlock popover.hide}}
     />

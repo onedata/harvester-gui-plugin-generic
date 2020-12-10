@@ -2,7 +2,7 @@
  * Represents collection of Elasticsearch query results. To parse results, `parseHelpers`
  * should be provided in constructor. For now only one parse helper is needed:
  * `fileBrowserUrlRequest` - generates file browser URL for given file ID.
- * 
+ *
  * @module utils/query-results
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
@@ -50,15 +50,10 @@ export default class QueryResults {
    */
   fillWithRawResults(rawResultsObject) {
     this.rawResultsObject = rawResultsObject;
-    const normalizedRawResultObject = rawResultsObject || {};
 
-    this.results = _.get(normalizedRawResultObject, 'hits.hits', [])
+    this.results = (rawResultsObject?.hits?.hits || [])
       .map(hit => new QueryResult(hit, this.parseHelpers));
-    this.totalResultsCount = _.get(
-      normalizedRawResultObject,
-      'hits.total.value',
-      this.results.length
-    );
+    this.totalResultsCount = rawResultsObject?.hits?.total?.value || this.results.length;
   }
 
   /**
@@ -86,7 +81,7 @@ export default class QueryResults {
     const rawResults = this.results.mapBy('source').compact();
     const propertiesTree = {};
 
-    rawResults.forEach(rawResult => {
+    for (const rawResult of rawResults) {
       const rawQueue = [rawResult];
       const treeTargetQueue = [propertiesTree];
 
@@ -107,7 +102,7 @@ export default class QueryResults {
           }
         }
       }
-    });
+    }
 
     return propertiesTree;
   }

@@ -3,13 +3,23 @@
     <div class="left-col-icon">
       <FaIcon @icon={{if isExpanded "caret-down" "caret-right"}} @size="lg"/>
     </div>
-    <samp class="result-sample">{{{this.readableJson}}}</samp>
+    <samp class="result-sample">
+      {{#if this.readableJson}}
+        {{{this.readableJson}}}
+      {{else}}
+        <em class="empty-result-sample">{{tt this "noJsonMatch"}}</em>
+      {{/if}}
+    </samp>
   </div>
   <a class="go-to-file-link" href={{@queryResult.fileBrowserUrl}} target="_blank">
     <span class="left-col-icon">
       <FaIcon @icon="external-link-alt"/>
     </span>
-    {{tt this "goToFileLink" fileName=@queryResult.fileName}}
+    {{#if @queryResult.fileName}}
+      {{tt this "goToFileLink" fileName=@queryResult.fileName}}
+    {{else}}
+      {{tt this "goToFileLinkWithoutName"}}
+    {{/if}}
   </a> |
   <OneCopyButton
     @value={{@queryResult.fileId}}
@@ -21,14 +31,14 @@
   <BsCollapse @collapsed={{not this.isExpanded}} class="result-representations-collapse">
     <BsTab class="result-representations" as |tab|>
       <tab.pane @title={{tt this "tableTabTitle"}}>
-        <div class="properties-table">
+        <dl class="properties-table">
           {{#each this.propertiesForTable as |property|}}
             <div class="property">
-              <samp class="property-name">{{{property.key}}}</samp>
-              <samp class="property-value">{{{property.value}}}</samp>
+              <dt class="property-name">{{{property.key}}}</dt>
+              <dd class="property-value">{{{property.value}}}</dd>
             </div>
           {{/each}}
-        </div>
+        </dl>
       </tab.pane>
       <tab.pane @title={{tt this "jsonTabTitle"}}>
         <textarea

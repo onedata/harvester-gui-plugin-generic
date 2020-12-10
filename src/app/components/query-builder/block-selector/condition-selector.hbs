@@ -1,5 +1,5 @@
 <div class="condition-selector">
-  <div class="form-group form-group-full-line">
+  <div class="form-group form-group-whole-line">
     <PowerSelect
       @options={{this.indexProperties}}
       @selected={{this.selectedConditionProperty}}
@@ -16,39 +16,46 @@
       </span>
     </PowerSelect>
   </div>
-  <div class="comparator-main-container">
-    {{#if this.comparators.length}}
+  {{#if this.comparators.length}}
+    <div class="comparator-main-container">
       <div class="form-group form-group-no-shrink">
-        <PowerSelect
-          @options={{this.comparators}}
-          @selected={{this.selectedConditionComparator}}
-          @onChange={{this.conditionComparatorChanged}}
-          @renderInPlace={{true}}
-          class="comparator-selector"
-          as |comparator|
-        >
-          {{tt this (concat "comparators." comparator)}}
-        </PowerSelect>
+        {{#if (gt this.comparators.length 1)}}
+          <PowerSelect
+            @options={{this.comparators}}
+            @selected={{this.selectedConditionComparator}}
+            @onChange={{this.conditionComparatorChanged}}
+            @renderInPlace={{true}}
+            class="comparator-selector"
+            as |comparator|
+          >
+            {{tt this (concat "comparators." comparator)}}
+          </PowerSelect>
+        {{else}}
+          <span class="comparator-selector">
+            {{tt this (concat "comparators." this.comparators.[0])}}
+          </span>
+        {{/if}}
       </div>
-    {{/if}}
-    <QueryBuilder::ConditionComparatorValueEditor
-      @mode="create"
-      @comparator={{this.selectedConditionComparator}}
-      @value={{this.conditionComparatorValue}}
-      @onValueChange={{this.conditionComparatorValueChanged}}
-      class="form-group-fill-line"
-    />
-  </div>
-  <div class="form-group-full-line">
-    <BsButton
-      class="accept-condition"
-      disabled={{not this.isConditionDataValid}}
-      @type="primary"
-      @size="sm"
-      @onClick={{this.conditionSelected}}
-    >
-      {{tt this "acceptCondition"}}
-    </BsButton>
-  </div>
+      <QueryBuilder::ConditionComparatorValueEditor
+        @mode="create"
+        @valuesBuilder={{@valuesBuilder}}
+        @comparator={{this.selectedConditionComparator}}
+        @value={{this.conditionComparatorValue}}
+        @onValueChange={{this.conditionComparatorValueChanged}}
+        class="form-group-fill-line"
+      />
+    </div>
+    <div class="form-group-whole-line form-group add-btn-container">
+      <BsButton
+        class="accept-condition"
+        disabled={{not this.isConditionDataValid}}
+        @type="primary"
+        @size="sm"
+        @onClick={{this.conditionSelected}}
+      >
+        {{tt this "acceptCondition"}}
+      </BsButton>
+    </div>
+  {{/if}}
 </div>
 {{yield}}

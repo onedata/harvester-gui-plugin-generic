@@ -14,9 +14,6 @@ describe('Integration | Component | query-results/result', function () {
     this.set('queryResult', new QueryResult({
       _id: 'file123',
       _source: {
-        a: {
-          b: true,
-        },
         c: 'someText',
         e: {
           f: 'anotherText',
@@ -47,6 +44,10 @@ describe('Integration | Component | query-results/result', function () {
         __onedata: {
           fileName: 'abc.txt',
         },
+        // "a" key is at the end to test keys sorting
+        a: {
+          b: true,
+        },
       },
     }, {
       fileBrowserUrlRequest: () => resolve('fileUrl'),
@@ -67,6 +68,20 @@ describe('Integration | Component | query-results/result', function () {
     expect(linkNode.textContent.trim()).to.equal('Go to source file "abc.txt"');
     expect(linkNode).to.have.attr('href', 'fileUrl');
   });
+
+  it(
+    'shows "Go to file" link without file name, when name is not available',
+    async function () {
+      this.queryResult.fileName = undefined;
+
+      await render(hbs `<QueryResults::Result @queryResult={{this.queryResult}}/>`);
+
+      const linkNode = this.element.querySelector('.go-to-file-link');
+      expect(linkNode).to.exist;
+      expect(linkNode.textContent.trim()).to.equal('Go to source file');
+      expect(linkNode).to.have.attr('href', 'fileUrl');
+    }
+  );
 
   it('has copy button with file id', async function () {
     await render(hbs `<QueryResults::Result @queryResult={{this.queryResult}}/>`);
@@ -160,7 +175,7 @@ describe('Integration | Component | query-results/result', function () {
         },
       },
     },
-    json: '',
+    json: 'No match.',
   }].forEach(({ description, filteredProperties, json }) => {
     it(description, async function () {
       this.set('filteredProperties', filteredProperties);
@@ -247,6 +262,6 @@ describe('Integration | Component | query-results/result', function () {
     />`);
 
     expect(this.element.querySelector('.json-textarea').textContent.trim())
-      .to.equal(JSON.stringify(this.get('queryResult').source, null, 2));
+      .to.equal(JSON.stringify(this.queryResult.source, null, 2));
   });
 });

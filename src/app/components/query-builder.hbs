@@ -1,7 +1,8 @@
 <div class="query-builder">
-  <div class="form-control query-builder-input">
+  <dl class="form-control query-builder-input">
     <QueryBuilder::OperatorBlock
       @queryBlock={{this.rootQueryBlock}}
+      @valuesBuilder={{@valuesBuilder}}
       @indexProperties={{this.indexProperties}}
       @onConditionEditionStart={{this.onConditionEditionStart}}
       @onConditionEditionEnd={{this.onConditionEditionEnd}}
@@ -9,7 +10,7 @@
       @onBlockRemoved={{this.onBlockRemoved}}
       class="root-block"
     />
-  </div>
+  </dl>
   <BsButton
     @type="primary"
     @onClick={{this.performQuery}}

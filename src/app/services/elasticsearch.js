@@ -20,7 +20,7 @@ export default class ElasticsearchService extends Service {
    * @returns {Promise<any>} request result
    */
   request(method, path, body) {
-    const dataRequest = this.get('appProxy.dataRequest');
+    const dataRequest = this.appProxy.dataRequest;
     return dataRequest({
       method,
       indexName: 'generic-index',
@@ -74,7 +74,7 @@ export default class ElasticsearchService extends Service {
    * @returns {Promise<String>} CURL command
    */
   requestCurl(method, path, body) {
-    const dataCurlCommandRequest = this.get('appProxy.dataCurlCommandRequest');
+    const dataCurlCommandRequest = this.appProxy.dataCurlCommandRequest;
     return dataCurlCommandRequest({
       method,
       indexName: 'generic-index',

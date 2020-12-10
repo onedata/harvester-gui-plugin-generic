@@ -1,6 +1,6 @@
 /**
  * A condition query block. Contains information about query conditions.
- * 
+ *
  * @module utils/query-builder/condition-query-block
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
@@ -17,7 +17,7 @@ export default class ConditionQueryBlock extends QueryBlock {
   static renderer = 'condition-block';
 
   /**
-   * @type {Utils.IndexProperty}
+   * @type {Utils.EsIndexProperty}
    */
   @tracked property = null;
 
@@ -32,9 +32,9 @@ export default class ConditionQueryBlock extends QueryBlock {
   @tracked comparatorValue = null;
 
   /**
-   * @param {Utils.IndexProperty} property 
-   * @param {String} comparator 
-   * @param {any} comparatorValue 
+   * @param {Utils.EsIndexProperty} property
+   * @param {String} comparator
+   * @param {any} comparatorValue
    */
   constructor(property = null, comparator = null, comparatorValue = null) {
     super(...arguments);

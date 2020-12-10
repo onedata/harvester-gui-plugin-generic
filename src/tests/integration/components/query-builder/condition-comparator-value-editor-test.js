@@ -9,6 +9,7 @@ import { click, fillIn, blur, triggerKeyEvent } from '@ember/test-helpers';
 import { isFlatpickrOpen, setFlatpickrDate, closeFlatpickrDate } from 'ember-flatpickr/test-support/helpers';
 import moment from 'moment';
 import SpacesProvider from 'harvester-gui-plugin-generic/services/spaces-provider';
+import QueryValueComponentsBuilder from 'harvester-gui-plugin-generic/utils/query-value-components-builder';
 
 const mathOperators = ['eq', 'lt', 'lte', 'gt', 'gte'];
 
@@ -30,6 +31,7 @@ describe(
         this.spaces = spaces;
       });
       this.owner.lookup('service:spaces-provider').reloadSpaces();
+      this.valuesBuilder = new QueryValueComponentsBuilder(spaces);
     });
 
     afterEach(function () {
@@ -42,7 +44,7 @@ describe(
       [{
         comparator: 'boolean.is',
         value: 'false',
-        viewValue: '"false"',
+        viewValue: 'false',
       }, {
         comparator: 'text.contains',
         value: 'a | b',
@@ -50,7 +52,7 @@ describe(
       }, {
         comparator: 'number.eq',
         value: '2',
-        viewValue: '"2"',
+        viewValue: '2',
       }, {
         comparator: 'date.eq',
         value: { timeEnabled: false, datetime: new Date(2020, 0, 2) },
@@ -72,9 +74,9 @@ describe(
         value: 'abc def',
         viewValue: '"abc def"',
       }].forEach(({ comparator, value, viewValue, descriptionSuffix }) => {
-        const [propertyType, comparatorName] = comparator.split('.');
+        const [propertyType, comparatorType] = comparator.split('.');
         it(
-          `shows comparator value for "${comparatorName}" comparator for ${propertyType} property${descriptionSuffix || ''}`,
+          `shows comparator value for "${comparatorType}" comparator for ${propertyType} property${descriptionSuffix || ''}`,
           async function () {
             this.setProperties({
               comparator,
@@ -83,6 +85,7 @@ describe(
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="view"
+              @valuesBuilder={{this.valuesBuilder}}
               @comparator={{this.comparator}}
               @value={{this.value}}
             />`);
@@ -98,6 +101,7 @@ describe(
 
         await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
           @mode="view"
+          @valuesBuilder={{this.valuesBuilder}}
           @comparator="boolean.is"
           @value="false"
           @onStartEdit={{this.onStartEditSpy}}
@@ -122,15 +126,16 @@ describe(
         comparator: 'anyProperty.hasPhrase',
         valueToInput: 'abc',
       }].forEach(({ comparator, valueToInput }) => {
-        const [propertyType, comparatorName] = comparator.split('.');
+        const [propertyType, comparatorType] = comparator.split('.');
 
         it(
-          `shows text input for "${comparatorName}" comparator for ${propertyType} property`,
+          `shows text input for "${comparatorType}" comparator for ${propertyType} property`,
           async function () {
             this.set('comparator', comparator);
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="create"
+              @valuesBuilder={{this.valuesBuilder}}
               @comparator={{this.comparator}}
             />`);
 
@@ -140,7 +145,7 @@ describe(
         );
 
         it(
-          `calls "onValueChange" callback, when ${propertyType} property "${comparatorName}" condition value has changed`,
+          `calls "onValueChange" callback, when ${propertyType} property "${comparatorType}" condition value has changed`,
           async function () {
             const { changeSpy } = this.setProperties({
               comparator,
@@ -149,6 +154,7 @@ describe(
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="create"
+              @valuesBuilder={{this.valuesBuilder}}
               @comparator={{this.comparator}}
               @onValueChange={{this.changeSpy}}
             />`);
@@ -170,15 +176,16 @@ describe(
         toSelect: 'space2',
         selectedValue: spaces[1],
       }].forEach(({ comparator, options, toSelect, selectedValue }) => {
-        const [propertyType, comparatorName] = comparator.split('.');
+        const [propertyType, comparatorType] = comparator.split('.');
 
         it(
-          `shows dropdown for "${comparatorName}" comparator for ${propertyType} property`,
+          `shows dropdown for "${comparatorType}" comparator for ${propertyType} property`,
           async function () {
             this.set('comparator', comparator);
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="create"
+              @valuesBuilder={{this.valuesBuilder}}
               @comparator={{this.comparator}}
             />`);
             await clickTrigger('.comparator-value');
@@ -193,7 +200,7 @@ describe(
         );
 
         it(
-          `calls "onValueChange" callback, when ${propertyType} property "${comparatorName}" condition value has changed`,
+          `calls "onValueChange" callback, when ${propertyType} property "${comparatorType}" condition value has changed`,
           async function () {
             const { changeSpy } = this.setProperties({
               comparator,
@@ -202,6 +209,7 @@ describe(
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="create"
+              @valuesBuilder={{this.valuesBuilder}}
               @comparator={{this.comparator}}
               @onValueChange={{this.changeSpy}}
             />`);
@@ -225,6 +233,7 @@ describe(
             });
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="create"
+              @valuesBuilder={{this.valuesBuilder}}
               @comparator={{this.comparator}}
               @value={{this.value}}
             />`);
@@ -252,6 +261,7 @@ describe(
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="create"
+              @valuesBuilder={{this.valuesBuilder}}
               @comparator={{this.comparator}}
               @value={{this.value}}
               @onValueChange={{this.changeSpy}}
@@ -284,6 +294,7 @@ describe(
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="create"
+              @valuesBuilder={{this.valuesBuilder}}
               @comparator={{this.comparator}}
               @value={{this.value}}
               @onValueChange={{this.changeSpy}}
@@ -310,16 +321,17 @@ describe(
         'keyword.is',
         'anyProperty.hasPhrase',
       ].forEach(comparator => {
-        const [propertyType, comparatorName] = comparator.split('.');
+        const [propertyType, comparatorType] = comparator.split('.');
         const beforeTest = testCase => testCase.set('comparator', comparator);
 
         it(
-          `has focused editor on init for "${comparatorName}" comparator for ${propertyType} property`,
+          `has focused editor on init for "${comparatorType}" comparator for ${propertyType} property`,
           async function () {
             beforeTest(this);
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="edit"
+              @valuesBuilder={{this.valuesBuilder}}
               @comparator={{this.comparator}}
               @value="abc"
             />`);
@@ -330,12 +342,13 @@ describe(
         );
 
         it(
-          `shows current comparator value for "${comparatorName}" comparator for ${propertyType} property`,
+          `shows current comparator value for "${comparatorType}" comparator for ${propertyType} property`,
           async function () {
             beforeTest(this);
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="edit"
+              @valuesBuilder={{this.valuesBuilder}}
               @comparator={{this.comparator}}
               @value="abc"
             />`);
@@ -345,7 +358,7 @@ describe(
         );
 
         it(
-          `closes editor and notifies about new value for "${comparatorName}" comparator for ${propertyType} property (close using Enter)`,
+          `closes editor and notifies about new value for "${comparatorType}" comparator for ${propertyType} property (close using Enter)`,
           async function () {
             beforeTest(this);
             const {
@@ -358,13 +371,14 @@ describe(
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="edit"
+              @valuesBuilder={{this.valuesBuilder}}
               @comparator={{this.comparator}}
-              @value={{this.value}}
+              @value="abc"
               @onValueChange={{this.changeSpy}}
               @onFinishEdit={{this.finishEditSpy}}
             />`);
             await fillIn('.comparator-value', 'def');
-            await triggerKeyEvent('.comparator-value', 'keydown', 13);
+            await triggerKeyEvent('.comparator-value', 'keydown', 'Enter');
 
             expect(changeSpy).to.be.calledWith('def');
             expect(finishEditSpy).to.be.calledOnce;
@@ -372,7 +386,7 @@ describe(
         );
 
         it(
-          `closes editor and notifies about new value for "${comparatorName}" comparator for ${propertyType} property (close using blur)`,
+          `closes editor and notifies about new value for "${comparatorType}" comparator for ${propertyType} property (close using blur)`,
           async function () {
             beforeTest(this);
             const {
@@ -385,8 +399,9 @@ describe(
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="edit"
+              @valuesBuilder={{this.valuesBuilder}}
               @comparator={{this.comparator}}
-              @value={{this.value}}
+              @value="abc"
               @onValueChange={{this.changeSpy}}
               @onFinishEdit={{this.finishEditSpy}}
             />`);
@@ -399,7 +414,7 @@ describe(
         );
 
         it(
-          `notifies about partial new value before close for "${comparatorName}" comparator for ${propertyType} property`,
+          `notifies about partial new value before close for "${comparatorType}" comparator for ${propertyType} property`,
           async function () {
             beforeTest(this);
             const {
@@ -412,8 +427,9 @@ describe(
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="edit"
+              @valuesBuilder={{this.valuesBuilder}}
               @comparator={{this.comparator}}
-              @value={{this.value}}
+              @value="abc"
               @onValueChange={{this.changeSpy}}
               @onFinishEdit={{this.finishEditSpy}}
             />`);
@@ -425,7 +441,7 @@ describe(
         );
 
         it(
-          `cancels editor on Escape key down for "${comparatorName}" comparator for ${propertyType} property`,
+          `cancels editor on Escape key down for "${comparatorType}" comparator for ${propertyType} property`,
           async function () {
             beforeTest(this);
             const {
@@ -438,12 +454,13 @@ describe(
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="edit"
+              @valuesBuilder={{this.valuesBuilder}}
               @comparator={{this.comparator}}
-              @value={{this.value}}
+              @value="abc"
               @onFinishEdit={{this.finishEditSpy}}
               @onCancelEdit={{this.cancelEditSpy}}
             />`);
-            await triggerKeyEvent('.comparator-value', 'keydown', 27);
+            await triggerKeyEvent('.comparator-value', 'keydown', 'Escape');
 
             expect(finishEditSpy).to.not.be.called;
             expect(cancelEditSpy).to.be.calledOnce;
@@ -451,12 +468,13 @@ describe(
         );
 
         it(
-          `does not add class "is-invalid" to the input by default for "${comparatorName}" comparator for ${propertyType} property`,
+          `does not add class "is-invalid" to the input by default for "${comparatorType}" comparator for ${propertyType} property`,
           async function () {
             beforeTest(this);
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="edit"
+              @valuesBuilder={{this.valuesBuilder}}
               @comparator={{this.comparator}}
               @value="abc"
             />`);
@@ -467,12 +485,13 @@ describe(
         );
 
         it(
-          `adds class "is-invalid" to the input if isValueInvalid is true for "${comparatorName}" comparator for ${propertyType} property`,
+          `adds class "is-invalid" to the input if isValueInvalid is true for "${comparatorType}" comparator for ${propertyType} property`,
           async function () {
             beforeTest(this);
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="edit"
+              @valuesBuilder={{this.valuesBuilder}}
               @comparator={{this.comparator}}
               @isValueInvalid={{true}}
               @value="abc"
@@ -506,19 +525,20 @@ describe(
         stringToSelect,
         selectionResult,
       }) => {
-        const [propertyType, comparatorName] = comparator.split('.');
+        const [propertyType, comparatorType] = comparator.split('.');
         const beforeTest = testCase => testCase.setProperties({
           comparator,
           value: initialValue,
         });
 
         it(
-          `has focused editor on init for "${comparatorName}" comparator for ${propertyType} property`,
+          `has focused editor on init for "${comparatorType}" comparator for ${propertyType} property`,
           async function () {
             beforeTest(this);
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="edit"
+              @valuesBuilder={{this.valuesBuilder}}
               @comparator={{this.comparator}}
               @value="abc"
             />`);
@@ -530,12 +550,13 @@ describe(
         );
 
         it(
-          `shows current comparator value for "${comparatorName}" comparator for ${propertyType} property`,
+          `shows current comparator value for "${comparatorType}" comparator for ${propertyType} property`,
           async function () {
             beforeTest(this);
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="edit"
+              @valuesBuilder={{this.valuesBuilder}}
               @comparator={{this.comparator}}
               @value={{this.value}}
             />`);
@@ -547,12 +568,13 @@ describe(
         );
 
         it(
-          `shows expanded dropdown for "${comparatorName}" comparator for ${propertyType} property`,
+          `shows expanded dropdown for "${comparatorType}" comparator for ${propertyType} property`,
           async function () {
             beforeTest(this);
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="edit"
+              @valuesBuilder={{this.valuesBuilder}}
               @comparator={{this.comparator}}
               @value={{this.value}}
             />`);
@@ -563,7 +585,7 @@ describe(
         );
 
         it(
-          `closes editor and notifies about new value for "${comparatorName}" comparator for ${propertyType} property`,
+          `closes editor and notifies about new value for "${comparatorType}" comparator for ${propertyType} property`,
           async function () {
             beforeTest(this);
             const {
@@ -576,6 +598,7 @@ describe(
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="edit"
+              @valuesBuilder={{this.valuesBuilder}}
               @comparator={{this.comparator}}
               @value={{this.value}}
               @onValueChange={{this.changeSpy}}
@@ -589,13 +612,14 @@ describe(
         );
 
         it(
-          `closes editor for "${comparatorName}" comparator for ${propertyType} property on dropdown trigger click`,
+          `closes editor for "${comparatorType}" comparator for ${propertyType} property on dropdown trigger click`,
           async function () {
             beforeTest(this);
             const finishEditSpy = this.set('finishEditSpy', sinon.spy());
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="edit"
+              @valuesBuilder={{this.valuesBuilder}}
               @comparator={{this.comparator}}
               @value={{this.value}}
               @onFinishEdit={{this.finishEditSpy}}
@@ -617,6 +641,7 @@ describe(
 
           await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
             @mode="edit"
+            @valuesBuilder={{this.valuesBuilder}}
             @comparator="date.lt"
             @value={{this.value}}
           />`);
@@ -645,6 +670,7 @@ describe(
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="edit"
+              @valuesBuilder={{this.valuesBuilder}}
               @comparator={{this.comparator}}
               @value={{this.value}}
               @onFinishEdit={{this.finishEditSpy}}
@@ -673,6 +699,7 @@ describe(
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="edit"
+              @valuesBuilder={{this.valuesBuilder}}
               @comparator={{this.comparator}}
               @value={{this.value}}
               @onValueChange={{this.valueChangeStub}}
@@ -708,6 +735,7 @@ describe(
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
               @mode="edit"
+              @valuesBuilder={{this.valuesBuilder}}
               @comparator={{this.comparator}}
               @value={{this.value}}
               @onValueChange={{this.valueChangeSpy}}

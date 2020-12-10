@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/condition-query-block';
-import IndexProperty from 'harvester-gui-plugin-generic/utils/index-property';
+import EsIndexProperty from 'harvester-gui-plugin-generic/utils/es-index-property';
 
 describe('Unit | Utility | query-builder/condition-query-block', function () {
   it(
@@ -18,8 +18,13 @@ describe('Unit | Utility | query-builder/condition-query-block', function () {
     expect(ConditionQueryBlock.renderer).to.equal('condition-block');
   });
 
+  it('has "level" field set to 1', function () {
+    const block = new ConditionQueryBlock();
+    expect(block.level).to.equal(1);
+  });
+
   it('can be cloned', function () {
-    const indexProperty = new IndexProperty(null, 'prop', { type: 'text' });
+    const indexProperty = new EsIndexProperty(null, 'prop', { type: 'text' });
     const block = new ConditionQueryBlock(indexProperty, 'text.contains', 'test');
     const clonedBlock = block.clone();
 

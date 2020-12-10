@@ -10,14 +10,13 @@
  */
 
 import Service from '@ember/service';
-import { get } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { Promise, resolve } from 'rsvp';
 import { later } from '@ember/runloop';
 import { tracked } from '@glimmer/tracking';
 import ENV from 'harvester-gui-plugin-generic/config/environment';
 
-export default class AppProxyService extends Service {
+class AppProxyService extends Service {
   /**
    * @type {Object}
    */
@@ -72,22 +71,6 @@ export default class AppProxyService extends Service {
    */
   @reads('appProxy.spacesRequest') spacesRequest;
 
-  /**
-   * Fake window object used in test environment. It is a very simple mock - to make it
-   * more suitable for specific tests, stub `getWindow()` method.
-   */
-  _testWindow = {
-    frameElement: {
-      appProxy: {
-        dataRequest: () => resolve({}),
-        dataCurlCommandRequest: () => resolve(''),
-        configRequest: () => resolve({}),
-        fileBrowserUrlRequest: () => resolve(''),
-        spacesRequest: () => resolve([]),
-      },
-    },
-  };
-
   constructor() {
     super(...arguments);
 
@@ -100,14 +83,15 @@ export default class AppProxyService extends Service {
    * @returns {Window}
    */
   getWindow() {
-    return ENV.environment === 'test' ? this._testWindow : window;
+    return window;
   }
 
   /**
    * @returns {Object}
    */
   loadAppProxy() {
-    return this.appProxy = get(this.getWindow(), 'frameElement.appProxy') || null;
+    const window = this.getWindow();
+    return this.appProxy = window.frameElement && window.frameElement.appProxy || null;
   }
 
   /**
@@ -125,3 +109,30 @@ export default class AppProxyService extends Service {
     });
   }
 }
+
+/**
+ * Fake window object used in test environment. It is a very simple mock - to make it
+ * more suitable for specific tests, stub `getWindow()` method.
+ */
+const testWindow = {
+  frameElement: {
+    appProxy: {
+      dataRequest: () => resolve({}),
+      dataCurlCommandRequest: () => resolve(''),
+      configRequest: () => resolve({}),
+      fileBrowserUrlRequest: () => resolve(''),
+      spacesRequest: () => resolve([]),
+    },
+  },
+};
+
+class TestAppProxyService extends AppProxyService {
+  /**
+   * @override
+   */
+  getWindow() {
+    return testWindow;
+  }
+}
+
+export default (ENV.environment === 'test' ? TestAppProxyService : AppProxyService);

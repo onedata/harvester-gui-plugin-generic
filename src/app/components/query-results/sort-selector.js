@@ -10,6 +10,7 @@
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
 import { inject as service } from '@ember/service';
+import { htmlSafe } from '@ember/template';
 
 // Only properties of types below are sortable
 const allowedPropertyTypes = [
@@ -19,6 +20,12 @@ const allowedPropertyTypes = [
   'number',
 ];
 
+/**
+ * @argument {Utils.Index} index
+ * @argument {Utils.EsIndexProperty} sortProperty
+ * @argument {String} sortDirection
+ * @argument {Function} onSortChange
+ */
 export default class QueryResultsSortSelectorComponent extends Component {
   @service intl;
 
@@ -28,7 +35,7 @@ export default class QueryResultsSortSelectorComponent extends Component {
   intlPrefix = 'components.query-results.sort-selector';
 
   /**
-   * @type {Array<Utils.IndexProperty>}
+   * @type {Array<Utils.EsIndexProperty>}
    */
   get indexProperties() {
     const properties = !this.index ? [] : this.index.getFlattenedProperties()
@@ -49,7 +56,7 @@ export default class QueryResultsSortSelectorComponent extends Component {
   }
 
   /**
-   * @type {Utils.IndexProperty}
+   * @type {Utils.EsIndexProperty}
    */
   get sortProperty() {
     return this.args.sortProperty || {};
@@ -65,7 +72,7 @@ export default class QueryResultsSortSelectorComponent extends Component {
 
   /**
    * @type {Function}
-   * @param {Utils.IndexProperty} sortSpec.property
+   * @param {Utils.EsIndexProperty} sortSpec.property
    * @param {String} sortSpec.direction
    */
   get onSortChange() {
@@ -76,11 +83,21 @@ export default class QueryResultsSortSelectorComponent extends Component {
    * @type {String}
    */
   get queryScorePropertyTranslation() {
-    return this.intl.t(this.intlPrefix + '.queryScoreProperty');
+    return this.intl.tt(this, 'queryScoreProperty');
   }
 
   /**
-   * @param {Utils.IndexProperty} selectedProperty 
+   * @type {SafeString}
+   */
+  get propertySelectorStyle() {
+    const ems = Math.min(Math.max(
+      ...this.indexProperties.filterBy('path').map(({ path }) => path.length * 0.8), 8
+    ), 25);
+    return htmlSafe(`width: ${ems}em`);
+  }
+
+  /**
+   * @param {Utils.EsIndexProperty} selectedProperty
    */
   @action
   sortPropertyChanged(selectedProperty) {
@@ -88,7 +105,7 @@ export default class QueryResultsSortSelectorComponent extends Component {
   }
 
   /**
-   * @param {String} newDirection 
+   * @param {String} newDirection
    */
   @action
   sortDirectionChanged(newDirection) {
@@ -96,8 +113,8 @@ export default class QueryResultsSortSelectorComponent extends Component {
   }
 
   /**
-   * @param {Utils.IndexProperty} property 
-   * @param {String} searchTerm 
+   * @param {Utils.EsIndexProperty} property
+   * @param {String} searchTerm
    * @returns {number}
    */
   @action

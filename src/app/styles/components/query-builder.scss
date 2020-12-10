@@ -1,3 +1,17 @@
+$color-query-block-darkest-bg: darken($color-light-blue, 8%);
+$color-query-block-remove: lighten($color-red, 25%);
+$query-block-hover-darken: 8%;
+
+@mixin query-builder-stripped-background($base-color, $darken-difference: 8%) {
+  background: repeating-linear-gradient(
+    135deg,
+    $base-color,
+    $base-color 4px,
+    darken($base-color, $darken-difference) 4px,
+    darken($base-color, $darken-difference) 8px
+  );
+}
+
 .query-builder {
   display: flex;
   align-items: flex-start;
@@ -10,6 +24,7 @@
     flex-basis: 100%;
     min-width: 0;
     margin-right: $spacer * 0.5;
+    padding: ($input-padding-y - $spacer * 0.3) ($input-padding-x - $spacer * 0.2);
   }
 
   .query-builder-block {
@@ -18,38 +33,76 @@
     align-items: center;
     flex-wrap: wrap;
     min-width: 0;
-    padding: 0 $spacer * 0.1;
+    padding: $spacer * 0.3 $spacer * 0.1 0 $spacer * 0.1;
 
     &:not(.root-block) {
-      background-color: $color-light-blue;
-      border: 1px solid darken($color-light-blue, 20%);
+      background-color: $color-query-block-darkest-bg;
+      border: 1px solid darken($color-query-block-darkest-bg, 8%);
       border-radius: $input-border-radius-sm;
 
-      > * {
-        margin: $spacer * 0.3 $spacer * 0.2;
+      $levelsCount: 5;
+      @for $level from 1 to $levelsCount {
+        &.block-level-#{$level} {
+          background-color: lighten(
+            $color-query-block-darkest-bg,
+            ($levelsCount - $level - 1) * 5%
+          );
+        }
       }
+    }
+
+    > * {
+      margin: 0 $spacer * 0.2 $spacer * 0.3 $spacer * 0.2;
     }
   }
 
   .query-builder-block-visualiser.is-directly-hovered {
     > .query-builder-block {
-      background-color: darken($color-light-blue, 5%);
-      border: 1px solid darken($color-light-blue, 25%);
+      background-color: darken($color-query-block-darkest-bg, $query-block-hover-darken);
+      border: 1px solid darken($color-query-block-darkest-bg, $query-block-hover-darken);
+    }
+  }
+
+  .query-builder-block-visualiser.has-open-settings {
+    > .query-builder-block {
+      @include query-builder-stripped-background($color-sand);
+      border: 1px solid darken($color-sand, 30%);
+    }
+  }
+
+  .query-builder-block-visualiser.has-remove-hovered,
+  .query-builder-block-visualiser.has-remove-hovered .query-builder-block-visualiser {
+    &.has-open-settings > .query-builder-block {
+      @include query-builder-stripped-background($color-query-block-remove, 4%);
+      border: 1px solid darken($color-query-block-remove, $query-block-hover-darken);
+    }
+  }
+
+  .query-builder-block-visualiser.has-remove-hovered {
+    > .query-builder-block > .remove-block {
+      color: $color-red;
+    }
+    > .query-builder-block, .query-builder-block {
+      background-color: $color-query-block-remove;
+      border: 1px solid darken($color-query-block-remove, $query-block-hover-darken);
     }
   }
 
   .block-label {
-    font-size: 80%;
+    margin-bottom: $spacer * 0.2;
+    @include font-monospace();
+    font-size: $small-font-size;
     text-transform: uppercase;
     line-height: 1;
   }
 
-  .block-prefix-label {
-    margin-right: $spacer * 0.2;
-  }
-
-  .block-infix-label {
-    margin: 0 $spacer * 0.2;
+  .query-builder-block-visualiser {
+    &.is-directly-hovered,
+    &.has-open-settings {
+      > .query-builder-block > .block-label {
+        @include font-monospace-bold();
+      }
+    }
   }
 
   .property-path, .comparator, .comparator-value {
@@ -64,11 +117,5 @@
     border: 0;
     color: darken($color-light-blue, 30%);
     font-size: 0.6rem;
-  }
-
-  .remove-block {
-    &:hover {
-      color: $danger;
-    }
   }
 }

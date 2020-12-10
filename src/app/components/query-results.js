@@ -12,6 +12,17 @@ import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 import QueryResults from 'harvester-gui-plugin-generic/utils/query-results';
 
+/**
+ * @argument {Promise<Utils.QueryResults>} queryResultsPromise
+ * @argument {Utils.Index} index
+ * @argument {Utils.EsIndexProperty} sortProperty
+ * @argument {String} sortDirection
+ * @argument {Number} activePageNumber
+ * @argument {Function} onSortChange
+ * @argument {Number} pageSize
+ * @argument {Function} onPageChange
+ * @argument {Function} onPageSizeChange
+ */
 export default class QueryResultsComponent extends Component {
   /**
    * Properties tree that indicates which properties should be visible in result preview.
@@ -41,7 +52,7 @@ export default class QueryResultsComponent extends Component {
   }
 
   /**
-   * @type {Utils.IndexProperty}
+   * @type {Utils.EsIndexProperty}
    */
   get sortProperty() {
     return this.args.sortProperty || {};
@@ -63,7 +74,7 @@ export default class QueryResultsComponent extends Component {
 
   /**
    * @type {Function}
-   * @param {Utils.IndexProperty} sortSpec.property
+   * @param {Utils.EsIndexProperty} sortSpec.property
    * @param {String} sortSpec.direction
    */
   get onSortChange() {
@@ -100,7 +111,7 @@ export default class QueryResultsComponent extends Component {
   }
 
   /**
-   * @param {Object} filteredProperties 
+   * @param {Object} filteredProperties
    */
   @action
   filteredPropertiesChanged(filteredProperties) {
@@ -113,7 +124,7 @@ export default class QueryResultsComponent extends Component {
 
   /**
    * Called when promise with new results settles
-   * @param {Utils.QueryResults} newQueryResults 
+   * @param {Utils.QueryResults} newQueryResults
    */
   @action
   gotNewQueryResults(newQueryResults) {

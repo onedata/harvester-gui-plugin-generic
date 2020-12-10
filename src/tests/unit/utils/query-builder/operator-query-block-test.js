@@ -19,13 +19,22 @@ describe('Unit | Utility | query-builder/operator-query-block', function () {
     expect(OperatorQueryBlock.renderer).to.equal('operator-block');
   });
 
-  it('has "maxOperandsNumber" static field set to max integer', function () {
-    expect(OperatorQueryBlock.maxOperandsNumber).to.equal(Number.MAX_SAFE_INTEGER);
+  it('has "level" field set to 1, when there are no nested block', function () {
+    const block = new OperatorQueryBlock();
+    expect(block.level).to.equal(1);
   });
 
-  it('creates new instance of itself via static "newInstance" method', function () {
-    const block = OperatorQueryBlock.newInstance();
-    expect(block).to.be.an.instanceOf(OperatorQueryBlock);
+  it(
+    'has "level" field set to the max subblock level + 1, when there are nested blocks',
+    function () {
+      const block = new OperatorQueryBlock();
+      block.operands.pushObjects([{ level: 2 }, { level: 5 }, { level: 3 }]);
+      expect(block.level).to.equal(6);
+    }
+  );
+
+  it('has "maxOperandsNumber" static field set to max integer', function () {
+    expect(OperatorQueryBlock.maxOperandsNumber).to.equal(Number.MAX_SAFE_INTEGER);
   });
 
   it('can be cloned (has operands)', function () {
@@ -37,6 +46,7 @@ describe('Unit | Utility | query-builder/operator-query-block', function () {
 
     expect(clonedBlock).to.not.equal(block);
     expect(clonedBlock.operator).to.equal('and');
+    expect(clonedBlock.operands).to.not.equal(block.operands);
     expect(clonedBlock.operands).to.have.length(1);
     expect(clonedBlock.operands[0]).to.equal('operandClone');
   });

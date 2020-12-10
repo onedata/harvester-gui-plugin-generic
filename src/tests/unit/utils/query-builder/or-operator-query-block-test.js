@@ -9,11 +9,6 @@ describe('Unit | Utility | query-builder/or-operator-query-block', function () {
     expect(block.operator).to.equal('or');
   });
 
-  it('creates new instance of itself via static "newInstance" method', function () {
-    const block = OrOperatorQueryBlock.newInstance();
-    expect(block).to.be.an.instanceOf(OrOperatorQueryBlock);
-  });
-
   it('can be cloned', function () {
     const block = new OrOperatorQueryBlock();
     block.operands.pushObject({
