@@ -1,0 +1,14 @@
+.content-index {
+  flex-grow: 1;
+  flex-basis: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .query-builder {
+    margin-bottom: $spacer;
+  }
+
+  .query-results {
+    flex-grow: 1;
+  }
+}

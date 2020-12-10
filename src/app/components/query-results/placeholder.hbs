@@ -1,0 +1,16 @@
+<div class="query-results-placeholder mode-{{@mode}}">
+  <FaIcon @icon="search" class="placeholder-icon"/>
+  <div class="status-message">
+    {{#if (eq @mode "loading")}}
+      <EmberSpinner
+        @scale={{0.35}}
+        @lines={{12}}
+        @length={{12}}
+      />
+      {{tt this "loading.status"}}
+    {{else if (eq @mode "empty")}}
+      {{tt this "empty.status"}}
+    {{/if}}
+  </div>
+  {{yield}}
+</div>

@@ -1,0 +1,54 @@
+.query-builder {
+  .query-builder-condition-block {
+    font-size: $small-font-size;
+    align-items: center;
+
+    .special-property {
+      font-style: italic;
+    }
+
+    .property-path {
+      font-size: 100%;
+      color: $body-color;
+      font-weight: bold;
+    }
+
+    .property-comparison {
+      display: flex;
+      align-items: center;
+      min-width: 0;
+    }
+
+    .comparator {
+      margin-right: $spacer * 0.2;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+
+    .property-path,
+    .comparator,
+    .comparator-value {
+      min-width: 0;
+      word-wrap: break-word;
+      line-height: 1;
+    }
+
+    .comparator-value-view,
+    .comparator-value-editor {
+      margin-left: $spacer * 0.2;
+    }
+
+    .comparator-value-view {
+      @include font-monospace();
+    }
+
+    .form-group {
+      margin-bottom: 0;
+    }
+
+    .comparator-value-view:hover {
+      cursor: pointer;
+      text-decoration: underline;
+    }
+  }
+}

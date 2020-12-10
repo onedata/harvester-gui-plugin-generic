@@ -1,0 +1,26 @@
+<BsButton
+  class="query-builder-block-adder clickable"
+  @size="sm"
+  @type="secondary"
+  ...attributes
+>
+  <FaIcon @icon="plus" />
+  <AttachPopover
+    @showOn="click"
+    @hideOn="clickout click"
+    @interactive={{true}}
+    @arrow={{true}}
+    @placement="auto"
+    @lazyRender={{true}}
+    as |popover|
+  >
+    <QueryBuilder::BlockSelector
+      @mode="create"
+      @valuesBuilder={{@valuesBuilder}}
+      @hideConditionCreation={{this.hideConditionCreation}}
+      @indexProperties={{@indexProperties}}
+      @onBlockAdd={{fn this.addBlock popover.hide}}
+    />
+  </AttachPopover>
+  {{yield}}
+</BsButton>

@@ -1,0 +1,36 @@
+.ember-attacher {
+  .filtered-properties-selector-body {
+    padding: $spacer * 0.8;
+    background-color: white;
+    font-size: $small-font-size;
+
+    .tree {
+      margin-top: $spacer * 0.5;
+      max-width: 80vw;
+      overflow: auto;
+      max-height: 60vh;
+    }
+
+    .tree-node {
+      line-height: 2.7em;
+      white-space: nowrap;
+    }
+
+    .tree-checkbox {
+      margin-left: $spacer * 0.3;
+      margin-right: $spacer * 0.5;
+    }
+
+    .tree-highlight {
+      background-color: initial;
+      color: inherit;
+      cursor: initial;
+    }
+
+    .toggle-icon {
+      width: 0.7em;
+      color: $body-color;
+      font-size: 100%;
+    }
+  }
+}

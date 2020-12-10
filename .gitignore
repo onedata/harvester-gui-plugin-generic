@@ -65,7 +65,6 @@ rel
 # Visual Studio Code
 .vscodeignore
 .vscode/
-jsconfig.json
 typings/
 
 gui_static.tar.gz

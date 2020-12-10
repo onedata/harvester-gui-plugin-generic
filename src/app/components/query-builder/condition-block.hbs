@@ -1,0 +1,21 @@
+<div class="query-builder-block query-builder-condition-block" ...attributes>
+  <dt class="property-path {{if (not @queryBlock.property.isRealProperty) "special-property"}}">
+    {{@queryBlock.property.path}}
+  </dt>
+  <dd class="property-comparison">
+    <span class="comparator">{{tt this (concat "comparators." @queryBlock.comparator)}}</span>
+    <QueryBuilder::ConditionComparatorValueEditor
+      class="clickable"
+      @mode={{this.mode}}
+      @comparator={{@queryBlock.comparator}}
+      @valuesBuilder={{@valuesBuilder}}
+      @value={{if (eq this.mode "edit") this.editComparatorValue @queryBlock.comparatorValue}}
+      @isValueInvalid={{not this.isEditComparatorValueValid}}
+      @onStartEdit={{this.startEdit}}
+      @onValueChange={{this.comparatorValueChange}}
+      @onFinishEdit={{this.finishEdit}}
+      @onCancelEdit={{this.cancelEdit}}
+    />
+  </dd>
+  {{yield}}
+</div>

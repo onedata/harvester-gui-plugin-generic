@@ -1,0 +1,61 @@
+<div class="query-results">
+  <div class="results-header">
+    <QueryResults::FilteredPropertiesSelector
+      @index={{this.index}}
+      @queryResults={{this.queryResults}}
+      @filteredProperties={{this.filteredProperties}}
+      @onSelectionChange={{this.filteredPropertiesChanged}}
+    />
+    {{#if this.queryResults.results}}
+      <QueryResults::SortSelector
+        @index={{this.index}}
+        @sortProperty={{this.sortProperty}}
+        @sortDirection={{this.sortDirection}}
+        @onSortChange={{this.onSortChange}}
+      />
+      <div class="header-line-breaker"></div>
+      <div class="results-counter">
+        Results: {{this.queryResults.totalResultsCount}}
+      </div>
+      <QueryResults::Pagination
+        @resultsCount={{this.queryResults.totalResultsCount}}
+        @activePageNumber={{this.activePageNumber}}
+        @pageSize={{this.pageSize}}
+        @onPageChange={{this.onPageChange}}
+        @onPageSizeChange={{this.onPageSizeChange}}
+      />
+    {{/if}}
+  </div>
+  <PromiseLoader
+    @promise={{@queryResultsPromise}}
+    @onResolve={{this.gotNewQueryResults}}
+    @onReject={{fn this.gotNewQueryResults this.emptyQueryResults}}
+    @useCustomPending={{true}}
+    as |data state|
+  >
+    {{#if (eq state "pending")}}
+      <QueryResults::Placeholder @mode="loading"/>
+    {{else}}
+      {{#if this.queryResults.results}}
+        <ul class="results-list">
+          {{#each this.queryResults.results as |queryResult|}}
+            <QueryResults::Result
+              @queryResult={{queryResult}}
+              @filteredProperties={{this.filteredProperties}}
+            />
+          {{/each}}
+        </ul>
+        <QueryResults::Pagination
+          @resultsCount={{this.queryResults.totalResultsCount}}
+          @activePageNumber={{this.activePageNumber}}
+          @pageSize={{this.pageSize}}
+          @onPageChange={{this.onPageChange}}
+          @onPageSizeChange={{this.onPageSizeChange}}
+        />
+      {{else}}
+        <QueryResults::Placeholder @mode="empty"/>
+      {{/if}}
+    {{/if}}
+  </PromiseLoader>
+</div>
+{{yield}}

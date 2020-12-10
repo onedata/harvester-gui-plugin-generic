@@ -1,0 +1,17 @@
+<PowerSelect
+  @options={{this.options}}
+  @selected={{this.value}}
+  @onChange={{this.onValueChange}}
+  @renderInPlace={{true}}
+  @onClose={{this.onFinishEdit}}
+  @placeholder={{tt this "dropdownPlaceholder"}}
+  class="comparator-value"
+  {{did-insert this.dropdownEditorInserted}}
+  as |value|
+>
+  {{#if value.name}}
+    {{value.name}}
+  {{else}}
+    {{value}}
+  {{/if}}
+</PowerSelect>

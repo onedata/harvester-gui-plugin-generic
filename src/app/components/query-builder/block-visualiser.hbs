@@ -1,0 +1,37 @@
+<div
+  class="query-builder-block-visualiser {{if this.areSettingsVisible "has-open-settings"}} {{if this.isRemoveButtonHovered "has-remove-hovered"}}"
+  {{add-direct-hover-class}}
+  {{on "click" clicked}}
+  {{did-insert this.didInsert}}
+>
+  {{#let (concat "query-builder/" @queryBlock.constructor.renderer) as |BlockRenderer|}}
+    <BlockRenderer
+      class={{concat "block-level-" @level}}
+      @queryBlock={{@queryBlock}}
+      @valuesBuilder={{@valuesBuilder}}
+      @indexProperties={{@indexProperties}}
+      @level={{@level}}
+      @onConditionEditionStart={{@onConditionEditionStart}}
+      @onConditionEditionEnd={{@onConditionEditionEnd}}
+      @onConditionEditionValidityChange={{@onConditionEditionValidityChange}}
+      @onBlockRemoved={{@onBlockRemoved}}
+    >
+      <QueryBuilder::BlockSettings
+        @queryBlock={{@queryBlock}}
+        @parentQueryBlock={{@parentQueryBlock}}
+        @onBlockReplace={{@onBlockReplace}}
+        @isShown={{this.areSettingsVisible}}
+        @onSettingsClose={{this.onSettingsClose}}
+      />
+      <BsButton
+        @onClick={{@onBlockRemove}}
+        @type="danger"
+        @bubble={{true}}
+        class="block-button remove-block clickable"
+        {{on-hover this.removeButtonHoverChange}}
+      >
+        <FaIcon @icon="times" />
+      </BsButton>
+    </BlockRenderer>
+  {{/let}}
+</div>

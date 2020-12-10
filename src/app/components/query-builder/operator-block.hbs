@@ -1,0 +1,75 @@
+<div class="query-builder-block query-builder-operator-block {{@queryBlock.operator}}-operator-block" ...attributes>
+  {{#if hasSingleOperandOperator}}
+    {{#if (and @queryBlock.operator (not-eq @queryBlock.operator "root"))}}
+      <div class="block-label block-prefix-label">{{tt this (concat "operators." @queryBlock.operator)}}</div>
+    {{/if}}
+    {{#if @queryBlock.operands.firstObject}}
+      <QueryBuilder::BlockVisualiser
+        @parentQueryBlock={{@queryBlock}}
+        @queryBlock={{@queryBlock.operands.firstObject}}
+        @valuesBuilder={{@valuesBuilder}}
+        @indexProperties={{@indexProperties}}
+        @level={{this.nestedBlocksLevel}}
+        @onBlockReplace={{fn this.replaceBlock @queryBlock.operands.firstObject}}
+        @onBlockRemove={{fn this.removeBlock @queryBlock.operands.firstObject}}
+        @onConditionEditionStart={{@onConditionEditionStart}}
+        @onConditionEditionEnd={{@onConditionEditionEnd}}
+        @onConditionEditionValidityChange={{@onConditionEditionValidityChange}}
+        @onBlockRemoved={{@onBlockRemoved}}
+      />
+      {{#if (eq @queryBlock.operator "root")}}
+        <QueryBuilder::BlockAdder
+          @onBlockAdd={{this.addBlock}}
+          @valuesBuilder={{@valuesBuilder}}
+          @hideConditionCreation={{true}}
+          class="surround-root"
+        />
+      {{/if}}
+    {{else}}
+      <QueryBuilder::BlockAdder
+        @onBlockAdd={{this.addBlock}}
+        @valuesBuilder={{@valuesBuilder}}
+        @indexProperties={{@indexProperties}}
+      />
+    {{/if}}
+  {{else}}
+    {{#each @queryBlock.operands as |operandBlock|}}
+      <QueryBuilder::BlockVisualiser
+        @parentQueryBlock={{@queryBlock}}
+        @queryBlock={{operandBlock}}
+        @indexProperties={{@indexProperties}}
+        @level={{this.nestedBlocksLevel}}
+        @valuesBuilder={{@valuesBuilder}}
+        @onBlockReplace={{fn this.replaceBlock operandBlock}}
+        @onBlockRemove={{fn this.removeBlock operandBlock}}
+        @onConditionEditionStart={{@onConditionEditionStart}}
+        @onConditionEditionEnd={{@onConditionEditionEnd}}
+        @onConditionEditionValidityChange={{@onConditionEditionValidityChange}}
+        @onBlockRemoved={{@onBlockRemoved}}
+      />
+      {{#if @queryBlock.operator}}
+        <div class="block-label block-infix-label">
+          {{tt this (concat "operators." @queryBlock.operator)}}
+        </div>
+      {{/if}}
+    {{else}}
+      <QueryBuilder::BlockAdder
+        @onBlockAdd={{this.addBlock}}
+        @valuesBuilder={{@valuesBuilder}}
+        @indexProperties={{@indexProperties}}
+      />
+      {{#if @queryBlock.operator}}
+        <div class="block-label block-infix-label">
+          {{tt this (concat "operators." @queryBlock.operator)}}
+        </div>
+      {{/if}}
+    {{/each}}
+    <QueryBuilder::BlockAdder
+      @onBlockAdd={{this.addBlock}}
+      @valuesBuilder={{@valuesBuilder}}
+      @indexProperties={{@indexProperties}}
+      disabled={{eq @queryBlock.operands.length 0}}
+    />
+  {{/if}}
+  {{yield}}
+</div>
