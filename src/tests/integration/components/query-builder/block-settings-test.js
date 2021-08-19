@@ -128,7 +128,7 @@ describe('Integration | Component | query-builder/block-settings', function () {
       const blockMatcher = sinon.match.instanceOf(AndOperatorQueryBlock)
         .and(sinon.match.has('operands', [this.queryBlock]));
       expect(this.replaceSpy).to.be.calledOnce.and.to.be.calledWith([blockMatcher]);
-      expect(this.closeSpy).to.be.calledOnce;
+      expect(this.closeSpy).to.be.called;
     }
   );
 
@@ -154,7 +154,7 @@ describe('Integration | Component | query-builder/block-settings', function () {
       const blockMatcher = sinon.match.instanceOf(AndOperatorQueryBlock)
         .and(sinon.match.has('operands', [condition]));
       expect(this.replaceSpy).to.be.calledOnce.and.to.be.calledWith([blockMatcher]);
-      expect(this.closeSpy).to.be.calledOnce;
+      expect(this.closeSpy).to.be.called;
     }
   );
 });

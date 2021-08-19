@@ -1,9 +1,14 @@
-<div class="one-checkbox {{this.valueClass}} {{if this.disabled "disabled"}}" {{on "click" this.changed}}>
+<div
+  class="one-checkbox {{this.valueClass}} {{if this.disabled "disabled"}}"
+  role="checkbox"
+  {{on "click" this.changed}}
+>
   <input
     id={{this.inputId}}
     type="checkbox"
     disabled={{this.disabled}}
     indeterminate={{this.indeterminate}}
+    aria-hidden
     {{on "change" this.changed}}
     {{on "click" this.clicked}}
   >

@@ -10,7 +10,6 @@
  */
 
 import Service from '@ember/service';
-import { reads } from '@ember/object/computed';
 import { Promise, resolve } from 'rsvp';
 import { later } from '@ember/runloop';
 import { tracked } from '@glimmer/tracking';
@@ -36,7 +35,9 @@ class AppProxyService extends Service {
    * @param {String|undefined} params.body request body
    * @returns {Promise<any>} request result
    */
-  @reads('appProxy.dataRequest') dataRequest;
+  get dataRequest() {
+    return this.appProxy?.dataRequest;
+  }
 
   /**
    * Generates CURL command that is equivalent to the dataRequest functionality
@@ -47,14 +48,18 @@ class AppProxyService extends Service {
    * @param {String|undefined} params.body request body
    * @returns {Promise<String>} CURL command
    */
-  @reads('appProxy.dataCurlCommandRequest') dataCurlCommandRequest;
+  get dataCurlCommandRequest() {
+    return this.appProxy?.dataCurlCommandRequest;
+  }
 
   /**
    * Fetches injected GUI plugin configuration
    * @type {Function}
    * @returns {Promise<Object>}
    */
-  @reads('appProxy.configRequest') configRequest;
+  get configRequest() {
+    return this.appProxy?.configRequest;
+  }
 
   /**
    * Generates URL, which redirects to file browser with specified file selected
@@ -62,14 +67,18 @@ class AppProxyService extends Service {
    * @param {String} fileId file ID (CDMI Object ID)
    * @returns {Promise<Object>}
    */
-  @reads('appProxy.fileBrowserUrlRequest') fileBrowserUrlRequest;
+  get fileBrowserUrlRequest() {
+    return this.appProxy?.fileBrowserUrlRequest;
+  }
 
   /**
    * Fetches harvester spaces
    * @type {Function}
    * @returns {Promise<Array<{ id: String, name: String }>>}
    */
-  @reads('appProxy.spacesRequest') spacesRequest;
+  get spacesRequest() {
+    return this.appProxy?.spacesRequest;
+  }
 
   constructor() {
     super(...arguments);

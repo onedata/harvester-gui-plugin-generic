@@ -54,10 +54,12 @@ module.exports = function (defaults) {
   fs.copyFileSync('app/manifest.json', 'public/manifest.json');
   app.import('node_modules/abortcontroller-polyfill/dist/abortcontroller-polyfill-only.js');
 
-  const fontAwesomeFonts = funnel('./node_modules/@fortawesome/fontawesome-free/webfonts', {
-    destDir: 'assets/fonts/fontawesome',
-    include: ['fa-solid-*'],
-  });
+  const fontAwesomeFonts = funnel(
+    './node_modules/@fortawesome/fontawesome-free/webfonts', {
+      destDir: 'assets/fonts/fontawesome',
+      include: ['fa-solid-*'],
+    }
+  );
 
   return merge([app.toTree(), fontAwesomeFonts]);
 };

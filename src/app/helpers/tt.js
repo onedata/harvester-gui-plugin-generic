@@ -16,7 +16,7 @@ export default t.extend({
   compute([component, key], options) {
     return htmlSafe(this._super(
       [component.intlPrefix + '.' + key],
-      options,
+      options
     ));
   },
 });

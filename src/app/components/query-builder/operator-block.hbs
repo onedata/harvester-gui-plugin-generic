@@ -1,5 +1,5 @@
 <div class="query-builder-block query-builder-operator-block {{@queryBlock.operator}}-operator-block" ...attributes>
-  {{#if hasSingleOperandOperator}}
+  {{#if this.hasSingleOperandOperator}}
     {{#if (and @queryBlock.operator (not-eq @queryBlock.operator "root"))}}
       <div class="block-label block-prefix-label">{{tt this (concat "operators." @queryBlock.operator)}}</div>
     {{/if}}

@@ -15,7 +15,7 @@
       />
       <div class="header-line-breaker"></div>
       <div class="results-counter">
-        Results: {{this.queryResults.totalResultsCount}}
+        {{tt this "resultsCounter"}}: {{this.queryResults.totalResultsCount}}
       </div>
       <QueryResults::Pagination
         @resultsCount={{this.queryResults.totalResultsCount}}

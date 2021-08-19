@@ -7,8 +7,8 @@ module.exports = {
     ecmaVersion: 2018,
     sourceType: 'module',
     ecmaFeatures: {
-      legacyDecorators: true
-    }
+      legacyDecorators: true,
+    },
   },
   plugins: [
     'ember',
@@ -30,10 +30,13 @@ module.exports = {
       'property',
     ],
     'eol-last': 1,
-    'comma-dangle': [
-      1,
-      'always-multiline',
-    ],
+    'comma-dangle': ['warn', {
+      arrays: 'always-multiline',
+      objects: 'always-multiline',
+      imports: 'always-multiline',
+      exports: 'always-multiline',
+      functions: 'never',
+    }],
     'quotes': [
       1,
       'single',
@@ -60,9 +63,9 @@ module.exports = {
     'prefer-const': [
       1,
       {
-        'destructuring': 'all',
-        'ignoreReadBeforeAssign': true
-      }
+        destructuring: 'all',
+        ignoreReadBeforeAssign: true,
+      },
     ],
     'no-var': 1,
     'one-var': [
@@ -72,16 +75,16 @@ module.exports = {
     'max-len': [
       1,
       {
-        'code': 90,
-        'tabWidth': 2,
-        'ignoreStrings': false,
-        'ignoreComments': true,
-        'ignoreTrailingComments': false,
-        'ignoreUrls': true,
-        'ignoreTemplateLiterals': false,
-        'ignoreRegExpLiterals': true,
-        'ignorePattern': '^import|.*[\'"`]\\)?,?;?$',
-      }
+        code: 90,
+        tabWidth: 2,
+        ignoreStrings: false,
+        ignoreComments: true,
+        ignoreTrailingComments: false,
+        ignoreUrls: true,
+        ignoreTemplateLiterals: false,
+        ignoreRegExpLiterals: true,
+        ignorePattern: '^import|.*[\'"`]\\)?,?;?$',
+      },
     ],
     'promise/always-return': 'off', // default: error
     'promise/no-return-wrap': 'error',
@@ -105,23 +108,24 @@ module.exports = {
         'blueprints/*/index.js',
         'config/**/*.js',
         'lib/*/index.js',
-        'server/**/*.js'
+        'server/**/*.js',
       ],
       parserOptions: {
-        sourceType: 'script'
+        sourceType: 'script',
       },
       env: {
         browser: false,
-        node: true
+        node: true,
       },
       plugins: ['node'],
       rules: Object.assign({}, require('eslint-plugin-node').configs.recommended.rules, {
         // add your custom rules and overrides for node files here
+        'node/no-extraneous-require': 'off',
 
         // this can be removed once the following is fixed
         // https://github.com/mysticatea/eslint-plugin-node/issues/77
-        'node/no-unpublished-require': 'off'
-      })
-    }
-  ]
+        'node/no-unpublished-require': 'off',
+      }),
+    },
+  ],
 };

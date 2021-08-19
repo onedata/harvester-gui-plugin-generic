@@ -1,6 +1,6 @@
-<div class="query-builder-block-selector {{this.mode}}-block-selector {{if (not this.hideConditionCreation) "with-conditions"}}">
+<div class="query-builder-block-selector {{this.mode}}-block-selector {{unless this.hideConditionCreation "with-conditions"}}">
   {{#if (eq this.mode "create")}}
-    {{#if (not this.hideConditionCreation)}}
+    {{#unless this.hideConditionCreation}}
       <div class="condition-section">
         <h1>{{tt this "conditionHeader"}}</h1>
         <QueryBuilder::BlockSelector::ConditionSelector
@@ -10,7 +10,7 @@
         />
       </div>
       <div class="or-line">{{tt this "orLineText"}}</div>
-    {{/if}}
+    {{/unless}}
     <div class="operators-section add-operator-section">
       <h1>{{tt this "operatorsHeader"}}</h1>
       <QueryBuilder::BlockSelector::OperatorSelector
