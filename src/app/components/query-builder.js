@@ -96,8 +96,7 @@ export default class QueryBuilderComponent extends Component {
   @action
   onConditionEditionStart(conditionBlock) {
     this.editedConditions.set(conditionBlock, { isValid: true });
-    // trigger change
-    this.editedConditions = new Map(this.editedConditions);
+    this.triggerEditedConditionsChange();
   }
 
   /**
@@ -106,8 +105,7 @@ export default class QueryBuilderComponent extends Component {
   @action
   onConditionEditionEnd(conditionBlock) {
     this.editedConditions.delete(conditionBlock);
-    // trigger change
-    this.editedConditions = new Map(this.editedConditions);
+    this.triggerEditedConditionsChange();
   }
 
   /**
@@ -123,8 +121,7 @@ export default class QueryBuilderComponent extends Component {
         isValid,
       };
       this.editedConditions.set(conditionBlock, updatedConditionEntry);
-      // trigger change
-      this.editedConditions = new Map(this.editedConditions);
+      this.triggerEditedConditionsChange();
     }
   }
 
@@ -147,8 +144,7 @@ export default class QueryBuilderComponent extends Component {
 
     flattenedConditionsList.forEach(condition => this.editedConditions.delete(condition));
 
-    // trigger change
-    this.editedConditions = new Map(this.editedConditions);
+    this.triggerEditedConditionsChange();
   }
 
   /**
@@ -169,5 +165,9 @@ export default class QueryBuilderComponent extends Component {
     } while (propertyInPath);
 
     return true;
+  }
+
+  triggerEditedConditionsChange() {
+    this.editedConditions = new Map(this.editedConditions);
   }
 }
