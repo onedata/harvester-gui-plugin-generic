@@ -4,6 +4,8 @@
 CHANGELOG
 ---------
 
+### 1.1.0:
+
 - **VFS-8178** Dependencies update.
 
 ### 1.0.0:
