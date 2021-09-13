@@ -25,6 +25,11 @@ import QueryResults from 'harvester-gui-plugin-generic/utils/query-results';
  */
 export default class QueryResultsComponent extends Component {
   /**
+   * @type {String}
+   */
+  intlPrefix = 'components.query-results';
+
+  /**
    * Properties tree that indicates which properties should be visible in result preview.
    * If is an empty object, then all properties will be rendered.
    * @type {Object}

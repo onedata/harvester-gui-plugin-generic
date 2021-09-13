@@ -11,7 +11,7 @@
       class="property-selector"
       as |indexProperty|
     >
-      <span class={{if (not indexProperty.isRealProperty) "special-property"}}>
+      <span class={{unless indexProperty.isRealProperty "special-property"}}>
         {{indexProperty.path}}
       </span>
     </PowerSelect>

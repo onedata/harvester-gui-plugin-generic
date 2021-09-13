@@ -8,9 +8,9 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import XTreeCheckboxBase from 'ember-simple-tree/components/x-tree-checkbox';
+import Component from '@glimmer/component';
 
-export default class XTreeCheckbox extends XTreeCheckboxBase {
+export default class XTreeCheckbox extends Component {
   /**
    * @type {MouseEvent}
    */

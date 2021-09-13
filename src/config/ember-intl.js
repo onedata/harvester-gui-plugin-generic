@@ -83,9 +83,9 @@ module.exports = function ( /* environment */ ) {
      *
      * See https://ember-intl.github.io/ember-intl/docs/guide/missing-translations#requiring-translations
      *
-     * @property requiresTranslation
      * @type {Function}
      * @default "function(key,locale) { return true }"
+     * @returns {Boolean}
      */
     requiresTranslation( /* key, locale */ ) {
       return true;

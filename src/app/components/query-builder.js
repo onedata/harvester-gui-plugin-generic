@@ -8,7 +8,7 @@
  */
 
 import Component from '@glimmer/component';
-import { action, set } from '@ember/object';
+import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 import RootOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/root-operator-query-block';
 import OperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/operator-query-block';
@@ -96,8 +96,7 @@ export default class QueryBuilderComponent extends Component {
   @action
   onConditionEditionStart(conditionBlock) {
     this.editedConditions.set(conditionBlock, { isValid: true });
-    // trigger change
-    this.editedConditions = this.editedConditions;
+    this.triggerEditedConditionsChange();
   }
 
   /**
@@ -106,8 +105,7 @@ export default class QueryBuilderComponent extends Component {
   @action
   onConditionEditionEnd(conditionBlock) {
     this.editedConditions.delete(conditionBlock);
-    // trigger change
-    this.editedConditions = this.editedConditions;
+    this.triggerEditedConditionsChange();
   }
 
   /**
@@ -118,9 +116,12 @@ export default class QueryBuilderComponent extends Component {
   onConditionEditionValidityChange(conditionBlock, isValid) {
     const editedConditionEntry = this.editedConditions.get(conditionBlock);
     if (editedConditionEntry) {
-      set(editedConditionEntry, 'isValid', isValid);
-      // trigger change
-      this.editedConditions = this.editedConditions;
+      const updatedConditionEntry = {
+        ...editedConditionEntry,
+        isValid,
+      };
+      this.editedConditions.set(conditionBlock, updatedConditionEntry);
+      this.triggerEditedConditionsChange();
     }
   }
 
@@ -143,8 +144,7 @@ export default class QueryBuilderComponent extends Component {
 
     flattenedConditionsList.forEach(condition => this.editedConditions.delete(condition));
 
-    // trigger change
-    this.editedConditions = this.editedConditions;
+    this.triggerEditedConditionsChange();
   }
 
   /**
@@ -165,5 +165,9 @@ export default class QueryBuilderComponent extends Component {
     } while (propertyInPath);
 
     return true;
+  }
+
+  triggerEditedConditionsChange() {
+    this.editedConditions = new Map(this.editedConditions);
   }
 }

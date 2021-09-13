@@ -113,7 +113,8 @@ describe('Integration | Component | query-builder/block-settings', function () {
     async function () {
       this.queryBlock = new NotOperatorQueryBlock();
       this.replaceSpy = sinon.spy();
-      this.closeSpy = sinon.stub().callsFake(() => this.isShown = false);
+      // Using `this.set` because simple assignment is not propagated to the component
+      this.closeSpy = sinon.stub().callsFake(() => this.set('isShown', false));
       this.isShown = true;
 
       await render(hbs `<QueryBuilder::BlockSettings
@@ -128,7 +129,7 @@ describe('Integration | Component | query-builder/block-settings', function () {
       const blockMatcher = sinon.match.instanceOf(AndOperatorQueryBlock)
         .and(sinon.match.has('operands', [this.queryBlock]));
       expect(this.replaceSpy).to.be.calledOnce.and.to.be.calledWith([blockMatcher]);
-      expect(this.closeSpy).to.be.calledOnce;
+      expect(this.closeSpy).to.be.called;
     }
   );
 
@@ -137,7 +138,8 @@ describe('Integration | Component | query-builder/block-settings', function () {
     async function () {
       this.queryBlock = new NotOperatorQueryBlock();
       this.replaceSpy = sinon.spy();
-      this.closeSpy = sinon.stub().callsFake(() => this.isShown = false);
+      // Using `this.set` because simple assignment is not propagated to the component
+      this.closeSpy = sinon.stub().callsFake(() => this.set('isShown', false));
       this.isShown = true;
       const condition = new ConditionQueryBlock();
       this.queryBlock.operands.pushObject(condition);

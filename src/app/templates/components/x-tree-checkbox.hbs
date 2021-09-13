@@ -1,7 +1,0 @@
-{{!-- overrides x-tree-checkbox component template from ember-simple-tree --}}
-
-<OneCheckbox
-  @value={{if this.model.isIndeterminate "indeterminate" this.model.isChecked}}
-  @disabled={{this.model.isDisabled}}
-  @onChange={{fn this.toggleCheck this.fakeClickEvent}}
-/>

@@ -1,10 +1,14 @@
 <div
   class="query-builder-block-visualiser {{if this.areSettingsVisible "has-open-settings"}} {{if this.isRemoveButtonHovered "has-remove-hovered"}}"
+  role="button"
   {{add-direct-hover-class}}
-  {{on "click" clicked}}
+  {{on "click" this.clicked}}
   {{did-insert this.didInsert}}
 >
-  {{#let (concat "query-builder/" @queryBlock.constructor.renderer) as |BlockRenderer|}}
+  {{#let
+    (component (concat "query-builder/" @queryBlock.constructor.renderer))
+    as |BlockRenderer|
+  }}
     <BlockRenderer
       class={{concat "block-level-" @level}}
       @queryBlock={{@queryBlock}}
