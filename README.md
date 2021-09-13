@@ -27,7 +27,7 @@ Specific `harvester-gui-plugin-generic` releases are intended to be used only wi
 
 | Onezone version | Compatible GUI plugin versions |
 |-----------------|--------------------------------|
-| `20.02.1`+      | `1.0.x`                        |
+| `20.02.1`+      | `1.x.x`                        |
 
 ## Project structure
 
