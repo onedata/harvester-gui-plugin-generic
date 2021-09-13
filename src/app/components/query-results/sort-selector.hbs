@@ -1,0 +1,27 @@
+<div class="query-results-sort-selector">
+  <span class="sort-by-label">{{tt this "sortByLabel"}}</span>
+  <PowerSelect
+    @options={{this.indexProperties}}
+    @selected={{this.sortProperty}}
+    @onChange={{this.sortPropertyChanged}}
+    @renderInPlace={{true}}
+    @searchEnabled={{true}}
+    @matcher={{this.propertiesDropdownMatcher}}
+    class="property-selector"
+    style={{this.propertySelectorStyle}}
+    as |property|
+  >
+    {{or property.path this.queryScorePropertyTranslation}}
+  </PowerSelect>
+  <PowerSelect
+    @options={{array "asc" "desc"}}
+    @selected={{this.sortDirection}}
+    @onChange={{this.sortDirectionChanged}}
+    @renderInPlace={{true}}
+    class="direction-selector"
+    as |direction|
+  >
+    {{tt this (concat "direction." direction)}}
+  </PowerSelect>
+  {{yield}}
+</div>

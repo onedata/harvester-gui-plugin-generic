@@ -1,0 +1,5 @@
+operatorsHeader: 'Insert operator'
+conditionHeader: 'Add condition'
+surroundWithOperatorHeader: 'Expand with operator'
+changeToOperatorHeader: 'Replace operator(s)'
+orLineText: 'or'

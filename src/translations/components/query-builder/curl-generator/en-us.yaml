@@ -1,0 +1,5 @@
+triggerLabel: "'{' REST API '}'"
+modalTitle: REST API
+closeModal: Close
+commandDescription: The command below can be used to perform a query equivalent to the one built in the visual editor, with the same filtering and sorting parameters.
+accessTokenInfo: Note that the '<code>'$TOKEN'</code>' environment variable must be set to an access token that is valid for accessing Onezone REST API.

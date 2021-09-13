@@ -1,0 +1,17 @@
+.ember-attacher {
+  z-index: $zindex-modal-backdrop - 1;
+}
+
+.ember-attacher-fill {
+  background-color: white;
+  border: 1px solid $input-border-color;
+
+  div[x-arrow] {
+    background-color: #fff;
+    height: 10px;
+    position: absolute;
+    width: 10px;
+    z-index: -1;
+    border: 1px solid $input-border-color;
+  }
+}

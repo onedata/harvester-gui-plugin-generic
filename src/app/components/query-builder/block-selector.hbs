@@ -1,0 +1,40 @@
+<div class="query-builder-block-selector {{this.mode}}-block-selector {{unless this.hideConditionCreation "with-conditions"}}">
+  {{#if (eq this.mode "create")}}
+    {{#unless this.hideConditionCreation}}
+      <div class="condition-section">
+        <h1>{{tt this "conditionHeader"}}</h1>
+        <QueryBuilder::BlockSelector::ConditionSelector
+          @valuesBuilder={{@valuesBuilder}}
+          @indexProperties={{@indexProperties}}
+          @onConditionSelected={{this.conditionAdded}}
+        />
+      </div>
+      <div class="or-line">{{tt this "orLineText"}}</div>
+    {{/unless}}
+    <div class="operators-section add-operator-section">
+      <h1>{{tt this "operatorsHeader"}}</h1>
+      <QueryBuilder::BlockSelector::OperatorSelector
+        @onOperatorSelected={{this.operatorAdded}}
+      />
+    </div>
+  {{else}}
+    {{#if this.isEditBlockAnOperator}}
+      <div class="operators-section change-to-section">
+        <h1>{{tt this "changeToOperatorHeader"}}</h1>
+        <QueryBuilder::BlockSelector::OperatorSelector
+          @onOperatorSelected={{this.changeToOperator}}
+          @operators={{array 'and' 'or' 'not' 'none'}}
+          @disabledOperators={{this.disabledOperatorsInChangeToSection}}
+        />
+      </div>
+      <div class="or-line">{{tt this "orLineText"}}</div>
+    {{/if}}
+    <div class="operators-section surround-section">
+      <h1>{{tt this "surroundWithOperatorHeader"}}</h1>
+      <QueryBuilder::BlockSelector::OperatorSelector
+        @onOperatorSelected={{this.surroundWithOperator}}
+      />
+    </div>
+  {{/if}}
+</div>
+{{yield}}

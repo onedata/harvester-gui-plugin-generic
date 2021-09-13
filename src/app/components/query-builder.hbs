@@ -1,0 +1,30 @@
+<div class="query-builder">
+  <dl class="form-control query-builder-input">
+    <QueryBuilder::OperatorBlock
+      @queryBlock={{this.rootQueryBlock}}
+      @valuesBuilder={{@valuesBuilder}}
+      @indexProperties={{this.indexProperties}}
+      @onConditionEditionStart={{this.onConditionEditionStart}}
+      @onConditionEditionEnd={{this.onConditionEditionEnd}}
+      @onConditionEditionValidityChange={{this.onConditionEditionValidityChange}}
+      @onBlockRemoved={{this.onBlockRemoved}}
+      class="root-block"
+    />
+  </dl>
+  <BsButton
+    @type="primary"
+    @onClick={{this.performQuery}}
+    disabled={{this.hasInvalidCondition}}
+    class="submit-query btn-input-padding"
+  >
+    {{tt this "performQueryButton"}}
+  </BsButton>
+  <QueryBuilder::CurlGenerator
+    @rootQueryBlock={{this.rootQueryBlock}}
+    @filteredProperties={{@filteredProperties}}
+    @sortProperty={{@sortProperty}}
+    @sortDirection={{@sortDirection}}
+    @onGenerateCurl={{@onGenerateCurl}}
+  />
+  {{yield}}
+</div>

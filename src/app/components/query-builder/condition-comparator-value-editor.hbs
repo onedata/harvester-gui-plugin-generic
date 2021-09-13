@@ -1,0 +1,26 @@
+{{#if (eq this.mode "view")}}
+  <span
+    class="comparator-value comparator-value-view"
+    role="button"
+    {{on "click" this.onStartEdit}}
+    ...attributes
+  >
+    {{component
+      (concat "query-builder/presenters/" this.presenterComponent)
+      value=@value
+    }}
+  </span>
+{{else}}
+  <div class="form-group comparator-value-editor {{this.editorComponentAndParams.component}}" ...attributes>
+    {{component
+      (concat "query-builder/editors/" this.editorComponentAndParams.component)
+      params=this.editorComponentAndParams.params
+      value=@value
+      onValueChange=this.valueChanged
+      onFinishEdit=@onFinishEdit
+      onCancelEdit=@onCancelEdit
+      isValueInvalid=@isValueInvalid
+    }}
+  </div>
+{{/if}}
+{{yield}}

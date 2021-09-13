@@ -1,0 +1,9 @@
+{{!-- overrides x-tree-checkbox component template from ember-simple-tree --}}
+
+<span class="tree-checkbox">
+  <OneCheckbox
+    @value={{if @model.isIndeterminate "indeterminate" @model.isChecked}}
+    @disabled={{@model.isDisabled}}
+    @onChange={{fn @toggleCheck this.fakeClickEvent}}
+  />
+</span>

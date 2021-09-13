@@ -1,0 +1,32 @@
+.resource-load-error {
+  display: flex;
+  border: 1px solid $danger;
+  border-radius: $border-radius;
+
+  .icon-container {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: $danger;
+    color: white;
+    width: 60px;
+    font-size: 160%;
+  }
+
+  .error-container {
+    flex-grow: 1;
+    min-width: 0;
+    padding: $spacer;
+  }
+
+  .main-message {
+    @include font-semibold;
+  }
+
+  .details-json {
+    display: block;
+    padding-top: $spacer;
+    white-space: pre;
+  }
+}

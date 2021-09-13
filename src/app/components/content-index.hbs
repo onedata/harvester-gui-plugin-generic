@@ -1,0 +1,27 @@
+<div class="content-index">
+  <PromiseLoader @promise={{this.indexPromise}} as |index|>
+    <QueryBuilder
+      @valuesBuilder={{this.queryValuesBuilder}}
+      @filteredProperties={{this.filteredProperties}}
+      @sortProperty={{this.sortProperty}}
+      @sortDirection={{this.sortDirection}}
+      @queryChanged={{this.queryChanged}}
+      @onPerformQuery={{this.performQuery}}
+      @onGenerateCurl={{this.getQueryCurl}}
+      @index={{index}}
+    />
+    <QueryResults
+      @queryResultsPromise={{this.queryResultsPromise}}
+      @activePageNumber={{this.activePageNumber}}
+      @pageSize={{this.pageSize}}
+      @index={{index}}
+      @sortProperty={{this.sortProperty}}
+      @sortDirection={{this.sortDirection}}
+      @onFilteredPropertiesChange={{this.filteredPropertiesChange}}
+      @onSortChange={{this.sortChange}}
+      @onPageChange={{this.pageChange}}
+      @onPageSizeChange={{this.pageSizeChange}}
+    />
+  </PromiseLoader>
+  {{yield}}
+</div>

@@ -1,0 +1,56 @@
+.query-results-pagination {
+  display: inline-flex;
+  align-items: center;
+  font-size: $small-font-size;
+
+  .form-control {
+    font-size: 100%;
+    padding: 0;
+  }
+
+  .input-group {
+    width: initial;
+  }
+
+  .btn {
+    border: 0;
+    padding: 3px 5px;
+
+    .fa-icon {
+      position: relative;
+      top: -0.1em;
+      line-height: 0;
+      vertical-align: middle;
+    }
+  }
+
+  .pages-counter-container {
+    align-items: center;
+    display: flex;
+    border: 0;
+    padding: 0 $spacer * 0.4;
+  }
+
+  .active-page-number {
+    width: 3em;
+    margin-right: $spacer * 0.3;
+    padding: 3px;
+    border: 1px solid $input-border-color;
+    border-radius: $input-border-radius-sm;
+    text-align: center;
+  }
+
+  .pages-count {
+    margin-left: $spacer * 0.3;
+  }
+
+  .page-size-selector {
+    margin-left: $spacer * 0.7;
+    margin-right: $spacer * 0.5;
+    flex-shrink: 0;
+  }
+
+  .per-page-label {
+    white-space: nowrap;
+  }
+}

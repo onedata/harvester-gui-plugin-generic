@@ -1,0 +1,53 @@
+@import "ember-bootstrap/functions";
+@import "./bootstrap-variables";
+@import "ember-bootstrap/bootstrap";
+
+.btn {
+  @include font-semibold;
+}
+
+.btn-input-padding {
+  padding: $input-btn-padding-y $input-btn-padding-x;
+}
+
+.btn-primary,
+.btn-secondary {
+  &, &.disabled, &:disabled {
+    color: white;
+  }
+}
+
+.btn-outline-primary,
+.btn-outline-secondary {
+  &:not(:disabled):not(.disabled):hover, &:not(:disabled):not(.disabled):active {
+    color: white;
+  }
+}
+
+.modal-content {
+  box-shadow: $modal-content-box-shadow-sm-up;
+}
+
+.modal-header, .modal-footer {
+  border: 0;
+}
+
+.modal-body {
+  padding: 0 $modal-inner-padding;
+}
+
+.form-control[readonly] {
+  background-color: white;
+}
+
+.was-validated .form-control:invalid,
+.form-control.is-invalid,
+.was-validated .form-control:valid,
+.form-control.is-valid {
+  background-image: none;
+  padding-right: $input-padding-x;
+
+  &.form-control-sm {
+    padding-right: $input-padding-x-sm;
+  }
+}
