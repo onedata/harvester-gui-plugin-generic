@@ -4,6 +4,8 @@
 CHANGELOG
 ---------
 
+- **VFS-8699** Fixed tests with proper usage of package-lock.json file.
+
 ### 1.1.0:
 
 - **VFS-8178** Dependencies update.
