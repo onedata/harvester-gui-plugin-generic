@@ -4,6 +4,7 @@
 CHANGELOG
 ---------
 
+- **VFS-9821** Removed legacy dependency `ember-cli-spinjs`.
 - **VFS-8699** Fixed tests with proper usage of package-lock.json file.
 
 ### 1.1.0:

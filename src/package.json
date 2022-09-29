@@ -46,7 +46,6 @@
     "ember-cli-inject-live-reload": "2.1.0",
     "ember-cli-moment-shim": "3.8.0",
     "ember-cli-sass": "10.0.1",
-    "ember-cli-spinjs": "2.1.1",
     "ember-cli-sri": "2.1.1",
     "ember-cli-template-lint": "2.0.2",
     "ember-cli-uglify": "3.0.0",
@@ -72,7 +71,8 @@
     "eslint-plugin-promise": "5.1.0",
     "loader.js": "4.7.0",
     "sass": "1.32.0",
-    "sinon-chai": "3.7.0"
+    "sinon-chai": "3.7.0",
+    "spin.js": "4.1.1"
   },
   "engines": {
     "node": "10.* || >= 12"
