@@ -1,7 +1,7 @@
 'use strict';
 
 const {
-  DEFAULT_CONFIG
+  DEFAULT_CONFIG,
 } = require('ember-template-lint/lib/rules/no-bare-strings');
 
 module.exports = {

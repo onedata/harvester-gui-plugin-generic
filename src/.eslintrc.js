@@ -2,16 +2,20 @@
 
 module.exports = {
   root: true,
-  parser: 'babel-eslint',
+  parser: '@babel/eslint-parser',
   parserOptions: {
-    ecmaVersion: 2018,
+    requireConfigFile: false,
+    ecmaVersion: 2021,
     sourceType: 'module',
-    ecmaFeatures: {
-      legacyDecorators: true,
+    babelOptions: {
+      plugins: [
+        ['@babel/plugin-proposal-decorators', { legacy: true }],
+      ],
     },
   },
   plugins: [
     'ember',
+    'node',
     'promise',
   ],
   extends: [
@@ -30,7 +34,7 @@ module.exports = {
       'property',
     ],
     'eol-last': 1,
-    'comma-dangle': ['warn', {
+    'comma-dangle': ['error', {
       arrays: 'always-multiline',
       objects: 'always-multiline',
       imports: 'always-multiline',
@@ -92,10 +96,10 @@ module.exports = {
     'promise/catch-or-return': 'off', // default: error
     'promise/no-native': 'error',
     'promise/no-nesting': 'off', // default: warn
-    'promise/no-promise-in-callback': 'warn',
+    'promise/no-promise-in-callback': 'error',
     'promise/no-callback-in-promise': 'off', // default: warn
     'promise/avoid-new': 'off', // default: warn
-    'promise/no-return-in-finally': 'warn',
+    'promise/no-return-in-finally': 'error',
   },
   overrides: [
     // node files
