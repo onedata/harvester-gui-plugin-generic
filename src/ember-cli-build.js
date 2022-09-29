@@ -56,7 +56,6 @@ module.exports = function (defaults) {
   const nodeAssets = [
     'abortcontroller-polyfill/dist/abortcontroller-polyfill-only.js',
     'spin.js/spin.css',
-
   ];
   nodeAssets.forEach(path => app.import(`node_modules/${path}`));
 
