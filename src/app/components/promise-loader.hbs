@@ -1,30 +1,19 @@
-<Await
-  @promise={{@promise}}
-  @onResolve={{@onResolve}}
-  @onReject={{@onReject}}
-  as |await|
->
-  <await.Pending>
-    {{#if @useCustomPending}}
-      {{yield null "pending"}}
-    {{else}}
-      <EmberSpinner
-        @scale={{or @spinnerScale 1}}
-        @lines={{12}}
-        @length={{12}}
-      />
-    {{/if}}
-  </await.Pending>
-
-  <await.Fulfilled as |promiseData|>
-    {{yield promiseData "fulfilled"}}
-  </await.Fulfilled>
-
-  <await.Rejected as |error|>
-    {{#if @useCustomRejected}}
-      {{yield error "rejected"}}
-    {{else}}
-      <ResourceLoadError @details={{error}}/>
-    {{/if}}
-  </await.Rejected>
-</Await>
+{{#if (eq this.promiseStatus "pending")}}
+  {{#if @useCustomPending}}
+    {{yield null "pending"}}
+  {{else}}
+    <EmberSpinner
+      @scale={{or @spinnerScale 1}}
+      @lines={{12}}
+      @length={{12}}
+    />
+  {{/if}}
+{{else if (eq this.promiseStatus "rejected")}}
+  {{#if @useCustomRejected}}
+    {{yield this.promiseError "rejected"}}
+  {{else}}
+    <ResourceLoadError @details={{this.promiseError}}/>
+  {{/if}}
+{{else}}
+  {{yield this.promiseResult "fulfilled"}}
+{{/if}}
