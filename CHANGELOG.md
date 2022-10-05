@@ -4,6 +4,8 @@
 CHANGELOG
 ---------
 
+- **VFS-9819** Replaced `ember-await` dependency with own implementation.
+- **VFS-9820** Upgraded ESLint and added Onedata-team-specific Bamboo specs.
 - **VFS-9821** Removed legacy dependency `ember-cli-spinjs`.
 - **VFS-8699** Fixed tests with proper usage of package-lock.json file.
 

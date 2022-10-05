@@ -1,10 +1,5 @@
-<Await
-  @promise={{@promise}}
-  @onResolve={{@onResolve}}
-  @onReject={{@onReject}}
-  as |await|
->
-  <await.Pending>
+{{#if this.promise}}
+  {{#if (eq this.promiseStatus "pending")}}
     {{#if @useCustomPending}}
       {{yield null "pending"}}
     {{else}}
@@ -14,17 +9,13 @@
         @length={{12}}
       />
     {{/if}}
-  </await.Pending>
-
-  <await.Fulfilled as |promiseData|>
-    {{yield promiseData "fulfilled"}}
-  </await.Fulfilled>
-
-  <await.Rejected as |error|>
+  {{else if (eq this.promiseStatus "rejected")}}
     {{#if @useCustomRejected}}
-      {{yield error "rejected"}}
+      {{yield this.promiseError "rejected"}}
     {{else}}
-      <ResourceLoadError @details={{error}}/>
+      <ResourceLoadError @details={{this.promiseError}}/>
     {{/if}}
-  </await.Rejected>
-</Await>
+  {{else}}
+    {{yield this.promiseResult "fulfilled"}}
+  {{/if}}
+{{/if}}
