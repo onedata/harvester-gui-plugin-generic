@@ -1,19 +1,21 @@
-{{#if (eq this.promiseStatus "pending")}}
-  {{#if @useCustomPending}}
-    {{yield null "pending"}}
+{{#if this.promise}}
+  {{#if (eq this.promiseStatus "pending")}}
+    {{#if @useCustomPending}}
+      {{yield null "pending"}}
+    {{else}}
+      <EmberSpinner
+        @scale={{or @spinnerScale 1}}
+        @lines={{12}}
+        @length={{12}}
+      />
+    {{/if}}
+  {{else if (eq this.promiseStatus "rejected")}}
+    {{#if @useCustomRejected}}
+      {{yield this.promiseError "rejected"}}
+    {{else}}
+      <ResourceLoadError @details={{this.promiseError}}/>
+    {{/if}}
   {{else}}
-    <EmberSpinner
-      @scale={{or @spinnerScale 1}}
-      @lines={{12}}
-      @length={{12}}
-    />
+    {{yield this.promiseResult "fulfilled"}}
   {{/if}}
-{{else if (eq this.promiseStatus "rejected")}}
-  {{#if @useCustomRejected}}
-    {{yield this.promiseError "rejected"}}
-  {{else}}
-    <ResourceLoadError @details={{this.promiseError}}/>
-  {{/if}}
-{{else}}
-  {{yield this.promiseResult "fulfilled"}}
 {{/if}}

@@ -18,8 +18,8 @@ import { tracked } from '@glimmer/tracking';
  * @argument {boolean} [useCustomPending]
  * @argument {boolean} [useCustomRejected]
  * @argument {number} [spinnerScale]
- * @argument {(data: unknown) => void)} [onResolve]
- * @argument {(error: unknown) => void)} [onReject]
+ * @argument {(data: unknown) => void} [onResolve]
+ * @argument {(error: unknown) => void} [onReject]
  */
 export default class PromiseLoaderComponent extends Component {
   /**
@@ -38,22 +38,7 @@ export default class PromiseLoaderComponent extends Component {
    */
   get promise() {
     if (!this.promiseCache || this.args.promise !== this.promiseCache) {
-      const currentPromise = this.args.promise;
-      this.promiseCache = currentPromise;
-      this.resetPromiseState();
-      this.args.promise
-        .then((data) => {
-          if (this.promiseCache === currentPromise) {
-            this.promiseState = { status: 'fulfilled', data };
-            this.args.onResolve?.(data);
-          }
-        })
-        .catch((error) => {
-          if (this.promiseCache === currentPromise) {
-            this.promiseState = { status: 'rejected', error };
-            this.args.onReject?.(error);
-          }
-        })
+      this.updatePromiseCache();
     }
     return this.promiseCache;
   }
@@ -65,7 +50,7 @@ export default class PromiseLoaderComponent extends Component {
     if (!this.promise || !this.promiseState?.status) {
       return 'pending';
     } else {
-      return this.promiseState.status
+      return this.promiseState.status;
     }
   }
 
@@ -98,5 +83,24 @@ export default class PromiseLoaderComponent extends Component {
 
   resetPromiseState() {
     this.promiseState = { status: 'pending' };
+  }
+
+  updatePromiseCache() {
+    const currentPromise = this.args.promise;
+    this.promiseCache = currentPromise;
+    this.resetPromiseState();
+    currentPromise
+      ?.then((data) => {
+        if (this.promiseCache === currentPromise) {
+          this.promiseState = { status: 'fulfilled', data };
+          this.args.onResolve?.(data);
+        }
+      })
+      ?.catch((error) => {
+        if (this.promiseCache === currentPromise) {
+          this.promiseState = { status: 'rejected', error };
+          this.args.onReject?.(error);
+        }
+      });
   }
 }

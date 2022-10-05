@@ -136,7 +136,7 @@ describe('Integration | Component | promise-loader', function () {
       await settled();
 
       expect(this.spy).not.to.be.called;
-      expect(this.element).to.contain.trimmed.text('abc')
+      expect(this.element).to.contain.trimmed.text('abc');
     }
   );
 });
