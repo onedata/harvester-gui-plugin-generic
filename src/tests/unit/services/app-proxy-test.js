@@ -12,6 +12,7 @@ describe('Unit | Service | app-proxy', function () {
       dataRequest: () => {},
       dataCurlCommandRequest: () => {},
       configRequest: () => {},
+      viewModeRequest: () => {},
       fileBrowserUrlRequest: () => {},
       spacesRequest: () => {},
     };
@@ -46,6 +47,7 @@ describe('Unit | Service | app-proxy', function () {
     'dataRequest',
     'dataCurlCommandRequest',
     'configRequest',
+    'viewModeRequest',
     'fileBrowserUrlRequest',
     'spacesRequest',
   ].forEach(injectedPropName => {

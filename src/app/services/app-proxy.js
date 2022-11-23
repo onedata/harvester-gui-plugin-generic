@@ -62,6 +62,17 @@ class AppProxyService extends Service {
   }
 
   /**
+   * Returns information about GUI rendering context.
+   * - `'private'` - GUI is rendered in a harvester page inside Onezone layout,
+   * - `'public'` - GUI is rendered in public mode outside Onezone layout.
+   * @type {Function}
+   * @returns {Promise<'private'|'public'>}
+   */
+  get viewModeRequest() {
+    return this.appProxy?.viewModeRequest;
+  }
+
+  /**
    * Generates URL, which redirects to file browser with specified file selected
    * @type {Function}
    * @param {String} fileId file ID (CDMI Object ID)
