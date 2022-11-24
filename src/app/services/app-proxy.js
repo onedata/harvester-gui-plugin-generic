@@ -15,6 +15,12 @@ import { later } from '@ember/runloop';
 import { tracked } from '@glimmer/tracking';
 import ENV from 'harvester-gui-plugin-generic/config/environment';
 
+/**
+ * @typedef {'private'|'public'} ViewMode
+ * - `'private'` - GUI is rendered in a harvester page inside Onezone layout,
+ * - `'public'` - GUI is rendered in public mode outside Onezone layout.
+ */
+
 class AppProxyService extends Service {
   /**
    * @type {Object}
@@ -63,10 +69,8 @@ class AppProxyService extends Service {
 
   /**
    * Returns information about GUI rendering context.
-   * - `'private'` - GUI is rendered in a harvester page inside Onezone layout,
-   * - `'public'` - GUI is rendered in public mode outside Onezone layout.
    * @type {Function}
-   * @returns {Promise<'private'|'public'>}
+   * @returns {Promise<ViewMode>}
    */
   get viewModeRequest() {
     return this.appProxy?.viewModeRequest;

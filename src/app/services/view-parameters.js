@@ -16,17 +16,14 @@ export default class ConfigurationService extends Service {
   @service appProxy;
 
   /**
-   * Possible values:
-   * - `'private'` - GUI is rendered in a harvester page inside Onezone layout,
-   * - `'public'` - GUI is rendered in public mode outside Onezone layout.
-   *
+   * GUI current rendering context.
    * Call `reloadViewMode` method to fill this field with actual data.
-   * @type {'private'|'public'|null}
+   * @type {ViewMode|null}
    */
   @tracked viewMode = null;
 
   /**
-   * @returns {Promise}
+   * @returns {Promise<ViewMode>}
    */
   reloadViewMode() {
     return this.appProxy.viewModeRequest()
@@ -34,6 +31,7 @@ export default class ConfigurationService extends Service {
       .catch(error => {
         this.viewMode = null;
         console.error('Loading GUI plugin view mode failed:', error);
+        return null;
       });
   }
 }
