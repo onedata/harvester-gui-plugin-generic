@@ -4,6 +4,7 @@
 CHANGELOG
 ---------
 
+- **VFS-10088** Fixed incorrect visibility of access token tip in cURL generator when browsing in public mode.
 - **VFS-9819** Replaced `ember-await` dependency with own implementation.
 - **VFS-9820** Upgraded ESLint and added Onedata-team-specific Bamboo specs.
 - **VFS-9821** Removed legacy dependency `ember-cli-spinjs`.
