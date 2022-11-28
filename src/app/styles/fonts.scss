@@ -1,8 +1,7 @@
 /// Import OpenSans Regular
 @font-face {
   font-family: 'Open Sans';
-  src: local('Open Sans'), local('OpenSans'),
-       url($root-url + 'fonts/opensans/OpenSans-Regular-webfont.woff') format('woff');
+  src: url($root-url + 'fonts/opensans/OpenSans-Regular-webfont.woff') format('woff');
   font-weight: normal;
   font-style: normal;
 }
@@ -14,8 +13,7 @@
 /// Import OpenSans Semibold
 @font-face {
   font-family: 'Open Sans Semibold';
-  src: local('Open Sans Semibold'), local('OpenSans Semibold'), local('OpenSansSemibold'),
-       url($root-url + 'fonts/opensans/OpenSans-Semibold-webfont.woff') format('woff');
+  src: url($root-url + 'fonts/opensans/OpenSans-Semibold-webfont.woff') format('woff');
   font-weight: normal;
   font-style: normal;
 }
@@ -27,8 +25,7 @@
 /// Import OpenSans Bold
 @font-face {
   font-family: 'Open Sans';
-  src: local('Open Sans'), local('OpenSans'),
-       url($root-url + 'fonts/opensans/OpenSans-Bold-webfont.woff') format('woff');
+  src: url($root-url + 'fonts/opensans/OpenSans-Bold-webfont.woff') format('woff');
   font-weight: bold;
   font-style: normal;
 }
@@ -43,8 +40,7 @@
   font-family: 'Source Code Pro';
   font-style: normal;
   font-weight: normal;
-  src: local('Source Code Pro Regular'), local('SourceCodePro-Regular'),
-       url($root-url + 'fonts/sourcecodepro/source-code-pro-regular.woff') format('woff');
+  src: url($root-url + 'fonts/sourcecodepro/source-code-pro-regular.woff') format('woff');
 }
 
 @mixin font-monospace() {
@@ -56,8 +52,7 @@
   font-family: 'Source Code Pro';
   font-style: normal;
   font-weight: bold;
-  src: local('Source Code Pro Bold'), local('SourceCodePro-Bold'),
-       url($root-url + 'fonts/sourcecodepro/source-code-pro-bold.woff') format('woff');
+  src: url($root-url + 'fonts/sourcecodepro/source-code-pro-bold.woff') format('woff');
 }
 
 @mixin font-monospace-bold() {
@@ -70,8 +65,7 @@
   font-family: 'Source Code Pro';
   font-style: italic;
   font-weight: normal;
-  src: local('Source Code Pro Medium Italic'), local('SourceCodePro-MediumIt'),
-       url($root-url + 'fonts/sourcecodepro/source-code-pro-italic.woff') format('woff');
+  src: url($root-url + 'fonts/sourcecodepro/source-code-pro-italic.woff') format('woff');
 }
 
 /// Import Source Code Pro Bold Italic
@@ -79,8 +73,7 @@
   font-family: 'Source Code Pro';
   font-style: italic;
   font-weight: bold;
-  src: local('Source Code Pro Bold Italic'), local('SourceCodePro-BoldIt'),
-       url($root-url + 'fonts/sourcecodepro/source-code-pro-bold-italic.woff') format('woff');
+  src: url($root-url + 'fonts/sourcecodepro/source-code-pro-bold-italic.woff') format('woff');
 }
 
 $fa-font-path: $root-url + "fonts/fontawesome";
