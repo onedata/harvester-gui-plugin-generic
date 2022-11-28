@@ -56,6 +56,8 @@ module.exports = function (defaults) {
   const nodeAssets = [
     'abortcontroller-polyfill/dist/abortcontroller-polyfill-only.js',
     'spin.js/spin.css',
+    'tippy.js/dist/tippy.css',
+    'tippy.js/themes/light-border.css',
   ];
   nodeAssets.forEach(path => app.import(`node_modules/${path}`));
 

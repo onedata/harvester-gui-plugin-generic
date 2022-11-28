@@ -6,8 +6,7 @@ import hbs from 'htmlbars-inline-precompile';
 import AndOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/and-operator-query-block';
 import NotOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/not-operator-query-block';
 import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/condition-query-block';
-import { click, waitUntil } from '@ember/test-helpers';
-import { isVisible } from 'ember-attacher';
+import { click, waitUntil, find } from '@ember/test-helpers';
 import sinon from 'sinon';
 
 describe('Integration | Component | query-builder/block-settings', function () {
@@ -16,25 +15,24 @@ describe('Integration | Component | query-builder/block-settings', function () {
   it('does not show block selector when "isShown" is false', async function () {
     this.queryBlock = new NotOperatorQueryBlock();
 
-    await render(hbs `<QueryBuilder::BlockSettings
+    await render(hbs `<span><QueryBuilder::BlockSettings
       @queryBlock={{this.queryBlock}}
       @isShown={{false}}
-    />`);
+    /></span>`);
 
-    expect(document.querySelector('.ember-attacher')).to.not.exist;
+    expect(document.querySelector('.block-settings-body')).to.not.exist;
   });
 
   it('shows block selector when "isShown" is true', async function () {
     this.queryBlock = new NotOperatorQueryBlock();
 
-    await render(hbs `<QueryBuilder::BlockSettings
+    await render(hbs `<span><QueryBuilder::BlockSettings
       @queryBlock={{this.queryBlock}}
       @isShown={{true}}
-    />`);
-    await waitUntil(() => isVisible('.ember-attacher'));
+    /></span>`);
 
     const blockSelector =
-      this.element.querySelector('.ember-attacher .query-builder-block-selector');
+      this.element.querySelector('.block-settings-body .query-builder-block-selector');
     expect(blockSelector).to.exist;
     expect(blockSelector).to.have.class('edit-block-selector');
   });
@@ -52,14 +50,14 @@ describe('Integration | Component | query-builder/block-settings', function () {
       );
       this.parentQueryBlock.operands.push(this.queryBlock);
 
-      await render(hbs `<QueryBuilder::BlockSettings
+      await render(hbs `<span><QueryBuilder::BlockSettings
         @queryBlock={{this.queryBlock}}
         @parentQueryBlock={{this.parentQueryBlock}}
         @isShown={{true}}
-      />`);
+      /></span>`);
 
       const blockSelector =
-        this.element.querySelector('.ember-attacher .query-builder-block-selector');
+        this.element.querySelector('.block-settings-body .query-builder-block-selector');
       expect(blockSelector).to.exist;
       // only operator blocks have "change to" section
       expect(blockSelector.querySelector('.change-to-section')).to.exist;
@@ -78,14 +76,14 @@ describe('Integration | Component | query-builder/block-settings', function () {
       );
       this.parentQueryBlock.operands.push(this.queryBlock);
 
-      await render(hbs `<QueryBuilder::BlockSettings
+      await render(hbs `<span><QueryBuilder::BlockSettings
         @queryBlock={{this.queryBlock}}
         @parentQueryBlock={{this.parentQueryBlock}}
         @isShown={{true}}
-      />`);
+      /></span>`);
 
       const blockSelector =
-        this.element.querySelector('.ember-attacher .query-builder-block-selector');
+        this.element.querySelector('.block-settings-body .query-builder-block-selector');
       expect(blockSelector).to.exist;
       // only operator blocks have "change to" section
       expect(blockSelector.querySelector('.change-to-section')).to.exist;
@@ -96,13 +94,13 @@ describe('Integration | Component | query-builder/block-settings', function () {
   it('shows block selector (condition block variant)', async function () {
     this.queryBlock = new ConditionQueryBlock();
 
-    await render(hbs `<QueryBuilder::BlockSettings
+    await render(hbs `<span><QueryBuilder::BlockSettings
       @queryBlock={{this.queryBlock}}
       @isShown={{true}}
-    />`);
+    /></span>`);
 
     const blockSelector =
-      this.element.querySelector('.ember-attacher .query-builder-block-selector');
+      this.element.querySelector('.block-settings-body .query-builder-block-selector');
     expect(blockSelector).to.exist;
     // condition blocks don't have "change to" section
     expect(blockSelector.querySelector('.change-to-section')).to.not.exist;
@@ -117,14 +115,14 @@ describe('Integration | Component | query-builder/block-settings', function () {
       this.closeSpy = sinon.stub().callsFake(() => this.set('isShown', false));
       this.isShown = true;
 
-      await render(hbs `<QueryBuilder::BlockSettings
+      await render(hbs `<span><QueryBuilder::BlockSettings
         @queryBlock={{this.queryBlock}}
         @onBlockReplace={{this.replaceSpy}}
         @onSettingsClose={{this.closeSpy}}
         @isShown={{this.isShown}}
-      />`);
-      await click('.ember-attacher .surround-section .operator-and');
-      await waitUntil(() => !isVisible('.ember-attacher'));
+      /></span>`);
+      await click('.block-settings-body .surround-section .operator-and');
+      await waitUntil(() => !find('.block-settings-body'));
 
       const blockMatcher = sinon.match.instanceOf(AndOperatorQueryBlock)
         .and(sinon.match.has('operands', [this.queryBlock]));
@@ -144,14 +142,14 @@ describe('Integration | Component | query-builder/block-settings', function () {
       const condition = new ConditionQueryBlock();
       this.queryBlock.operands.pushObject(condition);
 
-      await render(hbs `<QueryBuilder::BlockSettings
+      await render(hbs `<span><QueryBuilder::BlockSettings
         @queryBlock={{this.queryBlock}}
         @onBlockReplace={{this.replaceSpy}}
         @onSettingsClose={{this.closeSpy}}
         @isShown={{this.isShown}}
-      />`);
-      await click('.ember-attacher .change-to-section .operator-and');
-      await waitUntil(() => !isVisible('.ember-attacher'));
+      /></span>`);
+      await click('.block-settings-body .change-to-section .operator-and');
+      await waitUntil(() => !find('.block-settings-body'));
 
       const blockMatcher = sinon.match.instanceOf(AndOperatorQueryBlock)
         .and(sinon.match.has('operands', [condition]));

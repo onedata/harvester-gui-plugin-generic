@@ -5,15 +5,7 @@
   ...attributes
 >
   <FaIcon @icon="plus" />
-  <AttachPopover
-    @showOn="click"
-    @hideOn="clickout click"
-    @interactive={{true}}
-    @arrow={{true}}
-    @placement="auto"
-    @lazyRender={{true}}
-    as |popover|
-  >
+  <OnePopover class="block-adder-body" as |popover|>
     <QueryBuilder::BlockSelector
       @mode="create"
       @valuesBuilder={{@valuesBuilder}}
@@ -21,6 +13,6 @@
       @indexProperties={{@indexProperties}}
       @onBlockAdd={{fn this.addBlock popover.hide}}
     />
-  </AttachPopover>
+  </OnePopover>
   {{yield}}
 </BsButton>

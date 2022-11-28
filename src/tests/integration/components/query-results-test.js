@@ -114,11 +114,11 @@ describe('Integration | Component | query-results', function () {
     await click('.show-properties-selector');
     // expand all nodes
     await allFulfilled(
-      [...document.querySelectorAll('.ember-attacher .tree .toggle-icon')]
+      [...document.querySelectorAll('.filtered-properties-selector-body .tree .toggle-icon')]
       .map(element => click(element))
     );
     const firstBranchLastCheckbox = document.querySelectorAll(
-      '.ember-attacher .tree > .tree-branch > .tree-node:first-child > .tree-branch .one-checkbox'
+      '.filtered-properties-selector-body .tree > .tree-branch > .tree-node:first-child > .tree-branch .one-checkbox'
     )[1];
     await click(firstBranchLastCheckbox);
 
@@ -146,7 +146,7 @@ describe('Integration | Component | query-results', function () {
       @onFilteredPropertiesChange={{this.changeSpy}}
     />`);
     await click('.show-properties-selector');
-    await click('.select-all');
+    await click(document.querySelector('.select-all'));
 
     expect(this.changeSpy).to.be.calledOnce;
     expect(this.changeSpy.lastCall.args[0]).to.deep.equal({

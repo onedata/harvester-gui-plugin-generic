@@ -32,7 +32,9 @@ describe('Integration | Component | query-builder/operator-block', function () {
   it(
     'has classes "query-builder-block" and "query-builder-operator-block"',
     async function () {
-      await render(hbs `<QueryBuilder::OperatorBlock />`);
+      await render(hbs`<QueryBuilder::OperatorBlock
+        @valuesBuilder={{this.valuesBuilder}}
+      />`);
 
       expect(this.element.querySelectorAll(
         '.query-builder-block.query-builder-operator-block'
@@ -50,7 +52,10 @@ describe('Integration | Component | query-builder/operator-block', function () {
           this.set('queryBlock', new operatorBlockClasses[operatorName]());
 
           await render(hbs `
-            <QueryBuilder::OperatorBlock @queryBlock={{this.queryBlock}} />
+            <QueryBuilder::OperatorBlock
+              @queryBlock={{this.queryBlock}}
+              @valuesBuilder={{this.valuesBuilder}}
+            />
           `);
 
           expect(this.element.querySelectorAll(
@@ -66,7 +71,10 @@ describe('Integration | Component | query-builder/operator-block', function () {
             this.set('queryBlock', new operatorBlockClasses[operatorName]());
 
             await render(hbs `
-              <QueryBuilder::OperatorBlock @queryBlock={{this.queryBlock}} />
+              <QueryBuilder::OperatorBlock
+                @queryBlock={{this.queryBlock}}
+                @valuesBuilder={{this.valuesBuilder}}
+              />
             `);
 
             const blockAdderTriggers =
@@ -91,7 +99,10 @@ describe('Integration | Component | query-builder/operator-block', function () {
             ]);
 
             await render(hbs `
-              <QueryBuilder::OperatorBlock @queryBlock={{this.queryBlock}} />
+              <QueryBuilder::OperatorBlock
+                @queryBlock={{this.queryBlock}}
+                @valuesBuilder={{this.valuesBuilder}}
+              />
             `);
 
             // 2 operands
@@ -118,7 +129,7 @@ describe('Integration | Component | query-builder/operator-block', function () {
             @valuesBuilder={{this.valuesBuilder}}
           />`);
           await click('.query-builder-block-adder');
-          await click('.ember-attacher .operator-not');
+          await click('.block-adder-body .operator-not');
 
           // 1 operand
           expect(this.element.querySelectorAll(
@@ -144,7 +155,10 @@ describe('Integration | Component | query-builder/operator-block', function () {
           ]);
 
           await render(hbs `
-            <QueryBuilder::OperatorBlock @queryBlock={{this.queryBlock}} />
+            <QueryBuilder::OperatorBlock
+              @queryBlock={{this.queryBlock}}
+              @valuesBuilder={{this.valuesBuilder}}
+            />
           `);
 
           const labels = this.element.querySelectorAll('.block-infix-label');
@@ -160,7 +174,10 @@ describe('Integration | Component | query-builder/operator-block', function () {
             this.set('queryBlock', new operatorBlockClasses[operatorName]());
 
             await render(hbs `
-              <QueryBuilder::OperatorBlock @queryBlock={{this.queryBlock}} />
+              <QueryBuilder::OperatorBlock
+                @queryBlock={{this.queryBlock}}
+                @valuesBuilder={{this.valuesBuilder}}
+              />
             `);
 
             expect(this.element.querySelectorAll('.query-builder-block-adder'))
@@ -179,7 +196,10 @@ describe('Integration | Component | query-builder/operator-block', function () {
             queryBlock.operands.pushObject(new NotOperatorQueryBlock());
 
             await render(hbs `
-              <QueryBuilder::OperatorBlock @queryBlock={{this.queryBlock}} />
+              <QueryBuilder::OperatorBlock
+                @queryBlock={{this.queryBlock}}
+                @valuesBuilder={{this.valuesBuilder}}
+              />
             `);
 
             // 1 operand
@@ -207,7 +227,7 @@ describe('Integration | Component | query-builder/operator-block', function () {
             />
           `);
           await click('.query-builder-block-adder');
-          await click('.ember-attacher .operator-not');
+          await click('.block-adder-body .operator-not');
 
           // 1 operand
           expect(this.element.querySelectorAll(
@@ -229,7 +249,10 @@ describe('Integration | Component | query-builder/operator-block', function () {
             this.set('queryBlock', new operatorBlockClasses[operatorName]());
 
             await render(hbs `
-              <QueryBuilder::OperatorBlock @queryBlock={{this.queryBlock}} />
+              <QueryBuilder::OperatorBlock
+                @queryBlock={{this.queryBlock}}
+                @valuesBuilder={{this.valuesBuilder}}
+              />
             `);
 
             expect(this.element.querySelector('.block-prefix-label')).to.not.exist;
@@ -246,13 +269,13 @@ describe('Integration | Component | query-builder/operator-block', function () {
                 @valuesBuilder={{this.valuesBuilder}}
               />`);
               await click('.query-builder-block-adder');
-              await click('.ember-attacher .operator-not');
+              await click('.block-adder-body .operator-not');
               await click('.query-builder-block-adder.surround-root');
 
-              expect(this.element.querySelector('.ember-attacher .condition-selector'))
+              expect(this.element.querySelector('.block-adder-body .condition-selector'))
                 .to.not.exist;
 
-              await click('.ember-attacher .operator-and');
+              await click('.block-adder-body .operator-and');
 
               expect(this.element.querySelectorAll('.query-builder-block'))
                 .to.have.length(3);
@@ -276,7 +299,10 @@ describe('Integration | Component | query-builder/operator-block', function () {
             this.set('queryBlock', new operatorBlockClasses[operatorName]());
 
             await render(hbs `
-              <QueryBuilder::OperatorBlock @queryBlock={{this.queryBlock}} />
+              <QueryBuilder::OperatorBlock
+                @queryBlock={{this.queryBlock}}
+                @valuesBuilder={{this.valuesBuilder}}
+              />
             `);
 
             expect(this.element.querySelector('.block-prefix-label').textContent.trim())
@@ -300,7 +326,7 @@ describe('Integration | Component | query-builder/operator-block', function () {
           @onBlockRemoved={{this.removedSpy}}
         />`);
         await click('.query-builder-block-adder');
-        await click('.ember-attacher .operator-not');
+        await click('.block-adder-body .operator-not');
         expect(removedSpy).to.be.not.called;
         const nestedBlock = queryBlock.operands[0];
         await click('.remove-block');
@@ -323,9 +349,9 @@ describe('Integration | Component | query-builder/operator-block', function () {
           @valuesBuilder={{this.valuesBuilder}}
         />`);
         await click('.query-builder-block-adder');
-        await click('.ember-attacher .operator-not');
+        await click('.block-adder-body .operator-not');
         await click('.query-builder-block-visualiser');
-        await click('.ember-attacher .surround-section .operator-and');
+        await click('.block-settings-body .surround-section .operator-and');
 
         expect(this.element.querySelectorAll('.query-builder-block')).to.have.length(3);
         const surroundingBlock =
@@ -349,11 +375,11 @@ describe('Integration | Component | query-builder/operator-block', function () {
           @valuesBuilder={{this.valuesBuilder}}
         />`);
         await click('.query-builder-block-adder');
-        await click('.ember-attacher .operator-not');
+        await click('.block-adder-body .operator-not');
         await click('.query-builder-block-adder');
-        await click('.ember-attacher .operator-or');
+        await click('.block-adder-body .operator-or');
         await click('.query-builder-block-visualiser');
-        await click('.ember-attacher .change-to-section .operator-and');
+        await click('.block-settings-body .change-to-section .operator-and');
 
         expect(this.element.querySelectorAll('.query-builder-block')).to.have.length(3);
         const changedBlock =
@@ -379,9 +405,9 @@ describe('Integration | Component | query-builder/operator-block', function () {
             @valuesBuilder={{this.valuesBuilder}}
           />`);
           await click('.query-builder-block-adder');
-          await click('.ember-attacher .operator-not');
+          await click('.block-adder-body .operator-not');
           await click('.query-builder-block-visualiser');
-          await click('.ember-attacher .change-to-section .operator-none');
+          await click('.block-settings-body .change-to-section .operator-none');
 
           const blocks = this.element.querySelectorAll('.query-builder-block');
           expect(blocks).to.have.length(1);
@@ -401,11 +427,11 @@ describe('Integration | Component | query-builder/operator-block', function () {
             @valuesBuilder={{this.valuesBuilder}}
           />`);
           await click('.query-builder-block-adder');
-          await click('.ember-attacher .operator-not');
+          await click('.block-adder-body .operator-not');
           await click('.query-builder-block-adder');
-          await click('.ember-attacher .operator-and');
+          await click('.block-adder-body .operator-and');
           await click('.query-builder-block-visualiser');
-          await click('.ember-attacher .change-to-section .operator-none');
+          await click('.block-settings-body .change-to-section .operator-none');
 
           const blocks = this.element.querySelectorAll('.query-builder-block');
           expect(blocks).to.have.length(2);
@@ -428,15 +454,15 @@ describe('Integration | Component | query-builder/operator-block', function () {
             @valuesBuilder={{this.valuesBuilder}}
           />`);
           await click('.query-builder-block-adder');
-          await click('.ember-attacher .operator-and');
+          await click('.block-adder-body .operator-and');
           await click('.query-builder-block-adder');
-          await click('.ember-attacher .operator-not');
+          await click('.block-adder-body .operator-not');
           await click('.and-operator-block > .query-builder-block-adder');
-          await click('.ember-attacher .operator-not');
+          await click('.block-adder-body .operator-not');
           await click('.query-builder-block-visualiser');
 
           if (isMultiOperandOperator) {
-            await click('.ember-attacher .change-to-section .operator-none');
+            await click('.block-settings-body .change-to-section .operator-none');
 
             const blocks = this.element.querySelectorAll('.query-builder-block');
             expect(blocks).to.have.length(3);
@@ -448,7 +474,7 @@ describe('Integration | Component | query-builder/operator-block', function () {
             expect(queryBlock.operands[1]).to.be.an.instanceOf(NotOperatorQueryBlock);
           } else {
             expect(this.element.querySelector(
-              '.ember-attacher .change-to-section .operator-none'
+              '.block-settings-body .change-to-section .operator-none'
             )).to.not.exist;
           }
         }
@@ -509,7 +535,10 @@ describe('Integration | Component | query-builder/operator-block', function () {
         this.set('queryBlock', new operatorBlockClasses[operatorName]());
 
         await render(hbs `
-          <QueryBuilder::OperatorBlock @queryBlock={{this.queryBlock}}>
+          <QueryBuilder::OperatorBlock
+            @queryBlock={{this.queryBlock}}
+            @valuesBuilder={{this.valuesBuilder}}
+          >
             <span class="test-element"></span>
           </QueryBuilder::OperatorBlock>
         `);

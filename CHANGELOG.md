@@ -4,6 +4,8 @@
 CHANGELOG
 ---------
 
+- **VFS-9818** Replaced `ember-attacher` dependency with own implementation
+  based on `Tippy.js` library.
 - **VFS-9819** Replaced `ember-await` dependency with own implementation.
 - **VFS-9820** Upgraded ESLint and added Onedata-team-specific Bamboo specs.
 - **VFS-9821** Removed legacy dependency `ember-cli-spinjs`.

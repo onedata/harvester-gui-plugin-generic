@@ -5,10 +5,11 @@ $root-url: './';
 
 @import "./bootstrap";
 @import "./ember-power-select-config";
-@import "./ember-attacher-overrides";
+@import "./tippy-overrides";
 
 @import "./components/one-checkbox";
 @import "./components/one-copy-button";
+@import "./components/one-popover";
 @import "./components/resource-load-error";
 
 @import "./layout";

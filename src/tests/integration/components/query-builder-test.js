@@ -49,7 +49,7 @@ describe('Integration | Component | query-builder', function () {
   });
 
   it('has class "query-builder', async function () {
-    await render(hbs `<QueryBuilder />`);
+    await render(hbs `<QueryBuilder @valuesBuilder={{this.valuesBuilder}} />`);
 
     expect(this.element.querySelector('.query-builder'));
   });
@@ -96,7 +96,7 @@ describe('Integration | Component | query-builder', function () {
       />`);
       await click('.query-builder-block-adder');
       await selectChoose('.property-selector', 'c.d');
-      await fillIn('.ember-attacher .comparator-value', 'abc');
+      await fillIn('.block-adder-body .comparator-value', 'abc');
       await click('.accept-condition');
       await click('.query-builder-condition-block .comparator-value');
       await fillIn('.query-builder-condition-block .comparator-value', 'def');
@@ -112,7 +112,7 @@ describe('Integration | Component | query-builder', function () {
     />`);
     await click('.query-builder-block-adder');
     await selectChoose('.property-selector', 'c.d');
-    await fillIn('.ember-attacher .comparator-value', 'abc');
+    await fillIn('.block-adder-body .comparator-value', 'abc');
     await click('.accept-condition');
     await click('.query-builder-condition-block .comparator-value');
     await fillIn('.query-builder-condition-block .comparator-value', '');
@@ -129,7 +129,7 @@ describe('Integration | Component | query-builder', function () {
       />`);
       await click('.query-builder-block-adder');
       await selectChoose('.property-selector', 'c.d');
-      await fillIn('.ember-attacher .comparator-value', 'abc');
+      await fillIn('.block-adder-body .comparator-value', 'abc');
       await click('.accept-condition');
       await click('.query-builder-condition-block .comparator-value');
       await fillIn('.query-builder-condition-block .comparator-value', '');
@@ -148,7 +148,7 @@ describe('Integration | Component | query-builder', function () {
       />`);
       await click('.query-builder-block-adder');
       await selectChoose('.property-selector', 'c.d');
-      await fillIn('.ember-attacher .comparator-value', 'abc');
+      await fillIn('.block-adder-body .comparator-value', 'abc');
       await click('.accept-condition');
       await click('.query-builder-condition-block .comparator-value');
       await fillIn('.query-builder-condition-block .comparator-value', '');
@@ -169,7 +169,7 @@ describe('Integration | Component | query-builder', function () {
       await click('.operator-not');
       await click('.query-builder-block-adder');
       await selectChoose('.property-selector', 'c.d');
-      await fillIn('.ember-attacher .comparator-value', 'abc');
+      await fillIn('.block-adder-body .comparator-value', 'abc');
       await click('.accept-condition');
       await click('.query-builder-condition-block .comparator-value');
       await fillIn('.query-builder-condition-block .comparator-value', '');
