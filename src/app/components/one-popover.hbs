@@ -1,0 +1,9 @@
+<div
+  class="one-popover-content"
+  {{did-insert this.didInsertComponent}}
+  {{did-update this.handleIsOpenChange @isOpen}}
+  {{will-destroy this.willDestroyComponent}}
+  ...attributes
+>
+  {{yield (hash hide=this.hide)}}
+</div>

@@ -93,7 +93,7 @@ describe('Integration | Component | content-index', function () {
     async function () {
       await render(hbs `<ContentIndex/>`);
       await click('.query-builder-block-adder');
-      await clickTrigger('.ember-attacher .property-selector');
+      await clickTrigger('.block-adder-body .property-selector');
 
       const options = this.element.querySelectorAll('.ember-power-select-option');
       expect(options).to.have.length(4);
@@ -110,11 +110,13 @@ describe('Integration | Component | content-index', function () {
       await click('.show-properties-selector');
       // expand all nodes
       await allFulfilled(
-        [...document.querySelectorAll('.ember-attacher .tree .toggle-icon')]
+        [...document.querySelectorAll(
+          '.filtered-properties-selector-body .tree .toggle-icon'
+        )]
         .map(element => click(element))
       );
 
-      const treeLabels = document.querySelectorAll('.ember-attacher .tree-label');
+      const treeLabels = document.querySelectorAll('.filtered-properties-selector-body .tree-label');
       expect(treeLabels).to.have.length(3);
       ['a', 'b', 'c'].forEach((propertyName, index) =>
         expect(treeLabels[index].textContent.trim()).to.equal(propertyName)
@@ -184,7 +186,7 @@ describe('Integration | Component | content-index', function () {
       },
     });
     await click('.query-builder-block-adder');
-    await selectChoose('.ember-attacher .property-selector', 'a.b');
+    await selectChoose('.block-adder-body .property-selector', 'a.b');
     await click('.accept-condition');
     await click('.submit-query');
 
@@ -205,7 +207,7 @@ describe('Integration | Component | content-index', function () {
     this.dataRequestStub.resetBehavior();
     this.dataRequestStub.returns(new Promise(() => {}));
     await click('.query-builder-block-adder');
-    await selectChoose('.ember-attacher .property-selector', 'a.b');
+    await selectChoose('.block-adder-body .property-selector', 'a.b');
     await click('.accept-condition');
     await click('.submit-query');
 
@@ -219,7 +221,7 @@ describe('Integration | Component | content-index', function () {
     let rejectQuery;
     this.dataRequestStub.returns(new Promise((resolve, reject) => rejectQuery = reject));
     await click('.query-builder-block-adder');
-    await selectChoose('.ember-attacher .property-selector', 'a.b');
+    await selectChoose('.block-adder-body .property-selector', 'a.b');
     await click('.accept-condition');
     await click('.submit-query');
     rejectQuery('queryError');
@@ -345,7 +347,7 @@ describe('Integration | Component | content-index', function () {
     async function () {
       await render(hbs `<ContentIndex/>`);
       await click('.query-builder-block-adder');
-      await selectChoose('.ember-attacher .property-selector', 'a.b');
+      await selectChoose('.block-adder-body .property-selector', 'a.b');
       await click('.accept-condition');
       await click('.submit-query');
       await selectChoose('.query-results-sort-selector .property-selector', 'a.b');
@@ -354,7 +356,7 @@ describe('Integration | Component | content-index', function () {
       await click('.next-page');
       await click('.filtered-properties-selector .show-properties-selector');
       // will click the first checkbox, which corresponds to the `a` property
-      await click('.ember-attacher .one-checkbox');
+      await click('.filtered-properties-selector-body .one-checkbox');
       await click('.generate-query-request');
 
       expect(this.element.querySelector('.copy-textarea').textContent.trim())

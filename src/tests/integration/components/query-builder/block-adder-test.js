@@ -3,8 +3,7 @@ import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
 import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
-import { click, waitUntil } from '@ember/test-helpers';
-import { isVisible } from 'ember-attacher';
+import { click, waitUntil, find } from '@ember/test-helpers';
 import sinon from 'sinon';
 import { selectChoose } from 'ember-power-select/test-support/helpers';
 import AndOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/and-operator-query-block';
@@ -28,10 +27,9 @@ describe('Integration | Component | query-builder/block-adder', function () {
     await render(hbs `<QueryBuilder::BlockAdder @valuesBuilder={{this.valuesBuilder}}/>`);
 
     await click('.query-builder-block-adder');
-    await waitUntil(() => isVisible('.ember-attacher'));
-    expect(this.element.querySelector('.ember-attacher .query-builder-block-selector'))
+    expect(this.element.querySelector('.block-adder-body .query-builder-block-selector'))
       .to.exist;
-    expect(this.element.querySelector('.ember-attacher .condition-selector'))
+    expect(this.element.querySelector('.block-adder-body .condition-selector'))
       .to.exist;
   });
 
@@ -44,10 +42,10 @@ describe('Integration | Component | query-builder/block-adder', function () {
       />`);
 
       await click('.query-builder-block-adder');
-      await waitUntil(() => isVisible('.ember-attacher'));
-      expect(this.element.querySelector('.ember-attacher .query-builder-block-selector'))
-        .to.exist;
-      expect(this.element.querySelector('.ember-attacher .condition-selector'))
+      expect(
+        this.element.querySelector('.block-adder-body .query-builder-block-selector')
+      ).to.exist;
+      expect(this.element.querySelector('.block-adder-body .condition-selector'))
         .to.not.exist;
     }
   );
@@ -61,7 +59,7 @@ describe('Integration | Component | query-builder/block-adder', function () {
     />`);
 
     await click('.query-builder-block-adder');
-    await click('.ember-attacher .operator-and');
+    await click('.block-adder-body .operator-and');
 
     expect(this.addSpy).to.be.calledOnce
       .and.to.be.calledWith(sinon.match.instanceOf(AndOperatorQueryBlock));
@@ -91,8 +89,8 @@ describe('Integration | Component | query-builder/block-adder', function () {
   it('closes block selector when operator has been chosen', async function () {
     await render(hbs `<QueryBuilder::BlockAdder @valuesBuilder={{this.valuesBuilder}}/>`);
     await click('.query-builder-block-adder');
-    await click('.ember-attacher .operator-and');
-    await waitUntil(() => !isVisible('.ember-attacher'));
+    await click('.block-adder-body .operator-and');
+    await waitUntil(() => !find('.block-adder-body'));
   });
 
   it('closes block selector when condition has been chosen', async function () {
@@ -109,11 +107,14 @@ describe('Integration | Component | query-builder/block-adder', function () {
     await selectChoose('.property-selector', 'a.b');
     await selectChoose('.comparator-value', 'false');
     await click('.accept-condition');
-    await waitUntil(() => !isVisible('.ember-attacher'));
+    await waitUntil(() => !find('.block-adder-body'));
   });
 
   it('can be disabled', async function () {
-    await render(hbs `<QueryBuilder::BlockAdder disabled={{true}}/>`);
+    await render(hbs`<QueryBuilder::BlockAdder
+      @valuesBuilder={{this.valuesBuilder}}
+      disabled={{true}}
+    />`);
 
     expect(this.element.querySelector('.query-builder-block-adder'))
       .to.have.attr('disabled');

@@ -1,18 +1,13 @@
-<AttachPopover
-  @showOn=""
-  @hideOn="clickout click"
-  @interactive={{true}}
-  @arrow={{true}}
-  @placement="auto"
-  @lazyRender={{true}}
-  @isShown={{@isShown}}
-  @onChange={{this.popoverVisibilityChange}}
-  as |popover|
+<OnePopover
+  @isOpen={{@isShown}}
+  @trigger="manual"
+  @onHideEventTriggered={{this.hidePopover}}
+  class="block-settings-body"
 >
   <QueryBuilder::BlockSelector
     @mode="edit"
     @editBlock={{@queryBlock}}
     @editParentBlock={{@parentQueryBlock}}
-    @onBlockReplace={{fn this.blockReplace popover.hide}}
+    @onBlockReplace={{fn this.blockReplace this.hidePopover}}
   />
-</AttachPopover>
+</OnePopover>
