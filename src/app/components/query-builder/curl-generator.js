@@ -10,6 +10,7 @@
 
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
+import { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 import { resolve } from 'rsvp';
 import ElasticsearchQueryBuilder from 'harvester-gui-plugin-generic/utils/elasticsearch-query-builder';
@@ -22,6 +23,8 @@ import ElasticsearchQueryBuilder from 'harvester-gui-plugin-generic/utils/elasti
  * @argument {String} sortDirection
  */
 export default class QueryBuilderCurlGeneratorComponent extends Component {
+  @service viewParameters;
+
   /**
    * @type {String}
    */
@@ -77,6 +80,13 @@ export default class QueryBuilderCurlGeneratorComponent extends Component {
    */
   get sortDirection() {
     return this.args.sortDirection || null;
+  }
+
+  /**
+   * @type {Boolean}
+   */
+  get isAccessTokenInfoVisible() {
+    return this.viewParameters.viewMode !== 'public';
   }
 
   @action
