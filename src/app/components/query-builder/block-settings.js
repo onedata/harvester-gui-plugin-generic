@@ -41,7 +41,7 @@ export default class QueryBuilderBlockSettingsComponent extends Component {
   }
 
   @action
-  popoverWillHide() {
+  hidePopover() {
     if (this.isShown) {
       this.onSettingsClose();
     }

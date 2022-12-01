@@ -42,8 +42,9 @@ describe('Integration | Component | query-builder/block-adder', function () {
       />`);
 
       await click('.query-builder-block-adder');
-      expect(this.element.querySelector('.block-adder-body .query-builder-block-selector'))
-        .to.exist;
+      expect(
+        this.element.querySelector('.block-adder-body .query-builder-block-selector')
+      ).to.exist;
       expect(this.element.querySelector('.block-adder-body .condition-selector'))
         .to.not.exist;
     }

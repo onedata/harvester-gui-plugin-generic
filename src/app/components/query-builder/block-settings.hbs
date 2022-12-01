@@ -1,14 +1,13 @@
 <OnePopover
   @isOpen={{@isShown}}
   @trigger="manual"
-  @onHide={{this.popoverWillHide}}
+  @onHideEventTriggered={{this.hidePopover}}
   class="block-settings-body"
-  as |popover|
 >
   <QueryBuilder::BlockSelector
     @mode="edit"
     @editBlock={{@queryBlock}}
     @editParentBlock={{@parentQueryBlock}}
-    @onBlockReplace={{fn this.blockReplace popover.hide}}
+    @onBlockReplace={{fn this.blockReplace this.hidePopover}}
   />
 </OnePopover>

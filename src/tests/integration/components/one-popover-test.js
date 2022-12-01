@@ -1,34 +1,61 @@
 import { expect } from 'chai';
-import { describe, it } from 'mocha';
+import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render, find, click, waitUntil, settled } from '@ember/test-helpers';
+import { render, find, click, settled } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
 import sinon from 'sinon';
+import { htmlSafe } from '@ember/template';
+
+const manualShowEvents = ['onWillShow', 'onDidShow'];
+const showEvents = ['onShowEventTriggered', ...manualShowEvents];
+const manualHideEvents = ['onWillHide', 'onDidHide'];
+const hideEvents = ['onHideEventTriggered', ...manualHideEvents];
+const allEvents = [...showEvents, ...hideEvents];
 
 describe('Integration | Component | one-popover', function () {
   setupRenderingTest();
 
+  beforeEach(function () {
+    this.setProperties({
+      trigger: 'click',
+      isOpen: false,
+      events: [],
+      onShowEventTriggered: () => {
+        this.events.push('onShowEventTriggered');
+        return this.onShowEventTriggeredResult;
+      },
+      onWillShow: () => this.events.push('onWillShow'),
+      onDidShow: () => this.events.push('onDidShow'),
+      onHideEventTriggered: () => {
+        this.events.push('onHideEventTriggered');
+        return this.onHideEventTriggeredResult;
+      },
+      onWillHide: () => this.events.push('onWillHide'),
+      onDidHide: () => this.events.push('onDidHide'),
+      onShowEventTriggeredResult: undefined,
+      onHideEventTriggeredResult: undefined,
+      popoverContent: undefined,
+    });
+  });
+
   it('does not render anything in place when is not opened', async function () {
-    await render(hbs`<button class="btn">
-      <OnePopover>some text</OnePopover>
-    </button>`);
+    this.set('popoverContent', 'some text');
+    await renderPopover();
 
     expect(find('.btn').children).to.have.length(0);
   });
 
   it('is not visible when not opened', async function () {
-    await render(hbs`<button class="btn">
-      <OnePopover>some text</OnePopover>
-    </button>`);
+    this.set('popoverContent', 'some text');
+    await renderPopover();
 
     expect(isPopoverHidden()).to.be.true;
     expect(this.element).to.have.trimmed.text('');
   });
 
   it('becomes visible when opened by trigger click', async function () {
-    await render(hbs`<button class="btn">
-      <OnePopover>some text</OnePopover>
-    </button>`);
+    this.set('popoverContent', 'some text');
+    await renderPopover();
 
     await click('.btn');
 
@@ -38,7 +65,7 @@ describe('Integration | Component | one-popover', function () {
   });
 
   it('becomes hidden when closed by trigger click', async function () {
-    await render(hbs`<button class="btn"><OnePopover /></button>`);
+    await renderPopover();
 
     await click('.btn');
     await click('.btn');
@@ -47,7 +74,7 @@ describe('Integration | Component | one-popover', function () {
   });
 
   it('becomes hidden when closed by outside click', async function () {
-    await render(hbs`<button class="btn"><OnePopover /></button>`);
+    await renderPopover();
 
     await click('.btn');
     await click(this.element);
@@ -56,9 +83,8 @@ describe('Integration | Component | one-popover', function () {
   });
 
   it('is still visible after click inside popover', async function () {
-    await render(hbs`<button class="btn">
-      <OnePopover><button class="inside"></button></OnePopover>
-    </button>`);
+    this.set('popoverContent', htmlSafe('<button class="inside"></button>'));
+    await renderPopover();
 
     await click('.btn');
     await click('.inside');
@@ -80,152 +106,288 @@ describe('Integration | Component | one-popover', function () {
   });
 
   it('renders dynamic ember-ish content inside popover', async function () {
-    this.set('content', 'ab');
-    await render(hbs`<button class="btn">
-      <OnePopover>{{content}}</OnePopover>
-    </button>`);
+    this.set('popoverContent', 'ab');
+    await renderPopover();
 
     await click('.btn');
-    this.set('content', 'cd');
+    this.set('popoverContent', 'cd');
     await settled();
 
     expect(this.element).to.have.trimmed.text('cd');
   });
 
-  it('triggers both onShow and onShown events when becomes visible', async function () {
-    this.setProperties({
-      onShow: sinon.spy(),
-      onShown: sinon.spy(),
-    });
-    await render(hbs`<button class="btn">
-      <OnePopover @onShow={{this.onShow}} @onShown={{this.onShown}} />
-    </button>`);
+  it('triggers onShowEventTriggered, onWillShow and onDidShow events when becomes visible',
+    async function () {
+      await renderPopover();
+
+      await click('.btn');
+
+      expectEvents(this, showEvents);
+    }
+  );
+
+  it('does not trigger onWillShow and onDidShow events and does not show popover when onShowEventTriggered returns false',
+    async function () {
+      this.set('onShowEventTriggeredResult', false);
+      await renderPopover();
+
+      await click('.btn');
+
+      expectEvents(this, ['onShowEventTriggered']);
+      expect(isPopoverHidden()).to.be.true;
+    }
+  );
+
+  it('has nothing rendered when onShowEventTriggered is called', async function () {
+    const onShowEventTriggeredOld = this.onShowEventTriggered;
+    const eventHandler = this.set('onShowEventTriggered', sinon.spy(() => {
+      expect(isPopoverHidden()).to.be.true;
+      return onShowEventTriggeredOld();
+    }));
+    await renderPopover();
 
     await click('.btn');
 
-    expect(this.onShow).to.be.calledOnce;
-    expect(this.onShown).to.be.calledOnce;
+    expect(eventHandler).to.be.calledOnce;
   });
 
-  it('does not trigger onShown and does not show popover when onShow returns false', async function () {
-    this.setProperties({
-      onShow: sinon.spy(() => false),
-      onShown: sinon.spy(),
-    });
-    await render(hbs`<button class="btn">
-      <OnePopover @onShow={{this.onShow}} @onShown={{this.onShown}} />
-    </button>`);
+  it('has nothing rendered when onWillShow is called', async function () {
+    const onWillShowOld = this.onWillShow;
+    const eventHandler = this.set('onWillShow', sinon.spy(() => {
+      expect(isPopoverHidden()).to.be.true;
+      return onWillShowOld();
+    }));
+    await renderPopover();
 
     await click('.btn');
 
-    expect(this.onShow).to.be.calledOnce;
-    expect(this.onShown).to.be.not.called;
-    expect(isPopoverHidden()).to.be.true;
+    expect(eventHandler).to.be.calledOnce;
   });
 
-  it('triggers both onHide and onHidden events when becomes hidden', async function () {
-    this.setProperties({
-      onHide: sinon.spy(),
-      onHidden: sinon.spy(),
-    });
-    await render(hbs`<button class="btn">
-      <OnePopover @onHide={{this.onHide}} @onHidden={{this.onHidden}} />
-    </button>`);
+  it('has rendered popover when onDidShow is called', async function () {
+    const onDidShowOld = this.onDidShow;
+    const eventHandler = this.set('onDidShow', sinon.spy(() => {
+      expect(isPopoverShown()).to.be.true;
+      return onDidShowOld();
+    }));
+    await renderPopover();
 
     await click('.btn');
-    await click('.btn');
 
-    expect(this.onHide).to.be.calledOnce;
-    expect(this.onHidden).to.be.calledOnce;
+    expect(eventHandler).to.be.calledOnce;
   });
 
-  it('does not trigger onHidden and does not hide popover when onHide returns false', async function () {
-    this.setProperties({
-      onHide: sinon.spy(() => false),
-      onHidden: sinon.spy(),
-    });
-    await render(hbs`<button class="btn">
-      <OnePopover @onHide={{this.onHide}} @onHidden={{this.onHidden}} />
-    </button>`);
+  it('triggers onHideEventTriggered, onWillHide and onDidHide events when becomes hidden',
+    async function () {
+      await renderPopover();
+
+      await click('.btn');
+      await click('.btn');
+
+      expectEvents(this, allEvents);
+    }
+  );
+
+  it('does not trigger onWillHide and onDidHide events and does not hide popover when onHideEventTriggered returns false',
+    async function () {
+      this.set('onHideEventTriggeredResult', false);
+      await renderPopover();
+
+      await click('.btn');
+      await click('.btn');
+
+      expectEvents(this, [...showEvents, 'onHideEventTriggered']);
+      expect(isPopoverShown()).to.be.true;
+    }
+  );
+
+  it('has rendered popover when onHideEventTriggered is called', async function () {
+    const onHideEventTriggeredOld = this.onHideEventTriggered;
+    const eventHandler = this.set('onHideEventTriggered', sinon.spy(() => {
+      expect(isPopoverShown()).to.be.true;
+      return onHideEventTriggeredOld();
+    }));
+    await renderPopover();
 
     await click('.btn');
     await click('.btn');
 
-    expect(this.onHide).to.be.calledOnce;
-    expect(this.onHidden).to.be.not.called;
-    expect(isPopoverShown()).to.be.true;
+    expect(eventHandler).to.be.calledOnce;
+  });
+
+  it('has rendered popover when onWillHide is called', async function () {
+    const onWillHideOld = this.onWillHide;
+    const eventHandler = this.set('onWillHide', sinon.spy(() => {
+      expect(isPopoverShown()).to.be.true;
+      return onWillHideOld();
+    }));
+    await renderPopover();
+
+    await click('.btn');
+    await click('.btn');
+
+    expect(eventHandler).to.be.calledOnce;
+  });
+
+  it('has nothing rendered when onDidHide is called', async function () {
+    const onDidHideOld = this.onDidHide;
+    const eventHandler = this.set('onDidHide', sinon.spy(() => {
+      expect(isPopoverHidden()).to.be.true;
+      return onDidHideOld();
+    }));
+    await renderPopover();
+
+    await click('.btn');
+    await click('.btn');
+
+    expect(eventHandler).to.be.calledOnce;
   });
 
   it('can be opened with "manual" trigger', async function () {
-    await render(hbs`<button class="btn">
-      <OnePopover @trigger="manual" @isOpen={{this.isOpen}} />
-    </button>`);
+    this.set('trigger', 'manual');
+    await renderPopover();
 
     this.set('isOpen', true);
     await settled();
 
+    expectEvents(this, manualShowEvents);
     expect(isPopoverShown()).to.be.true;
   });
 
   it('can be closed with "manual" trigger', async function () {
-    await render(hbs`<button class="btn">
-      <OnePopover @trigger="manual" @isOpen={{this.isOpen}} />
-    </button>`);
+    this.set('trigger', 'manual');
+    await renderPopover();
 
     this.set('isOpen', true);
     await settled();
     this.set('isOpen', false);
     await settled();
 
+    expectEvents(this, [...manualShowEvents, ...manualHideEvents]);
     expect(isPopoverHidden()).to.be.true;
   });
 
-  it('triggers onShow when trigger is "manual" and user clicks on trigger element', async function () {
-    this.setProperties({
-      onShow: sinon.spy(),
-      onShown: sinon.spy(),
-      isOpen: false,
-    });
-    await render(hbs`<button class="btn">
-      <OnePopover
-        @trigger="manual"
-        @onShow={{this.onShow}}
-        @onShown={{this.onShown}}
-        @isOpen={{this.isOpen}}
-      />
-    </button>`);
-
-    await click('.btn');
-
-    expect(this.onShow).to.be.calledOnce;
-    expect(this.onShown).to.be.not.called;
-    expect(isPopoverHidden()).to.be.true;
-  });
-
-  it('triggers onHide when trigger is "manual", popover is opened and user clicks on trigger element',
+  it('triggers onShowEventTriggered when trigger is "manual" and user clicks on trigger element',
     async function () {
-      this.setProperties({
-        onHide: sinon.spy(),
-        onHidden: sinon.spy(),
-        isOpen: true,
-      });
-      await render(hbs`<button class="btn">
-        <OnePopover
-          @trigger="manual"
-          @onHide={{this.onHide}}
-          @onHidden={{this.onHidden}}
-          @isOpen={{this.isOpen}}
-        />
-      </button>`);
+      this.set('trigger', 'manual');
+      await renderPopover();
 
       await click('.btn');
 
-      expect(this.onHide).to.be.calledOnce;
-      expect(this.onHidden).to.be.not.called;
+      expectEvents(this, ['onShowEventTriggered']);
+      expect(isPopoverHidden()).to.be.true;
+    }
+  );
+
+  it('triggers two onShowEventTriggered events when trigger is "manual" and user clicks two times on trigger element',
+    async function () {
+      this.set('trigger', 'manual');
+      await renderPopover();
+
+      await click('.btn');
+      await click('.btn');
+
+      expectEvents(this, ['onShowEventTriggered', 'onShowEventTriggered']);
+      expect(isPopoverHidden()).to.be.true;
+    }
+  );
+
+  it('triggers onHideEventTriggered when trigger is "manual", popover is opened and user clicks on trigger element',
+    async function () {
+      this.setProperties({
+        trigger: 'manual',
+        isOpen: true,
+      });
+      await renderPopover();
+
+      await click('.btn');
+
+      expectEvents(this, [...manualShowEvents, 'onHideEventTriggered']);
       expect(isPopoverShown()).to.be.true;
     }
   );
+
+  it('triggers two onHideEventTriggered events when trigger is "manual", popover is opened and and user clicks two times on trigger element',
+    async function () {
+      this.setProperties({
+        trigger: 'manual',
+        isOpen: true,
+      });
+      await renderPopover();
+
+      await click('.btn');
+      await click('.btn');
+
+      expectEvents(
+        this,
+        [...manualShowEvents, 'onHideEventTriggered', 'onHideEventTriggered']
+      );
+      expect(isPopoverShown()).to.be.true;
+    }
+  );
+
+  it('triggers onHideEventTriggered on outside click when popover is open in manual mode',
+    async function () {
+      this.setProperties({
+        trigger: 'manual',
+        isOpen: true,
+      });
+      await renderPopover();
+
+      await click(this.element);
+
+      expectEvents(this, [...manualShowEvents, 'onHideEventTriggered']);
+      expect(isPopoverShown()).to.be.true;
+    }
+  );
+
+  it('triggers two onHideEventTriggered events on outside two clicks when popover is open in manual mode',
+    async function () {
+      this.setProperties({
+        trigger: 'manual',
+        isOpen: true,
+      });
+      await renderPopover();
+
+      await click(this.element);
+      await click(this.element);
+
+      expectEvents(
+        this,
+        [...manualShowEvents, 'onHideEventTriggered', 'onHideEventTriggered']
+      );
+      expect(isPopoverShown()).to.be.true;
+    }
+  );
+
+  it('does not trigger onHideEventTriggered on outside click after ignored show trigger in manual mode',
+    async function () {
+      this.set('trigger', 'manual');
+      await renderPopover();
+
+      await click('.btn');
+      await click(this.element);
+
+      expectEvents(this, ['onShowEventTriggered']);
+      expect(isPopoverHidden()).to.be.true;
+    }
+  );
 });
+
+async function renderPopover() {
+  await render(hbs`<button class="btn">
+    <OnePopover
+      @trigger={{this.trigger}}
+      @isOpen={{this.isOpen}}
+      @onShowEventTriggered={{this.onShowEventTriggered}}
+      @onWillShow={{this.onWillShow}}
+      @onDidShow={{this.onDidShow}}
+      @onHideEventTriggered={{this.onHideEventTriggered}}
+      @onWillHide={{this.onWillHide}}
+      @onDidHide={{this.onDidHide}}
+    >{{popoverContent}}</OnePopover>
+  </button>`);
+}
 
 function isPopoverShown() {
   return find('.btn').getAttribute('aria-expanded') === 'true' &&
@@ -235,4 +397,8 @@ function isPopoverShown() {
 function isPopoverHidden() {
   return find('.btn').getAttribute('aria-expanded') === 'false' &&
     !find('.tippy-box');
+}
+
+function expectEvents(testCase, events) {
+  expect(testCase.events).to.deep.equal(events);
 }

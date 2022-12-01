@@ -110,7 +110,9 @@ describe('Integration | Component | content-index', function () {
       await click('.show-properties-selector');
       // expand all nodes
       await allFulfilled(
-        [...document.querySelectorAll('.filtered-properties-selector-body .tree .toggle-icon')]
+        [...document.querySelectorAll(
+          '.filtered-properties-selector-body .tree .toggle-icon'
+        )]
         .map(element => click(element))
       );
 

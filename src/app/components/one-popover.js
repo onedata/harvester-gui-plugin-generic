@@ -70,18 +70,34 @@ const onePopoverPlacementsArray = Object.values(OnePopoverPlacement);
  * @argument {boolean} [isOpen] Controls open state of the popover. It's taken
  * into account only when `trigger` is `'manual'`.
  * @argument {OnePopoverPlacement} [placement]
- * @argument {() => boolean|undefined} [onShow] Called before popover is shown.
- * If returns `false`, the show procedure is aborted. It's called also when
- * `trigger` is `'manual'` - in that case it means that popover wants to be
- * shown (but it will not without `isOpen` change).
- * @argument {() => void} [onShown] Called after popover is shown.
- * @argument {() => boolean|undefined} [onHide] Called before popover is hidden.
- * If returns `false`, the hiding procedure is aborted. It's called also when
- * `trigger` is `'manual'` - in that case it means that popover wants to be
- * hidden (but it will not without `isOpen` change).
- * @argument {() => void} [onHidden] Called after popover is hidden.
+ * @argument {() => false|undefined} [onShowEventTriggered] Called after
+ * DOM-caused show event occurred and before actual popover rendering. It will
+ * not be fired by changing `isOpen` to `true` in `'manual'` mode. You can
+ * cancel show procedure by returning false from this handler (only in
+ * non-`'manual'` mode).
+ * @argument {() => void} [onWillShow] Called before popover is shown and after
+ * possible `onShowEventTriggered` event has been handled.
+ * @argument {() => void} [onDidShow] Called after popover has been shown.
+ * @argument {() => false|undefined} [onHideEventTriggered] Called after
+ * DOM-caused hide event occurred and before actual popover unrendering. It will
+ * not be fired by changing `isOpen` to `false` in `'manual'` mode. You can
+ * cancel hide procedure by returning false from this handler (only in
+ * non-`'manual'` mode).
+ * @argument {() => void} [onWillHide] Called before popover is
+ * hidden and after possible `onHideEventTriggered` event has been handled.
+ * @argument {() => void} [onDidHide] Called after popover is hidden.
  */
 export default class OnePopoverComponent extends Component {
+  /**
+   * @type {tippy.js/Instance|null}
+   */
+  tippyInstance = null;
+
+  /**
+   * @type {HTMLElement|null}
+   */
+  appRootElement = null;
+
   /**
    * @type {OnePopoverTrigger}
    */
@@ -106,31 +122,45 @@ export default class OnePopoverComponent extends Component {
   }
 
   /**
-   * @type {() => boolean|undefined}
+   * @type {() => false|undefined}
    */
-  get onShow() {
-    return this.args.onShow;
+  get onShowEventTriggered() {
+    return this.args.onShowEventTriggered;
   }
 
   /**
    * @type {() => void}
    */
-  get onShown() {
-    return this.args.onShown;
-  }
-
-  /**
-   * @type {() => boolean|undefined}
-   */
-  get onHide() {
-    return this.args.onHide;
+  get onWillShow() {
+    return this.args.onWillShow;
   }
 
   /**
    * @type {() => void}
    */
-  get onHidden() {
-    return this.args.onHidden;
+  get onDidShow() {
+    return this.args.onDidShow;
+  }
+
+  /**
+   * @type {() => false|undefined}
+   */
+  get onHideEventTriggered() {
+    return this.args.onHideEventTriggered;
+  }
+
+  /**
+   * @type {() => void}
+   */
+  get onWillHide() {
+    return this.args.onWillHide;
+  }
+
+  /**
+   * @type {() => void}
+   */
+  get onDidHide() {
+    return this.args.onDidHide;
   }
 
   /**
@@ -139,16 +169,6 @@ export default class OnePopoverComponent extends Component {
   get isTippyOpen() {
     return Boolean(this.tippyInstance?.state?.isVisible);
   }
-
-  /**
-   * @type {tippy.js/Instance|null}
-   */
-  tippyInstance = null;
-
-  /**
-   * @type {HTMLElement|null}
-   */
-  appRootElement = null;
 
   constructor(owner) {
     super(...arguments);
@@ -159,67 +179,106 @@ export default class OnePopoverComponent extends Component {
   didInsertComponent(element) {
     const animation = ENV.environment === 'test' ? false : 'fade';
 
+    let cancelNextShow = false;
+    let cancelNextHide = false;
+    let ignoreNextHide = false;
+
+    const untriggerHandler = () => {
+      const onHideEventTriggeredResult = this.onHideEventTriggered?.() !== false;
+      if (this.trigger === OnePopoverTrigger.Manual || !onHideEventTriggeredResult) {
+        cancelNextHide = true;
+      }
+    };
+
     this.tippyInstance = tippy(element.parentElement, {
       content: element,
       interactive: true,
       appendTo: this.appRootElement ?? document.body,
-      // Always using `'click'` to let `onShow` and `onHide` callbacks fire on
-      // user click. When `this.trigger` is `'manual'` then `onShow` and
-      // `onHide` always return false (so click is cancelled) which is
-      // a functional equivalent of `'manual'` trigger in tippy.js.
+      // Always using `'click'` to let `onTrigger` and `onUntrigger` callbacks
+      // fire on user click. When `this.trigger` is `'manual'` then `onShow` and
+      // `onHide` always return false (so click is cancelled) which is a
+      // functional equivalent of `'manual'` trigger in tippy.js.
       trigger: 'click',
       theme: 'light-border',
       placement: this.placement,
       animation,
-      // Using `1` because with `0` in tests which closes popover by clicking
-      // trigger element the `aria-expanded` value is not always changed after
-      // async wait. It's probably because when `delay` is `0` tippy.js
-      // uses `requestAnimationFrame` for scheduling popover hiding instead of
-      // `setTimeout`.
+      // Using `1` in tests, because `0` causes the `aria-expanded` value to be
+      // not always changed after async wait in test cases closing popover by
+      // clicking trigger element. It's probably because when `delay` is `0`
+      // tippy.js uses `requestAnimationFrame` for scheduling popover hiding
+      // instead of `setTimeout`.
       delay: ENV.environment === 'test' ? 1 : 0,
+      onTrigger: () => {
+        const onShowEventTriggeredResult = this.onShowEventTriggered?.() !== false;
+        if (this.trigger === OnePopoverTrigger.Manual || !onShowEventTriggeredResult) {
+          cancelNextShow = true;
+        }
+      },
       onShow: () => {
-        const onShowResult = this.onShow?.() !== false;
-        const shouldBeShown = (this.trigger === OnePopoverTrigger.Manual && this.isOpen) ||
-          (this.trigger !== OnePopoverTrigger.Manual && onShowResult);
+        if (cancelNextShow) {
+          cancelNextShow = false;
 
-        if (shouldBeShown && !animation) {
+          // Canceling show is a little buggy in Tippy.js.
+          // It lefts tippy instance in some mixed open-closed state.
+          // To fix that, we patch tippy instance a bit to let it think,
+          // that it is open and then close it manually.
+          ignoreNextHide = true;
+          this.tippyInstance.state.isVisible = true;
+          this.toggleTippy(false);
+
+          return false;
+        }
+
+        this.onWillShow?.();
+
+        if (!animation) {
           next(() => {
             if (this.isTippyOpen) {
               // `onShown` event is not triggered by tippy.js when there is
-              // no animation. So we have to do it manually. On the other hand
+              // no animation, so we have to do it manually. On the other hand
               // `onHidden` is triggered regardless lack of animation...
-              this.onShown?.();
+              this.onDidShow?.();
             }
           });
         }
-
-        return shouldBeShown;
       },
       onShown: () => {
         if (this.isDestroying || this.isDestroyed) {
           return;
         }
-
-        this.onShown?.();
+        this.onDidShow?.();
+      },
+      onUntrigger: () => {
+        untriggerHandler();
+      },
+      onClickOutside: () => {
+        if (!this.isTippyOpen) {
+          return;
+        }
+        untriggerHandler();
       },
       onHide: () => {
+        if (!this.isTippyOpen || ignoreNextHide) {
+          ignoreNextHide = false;
+          return;
+        }
+
         // When component is destroyed, then the popover is closed due to the
         // component cleanup. It should be closed unconditionally and without
         // calling component event handlers.
         if (this.isDestroying || this.isDestroyed) {
-          return true;
+          return;
+        } else if (cancelNextHide) {
+          cancelNextHide = false;
+          return false;
         }
-
-        const onHideResult = this.onHide?.() !== false;
-        return (this.trigger === OnePopoverTrigger.Manual && !this.isOpen) ||
-          (this.trigger !== OnePopoverTrigger.Manual && onHideResult);
+        this.onWillHide?.();
       },
       onHidden: () => {
         if (this.isDestroying || this.isDestroyed) {
           return;
         }
-
-        this.onHidden?.();
+        this.onDidHide?.();
       },
     });
 
@@ -238,7 +297,7 @@ export default class OnePopoverComponent extends Component {
   @action
   willDestroyComponent() {
     this.toggleTippy(false);
-    this.tippyInstance?.destroy?.();
+    this.tippyInstance?.destroy();
     this.tippyInstance = null;
   }
 
