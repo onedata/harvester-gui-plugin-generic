@@ -3,7 +3,7 @@ import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
 import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
-import { typeInSearch, clickTrigger, selectChoose } from 'ember-power-select/test-support/helpers';
+import { typeInSearch, clickTrigger, selectChoose } from '../../../helpers/ember-power-select';
 import sinon from 'sinon';
 import EsIndex from 'harvester-gui-plugin-generic/utils/es-index';
 

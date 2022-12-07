@@ -4,7 +4,7 @@ import { setupRenderingTest } from 'ember-mocha';
 import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import sinon from 'sinon';
-import { clickTrigger, selectChoose } from 'ember-power-select/test-support/helpers';
+import { clickTrigger, selectChoose } from '../../../helpers/ember-power-select';
 import { click, fillIn, blur, triggerKeyEvent } from '@ember/test-helpers';
 import { isFlatpickrOpen, setFlatpickrDate, closeFlatpickrDate } from 'ember-flatpickr/test-support/helpers';
 import moment from 'moment';
@@ -544,7 +544,7 @@ describe(
             />`);
 
             expect(
-              this.element.querySelector('.comparator-value .ember-power-select-trigger')
+              this.element.querySelector('.comparator-value')
             ).to.equal(document.activeElement);
           }
         );

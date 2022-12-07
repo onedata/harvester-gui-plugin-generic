@@ -11,8 +11,8 @@ describe('Integration | Helper | html-safe', function () {
     this.set('str', '<b></b>');
 
     await render(hbs `
-      <span class="non-safe">{{str}}</span>
-      <span class="safe">{{html-safe str}}</span>
+      <span class="non-safe">{{this.str}}</span>
+      <span class="safe">{{html-safe this.str}}</span>
     `);
 
     expect(this.element.querySelector('.non-safe').innerHTML)

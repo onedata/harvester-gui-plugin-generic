@@ -16,9 +16,9 @@
     >{{@value}}</textarea>
   {{/if}}
   <CopyButton
-    @clipboardTarget={{if (not-eq this.mode "button") (concat "#" this.inputId) undefined}}
-    @clipboardText={{if (eq this.mode "button") this.value undefined}}
-    @success={{this.copySuccess}}
+    @target={{if (not-eq this.mode "button") (concat "#" this.inputId) undefined}}
+    @text={{if (eq this.mode "button") this.value undefined}}
+    @onSuccess={{this.copySuccess}}
     class={{this.buttonClasses}}
     title={{this.hoverTip}}
   >

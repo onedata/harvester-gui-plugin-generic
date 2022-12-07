@@ -5,7 +5,7 @@ const {
 } = require('ember-template-lint/lib/rules/no-bare-strings');
 
 module.exports = {
-  extends: 'octane',
+  extends: 'recommended',
   rules: {
     'no-bare-strings': [...DEFAULT_CONFIG.allowlist, '"', '\'', '-'],
   },

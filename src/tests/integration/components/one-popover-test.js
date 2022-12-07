@@ -385,7 +385,7 @@ async function renderPopover() {
       @onHideEventTriggered={{this.onHideEventTriggered}}
       @onWillHide={{this.onWillHide}}
       @onDidHide={{this.onDidHide}}
-    >{{popoverContent}}</OnePopover>
+    >{{this.popoverContent}}</OnePopover>
   </button>`);
 }
 
