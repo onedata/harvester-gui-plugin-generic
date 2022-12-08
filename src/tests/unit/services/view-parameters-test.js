@@ -26,13 +26,15 @@ describe('Unit | Service | view-parameters', function () {
       .then(() => expect(service.viewMode).to.equal('public'));
   });
 
-  it('sets configuration property to null after failure of reloadViewMode() call', function () {
-    this.viewModeRequestStub.rejects('error');
-    const service = this.owner.lookup('service:view-parameters');
+  it('sets configuration property to null after failure of reloadViewMode() call',
+    function () {
+      this.viewModeRequestStub.rejects('error');
+      const service = this.owner.lookup('service:view-parameters');
 
-    // Set to sth non-null to check if reload failure will clear it out
-    service.viewMode = 'public';
-    return service.reloadViewMode()
-      .then(() => expect(service.viewMode).to.be.null);
-  });
+      // Set to sth non-null to check if reload failure will clear it out
+      service.viewMode = 'public';
+      return service.reloadViewMode()
+        .then(() => expect(service.viewMode).to.be.null);
+    }
+  );
 });

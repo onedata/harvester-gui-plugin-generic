@@ -4,7 +4,7 @@ module.exports = function (environment) {
   const ENV = {
     modulePrefix: 'harvester-gui-plugin-generic',
     environment,
-    rootURL: null,
+    rootURL: '',
     locationType: 'hash',
     EmberENV: {
       FEATURES: {

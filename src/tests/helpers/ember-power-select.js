@@ -4,7 +4,7 @@ export { typeInSearch, selectChoose } from 'ember-power-select/test-support/help
 const triggerSelector = '.ember-power-select-trigger';
 
 /**
- * Fixes ember-power-select clickTrigger helpers. It's native implementation
+ * Fixes ember-power-select clickTrigger helper. It's native implementation
  * does not allow to click on dropdown trigger with selector pointing directly
  * to the trigger element.
  * @param {string} [selector]

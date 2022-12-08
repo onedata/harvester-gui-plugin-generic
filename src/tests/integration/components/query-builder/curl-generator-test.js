@@ -175,8 +175,25 @@ describe('Integration | Component | query-builder/curl-generator', function () {
   });
 
   ['private', null].forEach((viewMode) => {
-    it(`shows access token information when viewMode is ${JSON.stringify(viewMode)}`, async function () {
-      set(this.owner.lookup('service:view-parameters'), 'viewMode', viewMode);
+    it(`shows access token information when viewMode is ${JSON.stringify(viewMode)}`,
+      async function () {
+        set(this.owner.lookup('service:view-parameters'), 'viewMode', viewMode);
+        this.set('generateCurlStub', sinon.stub().resolves('curl!'));
+        await render(hbs`<QueryBuilder::CurlGenerator
+        @onGenerateCurl={{this.generateCurlStub}}
+      />`);
+
+        await click('.generate-query-request');
+
+        expect(document.querySelector('.curl-generator-modal .access-token-info'))
+          .to.exist;
+      }
+    );
+  });
+
+  it('does not show access token information when viewMode is "public"',
+    async function () {
+      set(this.owner.lookup('service:view-parameters'), 'viewMode', 'public');
       this.set('generateCurlStub', sinon.stub().resolves('curl!'));
       await render(hbs`<QueryBuilder::CurlGenerator
         @onGenerateCurl={{this.generateCurlStub}}
@@ -185,20 +202,7 @@ describe('Integration | Component | query-builder/curl-generator', function () {
       await click('.generate-query-request');
 
       expect(document.querySelector('.curl-generator-modal .access-token-info'))
-        .to.exist;
-    });
-  });
-
-  it('does not show access token information when viewMode is "public"', async function () {
-    set(this.owner.lookup('service:view-parameters'), 'viewMode', 'public');
-    this.set('generateCurlStub', sinon.stub().resolves('curl!'));
-    await render(hbs`<QueryBuilder::CurlGenerator
-      @onGenerateCurl={{this.generateCurlStub}}
-    />`);
-
-    await click('.generate-query-request');
-
-    expect(document.querySelector('.curl-generator-modal .access-token-info'))
-      .to.not.exist;
-  });
+        .to.not.exist;
+    }
+  );
 });
