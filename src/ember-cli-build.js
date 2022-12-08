@@ -24,6 +24,12 @@ module.exports = function (defaults) {
       ],
       replaceExtensions: ['html', 'css', 'js'],
     },
+    'autoImport': {
+      // We need to specify this, becase `ember-auto-import` has a bug in which
+      // it replaces `rootURL` of the application from `''` to `'/'`.
+      // GitHub issue: https://github.com/ef4/ember-auto-import/issues/540
+      publicAssetURL: 'assets/',
+    },
     'ember-bootstrap': {
       bootstrapVersion: 4,
       importBootstrapCSS: false,
