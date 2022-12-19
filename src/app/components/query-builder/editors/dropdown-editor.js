@@ -34,7 +34,7 @@ extends QueryBuilderEditorsEditorBaseComponent {
   }
 
   /**
-   * @param {HTMLDivElement} dropdownElement
+   * @param {HTMLDivElement} dropdownTriggerElement
    */
   @action
   dropdownEditorInserted(dropdownTriggerElement) {
