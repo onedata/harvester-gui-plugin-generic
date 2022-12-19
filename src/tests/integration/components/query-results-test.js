@@ -5,7 +5,7 @@ import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import QueryResults from 'harvester-gui-plugin-generic/utils/query-results';
 import { click } from '@ember/test-helpers';
-import { selectChoose } from 'ember-power-select/test-support/helpers';
+import { selectChoose } from '../../helpers/ember-power-select';
 import { all as allFulfilled, resolve, Promise } from 'rsvp';
 import sinon from 'sinon';
 import EsIndex from 'harvester-gui-plugin-generic/utils/es-index';

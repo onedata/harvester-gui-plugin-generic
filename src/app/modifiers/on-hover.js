@@ -9,10 +9,13 @@
  */
 
 import Modifier from 'ember-modifier';
+import { registerDestructor } from '@ember/destroyable';
 import { action } from '@ember/object';
 
 export default class AddDirectHoverClassModifier extends Modifier {
+  areListenersInstalled = false;
   isHovered = false;
+  elementRef = null;
 
   /**
    * @type {String}
@@ -21,20 +24,29 @@ export default class AddDirectHoverClassModifier extends Modifier {
     return this.args.positional[0] || (() => {});
   }
 
-  /**
-   * @override
-   */
-  didInstall() {
-    this.element.addEventListener('mouseleave', this.onMouseLeave);
-    this.element.addEventListener('mouseenter', this.onMouseEnter);
+  constructor() {
+    super(...arguments);
+    registerDestructor(this, (instance) => instance.cleanup());
   }
 
   /**
    * @override
    */
-  willRemove() {
-    this.element.removeEventListener('mouseleave', this.onMouseLeave);
-    this.element.removeEventListener('mouseenter', this.onMouseEnter);
+  modify(element) {
+    if (!this.areListenersInstalled) {
+      this.elementRef = element;
+      element.addEventListener('mouseleave', this.onMouseLeave);
+      element.addEventListener('mouseenter', this.onMouseEnter);
+      this.areListenersInstalled = true;
+    }
+  }
+
+  cleanup() {
+    if (this.areListenersInstalled) {
+      this.elementRef?.removeEventListener('mouseleave', this.onMouseLeave);
+      this.elementRef?.removeEventListener('mouseenter', this.onMouseEnter);
+      this.areListenersInstalled = false;
+    }
   }
 
   @action

@@ -11,9 +11,13 @@
  */
 
 import Modifier from 'ember-modifier';
+import { registerDestructor } from '@ember/destroyable';
 import { action } from '@ember/object';
 
 export default class AddDirectHoverClassModifier extends Modifier {
+  areListenersInstalled = false;
+  elementRef = null;
+
   /**
    * @type {String}
    */
@@ -21,20 +25,29 @@ export default class AddDirectHoverClassModifier extends Modifier {
     return this.args.named.className || 'is-directly-hovered';
   }
 
-  /**
-   * @override
-   */
-  didInstall() {
-    this.element.addEventListener('mouseleave', this.onMouseLeave);
-    this.element.addEventListener('mousemove', this.onMouseMove);
+  constructor() {
+    super(...arguments);
+    registerDestructor(this, (instance) => instance.cleanup());
   }
 
   /**
    * @override
    */
-  willRemove() {
-    this.element.removeEventListener('mouseleave', this.onMouseLeave);
-    this.element.removeEventListener('mousemove', this.onMouseMove);
+  modify(element) {
+    if (!this.areListenersInstalled) {
+      this.elementRef = element;
+      element.addEventListener('mouseleave', this.onMouseLeave);
+      element.addEventListener('mousemove', this.onMouseMove);
+      this.areListenersInstalled = true;
+    }
+  }
+
+  cleanup() {
+    if (this.areListenersInstalled) {
+      this.elementRef?.removeEventListener('mouseleave', this.onMouseLeave);
+      this.elementRef?.removeEventListener('mousemove', this.onMouseMove);
+      this.areListenersInstalled = false;
+    }
   }
 
   @action
@@ -45,7 +58,7 @@ export default class AddDirectHoverClassModifier extends Modifier {
   @action
   onMouseMove() {
     const containsHoveredElement =
-      Boolean(this.element.querySelector(`.${this.className}`));
+      Boolean(this.elementRef.querySelector(`.${this.className}`));
     this.changeHoverState(!containsHoveredElement);
   }
 
@@ -54,8 +67,8 @@ export default class AddDirectHoverClassModifier extends Modifier {
    * @param {boolean} newState
    */
   changeHoverState(newState) {
-    if (this.element.classList.contains(this.className) !== newState) {
-      this.element.classList.toggle(this.className, newState);
+    if (this.elementRef.classList.contains(this.className) !== newState) {
+      this.elementRef.classList.toggle(this.className, newState);
     }
   }
 }

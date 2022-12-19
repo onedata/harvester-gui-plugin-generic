@@ -10,7 +10,7 @@ import OrOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-build
 import NotOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/not-operator-query-block';
 import RootOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/root-operator-query-block';
 import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/condition-query-block';
-import { clickTrigger, selectChoose } from 'ember-power-select/test-support/helpers';
+import { clickTrigger, selectChoose } from '../../../helpers/ember-power-select';
 import QueryValueComponentsBuilder from 'harvester-gui-plugin-generic/utils/query-value-components-builder';
 
 const multiOperandOperatorsList = ['and', 'or'];

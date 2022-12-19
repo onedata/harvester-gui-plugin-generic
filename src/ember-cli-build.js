@@ -5,6 +5,8 @@ const fs = require('fs');
 const funnel = require('broccoli-funnel');
 const merge = require('broccoli-merge-trees');
 
+const environment = EmberApp.env();
+
 module.exports = function (defaults) {
   const app = new EmberApp(defaults, {
     'fingerprint': {
@@ -23,6 +25,12 @@ module.exports = function (defaults) {
         'eot',
       ],
       replaceExtensions: ['html', 'css', 'js'],
+    },
+    'autoImport': {
+      // We need to specify this, becase `ember-auto-import` has a bug in which
+      // it replaces `rootURL` of the application from `''` to `'/'`.
+      // GitHub issue: https://github.com/ef4/ember-auto-import/issues/540
+      publicAssetURL: environment === 'test' ? '/assets/' : 'assets/',
     },
     'ember-bootstrap': {
       bootstrapVersion: 4,

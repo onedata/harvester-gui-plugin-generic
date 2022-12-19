@@ -14,7 +14,7 @@ describe('Integration | Helper | tt', function () {
       .withArgs('a.b.mytranslation', sinon.match({}))
       .returns('my translation');
 
-    await render(hbs `{{tt context "mytranslation"}}`);
+    await render(hbs `{{tt this.context "mytranslation"}}`);
 
     expect(this.element.textContent.trim()).to.equal('my translation');
   });

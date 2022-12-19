@@ -5,7 +5,7 @@ import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import sinon from 'sinon';
 import { click, fillIn, triggerKeyEvent } from '@ember/test-helpers';
-import { selectChoose, clickTrigger } from 'ember-power-select/test-support/helpers';
+import { selectChoose, clickTrigger } from '../../helpers/ember-power-select';
 import RootOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/root-operator-query-block';
 import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/condition-query-block';
 import EsIndex from 'harvester-gui-plugin-generic/utils/es-index';

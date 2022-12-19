@@ -24,5 +24,8 @@
   "seito-openfile.wordbound": "[\\s\\\"\\'\\>\\<#;?{}.(]",
   "seito-openfile.leadingPathMapping": {
     "harvester-gui-plugin-generic": ""
-  }
+  },
+  "eslint.workingDirectories": [{
+    "mode": "auto"
+  }]
 }

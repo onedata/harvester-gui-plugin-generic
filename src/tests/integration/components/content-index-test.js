@@ -6,7 +6,7 @@ import hbs from 'htmlbars-inline-precompile';
 import sinon from 'sinon';
 import { Promise, resolve, all as allFulfilled } from 'rsvp';
 import { click, settled } from '@ember/test-helpers';
-import { clickTrigger, selectChoose } from 'ember-power-select/test-support/helpers';
+import { clickTrigger, selectChoose } from '../../helpers/ember-power-select';
 import SpacesProvider from 'harvester-gui-plugin-generic/services/spaces-provider';
 
 const indexName = 'generic-index';

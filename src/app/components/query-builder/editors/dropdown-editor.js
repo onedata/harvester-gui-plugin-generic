@@ -34,16 +34,15 @@ extends QueryBuilderEditorsEditorBaseComponent {
   }
 
   /**
-   * @param {HTMLDivElement} dropdownElement
+   * @param {HTMLDivElement} dropdownTriggerElement
    */
   @action
-  dropdownEditorInserted(dropdownElement) {
+  dropdownEditorInserted(dropdownTriggerElement) {
     if (this.params.initiallyFocused) {
       next(() => {
-        const trigger = dropdownElement.querySelector('.ember-power-select-trigger');
         const mouseDownEvent = new MouseEvent('mousedown');
-        trigger.dispatchEvent(mouseDownEvent);
-        trigger.focus();
+        dropdownTriggerElement.dispatchEvent(mouseDownEvent);
+        dropdownTriggerElement.focus();
       });
     }
   }

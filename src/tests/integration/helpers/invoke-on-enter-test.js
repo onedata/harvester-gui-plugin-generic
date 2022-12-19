@@ -16,7 +16,7 @@ describe('Integration | Helper | invoke-on-enter', function () {
     await render(hbs `
       <input
         id="invoke-on-enter-input"
-        onkeydown={{invoke-on-enter (action myAction 1 2 3)}}
+        onkeydown={{invoke-on-enter (action this.myAction 1 2 3)}}
       >
     `);
     await triggerKeyEvent('#invoke-on-enter-input', 'keydown', 'Enter');
