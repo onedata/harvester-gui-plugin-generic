@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { describe, it } from 'mocha';
+import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
 import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
@@ -18,13 +18,20 @@ const operatorBlockClasses = {
 describe('Integration | Component | query-builder/block-visualiser', function () {
   setupRenderingTest();
 
+  beforeEach(function () {
+    this.valuesBuilder = new QueryValueComponentsBuilder([]);
+  });
+
   Object.keys(operatorBlockClasses).forEach(operatorName => {
     it(
       `renders ${operatorName.toUpperCase()} operator block according to the passed block spec`,
       async function () {
         this.block = new operatorBlockClasses[operatorName]();
 
-        await render(hbs `<QueryBuilder::BlockVisualiser @queryBlock={{this.block}} />`);
+        await render(hbs`<QueryBuilder::BlockVisualiser
+          @queryBlock={{this.block}}
+          @valuesBuilder={{this.valuesBuilder}}
+        />`);
 
         expect(this.element.querySelector(
           `.query-builder-operator-block.${operatorName}-operator-block`
@@ -37,7 +44,6 @@ describe('Integration | Component | query-builder/block-visualiser', function ()
     'renders condition block according to the passed block spec',
     async function () {
       this.block = new ConditionQueryBlock({ path: 'a' }, 'boolean.is', 'true');
-      this.valuesBuilder = new QueryValueComponentsBuilder([]);
 
       await render(hbs `<QueryBuilder::BlockVisualiser
         @queryBlock={{this.block}}

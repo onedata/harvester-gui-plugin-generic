@@ -1,9 +1,9 @@
 /**
  * Main application route. Loads appProxy, configuration and spaces.
- * 
+ *
  * @module routes/application
  * @author Michał Borzęcki
- * @copyright (C) 2020 ACK CYFRONET AGH
+ * @copyright (C) 2022 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -14,6 +14,7 @@ import { all as allFulfilled } from 'rsvp';
 export default class ApplicationRoute extends Route {
   @service appProxy;
   @service configuration;
+  @service viewParameters;
   @service spacesProvider;
 
   /**
@@ -26,6 +27,8 @@ export default class ApplicationRoute extends Route {
       .then(() => allFulfilled([
         // load configuration
         this.configuration.reloadConfiguration(),
+        // load view mode
+        this.viewParameters.reloadViewMode(),
         // load spaces
         this.spacesProvider.reloadSpaces(),
       ]))

@@ -1,6 +1,4 @@
 .query-builder-block-selector {
-  background-color: white;
-  padding: $spacer * 0.8;
   font-size: $small-font-size;
 
   &.with-conditions {
@@ -40,7 +38,6 @@
   .btn, .form-control {
     font-size: inherit;
   }
-
 
   .operator-selector {
     display: flex;

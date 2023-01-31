@@ -105,10 +105,10 @@ describe('Integration | Component | promise-loader', function () {
       <PromiseLoader
         @promise={{this.promise}}
         @useCustomRejected={{true}}
-        as |result state|
+        as |data state|
       >
         {{#if (eq state "rejected")}}
-          <div class="error-test"></div>
+          <div class="error-test">{{data}}</div>
         {{/if}}
       </PromiseLoader>
     `);
@@ -116,5 +116,27 @@ describe('Integration | Component | promise-loader', function () {
     await settled();
 
     expect(this.element.querySelector('.error-test')).to.exist;
+    expect(this.element).to.contain.text('test');
   });
+
+  it('does not notify about promise reject when that promise has been replaced with another promise',
+    async function () {
+      this.spy = sinon.spy();
+      let rejectCallback;
+      this.promise = new Promise((resolve, reject) => rejectCallback = reject);
+
+      await render(hbs `
+        <PromiseLoader @promise={{this.promise}} @onReject={{this.spy}} as |result|>
+          {{result}}
+        </PromiseLoader>
+      `);
+      this.set('promise', Promise.resolve('abc'));
+      await settled();
+      rejectCallback('test');
+      await settled();
+
+      expect(this.spy).not.to.be.called;
+      expect(this.element).to.contain.trimmed.text('abc');
+    }
+  );
 });

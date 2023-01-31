@@ -7,7 +7,7 @@ import sinon from 'sinon';
 import { click, fillIn } from '@ember/test-helpers';
 import moment from 'moment';
 import SpacesProvider from 'harvester-gui-plugin-generic/services/spaces-provider';
-import { typeInSearch, clickTrigger, selectChoose } from 'ember-power-select/test-support/helpers';
+import { typeInSearch, clickTrigger, selectChoose } from '../../../../helpers/ember-power-select';
 import { setFlatpickrDate } from 'ember-flatpickr/test-support/helpers';
 import QueryValueComponentsBuilder from 'harvester-gui-plugin-generic/utils/query-value-components-builder';
 
