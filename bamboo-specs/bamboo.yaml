@@ -86,7 +86,7 @@ Fetch dependencies:
 
         cat > dockers.config <<EOF
         {
-            "builder": "onedata/gui_builder:v18"
+            "builder": "onedata/gui_builder:v19"
         }
 
         EOF

@@ -4,6 +4,8 @@
 CHANGELOG
 ---------
 
+### 1.2.0:
+
 - **VFS-9822** Upgraded Ember to version 4.4.
 - **VFS-9818** Replaced `ember-attacher` dependency with own implementation
   based on `Tippy.js` library.
