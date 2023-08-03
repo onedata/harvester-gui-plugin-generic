@@ -1,35 +1,33 @@
-import { expect } from 'chai';
-import { describe, it } from 'mocha';
-import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
-import hbs from 'htmlbars-inline-precompile';
-import { click, fillIn, triggerKeyEvent } from '@ember/test-helpers';
+import { module, test } from 'qunit';
+import { setupRenderingTest } from '../../../helpers';
+import { render, click, fillIn, triggerKeyEvent } from '@ember/test-helpers';
+import { hbs } from 'ember-cli-htmlbars';
 import { clickTrigger, selectChoose } from '../../../helpers/ember-power-select';
 import sinon from 'sinon';
 
-describe('Integration | Component | query-results/pagination', function () {
-  setupRenderingTest();
+module('Integration | Component | query-results/pagination', hooks => {
+  setupRenderingTest(hooks);
 
-  it('renders correct number of pages', async function () {
+  test('renders correct number of pages', async function (assert) {
     await render(hbs `<QueryResults::Pagination
       @resultsCount={{121}}
       @pageSize={{10}}
     />`);
 
-    expect(this.element.querySelector('.pages-count').textContent.trim()).to.equal('13');
+    assert.strictEqual(this.element.querySelector('.pages-count').textContent.trim(), '13');
   });
 
-  it('shows active page number', async function () {
+  test('shows active page number', async function (assert) {
     await render(hbs `<QueryResults::Pagination
       @resultsCount={{121}}
       @pageSize={{10}}
       @activePageNumber={{2}}
     />`);
 
-    expect(this.element.querySelector('.active-page-number')).to.have.value('2');
+    assert.dom(this.element.querySelector('.active-page-number')).hasValue('2');
   });
 
-  it('notifies about "go to first" page change', async function () {
+  test('notifies about "go to first" page change', async function (assert) {
     const changeSpy = this.set('changeSpy', sinon.spy());
     await render(hbs `<QueryResults::Pagination
       @resultsCount={{121}}
@@ -39,10 +37,11 @@ describe('Integration | Component | query-results/pagination', function () {
     />`);
     await click('.first-page');
 
-    expect(changeSpy).to.be.calledOnce.and.to.be.calledWith(1);
+    assert.ok(changeSpy.calledOnce);
+    assert.ok(changeSpy.calledWith(1));
   });
 
-  it('notifies about "go to prev" page change', async function () {
+  test('notifies about "go to prev" page change', async function (assert) {
     const changeSpy = this.set('changeSpy', sinon.spy());
     await render(hbs `<QueryResults::Pagination
       @resultsCount={{121}}
@@ -52,10 +51,11 @@ describe('Integration | Component | query-results/pagination', function () {
     />`);
     await click('.prev-page');
 
-    expect(changeSpy).to.be.calledOnce.and.to.be.calledWith(4);
+    assert.ok(changeSpy.calledOnce);
+    assert.ok(changeSpy.calledWith(4));
   });
 
-  it('notifies about "go to next" page change', async function () {
+  test('notifies about "go to next" page change', async function (assert) {
     const changeSpy = this.set('changeSpy', sinon.spy());
     await render(hbs `<QueryResults::Pagination
       @resultsCount={{121}}
@@ -65,10 +65,11 @@ describe('Integration | Component | query-results/pagination', function () {
     />`);
     await click('.next-page');
 
-    expect(changeSpy).to.be.calledOnce.and.to.be.calledWith(6);
+    assert.ok(changeSpy.calledOnce);
+    assert.ok(changeSpy.calledWith(6));
   });
 
-  it('notifies about "go to last" page change', async function () {
+  test('notifies about "go to last" page change', async function (assert) {
     const changeSpy = this.set('changeSpy', sinon.spy());
     await render(hbs `<QueryResults::Pagination
       @resultsCount={{121}}
@@ -78,62 +79,63 @@ describe('Integration | Component | query-results/pagination', function () {
     />`);
     await click('.last-page');
 
-    expect(changeSpy).to.be.calledOnce.and.to.be.calledWith(13);
+    assert.ok(changeSpy.calledOnce);
+    assert.ok(changeSpy.calledWith(13));
   });
 
-  it(
+  test(
     'blocks "go to prev" and "go to first" page buttons, when is on the first page',
-    async function () {
+    async function (assert) {
       await render(hbs `<QueryResults::Pagination
         @resultsCount={{121}}
         @pageSize={{10}}
         @activePageNumber={{1}}
       />`);
 
-      expect(this.element.querySelector('.first-page')).to.have.attr('disabled');
-      expect(this.element.querySelector('.prev-page')).to.have.attr('disabled');
+      assert.dom(this.element.querySelector('.first-page')).hasAttribute('disabled');
+      assert.dom(this.element.querySelector('.prev-page')).hasAttribute('disabled');
     }
   );
 
-  it(
+  test(
     'unlocks "go to prev" and "go to first" page buttons, when is not on the first page',
-    async function () {
+    async function (assert) {
       await render(hbs `<QueryResults::Pagination
         @resultsCount={{121}}
         @pageSize={{10}}
         @activePageNumber={{2}}
       />`);
 
-      expect(this.element.querySelector('.first-page')).to.not.have.attr('disabled');
-      expect(this.element.querySelector('.prev-page')).to.not.have.attr('disabled');
+      assert.dom(this.element.querySelector('.first-page')).doesNotHaveAttribute('disabled');
+      assert.dom(this.element.querySelector('.prev-page')).doesNotHaveAttribute('disabled');
     }
   );
 
-  it(
+  test(
     'blocks "go to next" and "go to last" page buttons, when is on the last page',
-    async function () {
+    async function (assert) {
       await render(hbs `<QueryResults::Pagination
         @resultsCount={{121}}
         @pageSize={{10}}
         @activePageNumber={{13}}
       />`);
 
-      expect(this.element.querySelector('.next-page')).to.have.attr('disabled');
-      expect(this.element.querySelector('.last-page')).to.have.attr('disabled');
+      assert.dom(this.element.querySelector('.next-page')).hasAttribute('disabled');
+      assert.dom(this.element.querySelector('.last-page')).hasAttribute('disabled');
     }
   );
 
-  it(
+  test(
     'unlocks "go to next" and "go to last" page buttons, when is not on the last page',
-    async function () {
+    async function (assert) {
       await render(hbs `<QueryResults::Pagination
         @resultsCount={{121}}
         @pageSize={{10}}
         @activePageNumber={{12}}
       />`);
 
-      expect(this.element.querySelector('.next-page')).to.not.have.attr('disabled');
-      expect(this.element.querySelector('.last-page')).to.not.have.attr('disabled');
+      assert.dom(this.element.querySelector('.next-page')).doesNotHaveAttribute('disabled');
+      assert.dom(this.element.querySelector('.last-page')).doesNotHaveAttribute('disabled');
     }
   );
 
@@ -143,9 +145,9 @@ describe('Integration | Component | query-results/pagination', function () {
     ['-5', 1],
     ['asdf', 1],
   ].forEach(([rawValue, notifiedValue]) => {
-    it(
+    test(
       `notifies about changed page number in input (input value: "${rawValue}", notified value: ${notifiedValue})`,
-      async function () {
+      async function (assert) {
         const changeSpy = this.set('changeSpy', sinon.spy());
         await render(hbs `<QueryResults::Pagination
           @resultsCount={{121}}
@@ -156,35 +158,41 @@ describe('Integration | Component | query-results/pagination', function () {
         await fillIn('.active-page-number', rawValue);
         await triggerKeyEvent('.active-page-number', 'keydown', 'Enter');
 
-        expect(changeSpy).to.be.calledOnce.and.to.be.calledWith(notifiedValue);
+        assert.ok(changeSpy.calledOnce);
+        assert.ok(changeSpy.calledWith(notifiedValue));
       }
     );
   });
 
-  it('provides options 10, 25, 50 and 100 in page size selector', async function () {
-    await render(hbs `<QueryResults::Pagination @pageSize={{10}}/>`);
-    await clickTrigger('.query-results-pagination');
-    const options = this.element.querySelectorAll('.ember-power-select-option');
+  test('provides options 10, 25, 50 and 100 in page size selector',
+    async function (assert) {
+      await render(hbs `<QueryResults::Pagination @pageSize={{10}}/>`);
+      await clickTrigger('.query-results-pagination');
+      const options = this.element.querySelectorAll('.ember-power-select-option');
 
-    expect(options).to.have.length(4);
-    [10, 25, 50, 100].forEach((pageSize, index) =>
-      expect(options[index].textContent.trim()).to.equal(String(pageSize))
-    );
-  });
+      assert.strictEqual(options.length, 4);
+      [10, 25, 50, 100].forEach((pageSize, index) =>
+        assert.strictEqual(options[index].textContent.trim(), String(pageSize))
+      );
+    }
+  );
 
-  it('has selected active page size option in page size selector', async function () {
-    await render(hbs `<QueryResults::Pagination @pageSize={{50}}/>`);
+  test('has selected active page size option in page size selector',
+    async function (assert) {
+      await render(hbs `<QueryResults::Pagination @pageSize={{50}}/>`);
 
-    expect(this.element.querySelector(
-      '.page-size-selector .ember-power-select-selected-item'
-    ).textContent.trim()).to.equal('50');
-  });
+      assert.strictEqual(this.element.querySelector(
+        '.page-size-selector .ember-power-select-selected-item'
+      ).textContent.trim(), '50');
+    }
+  );
 
-  it('notifies about changed page size', async function () {
+  test('notifies about changed page size', async function (assert) {
     const changeSpy = this.set('changeSpy', sinon.spy());
     await render(hbs `<QueryResults::Pagination @onPageSizeChange={{this.changeSpy}}/>`);
     await selectChoose('.page-size-selector', '50');
 
-    expect(changeSpy).to.be.calledOnce.and.to.be.calledWith(50);
+    assert.ok(changeSpy.calledOnce);
+    assert.ok(changeSpy.calledWith(50));
   });
 });

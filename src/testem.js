@@ -1,6 +1,6 @@
 /* eslint-env node */
 module.exports = {
-  framework: 'mocha',
+  framework: 'qunit',
   test_page: 'tests/index.html?hidepassed',
   report_file: 'tmp/test-results.xml',
   disable_watching: true,

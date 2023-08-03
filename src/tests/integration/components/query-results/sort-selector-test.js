@@ -1,16 +1,15 @@
-import { expect } from 'chai';
-import { describe, it, beforeEach } from 'mocha';
-import { setupRenderingTest } from 'ember-mocha';
+import { module, test } from 'qunit';
+import { setupRenderingTest } from '../../../helpers';
 import { render } from '@ember/test-helpers';
-import hbs from 'htmlbars-inline-precompile';
+import { hbs } from 'ember-cli-htmlbars';
 import { typeInSearch, clickTrigger, selectChoose } from '../../../helpers/ember-power-select';
 import sinon from 'sinon';
 import EsIndex from 'harvester-gui-plugin-generic/utils/es-index';
 
-describe('Integration | Component | query-results/sort-selector', function () {
-  setupRenderingTest();
+module('Integration | Component | query-results/sort-selector', hooks => {
+  setupRenderingTest(hooks);
 
-  beforeEach(function () {
+  hooks.beforeEach(function () {
     this.set('index', new EsIndex({
       mappings: {
         properties: {
@@ -43,26 +42,26 @@ describe('Integration | Component | query-results/sort-selector', function () {
     }));
   });
 
-  it('has class "query-results-sort-selector"', async function () {
+  test('has class "query-results-sort-selector"', async function (assert) {
     await render(hbs `<QueryResults::SortSelector />`);
 
-    expect(this.element.querySelector('.query-results-sort-selector')).to.exist;
+    assert.ok(this.element.querySelector('.query-results-sort-selector'));
   });
 
-  it('has asc/desc dropdown selector', async function () {
+  test('has asc/desc dropdown selector', async function (assert) {
     await render(hbs `<QueryResults::SortSelector />`);
     await clickTrigger('.direction-selector');
 
     const options = this.element.querySelectorAll('.ember-power-select-option');
-    expect(options).to.have.length(2);
-    expect(options[0].textContent.trim()).to.equal('asc');
-    expect(options[1].textContent.trim()).to.equal('desc');
-    expect(this.element.querySelector(
+    assert.strictEqual(options.length, 2);
+    assert.strictEqual(options[0].textContent.trim(), 'asc');
+    assert.strictEqual(options[1].textContent.trim(), 'desc');
+    assert.strictEqual(this.element.querySelector(
       '.direction-selector .ember-power-select-selected-item'
-    ).textContent.trim()).to.equal('desc');
+    ).textContent.trim(), 'desc');
   });
 
-  it('notifies about sort direction change', async function () {
+  test('notifies about sort direction change', async function (assert) {
     const changeSpy = this.set('changeSpy', sinon.spy());
 
     await render(hbs `<QueryResults::SortSelector
@@ -75,39 +74,40 @@ describe('Integration | Component | query-results/sort-selector', function () {
       property: sinon.match({}),
       direction: 'asc',
     });
-    expect(changeSpy).to.be.calledOnce.and.to.be.calledWith(changeMatcher);
+    assert.ok(changeSpy.calledOnce);
+    assert.ok(changeSpy.calledWith(changeMatcher));
   });
 
-  it('has index properties selector', async function () {
+  test('has index properties selector', async function (assert) {
     await render(hbs `<QueryResults::SortSelector @index={{this.index}} />`);
     await clickTrigger('.property-selector');
 
     const options = this.element.querySelectorAll('.ember-power-select-option');
-    expect(options).to.have.length(3);
+    assert.strictEqual(options.length, 3);
     [
       'query score',
       'a.b',
       'c.d',
     ].forEach((propertyPath, index) => {
-      expect(options[index].textContent.trim()).to.equal(propertyPath);
+      assert.strictEqual(options[index].textContent.trim(), propertyPath);
     });
-    expect(this.element.querySelector(
+    assert.strictEqual(this.element.querySelector(
       '.property-selector .ember-power-select-selected-item'
-    ).textContent.trim()).to.equal('query score');
+    ).textContent.trim(), 'query score');
   });
 
-  it('filters index properties in dropdown', async function () {
+  test('filters index properties in dropdown', async function (assert) {
     await render(hbs `<QueryResults::SortSelector @index={{this.index}} />`);
     await clickTrigger('.property-selector');
     await typeInSearch('c');
 
     const options = this.element.querySelectorAll('.ember-power-select-option');
-    expect(options).to.have.length(2);
-    expect(options[0].textContent.trim()).to.equal('query score');
-    expect(options[1].textContent.trim()).to.equal('c.d');
+    assert.strictEqual(options.length, 2);
+    assert.strictEqual(options[0].textContent.trim(), 'query score');
+    assert.strictEqual(options[1].textContent.trim(), 'c.d');
   });
 
-  it('notifies about sort property change', async function () {
+  test('notifies about sort property change', async function (assert) {
     const changeSpy = this.set('changeSpy', sinon.spy());
 
     await render(hbs `<QueryResults::SortSelector
@@ -119,6 +119,7 @@ describe('Integration | Component | query-results/sort-selector', function () {
       direction: 'desc',
       property: sinon.match.same(this.index.properties.a.properties.b),
     });
-    expect(changeSpy).to.be.calledOnce.and.to.be.calledWith(changeMatcher);
+    assert.ok(changeSpy.calledOnce);
+    assert.ok(changeSpy.calledWith(changeMatcher));
   });
 });

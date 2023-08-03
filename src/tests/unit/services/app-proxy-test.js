@@ -1,13 +1,12 @@
-import { expect } from 'chai';
-import { describe, it, beforeEach, afterEach } from 'mocha';
-import { setupTest } from 'ember-mocha';
+import { module, test } from 'qunit';
+import { setupTest } from '../../helpers';
 import sinon from 'sinon';
 import AppProxy from 'harvester-gui-plugin-generic/services/app-proxy';
 
-describe('Unit | Service | app-proxy', function () {
-  setupTest();
+module('Unit | Service | app-proxy', hooks => {
+  setupTest(hooks);
 
-  beforeEach(function () {
+  hooks.beforeEach(function () {
     const appProxy = {
       dataRequest: () => {},
       dataCurlCommandRequest: () => {},
@@ -28,7 +27,7 @@ describe('Unit | Service | app-proxy', function () {
     });
   });
 
-  afterEach(function () {
+  hooks.afterEach(function () {
     const fakeClock = this.fakeClock;
     if (fakeClock) {
       fakeClock.restore();
@@ -38,9 +37,9 @@ describe('Unit | Service | app-proxy', function () {
     }
   });
 
-  it('loads parent application appProxy on init', function () {
+  test('loads parent application appProxy on init', function (assert) {
     const service = this.owner.lookup('service:app-proxy');
-    expect(service.appProxy).to.equal(this.appProxy);
+    assert.strictEqual(service.appProxy, this.appProxy);
   });
 
   [
@@ -51,36 +50,35 @@ describe('Unit | Service | app-proxy', function () {
     'fileBrowserUrlRequest',
     'spacesRequest',
   ].forEach(injectedPropName => {
-    it(
+    test(
       `loads ${injectedPropName} from appProxy to the ${injectedPropName} field`,
-      function () {
+      function (assert) {
         const service = this.owner.lookup('service:app-proxy');
-        expect(service[injectedPropName])
-          .to.equal(this.appProxy[injectedPropName]);
+        assert.strictEqual(service[injectedPropName], this.appProxy[injectedPropName]);
       }
     );
   });
 
-  it(
+  test(
     'tries to load appProxy continuously when it is not available on init',
-    function () {
+    function (assert) {
       this.fakeClock = sinon.useFakeTimers();
       this.windowMock.frameElement = {};
       const promiseResolveSpy = sinon.spy();
 
       const service = this.owner.lookup('service:app-proxy');
       service.appProxyLoadingPromise.then(promiseResolveSpy);
-      expect(service.appProxy).to.be.null;
-      expect(promiseResolveSpy).to.be.not.called;
+      assert.notOk(service.appProxy);
+      assert.ok(promiseResolveSpy.notCalled);
 
       this.fakeClock.tick(15);
-      expect(service.appProxy).to.be.null;
-      expect(promiseResolveSpy).to.be.not.called;
+      assert.notOk(service.appProxy);
+      assert.ok(promiseResolveSpy.notCalled);
 
       this.windowMock.frameElement.appProxy = this.appProxy;
       this.fakeClock.tick(15);
-      expect(service.appProxy).to.equal(this.appProxy);
-      expect(promiseResolveSpy).to.be.calledOnce;
+      assert.strictEqual(service.appProxy, this.appProxy);
+      assert.ok(promiseResolveSpy.calledOnce);
     }
   );
 });

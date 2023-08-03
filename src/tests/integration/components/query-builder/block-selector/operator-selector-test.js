@@ -1,55 +1,53 @@
-import { expect } from 'chai';
-import { describe, it, beforeEach } from 'mocha';
-import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
-import hbs from 'htmlbars-inline-precompile';
+import { module, test } from 'qunit';
+import { setupRenderingTest } from '../../../../helpers';
+import { render, click } from '@ember/test-helpers';
+import { hbs } from 'ember-cli-htmlbars';
 import sinon from 'sinon';
-import { click } from '@ember/test-helpers';
 
 const allowedOperatorsList = ['and', 'or', 'not', 'none'];
 const defaultVisibleOperatorsList = allowedOperatorsList.without('none');
 
-describe(
+module(
   'Integration | Component | query-builder/block-selector/operator-selector',
-  function () {
-    setupRenderingTest();
+  hooks => {
+    setupRenderingTest(hooks);
 
-    beforeEach(function () {
+    hooks.beforeEach(function () {
       this.set('allOperators', allowedOperatorsList);
     });
 
-    it(
+    test(
       `renders three operators: ${defaultVisibleOperatorsList.map(s => s.toUpperCase()).join(', ')} by default`,
-      async function () {
+      async function (assert) {
         await render(hbs `<QueryBuilder::BlockSelector::OperatorSelector/>`);
 
         const operators = this.element.querySelectorAll('.operator-selector .operator');
-        expect(operators).to.have.length(3);
+        assert.strictEqual(operators.length, 3);
         defaultVisibleOperatorsList.forEach((operatorName, index) =>
-          checkOperatorButton(operators[index], operatorName)
+          checkOperatorButton(assert, operators[index], operatorName)
         );
       }
     );
 
-    it(
+    test(
       `renders all operators: ${allowedOperatorsList.map(s => s.toUpperCase()).join(', ')} when specified`,
-      async function () {
+      async function (assert) {
         await render(hbs `<QueryBuilder::BlockSelector::OperatorSelector
           @operators={{this.allOperators}}
         />`);
 
         const operators = this.element.querySelectorAll('.operator-selector .operator');
-        expect(operators).to.have.length(4);
+        assert.strictEqual(operators.length, 4);
         allowedOperatorsList.forEach((operatorName, index) =>
-          checkOperatorButton(operators[index], operatorName)
+          checkOperatorButton(assert, operators[index], operatorName)
         );
       }
     );
 
     allowedOperatorsList.forEach(operatorName => {
-      it(
+      test(
         `calls "onOperatorSelected" callback, when ${operatorName.toUpperCase()} operator has been clicked`,
-        async function () {
+        async function (assert) {
           const addSpy = this.set('addSpy', sinon.spy());
 
           await render(hbs `<QueryBuilder::BlockSelector::OperatorSelector
@@ -57,72 +55,73 @@ describe(
             @onOperatorSelected={{this.addSpy}}
           />`);
 
-          expect(addSpy).to.not.be.called;
+          assert.ok(addSpy.notCalled);
           await click(`.operator-${operatorName}`);
-          expect(addSpy).to.be.calledOnce.and.to.be.calledWith(operatorName);
+          assert.ok(addSpy.calledOnce);
+          assert.ok(addSpy.calledWith(operatorName));
         }
       );
     });
 
-    it(
+    test(
       'renders only specified subset of operators',
-      async function () {
+      async function (assert) {
         await render(hbs `<QueryBuilder::BlockSelector::OperatorSelector
           @operators={{array "and" "or"}}
         />`);
 
         const operators = this.element.querySelectorAll('.operator-selector .operator');
-        expect(operators).to.have.length(2);
+        assert.strictEqual(operators.length, 2);
         ['and', 'or'].forEach((operatorName, index) =>
-          checkOperatorButton(operators[index], operatorName)
+          checkOperatorButton(assert, operators[index], operatorName)
         );
       }
     );
 
-    it(
+    test(
       'does not render incorrect operators',
-      async function () {
+      async function (assert) {
         await render(hbs `<QueryBuilder::BlockSelector::OperatorSelector
           @operators={{array "and" "xor"}}
         />`);
 
         const operators = this.element.querySelectorAll('.operator-selector .operator');
-        expect(operators).to.have.length(1);
-        checkOperatorButton(operators[0], 'and');
+        assert.strictEqual(operators.length, 1);
+        checkOperatorButton(assert, operators[0], 'and');
       }
     );
 
-    it(
+    test(
       'does not disable any operator by default',
-      async function () {
+      async function (assert) {
         await render(hbs `<QueryBuilder::BlockSelector::OperatorSelector/>`);
 
-        expect(this.element.querySelector(
+        assert.notOk(this.element.querySelector(
           '.operator-selector .operator[disabled]'
-        )).to.not.exist;
+        ));
       }
     );
 
-    it(
+    test(
       'disables specified operators',
-      async function () {
+      async function (assert) {
         await render(hbs `<QueryBuilder::BlockSelector::OperatorSelector
           @operators={{this.allOperators}}
           @disabledOperators={{array "and" "or"}}
         />`);
 
-        expect(this.element.querySelectorAll(
+        assert.strictEqual(this.element.querySelectorAll(
           '.operator-selector .operator[disabled]'
-        )).to.have.length(2);
-        ['not', 'none'].forEach(operatorName => expect(this.element.querySelector(
+        ).length, 2);
+        ['not', 'none'].forEach(operatorName => assert.dom(this.element.querySelector(
           `.operator-selector .operator-${operatorName}`
-        )).to.not.have.attr('disabled'));
+        )).doesNotHaveAttribute('disabled'));
       }
     );
   }
 );
 
-function checkOperatorButton(buttonNode, operatorName) {
-  expect(buttonNode.textContent.trim()).to.equal(operatorName);
-  expect(buttonNode).to.have.class(`operator-${operatorName}`);
+function checkOperatorButton(assert, buttonNode, operatorName) {
+  assert.strictEqual(buttonNode.textContent.trim(), operatorName);
+  assert.dom(buttonNode).hasClass(`operator-${operatorName}`);
 }

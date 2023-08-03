@@ -1,28 +1,27 @@
-import { expect } from 'chai';
-import { describe, it } from 'mocha';
+import { module, test } from 'qunit';
 import NotOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/not-operator-query-block';
 import sinon from 'sinon';
 
-describe('Unit | Utility | query-builder/not-operator-query-block', function () {
-  it('has "operator" equal to "not"', function () {
+module('Unit | Utility | query-builder/not-operator-query-block', () => {
+  test('has "operator" equal to "not"', function (assert) {
     const block = new NotOperatorQueryBlock();
-    expect(block.operator).to.equal('not');
+    assert.strictEqual(block.operator, 'not');
   });
 
-  it('has "maxOperandsNumber" static field set to 1', function () {
-    expect(NotOperatorQueryBlock.maxOperandsNumber).to.equal(1);
+  test('has "maxOperandsNumber" static field set to 1', function (assert) {
+    assert.strictEqual(NotOperatorQueryBlock.maxOperandsNumber, 1);
   });
 
-  it('can be cloned', function () {
+  test('can be cloned', function (assert) {
     const block = new NotOperatorQueryBlock();
     block.operands.pushObject({
       clone: sinon.stub().returns('operandClone'),
     });
     const clonedBlock = block.clone();
 
-    expect(clonedBlock).to.not.equal(block);
-    expect(clonedBlock).to.be.an.instanceOf(NotOperatorQueryBlock);
-    expect(clonedBlock.operands).to.have.length(1);
-    expect(clonedBlock.operands[0]).to.equal('operandClone');
+    assert.notStrictEqual(clonedBlock, block);
+    assert.ok(clonedBlock instanceof NotOperatorQueryBlock);
+    assert.strictEqual(clonedBlock.operands.length, 1);
+    assert.strictEqual(clonedBlock.operands[0], 'operandClone');
   });
 });

@@ -4,6 +4,8 @@
 CHANGELOG
 ---------
 
+- **VFS-11109** Migrated tests to QUnit framework.
+
 ### 1.2.0:
 
 - **VFS-9822** Upgraded Ember to version 4.4.

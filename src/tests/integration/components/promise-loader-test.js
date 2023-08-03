@@ -1,16 +1,14 @@
-import { expect } from 'chai';
-import { describe, it } from 'mocha';
-import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
-import hbs from 'htmlbars-inline-precompile';
+import { module, test } from 'qunit';
+import { setupRenderingTest } from '../../helpers';
+import { render, settled } from '@ember/test-helpers';
+import { hbs } from 'ember-cli-htmlbars';
 import { resolve, Promise } from 'rsvp';
-import { settled } from '@ember/test-helpers';
 import sinon from 'sinon';
 
-describe('Integration | Component | promise-loader', function () {
-  setupRenderingTest();
+module('Integration | Component | promise-loader', hooks => {
+  setupRenderingTest(hooks);
 
-  it('yields result of fulfilled promise', async function () {
+  test('yields result of fulfilled promise', async function (assert) {
     this.promise = resolve('test');
     await render(hbs `
       <PromiseLoader @promise={{this.promise}} as |result|>
@@ -18,10 +16,10 @@ describe('Integration | Component | promise-loader', function () {
       </PromiseLoader>
     `);
 
-    expect(this.element.textContent.trim()).to.equal('test');
+    assert.strictEqual(this.element.textContent.trim(), 'test');
   });
 
-  it('shows spinner when promise is pending', async function () {
+  test('shows spinner when promise is pending', async function (assert) {
     this.promise = new Promise(() => {});
     await render(hbs `
       <PromiseLoader @promise={{this.promise}} as |result|>
@@ -29,10 +27,10 @@ describe('Integration | Component | promise-loader', function () {
       </PromiseLoader>
     `);
 
-    expect(this.element.querySelector('.spinner')).to.exist;
+    assert.ok(this.element.querySelector('.spinner'));
   });
 
-  it('shows error from rejected promise', async function () {
+  test('shows error from rejected promise', async function (assert) {
     let rejectCallback;
     this.promise = new Promise((resolve, reject) => rejectCallback = reject);
 
@@ -45,12 +43,11 @@ describe('Integration | Component | promise-loader', function () {
     await settled();
 
     const resourceLoadError = this.element.querySelector('.resource-load-error');
-    expect(resourceLoadError).to.exist;
-    expect(resourceLoadError.querySelector('.details-json').textContent.trim())
-      .to.equal('"test"');
+    assert.ok(resourceLoadError);
+    assert.strictEqual(resourceLoadError.querySelector('.details-json').textContent.trim(), '"test"');
   });
 
-  it('notifies about promise resolve', async function () {
+  test('notifies about promise resolve', async function (assert) {
     this.spy = sinon.spy();
     this.promise = resolve('test');
 
@@ -60,10 +57,11 @@ describe('Integration | Component | promise-loader', function () {
       </PromiseLoader>
     `);
 
-    expect(this.spy).to.be.calledOnce.and.to.be.calledWith('test');
+    assert.ok(this.spy.calledOnce);
+    assert.ok(this.spy.calledWith('test'));
   });
 
-  it('notifies about promise reject', async function () {
+  test('notifies about promise reject', async function (assert) {
     this.spy = sinon.spy();
     let rejectCallback;
     this.promise = new Promise((resolve, reject) => rejectCallback = reject);
@@ -76,51 +74,54 @@ describe('Integration | Component | promise-loader', function () {
     rejectCallback('test');
     await settled();
 
-    expect(this.spy).to.be.calledOnce.and.to.be.calledWith('test');
+    assert.ok(this.spy.calledOnce);
+    assert.ok(this.spy.calledWith('test'));
   });
 
-  it('allows to use custom template for "pending" promise state', async function () {
-    this.promise = new Promise(() => {});
+  test('allows to use custom template for "pending" promise state',
+    async function (assert) {
+      this.promise = new Promise(() => {});
 
-    await render(hbs `
-      <PromiseLoader
-        @promise={{this.promise}}
-        @useCustomPending={{true}}
-        as |result state|
-      >
-        {{#if (eq state "pending")}}
-          <div class="loading-test"></div>
-        {{/if}}
-      </PromiseLoader>
-    `);
+      await render(hbs `
+        <PromiseLoader
+          @promise={{this.promise}}
+          @useCustomPending={{true}}
+          as |result state|
+        >
+          {{#if (eq state "pending")}}
+            <div class="loading-test"></div>
+          {{/if}}
+        </PromiseLoader>
+      `);
 
-    expect(this.element.querySelector('.loading-test')).to.exist;
-  });
+      assert.ok(this.element.querySelector('.loading-test'));
+    });
 
-  it('allows to use custom template for "rejected" promise state', async function () {
-    let rejectCallback;
-    this.promise = new Promise((resolve, reject) => rejectCallback = reject);
+  test('allows to use custom template for "rejected" promise state',
+    async function (assert) {
+      let rejectCallback;
+      this.promise = new Promise((resolve, reject) => rejectCallback = reject);
 
-    await render(hbs `
-      <PromiseLoader
-        @promise={{this.promise}}
-        @useCustomRejected={{true}}
-        as |data state|
-      >
-        {{#if (eq state "rejected")}}
-          <div class="error-test">{{data}}</div>
-        {{/if}}
-      </PromiseLoader>
-    `);
-    rejectCallback('test');
-    await settled();
+      await render(hbs `
+        <PromiseLoader
+          @promise={{this.promise}}
+          @useCustomRejected={{true}}
+          as |data state|
+        >
+          {{#if (eq state "rejected")}}
+            <div class="error-test">{{data}}</div>
+          {{/if}}
+        </PromiseLoader>
+      `);
+      rejectCallback('test');
+      await settled();
 
-    expect(this.element.querySelector('.error-test')).to.exist;
-    expect(this.element).to.contain.text('test');
-  });
+      assert.ok(this.element.querySelector('.error-test'));
+      assert.dom(this.element).hasText('test');
+    });
 
-  it('does not notify about promise reject when that promise has been replaced with another promise',
-    async function () {
+  test('does not notify about promise reject when that promise has been replaced with another promise',
+    async function (assert) {
       this.spy = sinon.spy();
       let rejectCallback;
       this.promise = new Promise((resolve, reject) => rejectCallback = reject);
@@ -135,8 +136,8 @@ describe('Integration | Component | promise-loader', function () {
       rejectCallback('test');
       await settled();
 
-      expect(this.spy).not.to.be.called;
-      expect(this.element).to.contain.trimmed.text('abc');
+      assert.ok(this.spy.notCalled);
+      assert.dom(this.element).hasText('abc');
     }
   );
 });

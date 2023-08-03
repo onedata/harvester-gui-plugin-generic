@@ -1,19 +1,17 @@
-import { expect } from 'chai';
-import { describe, it, beforeEach } from 'mocha';
-import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
-import hbs from 'htmlbars-inline-precompile';
+import { module, test } from 'qunit';
+import { setupRenderingTest } from '../../helpers';
+import { render, click } from '@ember/test-helpers';
+import { hbs } from 'ember-cli-htmlbars';
 import QueryResults from 'harvester-gui-plugin-generic/utils/query-results';
-import { click } from '@ember/test-helpers';
 import { selectChoose } from '../../helpers/ember-power-select';
 import { all as allFulfilled, resolve, Promise } from 'rsvp';
 import sinon from 'sinon';
 import EsIndex from 'harvester-gui-plugin-generic/utils/es-index';
 
-describe('Integration | Component | query-results', function () {
-  setupRenderingTest();
+module('Integration | Component | query-results', hooks => {
+  setupRenderingTest(hooks);
 
-  beforeEach(function () {
+  hooks.beforeEach(function () {
     this.queryResults = new QueryResults({
       hits: {
         total: {
@@ -75,41 +73,41 @@ describe('Integration | Component | query-results', function () {
     });
   });
 
-  it('renders results', async function () {
+  test('renders results', async function (assert) {
     await render(hbs `<QueryResults @queryResultsPromise={{this.queryResultsPromise}}/>`);
 
     const results = this.element.querySelectorAll('.query-results-result');
-    expect(results).to.have.length(2);
-    expect(results[0].textContent).to.contain('anotherText');
-    expect(results[1].textContent).to.contain('someText2');
+    assert.strictEqual(results.length, 2);
+    assert.contains(results[0].textContent, 'anotherText');
+    assert.contains(results[1].textContent, 'someText2');
   });
 
-  it(
+  test(
     'shows "loading" placeholder view when query results are loading',
-    async function () {
+    async function (assert) {
       this.queryResultsPromise = new Promise(() => {});
 
       await render(hbs `<QueryResults @queryResultsPromise={{this.queryResultsPromise}}/>`);
 
-      expect(this.element.querySelector('.query-results-placeholder'))
-        .to.have.class('mode-loading');
+      assert.dom(this.element.querySelector('.query-results-placeholder')).hasClass('mode-loading');
     }
   );
 
-  it('shows "empty" placeholder view when query results are empty', async function () {
-    this.queryResultsPromise = resolve(new QueryResults({
-      hits: {
-        hits: [],
-      },
-    }));
+  test('shows "empty" placeholder view when query results are empty',
+    async function (assert) {
+      this.queryResultsPromise = resolve(new QueryResults({
+        hits: {
+          hits: [],
+        },
+      }));
 
-    await render(hbs `<QueryResults @queryResultsPromise={{this.queryResultsPromise}}/>`);
+      await render(hbs `<QueryResults @queryResultsPromise={{this.queryResultsPromise}}/>`);
 
-    expect(this.element.querySelector('.query-results-placeholder'))
-      .to.have.class('mode-empty');
-  });
+      assert.dom(this.element.querySelector('.query-results-placeholder')).hasClass('mode-empty');
+    }
+  );
 
-  it('filters properties', async function () {
+  test('filters properties', async function (assert) {
     await render(hbs `<QueryResults @queryResultsPromise={{this.queryResultsPromise}}/>`);
     await click('.show-properties-selector');
     // expand all nodes
@@ -125,22 +123,24 @@ describe('Integration | Component | query-results', function () {
     await click(firstBranchLastCheckbox);
 
     const resultSamples = this.element.querySelectorAll('.result-sample');
-    expect(resultSamples[0].textContent.trim()).to.equal('No match.');
-    expect(resultSamples[1].textContent.trim()).to.equal('a: [{bb: false}]');
+    assert.strictEqual(resultSamples[0].textContent.trim(), 'No match.');
+    assert.strictEqual(resultSamples[1].textContent.trim(), 'a: [{bb: false}]');
   });
 
-  it('does not notify about changed filtered properties on init', async function () {
-    this.changeSpy = sinon.spy();
+  test('does not notify about changed filtered properties on init',
+    async function (assert) {
+      this.changeSpy = sinon.spy();
 
-    await render(hbs `<QueryResults
-      @queryResultsPromise={{this.queryResultsPromise}}
-      @onFilteredPropertiesChange={{this.changeSpy}}
-    />`);
+      await render(hbs `<QueryResults
+        @queryResultsPromise={{this.queryResultsPromise}}
+        @onFilteredPropertiesChange={{this.changeSpy}}
+      />`);
 
-    expect(this.changeSpy).to.not.be.called;
-  });
+      assert.ok(this.changeSpy.notCalled);
+    }
+  );
 
-  it('notifies about changed filtered properties', async function () {
+  test('notifies about changed filtered properties', async function (assert) {
     this.changeSpy = sinon.spy();
 
     await render(hbs `<QueryResults
@@ -150,8 +150,8 @@ describe('Integration | Component | query-results', function () {
     await click('.show-properties-selector');
     await click(document.querySelector('.select-all'));
 
-    expect(this.changeSpy).to.be.calledOnce;
-    expect(this.changeSpy.lastCall.args[0]).to.deep.equal({
+    assert.ok(this.changeSpy.calledOnce);
+    assert.deepEqual(this.changeSpy.lastCall.args[0], {
       a: {
         b: {},
         bb: {},
@@ -163,28 +163,35 @@ describe('Integration | Component | query-results', function () {
     });
   });
 
-  it('has no pagination controls when query results are empty', async function () {
-    this.queryResultsPromise = resolve(new QueryResults({
-      hits: {
-        hits: [],
-      },
-    }));
+  test('has no pagination controls when query results are empty',
+    async function (assert) {
+      this.queryResultsPromise = resolve(new QueryResults({
+        hits: {
+          hits: [],
+        },
+      }));
 
-    await render(hbs `<QueryResults @queryResultsPromise={{this.queryResultsPromise}}/>`);
+      await render(hbs `<QueryResults @queryResultsPromise={{this.queryResultsPromise}}/>`);
 
-    expect(this.element.querySelector('.query-results-pagination')).to.not.exist;
-  });
+      assert.notOk(this.element.querySelector('.query-results-pagination'));
+    }
+  );
 
-  it('has two pagination controls when query results are not empty', async function () {
-    await render(hbs `<QueryResults @queryResultsPromise={{this.queryResultsPromise}}/>`);
+  test('has two pagination controls when query results are not empty',
+    async function (assert) {
+      await render(hbs `<QueryResults @queryResultsPromise={{this.queryResultsPromise}}/>`);
 
-    expect(this.element.querySelectorAll('.query-results-pagination')).to.have.length(2);
-  });
+      assert.strictEqual(
+        this.element.querySelectorAll('.query-results-pagination').length,
+        2
+      );
+    }
+  );
 
   ['top', 'bottom'].forEach((paginationPosition, index) => {
-    it(
+    test(
       `has page set to a value passed on init (${paginationPosition} pagination control)`,
-      async function () {
+      async function (assert) {
         await render(hbs `<QueryResults
           @queryResultsPromise={{this.queryResultsPromise}}
           @activePageNumber={{5}}
@@ -192,13 +199,13 @@ describe('Integration | Component | query-results', function () {
 
         const activePageInput = this.element
           .querySelectorAll('.query-results-pagination .active-page-number')[index];
-        expect(activePageInput).to.have.value('5');
+        assert.dom(activePageInput).hasValue('5');
       }
     );
 
-    it(
+    test(
       `has page size set to a value passed on init (${paginationPosition} pagination control)`,
-      async function () {
+      async function (assert) {
         await render(hbs `<QueryResults
           @queryResultsPromise={{this.queryResultsPromise}}
           @pageSize={{25}}
@@ -207,13 +214,13 @@ describe('Integration | Component | query-results', function () {
         const pageSize = this.element.querySelectorAll(
           '.query-results-pagination .page-size-selector .ember-power-select-selected-item'
         )[index];
-        expect(pageSize.textContent.trim()).to.equal('25');
+        assert.strictEqual(pageSize.textContent.trim(), '25');
       }
     );
 
-    it(
+    test(
       `shows correct number of pages for a small results set (${paginationPosition} pagination control)`,
-      async function () {
+      async function (assert) {
         await render(hbs `<QueryResults
           @queryResultsPromise={{this.queryResultsPromise}}
           @pageSize={{10}}
@@ -222,13 +229,13 @@ describe('Integration | Component | query-results', function () {
         const pagesCount = this.element.querySelectorAll(
           '.query-results-pagination .pages-count'
         )[index];
-        expect(pagesCount.textContent.trim()).to.equal('1');
+        assert.strictEqual(pagesCount.textContent.trim(), '1');
       }
     );
 
-    it(
+    test(
       `shows correct number of pages for a large results set (${paginationPosition} pagination control)`,
-      async function () {
+      async function (assert) {
         this.queryResults.totalResultsCount = 50;
         await render(hbs `<QueryResults
           @queryResultsPromise={{this.queryResultsPromise}}
@@ -238,13 +245,13 @@ describe('Integration | Component | query-results', function () {
         const pagesCount = this.element.querySelectorAll(
           '.query-results-pagination .pages-count'
         )[index];
-        expect(pagesCount.textContent.trim()).to.equal('5');
+        assert.strictEqual(pagesCount.textContent.trim(), '5');
       }
     );
 
-    it(
+    test(
       `notifies about page change (${paginationPosition} pagination control)`,
-      async function () {
+      async function (assert) {
         this.queryResults.totalResultsCount = 50;
         this.changeSpy = sinon.spy();
 
@@ -258,13 +265,14 @@ describe('Integration | Component | query-results', function () {
         )[index];
         await click(nextBtn);
 
-        expect(this.changeSpy).to.be.calledOnce.and.to.be.calledWith(2);
+        assert.ok(this.changeSpy.calledOnce);
+        assert.ok(this.changeSpy.calledWith(2));
       }
     );
 
-    it(
+    test(
       `notifies about page size change (${paginationPosition} pagination control)`,
-      async function () {
+      async function (assert) {
         this.changeSpy = sinon.spy();
 
         await render(hbs `<QueryResults
@@ -277,28 +285,31 @@ describe('Integration | Component | query-results', function () {
         )[index];
         await selectChoose(pageSizeSelector, '50');
 
-        expect(this.changeSpy).to.be.calledOnce.and.to.be.calledWith(50);
+        assert.ok(this.changeSpy.calledOnce);
+        assert.ok(this.changeSpy.calledWith(50));
       }
     );
   });
 
-  it('has sort selector set to values passed to the component', async function () {
-    await render(hbs `<QueryResults
-      @index={{this.index}}
-      @queryResultsPromise={{this.queryResultsPromise}}
-      @sortProperty={{this.index.properties.a.properties.b}}
-      @sortDirection="asc"
-    />`);
+  test('has sort selector set to values passed to the component',
+    async function (assert) {
+      await render(hbs `<QueryResults
+        @index={{this.index}}
+        @queryResultsPromise={{this.queryResultsPromise}}
+        @sortProperty={{this.index.properties.a.properties.b}}
+        @sortDirection="asc"
+      />`);
 
-    expect(this.element.querySelector(
-      '.property-selector .ember-power-select-selected-item'
-    ).textContent.trim()).to.equal('a.b');
-    expect(this.element.querySelector(
-      '.direction-selector .ember-power-select-selected-item'
-    ).textContent.trim()).to.equal('asc');
-  });
+      assert.strictEqual(this.element.querySelector(
+        '.property-selector .ember-power-select-selected-item'
+      ).textContent.trim(), 'a.b');
+      assert.strictEqual(this.element.querySelector(
+        '.direction-selector .ember-power-select-selected-item'
+      ).textContent.trim(), 'asc');
+    }
+  );
 
-  it('notifies about sort property change', async function () {
+  test('notifies about sort property change', async function (assert) {
     this.changeSpy = sinon.spy();
 
     await render(hbs `<QueryResults
@@ -314,10 +325,11 @@ describe('Integration | Component | query-results', function () {
       direction: 'desc',
       property: sinon.match.same(this.index.properties.c.properties.d),
     });
-    expect(this.changeSpy).to.be.calledOnce.and.to.be.calledWith(changeMatcher);
+    assert.ok(this.changeSpy.calledOnce);
+    assert.ok(this.changeSpy.calledWith(changeMatcher));
   });
 
-  it('notifies about sort direction change', async function () {
+  test('notifies about sort direction change', async function (assert) {
     this.changeSpy = sinon.spy();
 
     await render(hbs `<QueryResults
@@ -333,6 +345,7 @@ describe('Integration | Component | query-results', function () {
       direction: 'asc',
       property: sinon.match.same(this.index.properties.a.properties.b),
     });
-    expect(this.changeSpy).to.be.calledOnce.and.to.be.calledWith(changeMatcher);
+    assert.ok(this.changeSpy.calledOnce);
+    assert.ok(this.changeSpy.calledWith(changeMatcher));
   });
 });

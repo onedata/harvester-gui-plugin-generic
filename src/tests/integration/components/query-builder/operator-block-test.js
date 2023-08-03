@@ -1,9 +1,7 @@
-import { expect } from 'chai';
-import { describe, context, it, beforeEach } from 'mocha';
-import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
-import hbs from 'htmlbars-inline-precompile';
-import { click, fillIn, blur } from '@ember/test-helpers';
+import { module, test } from 'qunit';
+import { setupRenderingTest } from '../../../helpers';
+import { render, click, fillIn, blur } from '@ember/test-helpers';
+import { hbs } from 'ember-cli-htmlbars';
 import AndOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/and-operator-query-block';
 import OrOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/or-operator-query-block';
 import NotOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/not-operator-query-block';
@@ -22,33 +20,33 @@ const operatorBlockClasses = {
   root: RootOperatorQueryBlock,
 };
 
-describe('Integration | Component | query-builder/operator-block', function () {
-  setupRenderingTest();
+module('Integration | Component | query-builder/operator-block', hooks => {
+  setupRenderingTest(hooks);
 
-  beforeEach(function () {
+  hooks.beforeEach(function () {
     this.valuesBuilder = new QueryValueComponentsBuilder([]);
   });
 
-  it(
+  test(
     'has classes "query-builder-block" and "query-builder-operator-block"',
-    async function () {
+    async function (assert) {
       await render(hbs`<QueryBuilder::OperatorBlock
         @valuesBuilder={{this.valuesBuilder}}
       />`);
 
-      expect(this.element.querySelectorAll(
+      assert.strictEqual(this.element.querySelectorAll(
         '.query-builder-block.query-builder-operator-block'
-      )).to.have.length(1);
+      ).length, 1);
     }
   );
 
   operatorsList.forEach(operatorName => {
-    context(`with ${operatorName.toUpperCase()} operator`, function () {
+    module(`with ${operatorName.toUpperCase()} operator`, () => {
       const isMultiOperandOperator = multiOperandOperatorsList.includes(operatorName);
 
-      it(
+      test(
         `has class "${operatorName}-operator-block"`,
-        async function () {
+        async function (assert) {
           this.set('queryBlock', new operatorBlockClasses[operatorName]());
 
           await render(hbs `
@@ -58,16 +56,16 @@ describe('Integration | Component | query-builder/operator-block', function () {
             />
           `);
 
-          expect(this.element.querySelectorAll(
+          assert.strictEqual(this.element.querySelectorAll(
             `.query-builder-block.${operatorName}-operator-block`
-          )).to.have.length(1);
+          ).length, 1);
         }
       );
 
       if (isMultiOperandOperator) {
-        it(
+        test(
           'has two block-adders (only first enabled) and no block when it represents empty block',
-          async function () {
+          async function (assert) {
             this.set('queryBlock', new operatorBlockClasses[operatorName]());
 
             await render(hbs `
@@ -79,18 +77,18 @@ describe('Integration | Component | query-builder/operator-block', function () {
 
             const blockAdderTriggers =
               this.element.querySelectorAll('.query-builder-block-adder');
-            expect(blockAdderTriggers).to.have.length(2);
-            expect(blockAdderTriggers[0]).to.not.have.attr('disabled');
-            expect(blockAdderTriggers[1]).to.have.attr('disabled');
-            expect(this.element.querySelector(
+            assert.strictEqual(blockAdderTriggers.length, 2);
+            assert.dom(blockAdderTriggers[0]).doesNotHaveAttribute('disabled');
+            assert.dom(blockAdderTriggers[1]).hasAttribute('disabled');
+            assert.notOk(this.element.querySelector(
               '.query-builder-block .query-builder-block'
-            )).to.not.exist;
+            ));
           }
         );
 
-        it(
+        test(
           'shows blocks and one enabled block-adder when it represents non-empty block',
-          async function () {
+          async function (assert) {
             const queryBlock =
               this.set('queryBlock', new operatorBlockClasses[operatorName]());
             queryBlock.operands.pushObjects([
@@ -106,21 +104,21 @@ describe('Integration | Component | query-builder/operator-block', function () {
             `);
 
             // 2 operands
-            expect(this.element.querySelectorAll(
+            assert.strictEqual(this.element.querySelectorAll(
               '.query-builder-block .query-builder-block'
-            )).to.have.length(2);
+            ).length, 2);
             // 2 from operands + 1 from the parent block
-            expect(this.element.querySelectorAll(
+            assert.strictEqual(this.element.querySelectorAll(
               '.query-builder-block-adder:not([disabled])'
-            )).to.have.length(3);
+            ).length, 3);
             // exactly 2 are from operands (NOT operators)
-            expect(this.element.querySelectorAll(
+            assert.strictEqual(this.element.querySelectorAll(
               '.query-builder-block .query-builder-block .query-builder-block-adder'
-            )).to.have.length(2);
+            ).length, 2);
           }
         );
 
-        it('allows to add block using block-adder', async function () {
+        test('allows to add block using block-adder', async function (assert) {
           const queryBlock =
             this.set('queryBlock', new operatorBlockClasses[operatorName]());
 
@@ -132,21 +130,23 @@ describe('Integration | Component | query-builder/operator-block', function () {
           await click('.block-adder-body .operator-not');
 
           // 1 operand
-          expect(this.element.querySelectorAll(
+          assert.strictEqual(this.element.querySelectorAll(
             '.query-builder-block .query-builder-block'
-          )).to.have.length(1);
+          ).length, 1);
           // 1 from operands + 1 from the parent block
-          expect(this.element.querySelectorAll('.query-builder-block-adder'))
-            .to.have.length(2);
+          assert.strictEqual(
+            this.element.querySelectorAll('.query-builder-block-adder').length,
+            2
+          );
           // exactly 1 is from operands (NOT operators)
-          expect(this.element.querySelectorAll(
+          assert.strictEqual(this.element.querySelectorAll(
             '.query-builder-block .query-builder-block .query-builder-block-adder'
-          )).to.have.length(1);
-          expect(queryBlock.operands).to.have.length(1);
-          expect(queryBlock.operands[0]).to.be.an.instanceOf(NotOperatorQueryBlock);
+          ).length, 1);
+          assert.strictEqual(queryBlock.operands.length, 1);
+          assert.ok(queryBlock.operands[0] instanceof NotOperatorQueryBlock);
         });
 
-        it('shows operator name', async function () {
+        test('shows operator name', async function (assert) {
           const queryBlock =
             this.set('queryBlock', new operatorBlockClasses[operatorName]());
           queryBlock.operands.pushObjects([
@@ -162,15 +162,15 @@ describe('Integration | Component | query-builder/operator-block', function () {
           `);
 
           const labels = this.element.querySelectorAll('.block-infix-label');
-          expect(labels).to.have.length(2);
+          assert.strictEqual(labels.length, 2);
           labels.forEach(label =>
-            expect(label.textContent.trim()).to.equal(operatorName)
+            assert.strictEqual(label.textContent.trim(), operatorName)
           );
         });
       } else {
-        it(
+        test(
           'shows single block-adder and no block when it represents empty block',
-          async function () {
+          async function (assert) {
             this.set('queryBlock', new operatorBlockClasses[operatorName]());
 
             await render(hbs `
@@ -180,17 +180,19 @@ describe('Integration | Component | query-builder/operator-block', function () {
               />
             `);
 
-            expect(this.element.querySelectorAll('.query-builder-block-adder'))
-              .to.have.length(1);
-            expect(
-              this.element.querySelectorAll('.query-builder-block .query-builder-block')
-            ).to.not.exist;
+            assert.strictEqual(
+              this.element.querySelectorAll('.query-builder-block-adder').length,
+              1
+            );
+            assert.notOk(
+              this.element.querySelector('.query-builder-block .query-builder-block')
+            );
           }
         );
 
-        it(
+        test(
           'shows block and no block-adder when it represents non-empty block',
-          async function () {
+          async function (assert) {
             const queryBlock =
               this.set('queryBlock', new operatorBlockClasses[operatorName]());
             queryBlock.operands.pushObject(new NotOperatorQueryBlock());
@@ -203,20 +205,23 @@ describe('Integration | Component | query-builder/operator-block', function () {
             `);
 
             // 1 operand
-            expect(this.element.querySelectorAll(
+            assert.strictEqual(this.element.querySelectorAll(
               '.query-builder-block .query-builder-block'
-            )).to.have.length(1);
+            ).length, 1);
             // 1 adder... (or 2 if operator is "root")
-            expect(this.element.querySelectorAll('.query-builder-block-adder'))
-              .to.have.length(operatorName === 'root' ? 2 : 1);
+            assert.strictEqual(
+              this.element.querySelectorAll('.query-builder-block-adder').length,
+              operatorName === 'root' ? 2 : 1
+            );
             // ... where 1 is from operand
-            expect(this.element.querySelectorAll(
+            assert.ok(this.element.querySelectorAll(
               '.query-builder-block .query-builder-block .query-builder-block-adder'
-            )).to.exist;
+            ));
           }
         );
 
-        it('allows to add block using block-adder', async function () {
+        // eslint-disable-next-line qunit/no-identical-names
+        test('allows to add block using block-adder', async function (assert) {
           const queryBlock =
             this.set('queryBlock', new operatorBlockClasses[operatorName]());
 
@@ -230,22 +235,24 @@ describe('Integration | Component | query-builder/operator-block', function () {
           await click('.block-adder-body .operator-not');
 
           // 1 operand
-          expect(this.element.querySelectorAll(
+          assert.strictEqual(this.element.querySelectorAll(
             '.query-builder-block .query-builder-block'
-          )).to.have.length(1);
+          ).length, 1);
           // 1 adder... (or 2 if operator is "root")
-          expect(this.element.querySelectorAll('.query-builder-block-adder'))
-            .to.have.length(operatorName === 'root' ? 2 : 1);
+          assert.strictEqual(
+            this.element.querySelectorAll('.query-builder-block-adder').length,
+            operatorName === 'root' ? 2 : 1
+          );
           // ... where 1 is from operand
-          expect(this.element.querySelectorAll(
+          assert.ok(this.element.querySelectorAll(
             '.query-builder-block .query-builder-block .query-builder-block-adder'
-          )).to.exist;
-          expect(queryBlock.operands).to.have.length(1);
-          expect(queryBlock.operands[0]).to.be.an.instanceOf(NotOperatorQueryBlock);
+          ));
+          assert.strictEqual(queryBlock.operands.length, 1);
+          assert.ok(queryBlock.operands[0] instanceof NotOperatorQueryBlock);
         });
 
         if (operatorName === 'root') {
-          it('does not show operator name', async function () {
+          test('does not show operator name', async function (assert) {
             this.set('queryBlock', new operatorBlockClasses[operatorName]());
 
             await render(hbs `
@@ -255,12 +262,12 @@ describe('Integration | Component | query-builder/operator-block', function () {
               />
             `);
 
-            expect(this.element.querySelector('.block-prefix-label')).to.not.exist;
+            assert.notOk(this.element.querySelector('.block-prefix-label'));
           });
 
-          it(
+          test(
             'allows to surround existing operand with an operator via block-adder',
-            async function () {
+            async function (assert) {
               const queryBlock =
                 this.set('queryBlock', new operatorBlockClasses[operatorName]());
 
@@ -272,30 +279,35 @@ describe('Integration | Component | query-builder/operator-block', function () {
               await click('.block-adder-body .operator-not');
               await click('.query-builder-block-adder.surround-root');
 
-              expect(this.element.querySelector('.block-adder-body .condition-selector'))
-                .to.not.exist;
+              assert.notOk(
+                this.element.querySelector('.block-adder-body .condition-selector')
+              );
 
               await click('.block-adder-body .operator-and');
 
-              expect(this.element.querySelectorAll('.query-builder-block'))
-                .to.have.length(3);
+              assert.strictEqual(
+                this.element.querySelectorAll('.query-builder-block').length,
+                3
+              );
               const surroundingBlock =
                 this.element.querySelector('.query-builder-block .query-builder-block');
-              expect(surroundingBlock).to.have.class('and-operator-block');
+              assert.dom(surroundingBlock).hasClass('and-operator-block');
               const innerBlock = this.element.querySelector(
                 '.query-builder-block .query-builder-block .query-builder-block'
               );
-              expect(innerBlock).to.have.class('not-operator-block');
-              expect(queryBlock.operands[0]).to.be.an.instanceOf(AndOperatorQueryBlock);
-              expect(queryBlock.operands[0].operands[0])
-                .to.be.an.instanceOf(NotOperatorQueryBlock);
-              expect(
+              assert.dom(innerBlock).hasClass('not-operator-block');
+              assert.ok(queryBlock.operands[0] instanceof AndOperatorQueryBlock);
+              assert.ok(
+                queryBlock.operands[0].operands[0] instanceof NotOperatorQueryBlock
+              );
+              assert.ok(
                 this.element.querySelector('.query-builder-block-adder.surround-root')
-              ).to.exist;
+              );
             }
           );
         } else {
-          it('shows operator name', async function () {
+          // eslint-disable-next-line qunit/no-identical-names
+          test('shows operator name', async function (assert) {
             this.set('queryBlock', new operatorBlockClasses[operatorName]());
 
             await render(hbs `
@@ -305,13 +317,15 @@ describe('Integration | Component | query-builder/operator-block', function () {
               />
             `);
 
-            expect(this.element.querySelector('.block-prefix-label').textContent.trim())
-              .to.equal(operatorName);
+            assert.strictEqual(
+              this.element.querySelector('.block-prefix-label').textContent.trim(),
+              operatorName
+            );
           });
         }
       }
 
-      it('allows to remove nested block', async function () {
+      test('allows to remove nested block', async function (assert) {
         const {
           queryBlock,
           removedSpy,
@@ -327,20 +341,23 @@ describe('Integration | Component | query-builder/operator-block', function () {
         />`);
         await click('.query-builder-block-adder');
         await click('.block-adder-body .operator-not');
-        expect(removedSpy).to.be.not.called;
+        assert.ok(removedSpy.notCalled);
         const nestedBlock = queryBlock.operands[0];
         await click('.remove-block');
 
-        expect(this.element.querySelectorAll(
+        assert.notOk(this.element.querySelector(
           '.query-builder-block .query-builder-block'
-        )).to.not.exist;
-        expect(this.element.querySelectorAll('.query-builder-block-adder'))
-          .to.have.length(isMultiOperandOperator ? 2 : 1);
-        expect(queryBlock.operands).to.have.length(0);
-        expect(removedSpy).to.be.calledOnce.and.to.be.calledWith(nestedBlock);
+        ));
+        assert.strictEqual(
+          this.element.querySelectorAll('.query-builder-block-adder').length,
+          isMultiOperandOperator ? 2 : 1
+        );
+        assert.strictEqual(queryBlock.operands.length, 0);
+        assert.ok(removedSpy.calledOnce);
+        assert.ok(removedSpy.calledWith(nestedBlock));
       });
 
-      it('allows to surround nested block with an operator', async function () {
+      test('allows to surround nested block with an operator', async function (assert) {
         const queryBlock =
           this.set('queryBlock', new operatorBlockClasses[operatorName]());
 
@@ -353,50 +370,56 @@ describe('Integration | Component | query-builder/operator-block', function () {
         await click('.query-builder-block-visualiser');
         await click('.block-settings-body .surround-section .operator-and');
 
-        expect(this.element.querySelectorAll('.query-builder-block')).to.have.length(3);
+        assert.strictEqual(
+          this.element.querySelectorAll('.query-builder-block').length,
+          3
+        );
         const surroundingBlock =
           this.element.querySelector('.query-builder-block .query-builder-block');
-        expect(surroundingBlock).to.have.class('and-operator-block');
+        assert.dom(surroundingBlock).hasClass('and-operator-block');
         const innerBlock = this.element.querySelector(
           '.query-builder-block .query-builder-block .query-builder-block'
         );
-        expect(innerBlock).to.have.class('not-operator-block');
-        expect(queryBlock.operands[0]).to.be.an.instanceOf(AndOperatorQueryBlock);
-        expect(queryBlock.operands[0].operands[0])
-          .to.be.an.instanceOf(NotOperatorQueryBlock);
+        assert.dom(innerBlock).hasClass('not-operator-block');
+        assert.ok(queryBlock.operands[0] instanceof AndOperatorQueryBlock);
+        assert.ok(queryBlock.operands[0].operands[0] instanceof NotOperatorQueryBlock);
       });
 
-      it('allows to change nested operator to another operator', async function () {
-        const queryBlock =
-          this.set('queryBlock', new operatorBlockClasses[operatorName]());
+      test('allows to change nested operator to another operator',
+        async function (assert) {
+          const queryBlock =
+            this.set('queryBlock', new operatorBlockClasses[operatorName]());
 
-        await render(hbs `<QueryBuilder::OperatorBlock
-          @queryBlock={{this.queryBlock}}
-          @valuesBuilder={{this.valuesBuilder}}
-        />`);
-        await click('.query-builder-block-adder');
-        await click('.block-adder-body .operator-not');
-        await click('.query-builder-block-adder');
-        await click('.block-adder-body .operator-or');
-        await click('.query-builder-block-visualiser');
-        await click('.block-settings-body .change-to-section .operator-and');
+          await render(hbs `<QueryBuilder::OperatorBlock
+            @queryBlock={{this.queryBlock}}
+            @valuesBuilder={{this.valuesBuilder}}
+          />`);
+          await click('.query-builder-block-adder');
+          await click('.block-adder-body .operator-not');
+          await click('.query-builder-block-adder');
+          await click('.block-adder-body .operator-or');
+          await click('.query-builder-block-visualiser');
+          await click('.block-settings-body .change-to-section .operator-and');
 
-        expect(this.element.querySelectorAll('.query-builder-block')).to.have.length(3);
-        const changedBlock =
-          this.element.querySelector('.query-builder-block .query-builder-block');
-        expect(changedBlock).to.have.class('and-operator-block');
-        const innerBlock = this.element.querySelector(
-          '.query-builder-block .query-builder-block .query-builder-block'
-        );
-        expect(innerBlock).to.have.class('or-operator-block');
-        expect(queryBlock.operands[0]).to.be.an.instanceOf(AndOperatorQueryBlock);
-        expect(queryBlock.operands[0].operands[0])
-          .to.be.an.instanceOf(OrOperatorQueryBlock);
-      });
+          assert.strictEqual(
+            this.element.querySelectorAll('.query-builder-block').length,
+            3
+          );
+          const changedBlock =
+            this.element.querySelector('.query-builder-block .query-builder-block');
+          assert.dom(changedBlock).hasClass('and-operator-block');
+          const innerBlock = this.element.querySelector(
+            '.query-builder-block .query-builder-block .query-builder-block'
+          );
+          assert.dom(innerBlock).hasClass('or-operator-block');
+          assert.ok(queryBlock.operands[0] instanceof AndOperatorQueryBlock);
+          assert.ok(queryBlock.operands[0].operands[0] instanceof OrOperatorQueryBlock);
+        }
+      );
 
-      it(
+      test(
         'removes nested NOT operator (with no children) from parent operator when using "change to" "NONE"',
-        async function () {
+        async function (assert) {
           const queryBlock =
             this.set('queryBlock', new operatorBlockClasses[operatorName]());
 
@@ -410,15 +433,15 @@ describe('Integration | Component | query-builder/operator-block', function () {
           await click('.block-settings-body .change-to-section .operator-none');
 
           const blocks = this.element.querySelectorAll('.query-builder-block');
-          expect(blocks).to.have.length(1);
-          expect(blocks[0]).to.have.class(`${operatorName}-operator-block`);
-          expect(queryBlock.operands).to.have.length(0);
+          assert.strictEqual(blocks.length, 1);
+          assert.dom(blocks[0]).hasClass(`${operatorName}-operator-block`);
+          assert.strictEqual(queryBlock.operands.length, 0);
         }
       );
 
-      it(
+      test(
         'extracts nested NOT operator (with single child) to parent operator when using "change to" "NONE"',
-        async function () {
+        async function (assert) {
           const queryBlock =
             this.set('queryBlock', new operatorBlockClasses[operatorName]());
 
@@ -434,18 +457,18 @@ describe('Integration | Component | query-builder/operator-block', function () {
           await click('.block-settings-body .change-to-section .operator-none');
 
           const blocks = this.element.querySelectorAll('.query-builder-block');
-          expect(blocks).to.have.length(2);
-          expect(blocks[0]).to.have.class(`${operatorName}-operator-block`);
-          expect(blocks[1]).to.have.class('and-operator-block');
-          expect(queryBlock.operands).to.have.length(1);
-          expect(queryBlock.operands[0]).to.be.an.instanceOf(AndOperatorQueryBlock);
-          expect(queryBlock.operands[0].operands).to.have.length(0);
+          assert.strictEqual(blocks.length, 2);
+          assert.dom(blocks[0]).hasClass(`${operatorName}-operator-block`);
+          assert.dom(blocks[1]).hasClass('and-operator-block');
+          assert.strictEqual(queryBlock.operands.length, 1);
+          assert.ok(queryBlock.operands[0] instanceof AndOperatorQueryBlock);
+          assert.strictEqual(queryBlock.operands[0].operands.length, 0);
         }
       );
 
-      it(
+      test(
         `${isMultiOperandOperator ? 'extracts' : 'does not allow to extract' } nested AND operator (with two child) to parent operator when using "change to" "NONE"`,
-        async function () {
+        async function (assert) {
           const queryBlock =
             this.set('queryBlock', new operatorBlockClasses[operatorName]());
 
@@ -465,24 +488,24 @@ describe('Integration | Component | query-builder/operator-block', function () {
             await click('.block-settings-body .change-to-section .operator-none');
 
             const blocks = this.element.querySelectorAll('.query-builder-block');
-            expect(blocks).to.have.length(3);
+            assert.strictEqual(blocks.length, 3);
             [operatorName, 'not', 'not'].forEach((renderedOperatorName, index) =>
-              expect(blocks[index]).to.have.class(`${renderedOperatorName}-operator-block`)
+              assert.dom(blocks[index]).hasClass(`${renderedOperatorName}-operator-block`)
             );
-            expect(queryBlock.operands).to.have.length(2);
-            expect(queryBlock.operands[0]).to.be.an.instanceOf(NotOperatorQueryBlock);
-            expect(queryBlock.operands[1]).to.be.an.instanceOf(NotOperatorQueryBlock);
+            assert.strictEqual(queryBlock.operands.length, 2);
+            assert.ok(queryBlock.operands[0] instanceof NotOperatorQueryBlock);
+            assert.ok(queryBlock.operands[1] instanceof NotOperatorQueryBlock);
           } else {
-            expect(this.element.querySelector(
+            assert.notOk(this.element.querySelector(
               '.block-settings-body .change-to-section .operator-none'
-            )).to.not.exist;
+            ));
           }
         }
       );
 
-      it(
+      test(
         'propagates edition-related notifications from condition blocks',
-        async function () {
+        async function (assert) {
           const {
             queryBlock,
             editionStartSpy,
@@ -509,29 +532,31 @@ describe('Integration | Component | query-builder/operator-block', function () {
               @onConditionEditionValidityChange={{this.editionValidityChangeSpy}}
             />
           `);
-          expect(editionStartSpy).to.not.be.called;
-          expect(editionEndSpy).to.not.be.called;
-          expect(editionValidityChangeSpy).to.not.be.called;
+          assert.ok(editionStartSpy.notCalled);
+          assert.ok(editionEndSpy.notCalled);
+          assert.ok(editionValidityChangeSpy.notCalled);
 
           await click('.comparator-value');
-          expect(editionStartSpy).to.be.calledOnce.and.to.be.calledWith(condition);
-          expect(editionEndSpy).to.not.be.called;
-          expect(editionValidityChangeSpy).to.not.be.called;
+          assert.ok(editionStartSpy.calledOnce);
+          assert.ok(editionStartSpy.calledWith(condition));
+          assert.ok(editionEndSpy.notCalled);
+          assert.ok(editionValidityChangeSpy.notCalled);
 
           await fillIn('.comparator-value', 'def');
-          expect(editionStartSpy).to.be.calledOnce;
-          expect(editionEndSpy).to.not.be.called;
-          expect(editionValidityChangeSpy).to.be.calledOnce
-            .and.to.be.calledWith(condition, true);
+          assert.ok(editionStartSpy.calledOnce);
+          assert.ok(editionEndSpy.notCalled);
+          assert.ok(editionValidityChangeSpy.calledOnce);
+          assert.ok(editionValidityChangeSpy.calledWith(condition, true));
 
           await blur('.comparator-value');
-          expect(editionStartSpy).to.be.calledOnce;
-          expect(editionEndSpy).to.be.calledOnce.and.to.be.calledWith(condition);
-          expect(editionValidityChangeSpy).to.be.calledOnce;
+          assert.ok(editionStartSpy.calledOnce);
+          assert.ok(editionEndSpy.calledOnce);
+          assert.ok(editionEndSpy.calledWith(condition));
+          assert.ok(editionValidityChangeSpy.calledOnce);
         }
       );
 
-      it('yields', async function () {
+      test('yields', async function (assert) {
         this.set('queryBlock', new operatorBlockClasses[operatorName]());
 
         await render(hbs `
@@ -543,7 +568,7 @@ describe('Integration | Component | query-builder/operator-block', function () {
           </QueryBuilder::OperatorBlock>
         `);
 
-        expect(this.element.querySelector('.test-element')).to.exist;
+        assert.ok(this.element.querySelector('.test-element'));
       });
     });
   });

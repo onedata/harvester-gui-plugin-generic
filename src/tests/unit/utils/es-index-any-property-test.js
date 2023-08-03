@@ -1,13 +1,12 @@
-import { expect } from 'chai';
-import { describe, it } from 'mocha';
+import { module, test } from 'qunit';
 import EsIndexAnyProperty from 'harvester-gui-plugin-generic/utils/es-index-any-property';
 
-describe('Unit | Utility | es-index-any-property', function () {
-  it('properly instantiates', function () {
+module('Unit | Utility | es-index-any-property', () => {
+  test('properly instantiates', function (assert) {
     const property = new EsIndexAnyProperty(null);
-    expect(property.name).to.be.undefined;
-    expect(property.type).to.equal('anyProperty');
-    expect(property.isField).to.equal(false);
-    expect(property.path).to.equal('any property');
+    assert.notOk(property.name);
+    assert.strictEqual(property.type, 'anyProperty');
+    assert.false(property.isField);
+    assert.strictEqual(property.path, 'any property');
   });
 });

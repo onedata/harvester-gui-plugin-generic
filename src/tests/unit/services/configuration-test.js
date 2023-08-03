@@ -1,12 +1,11 @@
-import { expect } from 'chai';
-import { describe, it, beforeEach } from 'mocha';
-import { setupTest } from 'ember-mocha';
+import { module, test } from 'qunit';
+import { setupTest } from '../../helpers';
 import sinon from 'sinon';
 
-describe('Unit | Service | configuration', function () {
-  setupTest();
+module('Unit | Service | configuration', hooks => {
+  setupTest(hooks);
 
-  beforeEach(function () {
+  hooks.beforeEach(function () {
     const configRequestStub = sinon.stub().resolves('config');
     sinon.stub(this.owner.lookup('service:app-proxy'), 'configRequest')
       .get(() => configRequestStub);
@@ -14,28 +13,30 @@ describe('Unit | Service | configuration', function () {
     this.set('configRequestStub', configRequestStub);
   });
 
-  it('has null configuration property on init', function () {
+  test('has null configuration property on init', function (assert) {
     const service = this.owner.lookup('service:configuration');
-    expect(service.configuration).to.be.null;
+    assert.notOk(service.configuration);
   });
 
-  it('fills in configuration property after reloadConfiguration() call', function () {
-    const service = this.owner.lookup('service:configuration');
+  test('fills in configuration property after reloadConfiguration() call',
+    function (assert) {
+      const service = this.owner.lookup('service:configuration');
 
-    return service.reloadConfiguration()
-      .then(() => expect(service.configuration).to.equal('config'));
-  });
+      return service.reloadConfiguration()
+        .then(() => assert.strictEqual(service.configuration, 'config'));
+    }
+  );
 
-  it(
+  test(
     'sets configuration property to null after failure of reloadConfiguration() call',
-    function () {
+    function (assert) {
       this.configRequestStub.rejects('error');
       const service = this.owner.lookup('service:configuration');
 
       // Set to sth non-null to check if reload failure will clear it out
       service.configuration = 'config';
       return service.reloadConfiguration()
-        .then(() => expect(service.configuration).to.be.null);
+        .then(() => assert.notOk(service.configuration));
     }
   );
 });

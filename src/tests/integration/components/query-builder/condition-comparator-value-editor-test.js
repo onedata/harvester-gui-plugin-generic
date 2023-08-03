@@ -1,11 +1,9 @@
-import { expect } from 'chai';
-import { describe, context, it, beforeEach, afterEach } from 'mocha';
-import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
-import hbs from 'htmlbars-inline-precompile';
+import { module, test } from 'qunit';
+import { setupRenderingTest } from '../../../helpers';
+import { render, click, fillIn, blur, triggerKeyEvent } from '@ember/test-helpers';
+import { hbs } from 'ember-cli-htmlbars';
 import sinon from 'sinon';
 import { clickTrigger, selectChoose } from '../../../helpers/ember-power-select';
-import { click, fillIn, blur, triggerKeyEvent } from '@ember/test-helpers';
 import { isFlatpickrOpen, setFlatpickrDate, closeFlatpickrDate } from 'ember-flatpickr/test-support/helpers';
 import moment from 'moment';
 import SpacesProvider from 'harvester-gui-plugin-generic/services/spaces-provider';
@@ -21,12 +19,11 @@ const spaces = [{
   name: 'space2',
 }];
 
-describe(
-  'Integration | Component | query-builder/condition-comparator-value-editor',
-  function () {
-    setupRenderingTest();
+module('Integration | Component | query-builder/condition-comparator-value-editor',
+  hooks => {
+    setupRenderingTest(hooks);
 
-    beforeEach(function () {
+    hooks.beforeEach(function () {
       sinon.stub(SpacesProvider.prototype, 'reloadSpaces').callsFake(function () {
         this.spaces = spaces;
       });
@@ -34,13 +31,13 @@ describe(
       this.valuesBuilder = new QueryValueComponentsBuilder(spaces);
     });
 
-    afterEach(function () {
+    hooks.afterEach(function () {
       if (SpacesProvider.prototype.reloadSpaces.restore) {
         SpacesProvider.prototype.reloadSpaces.restore();
       }
     });
 
-    context('in view mode', function () {
+    module('in view mode', () => {
       [{
         comparator: 'boolean.is',
         value: 'false',
@@ -75,9 +72,9 @@ describe(
         viewValue: '"abc def"',
       }].forEach(({ comparator, value, viewValue, descriptionSuffix }) => {
         const [propertyType, comparatorType] = comparator.split('.');
-        it(
+        test(
           `shows comparator value for "${comparatorType}" comparator for ${propertyType} property${descriptionSuffix || ''}`,
-          async function () {
+          async function (assert) {
             this.setProperties({
               comparator,
               value,
@@ -90,13 +87,15 @@ describe(
               @value={{this.value}}
             />`);
 
-            expect(this.element.querySelector('.comparator-value').textContent.trim())
-              .to.equal(viewValue);
+            assert.strictEqual(
+              this.element.querySelector('.comparator-value').textContent.trim(),
+              viewValue
+            );
           }
         );
       });
 
-      it('calls "onStartEdit" on click', async function () {
+      test('calls "onStartEdit" on click', async function (assert) {
         const onStartEditSpy = this.set('onStartEditSpy', sinon.spy());
 
         await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
@@ -108,11 +107,11 @@ describe(
         />`);
         await click('.comparator-value');
 
-        expect(onStartEditSpy).to.be.calledOnce;
+        assert.ok(onStartEditSpy.calledOnce);
       });
     });
 
-    context('in create mode', function () {
+    module('in create mode', () => {
       [{
         comparator: 'text.contains',
         valueToInput: 'abc',
@@ -128,9 +127,9 @@ describe(
       }].forEach(({ comparator, valueToInput }) => {
         const [propertyType, comparatorType] = comparator.split('.');
 
-        it(
+        test(
           `shows text input for "${comparatorType}" comparator for ${propertyType} property`,
-          async function () {
+          async function (assert) {
             this.set('comparator', comparator);
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
@@ -139,14 +138,13 @@ describe(
               @comparator={{this.comparator}}
             />`);
 
-            expect(this.element.querySelector('input[type="text"].comparator-value'))
-              .to.exist;
+            assert.ok(this.element.querySelector('input[type="text"].comparator-value'));
           }
         );
 
-        it(
+        test(
           `calls "onValueChange" callback, when ${propertyType} property "${comparatorType}" condition value has changed`,
-          async function () {
+          async function (assert) {
             const { changeSpy } = this.setProperties({
               comparator,
               changeSpy: sinon.spy(),
@@ -160,7 +158,8 @@ describe(
             />`);
             await fillIn('.comparator-value', valueToInput);
 
-            expect(changeSpy).to.be.calledOnce.and.to.be.calledWith(valueToInput);
+            assert.ok(changeSpy.calledOnce);
+            assert.ok(changeSpy.calledWith(valueToInput));
           }
         );
       });
@@ -178,9 +177,9 @@ describe(
       }].forEach(({ comparator, options, toSelect, selectedValue }) => {
         const [propertyType, comparatorType] = comparator.split('.');
 
-        it(
+        test(
           `shows dropdown for "${comparatorType}" comparator for ${propertyType} property`,
-          async function () {
+          async function (assert) {
             this.set('comparator', comparator);
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
@@ -192,16 +191,16 @@ describe(
 
             const optionsNodes =
               this.element.querySelectorAll('.ember-power-select-option');
-            expect(optionsNodes).to.have.length(options.length);
+            assert.strictEqual(optionsNodes.length, options.length);
             options.forEach((option, index) =>
-              expect(optionsNodes[index].textContent.trim()).to.equal(option)
+              assert.strictEqual(optionsNodes[index].textContent.trim(), option)
             );
           }
         );
 
-        it(
+        test(
           `calls "onValueChange" callback, when ${propertyType} property "${comparatorType}" condition value has changed`,
-          async function () {
+          async function (assert) {
             const { changeSpy } = this.setProperties({
               comparator,
               changeSpy: sinon.spy(),
@@ -215,15 +214,16 @@ describe(
             />`);
             await selectChoose('.comparator-value', toSelect);
 
-            expect(changeSpy).to.be.calledOnce.and.to.be.calledWith(selectedValue);
+            assert.ok(changeSpy.calledOnce);
+            assert.ok(changeSpy.calledWith(selectedValue));
           }
         );
       });
 
       mathOperators.forEach(operator => {
-        it(
+        test(
           `shows flatpickr input without time for "${operator}" comparator for date property`,
-          async function () {
+          async function (assert) {
             this.setProperties({
               value: {
                 datetime: moment('2020-05-04 12:00').toDate(),
@@ -238,16 +238,15 @@ describe(
               @value={{this.value}}
             />`);
 
-            expect(this.element.querySelector('.comparator-value'))
-              .to.exist.and.to.have.value('2020-05-04');
-            expect(this.element.querySelector('.flatpickr-calendar')).to.exist;
-            expect(this.element.querySelector('.flatpickr-time.hasSeconds')).to.not.exist;
+            assert.dom(this.element.querySelector('.comparator-value')).hasValue('2020-05-04');
+            assert.ok(this.element.querySelector('.flatpickr-calendar'));
+            assert.notOk(this.element.querySelector('.flatpickr-time.hasSeconds'));
           }
         );
 
-        it(
+        test(
           `allows to enable time flatpickr input for "${operator}" comparator for date property`,
-          async function () {
+          async function (assert) {
             const { changeSpy } = this.setProperties({
               value: {
                 datetime: moment('2020-05-04 12:00').toDate(),
@@ -268,19 +267,19 @@ describe(
             />`);
             await click('.include-time');
 
-            expect(changeSpy).to.be.calledOnce.and.to.be.calledWith({
+            assert.ok(changeSpy.calledOnce);
+            assert.ok(changeSpy.calledWith({
               datetime: sinon.match.date,
               timeEnabled: true,
-            });
-            expect(this.element.querySelector('.comparator-value'))
-              .to.have.value('2020-05-04 12:00:00');
-            expect(this.element.querySelector('.flatpickr-time.hasSeconds')).to.exist;
+            }));
+            assert.dom(this.element.querySelector('.comparator-value')).hasValue('2020-05-04 12:00:00');
+            assert.ok(this.element.querySelector('.flatpickr-time.hasSeconds'));
           }
         );
 
-        it(
+        test(
           `calls "onValueChange" callback, when date property "${operator}" condition value has changed`,
-          async function () {
+          async function (assert) {
             const { changeSpy } = this.setProperties({
               value: {
                 datetime: moment('2020-05-04 12:00').toDate(),
@@ -302,19 +301,19 @@ describe(
             await click('.include-time');
             await setFlatpickrDate('.flatpickr-input', new Date(2020, 0, 2, 13, 10, 15));
 
-            expect(changeSpy).to.be.calledTwice.and.to.be.calledWith({
+            assert.ok(changeSpy.calledTwice);
+            assert.ok(changeSpy.calledWith({
               datetime: sinon.match.date,
               timeEnabled: true,
-            });
-            expect(
-              moment(changeSpy.lastCall.args[0].datetime).format('YYYY-MM-DD HH:mm:ss')
-            ).to.equal('2020-01-02 13:10:15');
+            }));
+            assert.strictEqual(moment(changeSpy.lastCall.args[0].datetime).format('YYYY-MM-DD HH:mm:ss'),
+              '2020-01-02 13:10:15');
           }
         );
       });
     });
 
-    context('in edit mode', function () {
+    module('in edit mode', () => {
       [
         'text.contains',
         ...mathOperators.map(operator => `number.${operator}`),
@@ -324,9 +323,9 @@ describe(
         const [propertyType, comparatorType] = comparator.split('.');
         const beforeTest = testCase => testCase.set('comparator', comparator);
 
-        it(
+        test(
           `has focused editor on init for "${comparatorType}" comparator for ${propertyType} property`,
-          async function () {
+          async function (assert) {
             beforeTest(this);
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
@@ -336,14 +335,16 @@ describe(
               @value="abc"
             />`);
 
-            expect(this.element.querySelector('.comparator-value'))
-              .to.equal(document.activeElement);
+            assert.strictEqual(
+              this.element.querySelector('.comparator-value'),
+              document.activeElement
+            );
           }
         );
 
-        it(
+        test(
           `shows current comparator value for "${comparatorType}" comparator for ${propertyType} property`,
-          async function () {
+          async function (assert) {
             beforeTest(this);
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
@@ -353,13 +354,13 @@ describe(
               @value="abc"
             />`);
 
-            expect(this.element.querySelector('.comparator-value')).to.have.value('abc');
+            assert.dom(this.element.querySelector('.comparator-value')).hasValue('abc');
           }
         );
 
-        it(
+        test(
           `closes editor and notifies about new value for "${comparatorType}" comparator for ${propertyType} property (close using Enter)`,
-          async function () {
+          async function (assert) {
             beforeTest(this);
             const {
               changeSpy,
@@ -380,14 +381,14 @@ describe(
             await fillIn('.comparator-value', 'def');
             await triggerKeyEvent('.comparator-value', 'keydown', 'Enter');
 
-            expect(changeSpy).to.be.calledWith('def');
-            expect(finishEditSpy).to.be.calledOnce;
+            assert.ok(changeSpy.calledWith('def'));
+            assert.ok(finishEditSpy.calledOnce);
           }
         );
 
-        it(
+        test(
           `closes editor and notifies about new value for "${comparatorType}" comparator for ${propertyType} property (close using blur)`,
-          async function () {
+          async function (assert) {
             beforeTest(this);
             const {
               changeSpy,
@@ -408,14 +409,14 @@ describe(
             await fillIn('.comparator-value', 'def');
             await blur('.comparator-value');
 
-            expect(changeSpy).to.be.calledWith('def');
-            expect(finishEditSpy).to.be.calledOnce;
+            assert.ok(changeSpy.calledWith('def'));
+            assert.ok(finishEditSpy.calledOnce);
           }
         );
 
-        it(
+        test(
           `notifies about partial new value before close for "${comparatorType}" comparator for ${propertyType} property`,
-          async function () {
+          async function (assert) {
             beforeTest(this);
             const {
               changeSpy,
@@ -435,14 +436,14 @@ describe(
             />`);
             await fillIn('.comparator-value', 'de');
 
-            expect(changeSpy).to.be.calledWith('de');
-            expect(finishEditSpy).to.not.be.called;
+            assert.ok(changeSpy.calledWith('de'));
+            assert.ok(finishEditSpy.notCalled);
           }
         );
 
-        it(
+        test(
           `cancels editor on Escape key down for "${comparatorType}" comparator for ${propertyType} property`,
-          async function () {
+          async function (assert) {
             beforeTest(this);
             const {
               finishEditSpy,
@@ -462,14 +463,14 @@ describe(
             />`);
             await triggerKeyEvent('.comparator-value', 'keydown', 'Escape');
 
-            expect(finishEditSpy).to.not.be.called;
-            expect(cancelEditSpy).to.be.calledOnce;
+            assert.ok(finishEditSpy.notCalled);
+            assert.ok(cancelEditSpy.calledOnce);
           }
         );
 
-        it(
+        test(
           `does not add class "is-invalid" to the input by default for "${comparatorType}" comparator for ${propertyType} property`,
-          async function () {
+          async function (assert) {
             beforeTest(this);
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
@@ -479,14 +480,14 @@ describe(
               @value="abc"
             />`);
 
-            expect(this.element.querySelector('.comparator-value'))
-              .to.not.have.class('is-invalid');
+            assert.dom(this.element.querySelector('.comparator-value'))
+              .doesNotHaveClass('is-invalid');
           }
         );
 
-        it(
+        test(
           `adds class "is-invalid" to the input if isValueInvalid is true for "${comparatorType}" comparator for ${propertyType} property`,
-          async function () {
+          async function (assert) {
             beforeTest(this);
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
@@ -497,8 +498,7 @@ describe(
               @value="abc"
             />`);
 
-            expect(this.element.querySelector('.comparator-value'))
-              .to.have.class('is-invalid');
+            assert.dom(this.element.querySelector('.comparator-value')).hasClass('is-invalid');
           }
         );
       });
@@ -531,9 +531,9 @@ describe(
           value: initialValue,
         });
 
-        it(
+        test(
           `has focused editor on init for "${comparatorType}" comparator for ${propertyType} property`,
-          async function () {
+          async function (assert) {
             beforeTest(this);
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
@@ -543,15 +543,16 @@ describe(
               @value="abc"
             />`);
 
-            expect(
-              this.element.querySelector('.comparator-value')
-            ).to.equal(document.activeElement);
+            assert.strictEqual(
+              this.element.querySelector('.comparator-value'),
+              document.activeElement
+            );
           }
         );
 
-        it(
+        test(
           `shows current comparator value for "${comparatorType}" comparator for ${propertyType} property`,
-          async function () {
+          async function (assert) {
             beforeTest(this);
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
@@ -561,15 +562,15 @@ describe(
               @value={{this.value}}
             />`);
 
-            expect(this.element.querySelector(
+            assert.strictEqual(this.element.querySelector(
               '.comparator-value .ember-power-select-selected-item'
-            ).textContent.trim()).to.equal(initialTriggerValue);
+            ).textContent.trim(), initialTriggerValue);
           }
         );
 
-        it(
+        test(
           `shows expanded dropdown for "${comparatorType}" comparator for ${propertyType} property`,
-          async function () {
+          async function (assert) {
             beforeTest(this);
 
             await render(hbs `<QueryBuilder::ConditionComparatorValueEditor
@@ -580,13 +581,13 @@ describe(
             />`);
 
             const options = this.element.querySelectorAll('.ember-power-select-option');
-            expect(options).to.have.length(optionsCount);
+            assert.strictEqual(options.length, optionsCount);
           }
         );
 
-        it(
+        test(
           `closes editor and notifies about new value for "${comparatorType}" comparator for ${propertyType} property`,
-          async function () {
+          async function (assert) {
             beforeTest(this);
             const {
               changeSpy,
@@ -606,14 +607,15 @@ describe(
             />`);
             await selectChoose('.comparator-value', stringToSelect);
 
-            expect(changeSpy).to.be.calledOnce.and.to.be.calledWith(selectionResult);
-            expect(finishEditSpy).to.be.calledOnce;
+            assert.ok(changeSpy.calledOnce);
+            assert.ok(changeSpy.calledWith(selectionResult));
+            assert.ok(finishEditSpy.calledOnce);
           }
         );
 
-        it(
+        test(
           `closes editor for "${comparatorType}" comparator for ${propertyType} property on dropdown trigger click`,
-          async function () {
+          async function (assert) {
             beforeTest(this);
             const finishEditSpy = this.set('finishEditSpy', sinon.spy());
 
@@ -626,14 +628,14 @@ describe(
             />`);
             await clickTrigger('.comparator-value');
 
-            expect(finishEditSpy).to.be.calledOnce;
+            assert.ok(finishEditSpy.calledOnce);
           }
         );
       });
 
-      it(
+      test(
         'shows current comparator value and opened flatpickr for "lt" comparator for date property',
-        async function () {
+        async function (assert) {
           this.set('value', {
             datetime: moment('2020-05-04 12:00').toDate(),
             timeEnabled: true,
@@ -646,19 +648,18 @@ describe(
             @value={{this.value}}
           />`);
 
-          expect(this.element.querySelector('.comparator-value'))
-            .to.have.value('2020-05-04 12:00:00');
-          expect(this.element.querySelector('.include-time')).to.have.class('active');
-          expect(isFlatpickrOpen()).to.be.true;
+          assert.dom(this.element.querySelector('.comparator-value')).hasValue('2020-05-04 12:00:00');
+          assert.dom(this.element.querySelector('.include-time')).hasClass('active');
+          assert.true(isFlatpickrOpen());
         }
       );
 
       mathOperators.forEach(operator => {
         const comparator = `date.${operator}`;
 
-        it(
+        test(
           `closes editor for "${operator}" comparator for date property on flatpickr close`,
-          async function () {
+          async function (assert) {
             const { finishEditSpy } = this.setProperties({
               value: {
                 datetime: moment('2020-05-04 12:00').toDate(),
@@ -677,13 +678,13 @@ describe(
             />`);
             await closeFlatpickrDate('.flatpickr-input');
 
-            expect(finishEditSpy).to.be.calledOnce;
+            assert.ok(finishEditSpy.calledOnce);
           }
         );
 
-        it(
+        test(
           `toggle of "time-enabled" button does not turn off editor of "${operator}" comparator for date property`,
-          async function () {
+          async function (assert) {
             const {
               finishEditSpy,
               valueChangeStub,
@@ -707,19 +708,19 @@ describe(
             />`);
             await click('.include-time');
 
-            expect(isFlatpickrOpen()).to.be.true;
-            expect(this.element.querySelector('.flatpickr-time.hasSeconds')).to.exist;
-            expect(finishEditSpy).to.not.be.called;
-            expect(valueChangeStub).to.be.calledWith(sinon.match({
+            assert.true(isFlatpickrOpen());
+            assert.ok(this.element.querySelector('.flatpickr-time.hasSeconds'));
+            assert.ok(finishEditSpy.notCalled);
+            assert.ok(valueChangeStub.calledWith(sinon.match({
               datetime: sinon.match.date,
               timeEnabled: true,
-            }));
+            })));
           }
         );
 
-        it(
+        test(
           `notifies about changed value of "${operator}" comparator for date property`,
-          async function () {
+          async function (assert) {
             const {
               finishEditSpy,
               valueChangeSpy,
@@ -743,13 +744,13 @@ describe(
             />`);
             await setFlatpickrDate('.flatpickr-input', new Date(2020, 0, 2));
 
-            expect(finishEditSpy).to.not.be.called;
-            expect(valueChangeSpy).to.be.calledWith(sinon.match({
+            assert.ok(finishEditSpy.notCalled);
+            assert.ok(valueChangeSpy.calledWith(sinon.match({
               datetime: sinon.match.date,
               timeEnabled: false,
-            }));
-            expect(moment(valueChangeSpy.lastCall.args[0].datetime).format('YYYY-MM-DD'))
-              .to.equal('2020-01-02');
+            })));
+            assert.strictEqual(moment(valueChangeSpy.lastCall.args[0].datetime).format('YYYY-MM-DD'),
+              '2020-01-02');
           }
         );
       });

@@ -1,63 +1,61 @@
-import { expect } from 'chai';
-import { describe, it } from 'mocha';
-import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
-import hbs from 'htmlbars-inline-precompile';
+import { module, test } from 'qunit';
+import { setupRenderingTest } from '../../helpers';
+import { render, click } from '@ember/test-helpers';
+import { hbs } from 'ember-cli-htmlbars';
 import sinon from 'sinon';
-import { click } from '@ember/test-helpers';
 
-describe('Integration | Component | one-checkbox', function () {
-  setupRenderingTest();
+module('Integration | Component | one-checkbox', hooks => {
+  setupRenderingTest(hooks);
 
-  it('has class "one-checkbox"', async function () {
+  test('has class "one-checkbox"', async function (assert) {
     await render(hbs `<OneCheckbox />`);
 
-    expect(this.element.querySelectorAll('.one-checkbox')).to.have.length(1);
+    assert.strictEqual(this.element.querySelectorAll('.one-checkbox').length, 1);
   });
 
-  it('shows value "true"', async function () {
+  test('shows value "true"', async function (assert) {
     await render(hbs `<OneCheckbox @value={{true}}/>`);
 
     const checkboxNode = this.element.querySelector('.one-checkbox');
-    expect(checkboxNode).to.have.class('checked');
-    expect(checkboxNode.querySelector('.fa-icon')).to.have.class('fa-check');
+    assert.dom(checkboxNode).hasClass('checked');
+    assert.dom(checkboxNode.querySelector('.fa-icon')).hasClass('fa-check');
   });
 
-  it('shows value "false"', async function () {
+  test('shows value "false"', async function (assert) {
     await render(hbs `<OneCheckbox @value={{false}}/>`);
 
     const checkboxNode = this.element.querySelector('.one-checkbox');
-    expect(checkboxNode).to.have.class('unchecked');
-    expect(checkboxNode.querySelector('.fa-icon')).to.not.exist;
+    assert.dom(checkboxNode).hasClass('unchecked');
+    assert.notOk(checkboxNode.querySelector('.fa-icon'));
   });
 
-  it('shows value "indeterminate"', async function () {
+  test('shows value "indeterminate"', async function (assert) {
     await render(hbs `<OneCheckbox @value="indeterminate"/>`);
 
     const checkboxNode = this.element.querySelector('.one-checkbox');
-    expect(checkboxNode).to.have.class('indeterminate');
-    expect(checkboxNode.querySelector('.fa-icon')).to.have.class('fa-circle');
+    assert.dom(checkboxNode).hasClass('indeterminate');
+    assert.dom(checkboxNode.querySelector('.fa-icon')).hasClass('fa-circle');
   });
 
-  it('is enabled by default', async function () {
+  test('is enabled by default', async function (assert) {
     await render(hbs `<OneCheckbox />`);
 
     const checkboxNode = this.element.querySelector('.one-checkbox');
-    expect(checkboxNode).to.not.have.class('disabled');
+    assert.dom(checkboxNode).doesNotHaveClass('disabled');
   });
 
-  it('can be disabled', async function () {
+  test('can be disabled', async function (assert) {
     await render(hbs `<OneCheckbox @disabled={{true}}/>`);
 
     const checkboxNode = this.element.querySelector('.one-checkbox');
-    expect(checkboxNode).to.have.class('disabled');
+    assert.dom(checkboxNode).hasClass('disabled');
   });
 
-  it('has customizable input id', async function () {
+  test('has customizable input id', async function (assert) {
     await render(hbs `<OneCheckbox @inputId="my-id"/>`);
 
     const inputNode = this.element.querySelector('.one-checkbox input');
-    expect(inputNode).to.have.attr('id', 'my-id');
+    assert.dom(inputNode).hasAttribute('id', 'my-id');
   });
 
   [{
@@ -70,21 +68,24 @@ describe('Integration | Component | one-checkbox', function () {
     prev: 'indeterminate',
     next: true,
   }].forEach(({ prev, next }) => {
-    it(`notifies about value change from "${prev}" to "${next}"`, async function () {
-      this.initialValue = prev;
-      this.changeSpy = sinon.spy();
+    test(`notifies about value change from "${prev}" to "${next}"`,
+      async function (assert) {
+        this.initialValue = prev;
+        this.changeSpy = sinon.spy();
 
-      await render(hbs `<OneCheckbox
-        @value={{this.initialValue}}
-        @onChange={{this.changeSpy}}
-      />`);
-      await click('.one-checkbox');
+        await render(hbs `<OneCheckbox
+          @value={{this.initialValue}}
+          @onChange={{this.changeSpy}}
+        />`);
+        await click('.one-checkbox');
 
-      expect(this.changeSpy).to.be.calledOnce.and.to.be.calledWith(next);
-    });
+        assert.ok(this.changeSpy.calledOnce);
+        assert.ok(this.changeSpy.calledWith(next));
+      }
+    );
   });
 
-  it('can be changed using associated label', async function () {
+  test('can be changed using associated label', async function (assert) {
     this.changeSpy = sinon.spy();
 
     await render(hbs `
@@ -97,6 +98,7 @@ describe('Integration | Component | one-checkbox', function () {
     `);
     await click('.label');
 
-    expect(this.changeSpy).to.be.calledOnce.and.to.be.calledWith(false);
+    assert.ok(this.changeSpy.calledOnce);
+    assert.ok(this.changeSpy.calledWith(false));
   });
 });

@@ -1,12 +1,11 @@
-import { expect } from 'chai';
-import { describe, it, beforeEach } from 'mocha';
+import { module, test } from 'qunit';
 import EsIndex from 'harvester-gui-plugin-generic/utils/es-index';
 import EsIndexProperty from 'harvester-gui-plugin-generic/utils/es-index-property';
 import EsIndexOnedataProperty from 'harvester-gui-plugin-generic/utils/es-index-onedata-property';
 import EsIndexAnyProperty from 'harvester-gui-plugin-generic/utils/es-index-any-property';
 
-describe('Unit | Utility | es-index', function () {
-  beforeEach(function () {
+module('Unit | Utility | es-index', hooks => {
+  hooks.beforeEach(function () {
     this.rawMapping = {
       mappings: {
         properties: {
@@ -38,53 +37,52 @@ describe('Unit | Utility | es-index', function () {
     };
   });
 
-  it('persists raw mapping in "rawMapping" field', function () {
+  test('persists raw mapping in "rawMapping" field', function (assert) {
     const index = new EsIndex(Object.freeze(this.rawMapping));
 
-    expect(index.rawMapping).to.deep.equal(this.rawMapping);
+    assert.deepEqual(index.rawMapping, this.rawMapping);
   });
 
-  it('extracts properties', function () {
+  test('extracts properties', function (assert) {
     const index = new EsIndex(Object.freeze(this.rawMapping));
 
-    expect(Object.keys(index.properties)).to.have.length(4);
-    expect(index.properties.a).to.be.an.instanceOf(EsIndexProperty)
-      .and.to.deep.include({
-        name: 'a',
-        rawMapping: this.rawMapping.mappings.properties.a,
-      });
-    expect(index.properties.b).to.be.an.instanceOf(EsIndexProperty)
-      .and.to.deep.include({
-        name: 'b',
-        rawMapping: this.rawMapping.mappings.properties.b,
-      });
-    expect(index.properties['__onedata.space'])
-      .to.be.an.instanceOf(EsIndexOnedataProperty)
-      .and.to.deep.include({
-        name: '__onedata.space',
-        type: 'space',
-        path: 'space',
-      });
-    expect(index.properties['__anyProperty'])
-      .to.be.an.instanceOf(EsIndexAnyProperty);
-    expect(Object.keys(index.properties.a.properties)).to.have.length(0);
-    expect(Object.keys(index.properties.b.properties)).to.have.length(1);
-    expect(Object.keys(index.properties['__onedata.space'].properties))
-      .to.have.length(0);
-    expect(index.properties.b.properties.ba).to.be.an.instanceOf(EsIndexProperty)
-      .and.to.deep.include({
-        name: 'ba',
-        rawMapping: this.rawMapping.mappings.properties.b.properties.ba,
-      });
+    assert.strictEqual(Object.keys(index.properties).length, 4);
+    assert.ok(index.properties.a instanceof EsIndexProperty);
+    assert.propContains(index.properties.a, {
+      name: 'a',
+      rawMapping: this.rawMapping.mappings.properties.a,
+    });
+    assert.ok(index.properties.b instanceof EsIndexProperty);
+    assert.propContains(index.properties.b, {
+      name: 'b',
+      rawMapping: this.rawMapping.mappings.properties.b,
+    });
+    assert.ok(index.properties['__onedata.space'] instanceof EsIndexOnedataProperty);
+    assert.propContains(index.properties['__onedata.space'], {
+      name: '__onedata.space',
+      type: 'space',
+    });
+    assert.ok(index.properties['__anyProperty'] instanceof EsIndexAnyProperty);
+    assert.strictEqual(Object.keys(index.properties.a.properties).length, 0);
+    assert.strictEqual(Object.keys(index.properties.b.properties).length, 1);
+    assert.strictEqual(
+      Object.keys(index.properties['__onedata.space'].properties).length,
+      0
+    );
+    assert.ok(index.properties.b.properties.ba instanceof EsIndexProperty);
+    assert.propContains(index.properties.b.properties.ba, {
+      name: 'ba',
+      rawMapping: this.rawMapping.mappings.properties.b.properties.ba,
+    });
   });
 
-  it(
+  test(
     'returns flattened list of properties on getFlattenedProperties call',
-    function () {
+    function (assert) {
       const index = new EsIndex(Object.freeze(this.rawMapping));
 
       const flattened = index.getFlattenedProperties();
-      expect(flattened).to.have.length(5);
+      assert.strictEqual(flattened.length, 5);
       [
         'a',
         'b',
@@ -93,16 +91,16 @@ describe('Unit | Utility | es-index', function () {
         'any property',
       ].forEach((propertyPath, index) => {
         const flattenedProperty = flattened[index];
-        expect(flattenedProperty).to.be.an.instanceOf(EsIndexProperty);
-        expect(flattenedProperty.path).to.equal(propertyPath);
+        assert.ok(flattenedProperty instanceof EsIndexProperty);
+        assert.strictEqual(flattenedProperty.path, propertyPath);
       });
     }
   );
 
-  it('builds properties tree', function () {
+  test('builds properties tree', function (assert) {
     const index = new EsIndex(Object.freeze(this.rawMapping));
     const propertiesTree = index.getPropertiesTree();
-    expect(propertiesTree).to.deep.equal({
+    assert.deepEqual(propertiesTree, {
       a: {},
       b: {
         ba: {},

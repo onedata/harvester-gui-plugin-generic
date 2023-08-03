@@ -1,8 +1,7 @@
-import { expect } from 'chai';
-import { describe, it, beforeEach } from 'mocha';
-import { setupRenderingTest } from 'ember-mocha';
+import { module, test } from 'qunit';
+import { setupRenderingTest } from '../../../helpers';
 import { render } from '@ember/test-helpers';
-import hbs from 'htmlbars-inline-precompile';
+import { hbs } from 'ember-cli-htmlbars';
 import AndOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/and-operator-query-block';
 import OrOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/or-operator-query-block';
 import NotOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/not-operator-query-block';
@@ -15,17 +14,17 @@ const operatorBlockClasses = {
   not: NotOperatorQueryBlock,
 };
 
-describe('Integration | Component | query-builder/block-visualiser', function () {
-  setupRenderingTest();
+module('Integration | Component | query-builder/block-visualiser', hooks => {
+  setupRenderingTest(hooks);
 
-  beforeEach(function () {
+  hooks.beforeEach(function () {
     this.valuesBuilder = new QueryValueComponentsBuilder([]);
   });
 
   Object.keys(operatorBlockClasses).forEach(operatorName => {
-    it(
+    test(
       `renders ${operatorName.toUpperCase()} operator block according to the passed block spec`,
-      async function () {
+      async function (assert) {
         this.block = new operatorBlockClasses[operatorName]();
 
         await render(hbs`<QueryBuilder::BlockVisualiser
@@ -33,16 +32,16 @@ describe('Integration | Component | query-builder/block-visualiser', function ()
           @valuesBuilder={{this.valuesBuilder}}
         />`);
 
-        expect(this.element.querySelector(
+        assert.ok(this.element.querySelector(
           `.query-builder-operator-block.${operatorName}-operator-block`
-        )).to.exist;
+        ));
       }
     );
   });
 
-  it(
+  test(
     'renders condition block according to the passed block spec',
-    async function () {
+    async function (assert) {
       this.block = new ConditionQueryBlock({ path: 'a' }, 'boolean.is', 'true');
 
       await render(hbs `<QueryBuilder::BlockVisualiser
@@ -50,7 +49,7 @@ describe('Integration | Component | query-builder/block-visualiser', function ()
         @valuesBuilder={{this.valuesBuilder}}
       />`);
 
-      expect(this.element.querySelector('.query-builder-condition-block')).to.exist;
+      assert.ok(this.element.querySelector('.query-builder-condition-block'));
     }
   );
 });

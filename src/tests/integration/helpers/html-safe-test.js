@@ -1,13 +1,12 @@
-import { expect } from 'chai';
-import { describe, it } from 'mocha';
-import { setupRenderingTest } from 'ember-mocha';
+import { module, test } from 'qunit';
+import { setupRenderingTest } from '../../helpers';
 import { render } from '@ember/test-helpers';
-import hbs from 'htmlbars-inline-precompile';
+import { hbs } from 'ember-cli-htmlbars';
 
-describe('Integration | Helper | html-safe', function () {
-  setupRenderingTest();
+module('Integration | Helper | html-safe', hooks => {
+  setupRenderingTest(hooks);
 
-  it('returns SafeString', async function () {
+  test('returns SafeString', async function (assert) {
     this.set('str', '<b></b>');
 
     await render(hbs `
@@ -15,8 +14,7 @@ describe('Integration | Helper | html-safe', function () {
       <span class="safe">{{html-safe this.str}}</span>
     `);
 
-    expect(this.element.querySelector('.non-safe').innerHTML)
-      .to.equal('&lt;b&gt;&lt;/b&gt;');
-    expect(this.element.querySelector('.safe').innerHTML).to.equal('<b></b>');
+    assert.strictEqual(this.element.querySelector('.non-safe').innerHTML, '&lt;b&gt;&lt;/b&gt;');
+    assert.strictEqual(this.element.querySelector('.safe').innerHTML, '<b></b>');
   });
 });

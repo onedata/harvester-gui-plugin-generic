@@ -1,9 +1,8 @@
-import { expect } from 'chai';
-import { describe, it, beforeEach } from 'mocha';
+import { module, test } from 'qunit';
 import EsIndexProperty from 'harvester-gui-plugin-generic/utils/es-index-property';
 
-describe('Unit | Utility | es-index-property', function () {
-  beforeEach(function () {
+module('Unit | Utility | es-index-property', hooks => {
+  hooks.beforeEach(function () {
     this.rawMapping = {
       properties: {
         a: { type: 'text' },
@@ -15,27 +14,30 @@ describe('Unit | Utility | es-index-property', function () {
     };
   });
 
-  it('places property name in "name" field', function () {
+  test('places property name in "name" field', function (assert) {
     const property = new EsIndexProperty(null, 'myfield');
-    expect(property.name).to.equal('myfield');
+    assert.strictEqual(property.name, 'myfield');
   });
 
-  it('places raw mapping in "rawMapping" field', function () {
+  test('places raw mapping in "rawMapping" field', function (assert) {
     const property = new EsIndexProperty(null, 'myfield', Object.freeze(this.rawMapping));
-    expect(property.rawMapping).to.equal(this.rawMapping);
+    assert.strictEqual(property.rawMapping, this.rawMapping);
   });
 
-  it('extracts type, when it is described in rawMapping', function () {
+  test('extracts type, when it is described in rawMapping', function (assert) {
     this.rawMapping.type = 'text';
 
     const property = new EsIndexProperty(null, 'myfield', Object.freeze(this.rawMapping));
-    expect(property.type).to.equal('text');
+    assert.strictEqual(property.type, 'text');
   });
 
-  it('sets type to "object" when type is not described in rawMapping', function () {
-    const property = new EsIndexProperty(null, 'myfield', Object.freeze(this.rawMapping));
-    expect(property.type).to.equal('object');
-  });
+  test('sets type to "object" when type is not described in rawMapping',
+    function (assert) {
+      const property =
+        new EsIndexProperty(null, 'myfield', Object.freeze(this.rawMapping));
+      assert.strictEqual(property.type, 'object');
+    }
+  );
 
   [
     'long',
@@ -47,67 +49,69 @@ describe('Unit | Utility | es-index-property', function () {
     'half_float',
     'scaled_float',
   ].forEach(type =>
-    it(`sets type to "number" when type in rawMapping equals "${type}"`, function () {
-      this.rawMapping.type = type;
+    test(`sets type to "number" when type in rawMapping equals "${type}"`,
+      function (assert) {
+        this.rawMapping.type = type;
 
-      const property =
-        new EsIndexProperty(null, 'myfield', Object.freeze(this.rawMapping));
-      expect(property.type).to.equal('number');
-    })
+        const property =
+          new EsIndexProperty(null, 'myfield', Object.freeze(this.rawMapping));
+        assert.strictEqual(property.type, 'number');
+      }
+    )
   );
 
-  it('extracts subproperties', function () {
+  test('extracts subproperties', function (assert) {
     const property = new EsIndexProperty(null, 'myfield', Object.freeze(this.rawMapping));
 
-    expect(Object.keys(property.properties)).to.have.length(3);
-    expect(property.properties.a).to.be.an.instanceOf(EsIndexProperty)
-      .and.to.deep.include({
-        parentProperty: property,
-        name: 'a',
-        rawMapping: this.rawMapping.properties.a,
-        isField: false,
-      });
-    expect(property.properties.b).to.be.an.instanceOf(EsIndexProperty)
-      .and.to.deep.include({
-        parentProperty: property,
-        name: 'b',
-        rawMapping: this.rawMapping.properties.b,
-        isField: false,
-      });
-    expect(property.properties.c).to.be.an.instanceOf(EsIndexProperty)
-      .and.to.deep.include({
-        parentProperty: property,
-        name: 'c',
-        rawMapping: this.rawMapping.fields.c,
-        isField: true,
-      });
+    assert.strictEqual(Object.keys(property.properties).length, 3);
+    assert.ok(property.properties.a instanceof EsIndexProperty);
+    assert.propContains(property.properties.a, {
+      name: 'a',
+      rawMapping: this.rawMapping.properties.a,
+      isField: false,
+    });
+    assert.strictEqual(property.properties.a.parentProperty, property);
+    assert.ok(property.properties.b instanceof EsIndexProperty);
+    assert.propContains(property.properties.b, {
+      name: 'b',
+      rawMapping: this.rawMapping.properties.b,
+      isField: false,
+    });
+    assert.strictEqual(property.properties.b.parentProperty, property);
+    assert.ok(property.properties.c instanceof EsIndexProperty);
+    assert.propContains(property.properties.c, {
+      name: 'c',
+      rawMapping: this.rawMapping.fields.c,
+      isField: true,
+    });
+    assert.strictEqual(property.properties.c.parentProperty, property);
   });
 
-  it(
+  test(
     'has "isField" flag set to false, when it represents an index property',
-    function () {
+    function (assert) {
       const property =
         new EsIndexProperty(null, 'myfield', Object.freeze(this.rawMapping));
-      expect(property.isField).to.be.false;
+      assert.false(property.isField);
     }
   );
 
-  it(
+  test(
     'has "isField" flag set to true, when it represents an index property field',
-    function () {
+    function (assert) {
       const property =
         new EsIndexProperty(null, 'myfield', Object.freeze(this.rawMapping), true);
-      expect(property.isField).to.be.true;
+      assert.true(property.isField);
     }
   );
 
-  it(
+  test(
     'remembers reference to parent property in "parentProperty"',
-    function () {
+    function (assert) {
       const parent = {};
       const property =
         new EsIndexProperty(parent, 'myfield', Object.freeze(this.rawMapping), true);
-      expect(property.parentProperty).to.equal(parent);
+      assert.strictEqual(property.parentProperty, parent);
     }
   );
 });

@@ -1,20 +1,18 @@
-import { expect } from 'chai';
-import { describe, it, beforeEach, afterEach } from 'mocha';
-import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
-import hbs from 'htmlbars-inline-precompile';
+import { module, test } from 'qunit';
+import { setupRenderingTest } from '../../helpers';
+import { render, click, settled } from '@ember/test-helpers';
+import { hbs } from 'ember-cli-htmlbars';
 import sinon from 'sinon';
 import { Promise, resolve, all as allFulfilled } from 'rsvp';
-import { click, settled } from '@ember/test-helpers';
 import { clickTrigger, selectChoose } from '../../helpers/ember-power-select';
 import SpacesProvider from 'harvester-gui-plugin-generic/services/spaces-provider';
 
 const indexName = 'generic-index';
 
-describe('Integration | Component | content-index', function () {
-  setupRenderingTest();
+module('Integration | Component | content-index', hooks => {
+  setupRenderingTest(hooks);
 
-  beforeEach(function () {
+  hooks.beforeEach(function () {
     sinon.stub(SpacesProvider.prototype, 'fetchElasticsearchSpaces')
       .resolves([]);
 
@@ -31,37 +29,37 @@ describe('Integration | Component | content-index', function () {
       .get(() => (fileId => resolve(`${fileId}url`)));
   });
 
-  afterEach(function () {
+  hooks.afterEach(function () {
     if (SpacesProvider.prototype.fetchElasticsearchSpaces.restore) {
       SpacesProvider.prototype.fetchElasticsearchSpaces.restore();
     }
   });
 
-  it('has class "content-index"', async function () {
+  test('has class "content-index"', async function (assert) {
     await render(hbs `<ContentIndex/>`);
 
-    expect(this.element.querySelectorAll('.content-index')).to.have.length(1);
+    assert.strictEqual(this.element.querySelectorAll('.content-index').length, 1);
   });
 
-  it('shows only spinner when index schema is being loaded', async function () {
+  test('shows only spinner when index schema is being loaded', async function (assert) {
     this.dataRequestStub.resetBehavior();
     this.dataRequestStub.returns(new Promise(() => {}));
 
     await render(hbs `<ContentIndex/>`);
 
     const componentChildren = this.element.querySelectorAll('.content-index > *');
-    expect(componentChildren).to.have.length(1);
-    expect(componentChildren[0]).to.have.class('spinner-display');
-    expect(this.dataRequestStub).to.be.calledOnce
-      .and.to.be.calledWith(sinon.match({
-        method: 'get',
-        indexName,
-        path: '_mapping',
-        body: undefined,
-      }));
+    assert.strictEqual(componentChildren.length, 1);
+    assert.dom(componentChildren[0]).hasClass('spinner-display');
+    assert.ok(this.dataRequestStub.calledOnce);
+    assert.ok(this.dataRequestStub.calledWith(sinon.match({
+      method: 'get',
+      indexName,
+      path: '_mapping',
+      body: undefined,
+    })));
   });
 
-  it('shows error when index schema cannot be loaded', async function () {
+  test('shows error when index schema cannot be loaded', async function (assert) {
     this.dataRequestStub.resetBehavior();
     let rejectDataRequest;
     this.dataRequestStub.returns(
@@ -73,39 +71,39 @@ describe('Integration | Component | content-index', function () {
     await settled();
 
     const componentChildren = this.element.querySelectorAll('.content-index > *');
-    expect(componentChildren).to.have.length(1);
-    expect(componentChildren[0]).to.have.class('resource-load-error');
-    expect(componentChildren[0].textContent).to.contain('indexError');
+    assert.strictEqual(componentChildren.length, 1);
+    assert.dom(componentChildren[0]).hasClass('resource-load-error');
+    assert.contains(componentChildren[0].textContent, 'indexError');
   });
 
-  it(
+  test(
     'shows query builder and filtered properties selector',
-    async function () {
+    async function (assert) {
       await render(hbs `<ContentIndex/>`);
 
-      expect(this.element.querySelector('.query-builder')).to.exist;
-      expect(this.element.querySelector('.filtered-properties-selector')).to.exist;
+      assert.ok(this.element.querySelector('.query-builder'));
+      assert.ok(this.element.querySelector('.filtered-properties-selector'));
     }
   );
 
-  it(
+  test(
     'lists index properties in query builder',
-    async function () {
+    async function (assert) {
       await render(hbs `<ContentIndex/>`);
       await click('.query-builder-block-adder');
       await clickTrigger('.block-adder-body .property-selector');
 
       const options = this.element.querySelectorAll('.ember-power-select-option');
-      expect(options).to.have.length(4);
+      assert.strictEqual(options.length, 4);
       ['any property', 'space', 'a.b', 'c'].forEach((propertyPath, index) =>
-        expect(options[index].textContent.trim()).to.equal(propertyPath)
+        assert.strictEqual(options[index].textContent.trim(), propertyPath)
       );
     }
   );
 
-  it(
+  test(
     'lists index properties in filtered properties selector',
-    async function () {
+    async function (assert) {
       await render(hbs `<ContentIndex/>`);
       await click('.show-properties-selector');
       // expand all nodes
@@ -117,41 +115,43 @@ describe('Integration | Component | content-index', function () {
       );
 
       const treeLabels = document.querySelectorAll('.filtered-properties-selector-body .tree-label');
-      expect(treeLabels).to.have.length(3);
+      assert.strictEqual(treeLabels.length, 3);
       ['a', 'b', 'c'].forEach((propertyName, index) =>
-        expect(treeLabels[index].textContent.trim()).to.equal(propertyName)
+        assert.strictEqual(treeLabels[index].textContent.trim(), propertyName)
       );
     }
   );
 
-  it('shows results of initial query', async function () {
+  test('shows results of initial query', async function (assert) {
     await render(hbs `<ContentIndex/>`);
 
     // #1 request: getting spaces list, #2 request: fetching initial query results
-    expect(this.dataRequestStub).to.be.calledTwice.and.to.be.calledWith(sinon.match({
+    assert.ok(this.dataRequestStub.calledTwice);
+    assert.ok(this.dataRequestStub.calledWith(sinon.match({
       method: 'post',
       indexName,
       path: '_search',
       body: '{"from":0,"size":10,"sort":[{"_score":"desc"}]}',
-    }));
-    expect(this.element.querySelectorAll('.query-results-result')).to.have.length(1);
-    expect(this.element.querySelector('.result-sample').textContent.trim())
-      .to.equal('a: {b: false}, c: "abc"');
-    expect(this.element.querySelector('.go-to-file-link'))
-      .to.have.attr('href', 'file123url');
+    })));
+    assert.strictEqual(this.element.querySelectorAll('.query-results-result').length, 1);
+    assert.strictEqual(
+      this.element.querySelector('.result-sample').textContent.trim(),
+      'a: {b: false}, c: "abc"'
+    );
+    assert.dom(this.element.querySelector('.go-to-file-link')).hasAttribute('href', 'file123url');
   });
 
-  it('shows results spinner while initial query is pending', async function () {
+  test('shows results spinner while initial query is pending', async function (assert) {
     this.dataRequestStub.resetBehavior();
     stubIndexMappingRequest(this.dataRequestStub);
     this.dataRequestStub.returns(new Promise(() => {}));
 
     await render(hbs `<ContentIndex/>`);
 
-    expect(this.element.querySelector('.query-results .spinner-display')).to.exist;
+    assert.ok(this.element.querySelector('.query-results .spinner-display'));
   });
 
-  it('shows results error when initial query failed', async function () {
+  test('shows results error when initial query failed', async function (assert) {
     this.dataRequestStub.resetBehavior();
     stubIndexMappingRequest(this.dataRequestStub);
     let rejectQuery;
@@ -163,11 +163,11 @@ describe('Integration | Component | content-index', function () {
 
     const errorContainer =
       this.element.querySelector('.query-results .resource-load-error');
-    expect(errorContainer).to.exist;
-    expect(errorContainer.textContent).to.contain('queryError');
+    assert.ok(errorContainer);
+    assert.contains(errorContainer.textContent, 'queryError');
   });
 
-  it('allows to perform custom query with conditions', async function () {
+  test('allows to perform custom query with conditions', async function (assert) {
     await render(hbs `<ContentIndex/>`);
     this.dataRequestStub.reset();
     this.dataRequestStub.resolves({
@@ -190,161 +190,162 @@ describe('Integration | Component | content-index', function () {
     await click('.accept-condition');
     await click('.submit-query');
 
-    expect(this.dataRequestStub).to.be.calledOnce.and.to.be.calledWith(sinon.match({
+    assert.ok(this.dataRequestStub.calledOnce);
+    assert.ok(this.dataRequestStub.calledWith(sinon.match({
       method: 'post',
       indexName,
       path: '_search',
       body: '{"from":0,"size":10,"sort":[{"_score":"desc"}],"query":{"bool":{"must":[{"term":{"a.b":{"value":"true"}}}]}}}',
-    }));
+    })));
 
-    expect(this.element.querySelectorAll('.query-results-result')).to.have.length(1);
-    expect(this.element.querySelector('.result-sample').textContent.trim())
-      .to.equal('a: {b: true}');
+    assert.strictEqual(this.element.querySelectorAll('.query-results-result').length, 1);
+    assert.strictEqual(this.element.querySelector('.result-sample').textContent.trim(), 'a: {b: true}');
   });
 
-  it('shows spinner while loading custom query with conditions', async function () {
-    await render(hbs `<ContentIndex/>`);
-    this.dataRequestStub.resetBehavior();
-    this.dataRequestStub.returns(new Promise(() => {}));
-    await click('.query-builder-block-adder');
-    await selectChoose('.block-adder-body .property-selector', 'a.b');
-    await click('.accept-condition');
-    await click('.submit-query');
+  test('shows spinner while loading custom query with conditions',
+    async function (assert) {
+      await render(hbs `<ContentIndex/>`);
+      this.dataRequestStub.resetBehavior();
+      this.dataRequestStub.returns(new Promise(() => {}));
+      await click('.query-builder-block-adder');
+      await selectChoose('.block-adder-body .property-selector', 'a.b');
+      await click('.accept-condition');
+      await click('.submit-query');
 
-    expect(this.element.querySelector('.query-results .spinner-display')).to.exist;
-    expect(this.element.querySelector('.result-sample')).to.not.exist;
-  });
+      assert.ok(this.element.querySelector('.query-results .spinner-display'));
+      assert.notOk(this.element.querySelector('.result-sample'));
+    }
+  );
 
-  it('shows loading error when custom query with conditions failed', async function () {
-    await render(hbs `<ContentIndex/>`);
-    this.dataRequestStub.resetBehavior();
-    let rejectQuery;
-    this.dataRequestStub.returns(new Promise((resolve, reject) => rejectQuery = reject));
-    await click('.query-builder-block-adder');
-    await selectChoose('.block-adder-body .property-selector', 'a.b');
-    await click('.accept-condition');
-    await click('.submit-query');
-    rejectQuery('queryError');
-    await settled();
+  test('shows loading error when custom query with conditions failed',
+    async function (assert) {
+      await render(hbs `<ContentIndex/>`);
+      this.dataRequestStub.resetBehavior();
+      let rejectQuery;
+      this.dataRequestStub.returns(
+        new Promise((resolve, reject) => rejectQuery = reject)
+      );
+      await click('.query-builder-block-adder');
+      await selectChoose('.block-adder-body .property-selector', 'a.b');
+      await click('.accept-condition');
+      await click('.submit-query');
+      rejectQuery('queryError');
+      await settled();
 
-    const errorContainer =
-      this.element.querySelector('.query-results .resource-load-error');
-    expect(errorContainer).to.exist;
-    expect(errorContainer.textContent).to.contain('queryError');
-    expect(this.element.querySelector('.result-sample')).to.not.exist;
-  });
+      const errorContainer =
+        this.element.querySelector('.query-results .resource-load-error');
+      assert.ok(errorContainer);
+      assert.contains(errorContainer.textContent, 'queryError');
+      assert.notOk(this.element.querySelector('.result-sample'));
+    }
+  );
 
-  it('allows to change sorting of results', async function () {
+  test('allows to change sorting of results', async function (assert) {
     await render(hbs `<ContentIndex/>`);
     this.dataRequestStub.resetHistory();
     await selectChoose('.query-results-sort-selector .property-selector', 'a.b');
     await selectChoose('.query-results-sort-selector .direction-selector', 'asc');
 
-    expect(this.dataRequestStub).to.be.calledTwice
-      .and.to.be.calledWith(sinon.match({
-        method: 'post',
-        indexName,
-        path: '_search',
-        body: '{"from":0,"size":10,"sort":[{"a.b":"desc"}]}',
-      }))
-      .and.to.be.calledWith(sinon.match({
-        method: 'post',
-        indexName,
-        path: '_search',
-        body: '{"from":0,"size":10,"sort":[{"a.b":"asc"}]}',
-      }));
-    expect(
-      this.element.querySelector('.query-results-sort-selector .property-selector')
-      .textContent.trim()
-    ).to.equal('a.b');
-    expect(
-      this.element.querySelector('.query-results-sort-selector .direction-selector')
-      .textContent.trim()
-    ).to.equal('asc');
+    assert.ok(this.dataRequestStub.calledTwice);
+    assert.ok(this.dataRequestStub.calledWith(sinon.match({
+      method: 'post',
+      indexName,
+      path: '_search',
+      body: '{"from":0,"size":10,"sort":[{"a.b":"desc"}]}',
+    })));
+    assert.ok(this.dataRequestStub.calledWith(sinon.match({
+      method: 'post',
+      indexName,
+      path: '_search',
+      body: '{"from":0,"size":10,"sort":[{"a.b":"asc"}]}',
+    })));
+    assert.strictEqual(this.element.querySelector('.query-results-sort-selector .property-selector')
+      .textContent.trim(), 'a.b');
+    assert.strictEqual(this.element.querySelector('.query-results-sort-selector .direction-selector')
+      .textContent.trim(), 'asc');
   });
 
-  it('allows to change results page', async function () {
+  test('allows to change results page', async function (assert) {
     await render(hbs `<ContentIndex/>`);
     this.dataRequestStub.resetHistory();
     await click('.next-page');
 
-    expect(this.dataRequestStub).to.be.calledOnce
-      .and.to.be.calledWith(sinon.match({
-        method: 'post',
-        indexName,
-        path: '_search',
-        body: '{"from":10,"size":10,"sort":[{"_score":"desc"}]}',
-      }));
-    expect(this.element.querySelector('.active-page-number')).to.have.value('2');
+    assert.ok(this.dataRequestStub.calledOnce);
+    assert.ok(this.dataRequestStub.calledWith(sinon.match({
+      method: 'post',
+      indexName,
+      path: '_search',
+      body: '{"from":10,"size":10,"sort":[{"_score":"desc"}]}',
+    })));
+    assert.dom(this.element.querySelector('.active-page-number')).hasValue('2');
   });
 
-  it('allows to change results page size', async function () {
+  test('allows to change results page size', async function (assert) {
     await render(hbs `<ContentIndex/>`);
     this.dataRequestStub.resetHistory();
     await selectChoose('.page-size-selector', '25');
 
-    expect(this.dataRequestStub).to.be.calledOnce
-      .and.to.be.calledWith(sinon.match({
-        method: 'post',
-        indexName,
-        path: '_search',
-        body: '{"from":0,"size":25,"sort":[{"_score":"desc"}]}',
-      }));
-    expect(this.element.querySelector('.page-size-selector').textContent.trim())
-      .to.equal('25');
+    assert.ok(this.dataRequestStub.calledOnce);
+    assert.ok(this.dataRequestStub.calledWith(sinon.match({
+      method: 'post',
+      indexName,
+      path: '_search',
+      body: '{"from":0,"size":25,"sort":[{"_score":"desc"}]}',
+    })));
+    assert.strictEqual(this.element.querySelector('.page-size-selector').textContent.trim(), '25');
   });
 
-  it('resets page number on results page size change', async function () {
+  test('resets page number on results page size change', async function (assert) {
     await render(hbs `<ContentIndex/>`);
     this.dataRequestStub.resetHistory();
     await click('.next-page');
     await selectChoose('.page-size-selector', '25');
 
-    expect(this.dataRequestStub).to.be.calledTwice
-      .and.to.be.calledWith(sinon.match({
-        method: 'post',
-        indexName,
-        path: '_search',
-        body: '{"from":0,"size":25,"sort":[{"_score":"desc"}]}',
-      }));
-    expect(this.element.querySelector('.active-page-number')).to.have.value('1');
+    assert.ok(this.dataRequestStub.calledTwice);
+    assert.ok(this.dataRequestStub.calledWith(sinon.match({
+      method: 'post',
+      indexName,
+      path: '_search',
+      body: '{"from":0,"size":25,"sort":[{"_score":"desc"}]}',
+    })));
+    assert.dom(this.element.querySelector('.active-page-number')).hasValue('1');
   });
 
-  it('resets page number on sort property change', async function () {
+  test('resets page number on sort property change', async function (assert) {
     await render(hbs `<ContentIndex/>`);
     this.dataRequestStub.resetHistory();
     await click('.next-page');
     await selectChoose('.query-results-sort-selector .property-selector', 'a.b');
 
-    expect(this.dataRequestStub).to.be.calledTwice
-      .and.to.be.calledWith(sinon.match({
-        method: 'post',
-        indexName,
-        path: '_search',
-        body: '{"from":0,"size":10,"sort":[{"a.b":"desc"}]}',
-      }));
-    expect(this.element.querySelector('.active-page-number')).to.have.value('1');
+    assert.ok(this.dataRequestStub.calledTwice);
+    assert.ok(this.dataRequestStub.calledWith(sinon.match({
+      method: 'post',
+      indexName,
+      path: '_search',
+      body: '{"from":0,"size":10,"sort":[{"a.b":"desc"}]}',
+    })));
+    assert.dom(this.element.querySelector('.active-page-number')).hasValue('1');
   });
 
-  it('resets page number on sort direction change', async function () {
+  test('resets page number on sort direction change', async function (assert) {
     await render(hbs `<ContentIndex/>`);
     this.dataRequestStub.resetHistory();
     await click('.next-page');
     await selectChoose('.query-results-sort-selector .direction-selector', 'asc');
 
-    expect(this.dataRequestStub).to.be.calledTwice
-      .and.to.be.calledWith(sinon.match({
-        method: 'post',
-        indexName,
-        path: '_search',
-        body: '{"from":0,"size":10,"sort":[{"_score":"asc"}]}',
-      }));
-    expect(this.element.querySelector('.active-page-number')).to.have.value('1');
+    assert.ok(this.dataRequestStub.calledTwice);
+    assert.ok(this.dataRequestStub.calledWith(sinon.match({
+      method: 'post',
+      indexName,
+      path: '_search',
+      body: '{"from":0,"size":10,"sort":[{"_score":"asc"}]}',
+    })));
+    assert.dom(this.element.querySelector('.active-page-number')).hasValue('1');
   });
 
-  it(
+  test(
     'generates curl command with custom conditions, sorting and filtered properties',
-    async function () {
+    async function (assert) {
       await render(hbs `<ContentIndex/>`);
       await click('.query-builder-block-adder');
       await selectChoose('.block-adder-body .property-selector', 'a.b');
@@ -359,15 +360,14 @@ describe('Integration | Component | content-index', function () {
       await click('.filtered-properties-selector-body .one-checkbox');
       await click('.generate-query-request');
 
-      expect(this.element.querySelector('.copy-textarea').textContent.trim())
-        .to.equal('curl');
-      expect(this.dataCurlCommandRequestStub).to.be.calledOnce
-        .and.to.be.calledWith(sinon.match({
-          method: 'post',
-          indexName,
-          path: '_search',
-          body: '{"from":0,"size":10,"sort":[{"a.b":"asc"}],"query":{"bool":{"must":[{"term":{"a.b":{"value":"true"}}}]}},"_source":["a.b"]}',
-        }));
+      assert.strictEqual(this.element.querySelector('.copy-textarea').textContent.trim(), 'curl');
+      assert.ok(this.dataCurlCommandRequestStub.calledOnce);
+      assert.ok(this.dataCurlCommandRequestStub.calledWith(sinon.match({
+        method: 'post',
+        indexName,
+        path: '_search',
+        body: '{"from":0,"size":10,"sort":[{"a.b":"asc"}],"query":{"bool":{"must":[{"term":{"a.b":{"value":"true"}}}]}},"_source":["a.b"]}',
+      })));
     }
   );
 });

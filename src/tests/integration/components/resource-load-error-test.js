@@ -1,36 +1,39 @@
-import { expect } from 'chai';
-import { describe, it } from 'mocha';
-import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
-import hbs from 'htmlbars-inline-precompile';
-import { click } from '@ember/test-helpers';
+import { module, test } from 'qunit';
+import { setupRenderingTest } from '../../helpers';
+import { render, click } from '@ember/test-helpers';
+import { hbs } from 'ember-cli-htmlbars';
 
-describe('Integration | Component | resource-load-error', function () {
-  setupRenderingTest();
+module('Integration | Component | resource-load-error', hooks => {
+  setupRenderingTest(hooks);
 
-  it('renders collapsed error details on init', async function () {
+  test('renders collapsed error details on init', async function (assert) {
     await render(hbs `<ResourceLoadError @details="error" />`);
 
-    expect(this.element.querySelector('.show-details').textContent.trim())
-      .to.equal('Show details...');
-    expect(this.element.querySelector('.collapse:not(.show)')).to.exist;
+    assert.strictEqual(this.element.querySelector('.show-details').textContent.trim(), 'Show details...');
+    assert.ok(this.element.querySelector('.collapse:not(.show)'));
   });
 
-  it('allows to expand error details', async function () {
+  test('allows to expand error details', async function (assert) {
     await render(hbs `<ResourceLoadError @details="error" />`);
     await click('.show-details');
 
-    expect(this.element.querySelector('.show-details').textContent.trim())
-      .to.equal('Hide details');
-    expect(this.element.querySelector('.collapse.show')).to.exist;
-    expect(this.element.querySelector('.collapse .details-json').textContent.trim())
-      .to.equal('"error"');
+    assert.strictEqual(
+      this.element.querySelector('.show-details').textContent.trim(),
+      'Hide details'
+    );
+    assert.ok(this.element.querySelector('.collapse.show'));
+    assert.strictEqual(
+      this.element.querySelector('.collapse .details-json').textContent.trim(),
+      '"error"'
+    );
   });
 
-  it('it does not render any details when none were specified', async function () {
-    await render(hbs `<ResourceLoadError />`);
+  test('it does not render any details when none were specified',
+    async function (assert) {
+      await render(hbs `<ResourceLoadError />`);
 
-    expect(this.element.querySelector('.show-details')).to.not.exist;
-    expect(this.element.querySelector('.collapse')).to.not.exist;
-  });
+      assert.notOk(this.element.querySelector('.show-details'));
+      assert.notOk(this.element.querySelector('.collapse'));
+    }
+  );
 });
