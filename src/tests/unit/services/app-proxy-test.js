@@ -3,7 +3,7 @@ import { setupTest } from '../../helpers';
 import sinon from 'sinon';
 import AppProxy from 'harvester-gui-plugin-generic/services/app-proxy';
 
-module('Unit | Service | app-proxy', hooks => {
+module('Unit | Service | app-proxy', (hooks) => {
   setupTest(hooks);
 
   hooks.beforeEach(function () {
@@ -68,11 +68,11 @@ module('Unit | Service | app-proxy', hooks => {
 
       const service = this.owner.lookup('service:app-proxy');
       service.appProxyLoadingPromise.then(promiseResolveSpy);
-      assert.notOk(service.appProxy);
+      assert.strictEqual(service.appProxy, null);
       assert.ok(promiseResolveSpy.notCalled);
 
       this.fakeClock.tick(15);
-      assert.notOk(service.appProxy);
+      assert.strictEqual(service.appProxy, null);
       assert.ok(promiseResolveSpy.notCalled);
 
       this.windowMock.frameElement.appProxy = this.appProxy;

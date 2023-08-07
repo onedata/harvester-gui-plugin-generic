@@ -1,6 +1,6 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from '../../../helpers';
-import { render, click, waitUntil, find } from '@ember/test-helpers';
+import { render, click, waitUntil, find, findAll } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
 import sinon from 'sinon';
 import { selectChoose } from '../../../helpers/ember-power-select';
@@ -8,7 +8,7 @@ import AndOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-buil
 import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/condition-query-block';
 import QueryValueComponentsBuilder from 'harvester-gui-plugin-generic/utils/query-value-components-builder';
 
-module('Integration | Component | query-builder/block-adder', hooks => {
+module('Integration | Component | query-builder/block-adder', (hooks) => {
   setupRenderingTest(hooks);
 
   hooks.beforeEach(function () {
@@ -19,7 +19,7 @@ module('Integration | Component | query-builder/block-adder', hooks => {
     await render(hbs `<QueryBuilder::BlockAdder @valuesBuilder={{this.valuesBuilder}}/>`);
 
     assert.strictEqual(
-      this.element.querySelectorAll('.query-builder-block-adder').length,
+      findAll('.query-builder-block-adder').length,
       1
     );
   });
@@ -29,9 +29,9 @@ module('Integration | Component | query-builder/block-adder', hooks => {
 
     await click('.query-builder-block-adder');
     assert.ok(
-      this.element.querySelector('.block-adder-body .query-builder-block-selector')
+      find('.block-adder-body .query-builder-block-selector')
     );
-    assert.ok(this.element.querySelector('.block-adder-body .condition-selector'));
+    assert.ok(find('.block-adder-body .condition-selector'));
   });
 
   test(
@@ -44,9 +44,9 @@ module('Integration | Component | query-builder/block-adder', hooks => {
 
       await click('.query-builder-block-adder');
       assert.ok(
-        this.element.querySelector('.block-adder-body .query-builder-block-selector')
+        find('.block-adder-body .query-builder-block-selector')
       );
-      assert.notOk(this.element.querySelector('.block-adder-body .condition-selector'));
+      assert.notOk(find('.block-adder-body .condition-selector'));
     }
   );
 
@@ -118,7 +118,7 @@ module('Integration | Component | query-builder/block-adder', hooks => {
       disabled={{true}}
     />`);
 
-    assert.dom(this.element.querySelector('.query-builder-block-adder'))
+    assert.dom(find('.query-builder-block-adder'))
       .hasAttribute('disabled');
   });
 });

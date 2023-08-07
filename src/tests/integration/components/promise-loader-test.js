@@ -1,11 +1,11 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from '../../helpers';
-import { render, settled } from '@ember/test-helpers';
+import { render, settled, find } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
 import { resolve, Promise } from 'rsvp';
 import sinon from 'sinon';
 
-module('Integration | Component | promise-loader', hooks => {
+module('Integration | Component | promise-loader', (hooks) => {
   setupRenderingTest(hooks);
 
   test('yields result of fulfilled promise', async function (assert) {
@@ -16,7 +16,7 @@ module('Integration | Component | promise-loader', hooks => {
       </PromiseLoader>
     `);
 
-    assert.strictEqual(this.element.textContent.trim(), 'test');
+    assert.dom(this.element).hasText('test');
   });
 
   test('shows spinner when promise is pending', async function (assert) {
@@ -27,7 +27,7 @@ module('Integration | Component | promise-loader', hooks => {
       </PromiseLoader>
     `);
 
-    assert.ok(this.element.querySelector('.spinner'));
+    assert.ok(find('.spinner'));
   });
 
   test('shows error from rejected promise', async function (assert) {
@@ -42,9 +42,9 @@ module('Integration | Component | promise-loader', hooks => {
     rejectCallback('test');
     await settled();
 
-    const resourceLoadError = this.element.querySelector('.resource-load-error');
+    const resourceLoadError = find('.resource-load-error');
     assert.ok(resourceLoadError);
-    assert.strictEqual(resourceLoadError.querySelector('.details-json').textContent.trim(), '"test"');
+    assert.dom(resourceLoadError.querySelector('.details-json')).hasText('"test"');
   });
 
   test('notifies about promise resolve', async function (assert) {
@@ -94,7 +94,7 @@ module('Integration | Component | promise-loader', hooks => {
         </PromiseLoader>
       `);
 
-      assert.ok(this.element.querySelector('.loading-test'));
+      assert.ok(find('.loading-test'));
     });
 
   test('allows to use custom template for "rejected" promise state',
@@ -116,7 +116,7 @@ module('Integration | Component | promise-loader', hooks => {
       rejectCallback('test');
       await settled();
 
-      assert.ok(this.element.querySelector('.error-test'));
+      assert.ok(find('.error-test'));
       assert.dom(this.element).hasText('test');
     });
 

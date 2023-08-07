@@ -4,7 +4,7 @@ import EsIndexAnyProperty from 'harvester-gui-plugin-generic/utils/es-index-any-
 module('Unit | Utility | es-index-any-property', () => {
   test('properly instantiates', function (assert) {
     const property = new EsIndexAnyProperty(null);
-    assert.notOk(property.name);
+    assert.strictEqual(property.name, undefined);
     assert.strictEqual(property.type, 'anyProperty');
     assert.false(property.isField);
     assert.strictEqual(property.path, 'any property');

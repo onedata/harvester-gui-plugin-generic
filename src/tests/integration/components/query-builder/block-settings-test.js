@@ -7,7 +7,7 @@ import NotOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-buil
 import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/condition-query-block';
 import sinon from 'sinon';
 
-module('Integration | Component | query-builder/block-settings', hooks => {
+module('Integration | Component | query-builder/block-settings', (hooks) => {
   setupRenderingTest(hooks);
 
   test('does not show block selector when "isShown" is false', async function (assert) {
@@ -30,7 +30,7 @@ module('Integration | Component | query-builder/block-settings', hooks => {
     /></span>`);
 
     const blockSelector =
-      this.element.querySelector('.block-settings-body .query-builder-block-selector');
+      find('.block-settings-body .query-builder-block-selector');
     assert.ok(blockSelector);
     assert.dom(blockSelector).hasClass('edit-block-selector');
   });
@@ -55,7 +55,7 @@ module('Integration | Component | query-builder/block-settings', hooks => {
       /></span>`);
 
       const blockSelector =
-        this.element.querySelector('.block-settings-body .query-builder-block-selector');
+        find('.block-settings-body .query-builder-block-selector');
       assert.ok(blockSelector);
       // only operator blocks have "change to" section
       assert.ok(blockSelector.querySelector('.change-to-section'));
@@ -81,11 +81,12 @@ module('Integration | Component | query-builder/block-settings', hooks => {
       /></span>`);
 
       const blockSelector =
-        this.element.querySelector('.block-settings-body .query-builder-block-selector');
+        find('.block-settings-body .query-builder-block-selector');
       assert.ok(blockSelector);
       // only operator blocks have "change to" section
       assert.ok(blockSelector.querySelector('.change-to-section'));
-      assert.dom(blockSelector.querySelector('.operator-none')).doesNotHaveAttribute('disabled');
+      assert.dom(blockSelector.querySelector('.operator-none'))
+        .doesNotHaveAttribute('disabled');
     }
   );
 
@@ -98,7 +99,7 @@ module('Integration | Component | query-builder/block-settings', hooks => {
     /></span>`);
 
     const blockSelector =
-      this.element.querySelector('.block-settings-body .query-builder-block-selector');
+      find('.block-settings-body .query-builder-block-selector');
     assert.ok(blockSelector);
     // condition blocks don't have "change to" section
     assert.notOk(blockSelector.querySelector('.change-to-section'));

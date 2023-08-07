@@ -1,11 +1,11 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from '../../../helpers';
-import { render, click } from '@ember/test-helpers';
+import { render, click, find, findAll } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
 import QueryResult from 'harvester-gui-plugin-generic/utils/query-result';
 import { resolve } from 'rsvp';
 
-module('Integration | Component | query-results/result', hooks => {
+module('Integration | Component | query-results/result', (hooks) => {
   setupRenderingTest(hooks);
 
   hooks.beforeEach(function () {
@@ -55,15 +55,15 @@ module('Integration | Component | query-results/result', hooks => {
   test('has class "query-results-result" and is a <li> element', async function (assert) {
     await render(hbs `<QueryResults::Result />`);
 
-    assert.ok(this.element.querySelector('li.query-results-result'));
+    assert.ok(find('li.query-results-result'));
   });
 
   test('shows "Go to file" link with file name included', async function (assert) {
     await render(hbs `<QueryResults::Result @queryResult={{this.queryResult}}/>`);
 
-    const linkNode = this.element.querySelector('.go-to-file-link');
+    const linkNode = find('.go-to-file-link');
     assert.ok(linkNode);
-    assert.strictEqual(linkNode.textContent.trim(), 'Go to source file "abc.txt"');
+    assert.dom(linkNode).hasText('Go to source file "abc.txt"');
     assert.dom(linkNode).hasAttribute('href', 'fileUrl');
   });
 
@@ -74,9 +74,9 @@ module('Integration | Component | query-results/result', hooks => {
 
       await render(hbs `<QueryResults::Result @queryResult={{this.queryResult}}/>`);
 
-      const linkNode = this.element.querySelector('.go-to-file-link');
+      const linkNode = find('.go-to-file-link');
       assert.ok(linkNode);
-      assert.strictEqual(linkNode.textContent.trim(), 'Go to source file');
+      assert.dom(linkNode).hasText('Go to source file');
       assert.dom(linkNode).hasAttribute('href', 'fileUrl');
     }
   );
@@ -84,9 +84,9 @@ module('Integration | Component | query-results/result', hooks => {
   test('has copy button with file id', async function (assert) {
     await render(hbs `<QueryResults::Result @queryResult={{this.queryResult}}/>`);
 
-    const copyBtn = this.element.querySelector('.copy-file-id');
+    const copyBtn = find('.copy-file-id');
     assert.ok(copyBtn);
-    assert.strictEqual(copyBtn.textContent.trim(), 'File ID');
+    assert.dom(copyBtn).hasText('File ID');
     assert.dom(copyBtn).hasAttribute('data-clipboard-text', 'file123');
   });
 
@@ -182,10 +182,7 @@ module('Integration | Component | query-results/result', hooks => {
         @filteredProperties={{this.filteredProperties}}
       />`);
 
-      assert.strictEqual(
-        this.element.querySelector('.result-sample').textContent.trim(),
-        json
-      );
+      assert.dom(find('.result-sample')).hasText(json);
     });
   });
 
@@ -194,7 +191,7 @@ module('Integration | Component | query-results/result', hooks => {
       @queryResult={{this.queryResult}}
     />`);
 
-    assert.dom(this.element.querySelector('.result-representations-collapse')).doesNotHaveClass('show');
+    assert.dom(find('.result-representations-collapse')).doesNotHaveClass('show');
   });
 
   test('expands on header click', async function (assert) {
@@ -203,7 +200,7 @@ module('Integration | Component | query-results/result', hooks => {
     />`);
     await click('.result-heading');
 
-    assert.dom(this.element.querySelector('.result-representations-collapse')).hasClass('show');
+    assert.dom(find('.result-representations-collapse')).hasClass('show');
   });
 
   test('has "table" tab active by default', async function (assert) {
@@ -211,7 +208,7 @@ module('Integration | Component | query-results/result', hooks => {
       @queryResult={{this.queryResult}}
     />`);
 
-    assert.ok(this.element.querySelector('.tab-pane.active .properties-table'));
+    assert.ok(find('.tab-pane.active .properties-table'));
   });
 
   test('shows data in table', async function (assert) {
@@ -244,17 +241,11 @@ module('Integration | Component | query-results/result', hooks => {
       key: '__onedata.fileName',
       value: '"abc.txt"',
     }];
-    const properties = this.element.querySelectorAll('.properties-table .property');
+    const properties = findAll('.properties-table .property');
     assert.strictEqual(properties.length, expectedProperties.length);
     expectedProperties.forEach(({ key, value }, index) => {
-      assert.strictEqual(
-        properties[index].querySelector('.property-name').textContent.trim(),
-        key
-      );
-      assert.strictEqual(
-        properties[index].querySelector('.property-value').textContent.trim(),
-        value
-      );
+      assert.dom(properties[index].querySelector('.property-name')).hasText(key);
+      assert.dom(properties[index].querySelector('.property-value')).hasText(value);
     });
   });
 
@@ -263,9 +254,7 @@ module('Integration | Component | query-results/result', hooks => {
       @queryResult={{this.queryResult}}
     />`);
 
-    assert.strictEqual(
-      this.element.querySelector('.json-textarea').textContent.trim(),
-      JSON.stringify(this.queryResult.source, null, 2)
-    );
+    assert.dom(find('.json-textarea'))
+      .hasText(JSON.stringify(this.queryResult.source, null, 2));
   });
 });

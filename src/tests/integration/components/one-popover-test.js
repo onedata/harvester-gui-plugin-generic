@@ -11,7 +11,7 @@ const manualHideEvents = ['onWillHide', 'onDidHide'];
 const hideEvents = ['onHideEventTriggered', ...manualHideEvents];
 const allEvents = [...showEvents, ...hideEvents];
 
-module('Integration | Component | one-popover', hooks => {
+module('Integration | Component | one-popover', (hooks) => {
   setupRenderingTest(hooks);
 
   hooks.beforeEach(function () {

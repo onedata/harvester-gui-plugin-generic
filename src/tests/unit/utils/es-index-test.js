@@ -4,7 +4,7 @@ import EsIndexProperty from 'harvester-gui-plugin-generic/utils/es-index-propert
 import EsIndexOnedataProperty from 'harvester-gui-plugin-generic/utils/es-index-onedata-property';
 import EsIndexAnyProperty from 'harvester-gui-plugin-generic/utils/es-index-any-property';
 
-module('Unit | Utility | es-index', hooks => {
+module('Unit | Utility | es-index', (hooks) => {
   hooks.beforeEach(function () {
     this.rawMapping = {
       mappings: {

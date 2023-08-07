@@ -1,6 +1,6 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from '../../../helpers';
-import { render, click, fillIn, blur } from '@ember/test-helpers';
+import { render, click, fillIn, blur, find, findAll } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
 import AndOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/and-operator-query-block';
 import OrOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/or-operator-query-block';
@@ -20,7 +20,7 @@ const operatorBlockClasses = {
   root: RootOperatorQueryBlock,
 };
 
-module('Integration | Component | query-builder/operator-block', hooks => {
+module('Integration | Component | query-builder/operator-block', (hooks) => {
   setupRenderingTest(hooks);
 
   hooks.beforeEach(function () {
@@ -34,7 +34,7 @@ module('Integration | Component | query-builder/operator-block', hooks => {
         @valuesBuilder={{this.valuesBuilder}}
       />`);
 
-      assert.strictEqual(this.element.querySelectorAll(
+      assert.strictEqual(findAll(
         '.query-builder-block.query-builder-operator-block'
       ).length, 1);
     }
@@ -56,7 +56,7 @@ module('Integration | Component | query-builder/operator-block', hooks => {
             />
           `);
 
-          assert.strictEqual(this.element.querySelectorAll(
+          assert.strictEqual(findAll(
             `.query-builder-block.${operatorName}-operator-block`
           ).length, 1);
         }
@@ -76,11 +76,11 @@ module('Integration | Component | query-builder/operator-block', hooks => {
             `);
 
             const blockAdderTriggers =
-              this.element.querySelectorAll('.query-builder-block-adder');
+              findAll('.query-builder-block-adder');
             assert.strictEqual(blockAdderTriggers.length, 2);
             assert.dom(blockAdderTriggers[0]).doesNotHaveAttribute('disabled');
             assert.dom(blockAdderTriggers[1]).hasAttribute('disabled');
-            assert.notOk(this.element.querySelector(
+            assert.notOk(find(
               '.query-builder-block .query-builder-block'
             ));
           }
@@ -104,15 +104,15 @@ module('Integration | Component | query-builder/operator-block', hooks => {
             `);
 
             // 2 operands
-            assert.strictEqual(this.element.querySelectorAll(
+            assert.strictEqual(findAll(
               '.query-builder-block .query-builder-block'
             ).length, 2);
             // 2 from operands + 1 from the parent block
-            assert.strictEqual(this.element.querySelectorAll(
+            assert.strictEqual(findAll(
               '.query-builder-block-adder:not([disabled])'
             ).length, 3);
             // exactly 2 are from operands (NOT operators)
-            assert.strictEqual(this.element.querySelectorAll(
+            assert.strictEqual(findAll(
               '.query-builder-block .query-builder-block .query-builder-block-adder'
             ).length, 2);
           }
@@ -130,16 +130,16 @@ module('Integration | Component | query-builder/operator-block', hooks => {
           await click('.block-adder-body .operator-not');
 
           // 1 operand
-          assert.strictEqual(this.element.querySelectorAll(
+          assert.strictEqual(findAll(
             '.query-builder-block .query-builder-block'
           ).length, 1);
           // 1 from operands + 1 from the parent block
           assert.strictEqual(
-            this.element.querySelectorAll('.query-builder-block-adder').length,
+            findAll('.query-builder-block-adder').length,
             2
           );
           // exactly 1 is from operands (NOT operators)
-          assert.strictEqual(this.element.querySelectorAll(
+          assert.strictEqual(findAll(
             '.query-builder-block .query-builder-block .query-builder-block-adder'
           ).length, 1);
           assert.strictEqual(queryBlock.operands.length, 1);
@@ -161,10 +161,10 @@ module('Integration | Component | query-builder/operator-block', hooks => {
             />
           `);
 
-          const labels = this.element.querySelectorAll('.block-infix-label');
+          const labels = findAll('.block-infix-label');
           assert.strictEqual(labels.length, 2);
           labels.forEach(label =>
-            assert.strictEqual(label.textContent.trim(), operatorName)
+            assert.dom(label).hasText(operatorName)
           );
         });
       } else {
@@ -181,11 +181,11 @@ module('Integration | Component | query-builder/operator-block', hooks => {
             `);
 
             assert.strictEqual(
-              this.element.querySelectorAll('.query-builder-block-adder').length,
+              findAll('.query-builder-block-adder').length,
               1
             );
             assert.notOk(
-              this.element.querySelector('.query-builder-block .query-builder-block')
+              find('.query-builder-block .query-builder-block')
             );
           }
         );
@@ -205,16 +205,16 @@ module('Integration | Component | query-builder/operator-block', hooks => {
             `);
 
             // 1 operand
-            assert.strictEqual(this.element.querySelectorAll(
+            assert.strictEqual(findAll(
               '.query-builder-block .query-builder-block'
             ).length, 1);
             // 1 adder... (or 2 if operator is "root")
             assert.strictEqual(
-              this.element.querySelectorAll('.query-builder-block-adder').length,
+              findAll('.query-builder-block-adder').length,
               operatorName === 'root' ? 2 : 1
             );
             // ... where 1 is from operand
-            assert.ok(this.element.querySelectorAll(
+            assert.ok(findAll(
               '.query-builder-block .query-builder-block .query-builder-block-adder'
             ));
           }
@@ -235,16 +235,16 @@ module('Integration | Component | query-builder/operator-block', hooks => {
           await click('.block-adder-body .operator-not');
 
           // 1 operand
-          assert.strictEqual(this.element.querySelectorAll(
+          assert.strictEqual(findAll(
             '.query-builder-block .query-builder-block'
           ).length, 1);
           // 1 adder... (or 2 if operator is "root")
           assert.strictEqual(
-            this.element.querySelectorAll('.query-builder-block-adder').length,
+            findAll('.query-builder-block-adder').length,
             operatorName === 'root' ? 2 : 1
           );
           // ... where 1 is from operand
-          assert.ok(this.element.querySelectorAll(
+          assert.ok(findAll(
             '.query-builder-block .query-builder-block .query-builder-block-adder'
           ));
           assert.strictEqual(queryBlock.operands.length, 1);
@@ -262,7 +262,7 @@ module('Integration | Component | query-builder/operator-block', hooks => {
               />
             `);
 
-            assert.notOk(this.element.querySelector('.block-prefix-label'));
+            assert.notOk(find('.block-prefix-label'));
           });
 
           test(
@@ -280,19 +280,19 @@ module('Integration | Component | query-builder/operator-block', hooks => {
               await click('.query-builder-block-adder.surround-root');
 
               assert.notOk(
-                this.element.querySelector('.block-adder-body .condition-selector')
+                find('.block-adder-body .condition-selector')
               );
 
               await click('.block-adder-body .operator-and');
 
               assert.strictEqual(
-                this.element.querySelectorAll('.query-builder-block').length,
+                findAll('.query-builder-block').length,
                 3
               );
               const surroundingBlock =
-                this.element.querySelector('.query-builder-block .query-builder-block');
+                find('.query-builder-block .query-builder-block');
               assert.dom(surroundingBlock).hasClass('and-operator-block');
-              const innerBlock = this.element.querySelector(
+              const innerBlock = find(
                 '.query-builder-block .query-builder-block .query-builder-block'
               );
               assert.dom(innerBlock).hasClass('not-operator-block');
@@ -301,7 +301,7 @@ module('Integration | Component | query-builder/operator-block', hooks => {
                 queryBlock.operands[0].operands[0] instanceof NotOperatorQueryBlock
               );
               assert.ok(
-                this.element.querySelector('.query-builder-block-adder.surround-root')
+                find('.query-builder-block-adder.surround-root')
               );
             }
           );
@@ -317,10 +317,7 @@ module('Integration | Component | query-builder/operator-block', hooks => {
               />
             `);
 
-            assert.strictEqual(
-              this.element.querySelector('.block-prefix-label').textContent.trim(),
-              operatorName
-            );
+            assert.dom(find('.block-prefix-label')).hasText(operatorName);
           });
         }
       }
@@ -345,11 +342,11 @@ module('Integration | Component | query-builder/operator-block', hooks => {
         const nestedBlock = queryBlock.operands[0];
         await click('.remove-block');
 
-        assert.notOk(this.element.querySelector(
+        assert.notOk(find(
           '.query-builder-block .query-builder-block'
         ));
         assert.strictEqual(
-          this.element.querySelectorAll('.query-builder-block-adder').length,
+          findAll('.query-builder-block-adder').length,
           isMultiOperandOperator ? 2 : 1
         );
         assert.strictEqual(queryBlock.operands.length, 0);
@@ -371,13 +368,13 @@ module('Integration | Component | query-builder/operator-block', hooks => {
         await click('.block-settings-body .surround-section .operator-and');
 
         assert.strictEqual(
-          this.element.querySelectorAll('.query-builder-block').length,
+          findAll('.query-builder-block').length,
           3
         );
         const surroundingBlock =
-          this.element.querySelector('.query-builder-block .query-builder-block');
+          find('.query-builder-block .query-builder-block');
         assert.dom(surroundingBlock).hasClass('and-operator-block');
-        const innerBlock = this.element.querySelector(
+        const innerBlock = find(
           '.query-builder-block .query-builder-block .query-builder-block'
         );
         assert.dom(innerBlock).hasClass('not-operator-block');
@@ -402,13 +399,13 @@ module('Integration | Component | query-builder/operator-block', hooks => {
           await click('.block-settings-body .change-to-section .operator-and');
 
           assert.strictEqual(
-            this.element.querySelectorAll('.query-builder-block').length,
+            findAll('.query-builder-block').length,
             3
           );
           const changedBlock =
-            this.element.querySelector('.query-builder-block .query-builder-block');
+            find('.query-builder-block .query-builder-block');
           assert.dom(changedBlock).hasClass('and-operator-block');
-          const innerBlock = this.element.querySelector(
+          const innerBlock = find(
             '.query-builder-block .query-builder-block .query-builder-block'
           );
           assert.dom(innerBlock).hasClass('or-operator-block');
@@ -432,7 +429,7 @@ module('Integration | Component | query-builder/operator-block', hooks => {
           await click('.query-builder-block-visualiser');
           await click('.block-settings-body .change-to-section .operator-none');
 
-          const blocks = this.element.querySelectorAll('.query-builder-block');
+          const blocks = findAll('.query-builder-block');
           assert.strictEqual(blocks.length, 1);
           assert.dom(blocks[0]).hasClass(`${operatorName}-operator-block`);
           assert.strictEqual(queryBlock.operands.length, 0);
@@ -456,7 +453,7 @@ module('Integration | Component | query-builder/operator-block', hooks => {
           await click('.query-builder-block-visualiser');
           await click('.block-settings-body .change-to-section .operator-none');
 
-          const blocks = this.element.querySelectorAll('.query-builder-block');
+          const blocks = findAll('.query-builder-block');
           assert.strictEqual(blocks.length, 2);
           assert.dom(blocks[0]).hasClass(`${operatorName}-operator-block`);
           assert.dom(blocks[1]).hasClass('and-operator-block');
@@ -487,7 +484,7 @@ module('Integration | Component | query-builder/operator-block', hooks => {
           if (isMultiOperandOperator) {
             await click('.block-settings-body .change-to-section .operator-none');
 
-            const blocks = this.element.querySelectorAll('.query-builder-block');
+            const blocks = findAll('.query-builder-block');
             assert.strictEqual(blocks.length, 3);
             [operatorName, 'not', 'not'].forEach((renderedOperatorName, index) =>
               assert.dom(blocks[index]).hasClass(`${renderedOperatorName}-operator-block`)
@@ -496,7 +493,7 @@ module('Integration | Component | query-builder/operator-block', hooks => {
             assert.ok(queryBlock.operands[0] instanceof NotOperatorQueryBlock);
             assert.ok(queryBlock.operands[1] instanceof NotOperatorQueryBlock);
           } else {
-            assert.notOk(this.element.querySelector(
+            assert.notOk(find(
               '.block-settings-body .change-to-section .operator-none'
             ));
           }
@@ -568,7 +565,7 @@ module('Integration | Component | query-builder/operator-block', hooks => {
           </QueryBuilder::OperatorBlock>
         `);
 
-        assert.ok(this.element.querySelector('.test-element'));
+        assert.ok(find('.test-element'));
       });
     });
   });

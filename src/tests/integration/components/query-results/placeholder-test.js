@@ -1,17 +1,17 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from '../../../helpers';
-import { render } from '@ember/test-helpers';
+import { render, find } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
 
 const modes = ['loading', 'empty'];
 
-module('Integration | Component | query-results/placeholder', hooks => {
+module('Integration | Component | query-results/placeholder', (hooks) => {
   setupRenderingTest(hooks);
 
   test('has class "query-results-placeholder"', async function (assert) {
     await render(hbs `<QueryResults::Placeholder/>`);
 
-    assert.ok(this.element.querySelector('.query-results-placeholder'));
+    assert.ok(find('.query-results-placeholder'));
   });
 
   modes.forEach(mode => {
@@ -19,14 +19,14 @@ module('Integration | Component | query-results/placeholder', hooks => {
       this.set('mode', mode);
       await render(hbs `<QueryResults::Placeholder @mode={{this.mode}}/>`);
 
-      assert.dom(this.element.querySelector('.query-results-placeholder')).hasClass(`mode-${mode}`);
+      assert.dom(find('.query-results-placeholder')).hasClass(`mode-${mode}`);
     });
 
     test(`shows "search" graphics in "${mode}" mode`, async function (assert) {
       this.set('mode', mode);
       await render(hbs `<QueryResults::Placeholder @mode={{this.mode}}/>`);
 
-      assert.ok(this.element.querySelector('.fa-icon.fa-search'));
+      assert.ok(find('.fa-icon.fa-search'));
     });
   });
 
@@ -34,16 +34,16 @@ module('Integration | Component | query-results/placeholder', hooks => {
     async function (assert) {
       await render(hbs `<QueryResults::Placeholder @mode="loading"/>`);
 
-      const statusMessage = this.element.querySelector('.status-message');
-      assert.strictEqual(statusMessage.textContent.trim(), 'Searching...');
+      const statusMessage = find('.status-message');
+      assert.dom(statusMessage).hasText('Searching...');
       assert.ok(statusMessage.querySelector('.spinner'));
     });
 
   test('shows "No matching results." text in "empty" mode', async function (assert) {
     await render(hbs `<QueryResults::Placeholder @mode="empty"/>`);
 
-    const statusMessage = this.element.querySelector('.status-message');
-    assert.strictEqual(statusMessage.textContent.trim(), 'No matching results.');
+    const statusMessage = find('.status-message');
+    assert.dom(statusMessage).hasText('No matching results.');
     assert.notOk(statusMessage.querySelector('.spinner'));
   });
 });

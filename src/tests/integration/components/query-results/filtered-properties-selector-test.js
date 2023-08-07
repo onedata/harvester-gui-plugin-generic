@@ -1,6 +1,6 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from '../../../helpers';
-import { render, click, waitUntil, find } from '@ember/test-helpers';
+import { render, click, waitUntil, find, findAll } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
 import QueryResults from 'harvester-gui-plugin-generic/utils/query-results';
 import EsIndex from 'harvester-gui-plugin-generic/utils/es-index';
@@ -9,7 +9,7 @@ import sinon from 'sinon';
 
 module(
   'Integration | Component | query-results/filtered-properties-selector',
-  hooks => {
+  (hooks) => {
     setupRenderingTest(hooks);
 
     hooks.beforeEach(function () {
@@ -91,7 +91,7 @@ module(
         @onSelectionChange={{this.changeSpy}}
       />`);
 
-      assert.ok(this.element.querySelector('.filtered-properties-selector'));
+      assert.ok(find('.filtered-properties-selector'));
     });
 
     test('does not render properties tree on init', async function (assert) {
@@ -102,7 +102,7 @@ module(
         @onSelectionChange={{this.changeSpy}}
       />`);
 
-      assert.notOk(this.element.querySelector('.tree'));
+      assert.notOk(find('.tree'));
     });
 
     test(
@@ -117,8 +117,11 @@ module(
         await click('.show-properties-selector');
         await waitUntil(() => find('.filtered-properties-selector-body'));
 
-        assert.contains(this.element.querySelector('.show-properties-selector').textContent, 'Filter properties');
-        assert.ok(this.element.querySelector('.tree'));
+        assert.contains(
+          find('.show-properties-selector').textContent,
+          'Filter properties'
+        );
+        assert.ok(find('.tree'));
       }
     );
 
@@ -130,7 +133,7 @@ module(
         @onSelectionChange={{this.changeSpy}}
       />`);
 
-      assert.notOk(this.element.querySelector('.tree-branch .tree-branch'));
+      assert.notOk(find('.tree-branch .tree-branch'));
     });
 
     test('renders properties from results and index', async function (assert) {
@@ -141,19 +144,19 @@ module(
         @onSelectionChange={{this.changeSpy}}
       />`);
       await click('.show-properties-selector');
-      await expandAllNodes(this);
+      await expandAllNodes();
 
-      const allLabels = this.element.querySelectorAll('.tree-label');
-      const rootLevelLabels = this.element.querySelectorAll(
+      const allLabels = findAll('.tree-label');
+      const rootLevelLabels = findAll(
         '.tree > .tree-branch > .tree-node > * > .tree-label'
       );
-      const firstBranchChildrenLabels = this.element.querySelectorAll(
+      const firstBranchChildrenLabels = findAll(
         '.tree > .tree-branch > .tree-node:first-child > .tree-branch .tree-label'
       );
-      const secondBranchChildrenLabels = this.element.querySelectorAll(
+      const secondBranchChildrenLabels = findAll(
         '.tree > .tree-branch > .tree-node:nth-child(2) > .tree-branch .tree-label'
       );
-      const fourthBranchChildrenLabels = this.element.querySelectorAll(
+      const fourthBranchChildrenLabels = findAll(
         '.tree > .tree-branch > .tree-node:nth-child(4) > .tree-branch .tree-label'
       );
 
@@ -163,13 +166,13 @@ module(
       assert.strictEqual(secondBranchChildrenLabels.length, 3);
       assert.strictEqual(fourthBranchChildrenLabels.length, 1);
       ['__onedata', 'a', 'c', 'e'].forEach((label, index) =>
-        assert.strictEqual(rootLevelLabels[index].textContent.trim(), label)
+        assert.dom(rootLevelLabels[index]).hasText(label)
       );
-      assert.strictEqual(firstBranchChildrenLabels[0].textContent.trim(), 'spaceId');
+      assert.dom(firstBranchChildrenLabels[0]).hasText('spaceId');
       ['b', 'bb', 'bbb'].forEach((label, index) =>
-        assert.strictEqual(secondBranchChildrenLabels[index].textContent.trim(), label)
+        assert.dom(secondBranchChildrenLabels[index]).hasText(label)
       );
-      assert.strictEqual(fourthBranchChildrenLabels[0].textContent.trim(), 'f');
+      assert.dom(fourthBranchChildrenLabels[0]).hasText('f');
     });
 
     test('has all properties deselected on init', async function (assert) {
@@ -180,9 +183,9 @@ module(
         @onSelectionChange={{this.changeSpy}}
       />`);
       await click('.show-properties-selector');
-      await expandAllNodes(this);
+      await expandAllNodes();
 
-      [...this.element.querySelectorAll('.one-checkbox')]
+      [...findAll('.one-checkbox')]
       .forEach(checkbox => assert.dom(checkbox).doesNotHaveClass('checked'));
     });
 
@@ -195,12 +198,12 @@ module(
       />`);
       await click('.show-properties-selector');
 
-      const selectAllBtn = this.element.querySelector('.select-all');
-      const deselectAllBtn = this.element.querySelector('.deselect-all');
+      const selectAllBtn = find('.select-all');
+      const deselectAllBtn = find('.deselect-all');
       assert.ok(selectAllBtn);
       assert.ok(deselectAllBtn);
-      assert.strictEqual(selectAllBtn.textContent.trim(), 'Select all');
-      assert.strictEqual(deselectAllBtn.textContent.trim(), 'Deselect all');
+      assert.dom(selectAllBtn).hasText('Select all');
+      assert.dom(deselectAllBtn).hasText('Deselect all');
     });
 
     test('allows to select all using "Select all" button', async function (assert) {
@@ -213,7 +216,7 @@ module(
       await click('.show-properties-selector');
       await click('.select-all');
 
-      [...this.element.querySelectorAll('.one-checkbox')]
+      [...findAll('.one-checkbox')]
       .forEach(checkbox => assert.dom(checkbox).hasClass('checked'));
     });
 
@@ -228,7 +231,7 @@ module(
       await click('.select-all');
       await click('.deselect-all');
 
-      [...this.element.querySelectorAll('.one-checkbox')]
+      [...findAll('.one-checkbox')]
       .forEach(checkbox => assert.dom(checkbox).doesNotHaveClass('checked'));
     });
 
@@ -288,8 +291,8 @@ module(
           @onSelectionChange={{this.changeSpy}}
         />`);
         await click('.show-properties-selector');
-        await expandAllNodes(this);
-        const firstBranchLastCheckbox = this.element.querySelectorAll(
+        await expandAllNodes();
+        const firstBranchLastCheckbox = findAll(
           '.tree > .tree-branch > .tree-node:nth-child(2) > .tree-branch .one-checkbox'
         )[1];
         await click(firstBranchLastCheckbox);
@@ -314,8 +317,8 @@ module(
         />`);
 
         const counter =
-          this.element.querySelector('.show-properties-selector .selection-counter');
-        assert.strictEqual(counter.textContent.trim(), '0/9');
+          find('.show-properties-selector .selection-counter');
+        assert.dom(counter).hasText('0/9');
       }
     );
 
@@ -332,8 +335,8 @@ module(
         await click('.select-all');
 
         const counter =
-          this.element.querySelector('.show-properties-selector .selection-counter');
-        assert.strictEqual(counter.textContent.trim(), '9/9');
+          find('.show-properties-selector .selection-counter');
+        assert.dom(counter).hasText('9/9');
       }
     );
 
@@ -346,15 +349,16 @@ module(
         @onSelectionChange={{this.changeSpy}}
       />`);
       await click('.show-properties-selector');
-      await expandAllNodes(this);
+      await expandAllNodes();
       this.set('queryResults', this.queryResults2);
 
-      const secondBranchLastNode = this.element.querySelectorAll(
+      const secondBranchLastNode = findAll(
         '.tree > .tree-branch > .tree-node:nth-child(2) > .tree-branch .tree-node'
       )[3];
       assert.ok(secondBranchLastNode);
-      assert.strictEqual(secondBranchLastNode.querySelector('.tree-label').textContent.trim(), 'bbbb');
-      assert.dom(secondBranchLastNode.querySelector('.one-checkbox')).hasClass('unchecked');
+      assert.dom(secondBranchLastNode.querySelector('.tree-label')).hasText('bbbb');
+      assert.dom(secondBranchLastNode.querySelector('.one-checkbox'))
+        .hasClass('unchecked');
     });
 
     test(
@@ -368,16 +372,16 @@ module(
           @onSelectionChange={{this.changeSpy}}
         />`);
         await click('.show-properties-selector');
-        await expandAllNodes(this);
+        await expandAllNodes();
         await click(
           '.tree > .tree-branch > .tree-node:nth-child(2) > .tree-children .one-checkbox'
         );
         this.set('queryResults', this.queryResults2);
 
-        const secondBranchGroupCheckbox = this.element.querySelector(
+        const secondBranchGroupCheckbox = find(
           '.tree > .tree-branch > .tree-node:nth-child(2) > .tree-children .one-checkbox'
         );
-        const secondBranchLastNodeCheckbox = this.element.querySelectorAll(
+        const secondBranchLastNodeCheckbox = findAll(
           '.tree > .tree-branch > .tree-node:nth-child(2) > .tree-branch .tree-node .one-checkbox'
         )[3];
         assert.dom(secondBranchGroupCheckbox).hasClass('indeterminate');
@@ -387,8 +391,8 @@ module(
   }
 );
 
-async function expandAllNodes(testCase) {
-  await allFulfilled([...testCase.element.querySelectorAll('.toggle-icon')]
+async function expandAllNodes() {
+  await allFulfilled([...findAll('.toggle-icon')]
     .map(element => click(element))
   );
 }

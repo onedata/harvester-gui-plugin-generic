@@ -1,7 +1,7 @@
 import { module, test } from 'qunit';
 import EsIndexProperty from 'harvester-gui-plugin-generic/utils/es-index-property';
 
-module('Unit | Utility | es-index-property', hooks => {
+module('Unit | Utility | es-index-property', (hooks) => {
   hooks.beforeEach(function () {
     this.rawMapping = {
       properties: {

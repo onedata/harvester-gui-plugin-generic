@@ -39,7 +39,7 @@ const dateInvalidValues = [
   undefined,
 ];
 
-module('Unit | Utility | query-value-components-builder', hooks => {
+module('Unit | Utility | query-value-components-builder', (hooks) => {
   hooks.beforeEach(function () {
     this.builder = new QueryValueComponentsBuilder(spaces);
     this.clock = sinon.useFakeTimers(fakeNow.valueOf());

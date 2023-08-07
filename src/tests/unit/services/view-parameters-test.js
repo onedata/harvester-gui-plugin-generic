@@ -2,7 +2,7 @@ import { module, test } from 'qunit';
 import { setupTest } from '../../helpers';
 import sinon from 'sinon';
 
-module('Unit | Service | view-parameters', hooks => {
+module('Unit | Service | view-parameters', (hooks) => {
   setupTest(hooks);
 
   hooks.beforeEach(function () {
@@ -15,7 +15,7 @@ module('Unit | Service | view-parameters', hooks => {
 
   test('has null viewMode property on init', function (assert) {
     const service = this.owner.lookup('service:view-parameters');
-    assert.notOk(service.viewMode);
+    assert.strictEqual(service.viewMode, null);
   });
 
   test('fills in configuration property after reloadViewMode() call', function (assert) {
@@ -33,7 +33,7 @@ module('Unit | Service | view-parameters', hooks => {
       // Set to sth non-null to check if reload failure will clear it out
       service.viewMode = 'public';
       return service.reloadViewMode()
-        .then(() => assert.notOk(service.viewMode));
+        .then(() => assert.strictEqual(service.viewMode, null));
     }
   );
 });

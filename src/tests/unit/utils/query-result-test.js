@@ -35,7 +35,7 @@ module('Unit | Utility | query-result', () => {
       }, {});
 
       await settled();
-      assert.notOk(result.fileBrowserUrl);
+      assert.strictEqual(result.fileBrowserUrl, '');
     }
   );
 

@@ -1,6 +1,6 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from '../../helpers';
-import { render, click, settled } from '@ember/test-helpers';
+import { render, click, settled, find, findAll } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
 import sinon from 'sinon';
 import { Promise, resolve, all as allFulfilled } from 'rsvp';
@@ -9,7 +9,7 @@ import SpacesProvider from 'harvester-gui-plugin-generic/services/spaces-provide
 
 const indexName = 'generic-index';
 
-module('Integration | Component | content-index', hooks => {
+module('Integration | Component | content-index', (hooks) => {
   setupRenderingTest(hooks);
 
   hooks.beforeEach(function () {
@@ -38,7 +38,7 @@ module('Integration | Component | content-index', hooks => {
   test('has class "content-index"', async function (assert) {
     await render(hbs `<ContentIndex/>`);
 
-    assert.strictEqual(this.element.querySelectorAll('.content-index').length, 1);
+    assert.strictEqual(findAll('.content-index').length, 1);
   });
 
   test('shows only spinner when index schema is being loaded', async function (assert) {
@@ -47,7 +47,7 @@ module('Integration | Component | content-index', hooks => {
 
     await render(hbs `<ContentIndex/>`);
 
-    const componentChildren = this.element.querySelectorAll('.content-index > *');
+    const componentChildren = findAll('.content-index > *');
     assert.strictEqual(componentChildren.length, 1);
     assert.dom(componentChildren[0]).hasClass('spinner-display');
     assert.ok(this.dataRequestStub.calledOnce);
@@ -70,7 +70,7 @@ module('Integration | Component | content-index', hooks => {
     rejectDataRequest('indexError');
     await settled();
 
-    const componentChildren = this.element.querySelectorAll('.content-index > *');
+    const componentChildren = findAll('.content-index > *');
     assert.strictEqual(componentChildren.length, 1);
     assert.dom(componentChildren[0]).hasClass('resource-load-error');
     assert.contains(componentChildren[0].textContent, 'indexError');
@@ -81,8 +81,8 @@ module('Integration | Component | content-index', hooks => {
     async function (assert) {
       await render(hbs `<ContentIndex/>`);
 
-      assert.ok(this.element.querySelector('.query-builder'));
-      assert.ok(this.element.querySelector('.filtered-properties-selector'));
+      assert.ok(find('.query-builder'));
+      assert.ok(find('.filtered-properties-selector'));
     }
   );
 
@@ -93,10 +93,10 @@ module('Integration | Component | content-index', hooks => {
       await click('.query-builder-block-adder');
       await clickTrigger('.block-adder-body .property-selector');
 
-      const options = this.element.querySelectorAll('.ember-power-select-option');
+      const options = findAll('.ember-power-select-option');
       assert.strictEqual(options.length, 4);
       ['any property', 'space', 'a.b', 'c'].forEach((propertyPath, index) =>
-        assert.strictEqual(options[index].textContent.trim(), propertyPath)
+        assert.dom(options[index]).hasText(propertyPath)
       );
     }
   );
@@ -114,10 +114,11 @@ module('Integration | Component | content-index', hooks => {
         .map(element => click(element))
       );
 
-      const treeLabels = document.querySelectorAll('.filtered-properties-selector-body .tree-label');
+      const treeLabels =
+        document.querySelectorAll('.filtered-properties-selector-body .tree-label');
       assert.strictEqual(treeLabels.length, 3);
       ['a', 'b', 'c'].forEach((propertyName, index) =>
-        assert.strictEqual(treeLabels[index].textContent.trim(), propertyName)
+        assert.dom(treeLabels[index]).hasText(propertyName)
       );
     }
   );
@@ -133,12 +134,9 @@ module('Integration | Component | content-index', hooks => {
       path: '_search',
       body: '{"from":0,"size":10,"sort":[{"_score":"desc"}]}',
     })));
-    assert.strictEqual(this.element.querySelectorAll('.query-results-result').length, 1);
-    assert.strictEqual(
-      this.element.querySelector('.result-sample').textContent.trim(),
-      'a: {b: false}, c: "abc"'
-    );
-    assert.dom(this.element.querySelector('.go-to-file-link')).hasAttribute('href', 'file123url');
+    assert.strictEqual(findAll('.query-results-result').length, 1);
+    assert.dom(find('.result-sample')).hasText('a: {b: false}, c: "abc"');
+    assert.dom(find('.go-to-file-link')).hasAttribute('href', 'file123url');
   });
 
   test('shows results spinner while initial query is pending', async function (assert) {
@@ -148,7 +146,7 @@ module('Integration | Component | content-index', hooks => {
 
     await render(hbs `<ContentIndex/>`);
 
-    assert.ok(this.element.querySelector('.query-results .spinner-display'));
+    assert.ok(find('.query-results .spinner-display'));
   });
 
   test('shows results error when initial query failed', async function (assert) {
@@ -162,7 +160,7 @@ module('Integration | Component | content-index', hooks => {
     await settled();
 
     const errorContainer =
-      this.element.querySelector('.query-results .resource-load-error');
+      find('.query-results .resource-load-error');
     assert.ok(errorContainer);
     assert.contains(errorContainer.textContent, 'queryError');
   });
@@ -198,8 +196,8 @@ module('Integration | Component | content-index', hooks => {
       body: '{"from":0,"size":10,"sort":[{"_score":"desc"}],"query":{"bool":{"must":[{"term":{"a.b":{"value":"true"}}}]}}}',
     })));
 
-    assert.strictEqual(this.element.querySelectorAll('.query-results-result').length, 1);
-    assert.strictEqual(this.element.querySelector('.result-sample').textContent.trim(), 'a: {b: true}');
+    assert.strictEqual(findAll('.query-results-result').length, 1);
+    assert.dom(find('.result-sample')).hasText('a: {b: true}');
   });
 
   test('shows spinner while loading custom query with conditions',
@@ -212,8 +210,8 @@ module('Integration | Component | content-index', hooks => {
       await click('.accept-condition');
       await click('.submit-query');
 
-      assert.ok(this.element.querySelector('.query-results .spinner-display'));
-      assert.notOk(this.element.querySelector('.result-sample'));
+      assert.ok(find('.query-results .spinner-display'));
+      assert.notOk(find('.result-sample'));
     }
   );
 
@@ -233,10 +231,10 @@ module('Integration | Component | content-index', hooks => {
       await settled();
 
       const errorContainer =
-        this.element.querySelector('.query-results .resource-load-error');
+        find('.query-results .resource-load-error');
       assert.ok(errorContainer);
       assert.contains(errorContainer.textContent, 'queryError');
-      assert.notOk(this.element.querySelector('.result-sample'));
+      assert.notOk(find('.result-sample'));
     }
   );
 
@@ -259,10 +257,8 @@ module('Integration | Component | content-index', hooks => {
       path: '_search',
       body: '{"from":0,"size":10,"sort":[{"a.b":"asc"}]}',
     })));
-    assert.strictEqual(this.element.querySelector('.query-results-sort-selector .property-selector')
-      .textContent.trim(), 'a.b');
-    assert.strictEqual(this.element.querySelector('.query-results-sort-selector .direction-selector')
-      .textContent.trim(), 'asc');
+    assert.dom(find('.query-results-sort-selector .property-selector')).hasText('a.b');
+    assert.dom(find('.query-results-sort-selector .direction-selector')).hasText('asc');
   });
 
   test('allows to change results page', async function (assert) {
@@ -277,7 +273,7 @@ module('Integration | Component | content-index', hooks => {
       path: '_search',
       body: '{"from":10,"size":10,"sort":[{"_score":"desc"}]}',
     })));
-    assert.dom(this.element.querySelector('.active-page-number')).hasValue('2');
+    assert.dom(find('.active-page-number')).hasValue('2');
   });
 
   test('allows to change results page size', async function (assert) {
@@ -292,7 +288,7 @@ module('Integration | Component | content-index', hooks => {
       path: '_search',
       body: '{"from":0,"size":25,"sort":[{"_score":"desc"}]}',
     })));
-    assert.strictEqual(this.element.querySelector('.page-size-selector').textContent.trim(), '25');
+    assert.dom(find('.page-size-selector')).hasText('25');
   });
 
   test('resets page number on results page size change', async function (assert) {
@@ -308,7 +304,7 @@ module('Integration | Component | content-index', hooks => {
       path: '_search',
       body: '{"from":0,"size":25,"sort":[{"_score":"desc"}]}',
     })));
-    assert.dom(this.element.querySelector('.active-page-number')).hasValue('1');
+    assert.dom(find('.active-page-number')).hasValue('1');
   });
 
   test('resets page number on sort property change', async function (assert) {
@@ -324,7 +320,7 @@ module('Integration | Component | content-index', hooks => {
       path: '_search',
       body: '{"from":0,"size":10,"sort":[{"a.b":"desc"}]}',
     })));
-    assert.dom(this.element.querySelector('.active-page-number')).hasValue('1');
+    assert.dom(find('.active-page-number')).hasValue('1');
   });
 
   test('resets page number on sort direction change', async function (assert) {
@@ -340,7 +336,7 @@ module('Integration | Component | content-index', hooks => {
       path: '_search',
       body: '{"from":0,"size":10,"sort":[{"_score":"asc"}]}',
     })));
-    assert.dom(this.element.querySelector('.active-page-number')).hasValue('1');
+    assert.dom(find('.active-page-number')).hasValue('1');
   });
 
   test(
@@ -360,7 +356,7 @@ module('Integration | Component | content-index', hooks => {
       await click('.filtered-properties-selector-body .one-checkbox');
       await click('.generate-query-request');
 
-      assert.strictEqual(this.element.querySelector('.copy-textarea').textContent.trim(), 'curl');
+      assert.dom(find('.copy-textarea')).hasText('curl');
       assert.ok(this.dataCurlCommandRequestStub.calledOnce);
       assert.ok(this.dataCurlCommandRequestStub.calledWith(sinon.match({
         method: 'post',

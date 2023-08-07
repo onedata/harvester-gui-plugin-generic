@@ -2,7 +2,7 @@ import { module, test } from 'qunit';
 import { setupTest } from '../../helpers';
 import sinon from 'sinon';
 
-module('Unit | Service | elasticsearch', hooks => {
+module('Unit | Service | elasticsearch', (hooks) => {
   setupTest(hooks);
 
   hooks.beforeEach(function () {

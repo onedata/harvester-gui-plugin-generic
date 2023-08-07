@@ -1,6 +1,6 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from '../../helpers';
-import { render, click, fillIn, triggerKeyEvent } from '@ember/test-helpers';
+import { render, click, fillIn, triggerKeyEvent, find, findAll } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
 import sinon from 'sinon';
 import { selectChoose, clickTrigger } from '../../helpers/ember-power-select';
@@ -9,7 +9,7 @@ import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builde
 import EsIndex from 'harvester-gui-plugin-generic/utils/es-index';
 import QueryValueComponentsBuilder from 'harvester-gui-plugin-generic/utils/query-value-components-builder';
 
-module('Integration | Component | query-builder', hooks => {
+module('Integration | Component | query-builder', (hooks) => {
   setupRenderingTest(hooks);
 
   hooks.beforeEach(function () {
@@ -49,7 +49,7 @@ module('Integration | Component | query-builder', hooks => {
   test('has class "query-builder', async function (assert) {
     await render(hbs `<QueryBuilder @valuesBuilder={{this.valuesBuilder}} />`);
 
-    assert.ok(this.element.querySelector('.query-builder'));
+    assert.ok(find('.query-builder'));
   });
 
   test('filters list of available index properties to supported ones',
@@ -61,10 +61,10 @@ module('Integration | Component | query-builder', hooks => {
       await click('.query-builder-block-adder');
       await clickTrigger('.property-selector');
 
-      const options = this.element.querySelectorAll('.ember-power-select-option');
+      const options = findAll('.ember-power-select-option');
       assert.strictEqual(options.length, 5);
       ['any property', 'space', 'a.b', 'c', 'c.d'].forEach((propertyPath, index) =>
-        assert.strictEqual(options[index].textContent.trim(), propertyPath)
+        assert.dom(options[index]).hasText(propertyPath)
       );
     }
   );
@@ -102,7 +102,7 @@ module('Integration | Component | query-builder', hooks => {
       await click('.query-builder-condition-block .comparator-value');
       await fillIn('.query-builder-condition-block .comparator-value', 'def');
 
-      assert.dom(this.element.querySelector('.submit-query')).doesNotHaveAttribute('disabled');
+      assert.dom(find('.submit-query')).doesNotHaveAttribute('disabled');
     }
   );
 
@@ -119,7 +119,7 @@ module('Integration | Component | query-builder', hooks => {
       await click('.query-builder-condition-block .comparator-value');
       await fillIn('.query-builder-condition-block .comparator-value', '');
 
-      assert.dom(this.element.querySelector('.submit-query')).hasAttribute('disabled');
+      assert.dom(find('.submit-query')).hasAttribute('disabled');
     }
   );
 
@@ -138,7 +138,7 @@ module('Integration | Component | query-builder', hooks => {
       await fillIn('.query-builder-condition-block .comparator-value', '');
       await triggerKeyEvent('.comparator-value', 'keydown', 'Escape');
 
-      assert.dom(this.element.querySelector('.submit-query')).doesNotHaveAttribute('disabled');
+      assert.dom(find('.submit-query')).doesNotHaveAttribute('disabled');
     }
   );
 
@@ -157,7 +157,7 @@ module('Integration | Component | query-builder', hooks => {
       await fillIn('.query-builder-condition-block .comparator-value', '');
       await click('.remove-block');
 
-      assert.dom(this.element.querySelector('.submit-query')).doesNotHaveAttribute('disabled');
+      assert.dom(find('.submit-query')).doesNotHaveAttribute('disabled');
     }
   );
 
@@ -178,7 +178,7 @@ module('Integration | Component | query-builder', hooks => {
       await fillIn('.query-builder-condition-block .comparator-value', '');
       await click('.not-operator-block > .remove-block');
 
-      assert.dom(this.element.querySelector('.submit-query')).doesNotHaveAttribute('disabled');
+      assert.dom(find('.submit-query')).doesNotHaveAttribute('disabled');
     }
   );
 

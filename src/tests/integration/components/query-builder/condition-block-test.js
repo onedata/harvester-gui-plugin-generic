@@ -1,6 +1,6 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from '../../../helpers';
-import { render, click, fillIn, blur, triggerKeyEvent } from '@ember/test-helpers';
+import { render, click, fillIn, blur, triggerKeyEvent, find } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
 import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/condition-query-block';
 import _ from 'lodash';
@@ -69,7 +69,7 @@ const renderingPropertyTestData = [{
   comparatorSymbol: 'has phrase',
 }];
 
-module('Integration | Component | query-builder/condition-block', hooks => {
+module('Integration | Component | query-builder/condition-block', (hooks) => {
   setupRenderingTest(hooks);
 
   hooks.beforeEach(function () {
@@ -86,7 +86,7 @@ module('Integration | Component | query-builder/condition-block', hooks => {
         @queryBlock={{this.block}}
       />`);
 
-      assert.ok(this.element.querySelectorAll(
+      assert.ok(find(
         '.query-builder-block.query-builder-condition-block'
       ));
     }
@@ -112,18 +112,9 @@ module('Integration | Component | query-builder/condition-block', hooks => {
           @queryBlock={{this.block}}
         />`);
 
-        assert.strictEqual(
-          this.element.querySelector('.property-path').textContent.trim(),
-          'a.b'
-        );
-        assert.strictEqual(
-          this.element.querySelector('.comparator').textContent.trim(),
-          comparatorSymbol
-        );
-        assert.strictEqual(
-          this.element.querySelector('.comparator-value').textContent.trim(),
-          comparatorViewValue
-        );
+        assert.dom(find('.property-path')).hasText('a.b');
+        assert.dom(find('.comparator')).hasText(comparatorSymbol);
+        assert.dom(find('.comparator-value')).hasText(comparatorViewValue);
       }
     );
   });
@@ -140,7 +131,7 @@ module('Integration | Component | query-builder/condition-block', hooks => {
       </QueryBuilder::ConditionBlock>
     `);
 
-    assert.ok(this.element.querySelector('.test-element'));
+    assert.ok(find('.test-element'));
   });
 
   test('starts comparator value edition on value click', async function (assert) {
@@ -155,8 +146,8 @@ module('Integration | Component | query-builder/condition-block', hooks => {
     assert.ok(this.editionStartSpy.notCalled);
     await click('.comparator-value');
 
-    assert.ok(this.element.querySelector('.comparator-value-editor'));
-    assert.ok(this.element.querySelector('input[type="text"].comparator-value'));
+    assert.ok(find('.comparator-value-editor'));
+    assert.ok(find('input[type="text"].comparator-value'));
     assert.ok(this.editionStartSpy.calledOnce);
     assert.ok(this.editionStartSpy.calledWith(this.block));
   });
@@ -178,8 +169,8 @@ module('Integration | Component | query-builder/condition-block', hooks => {
     assert.ok(this.editionEndSpy.notCalled);
     await blur('.comparator-value');
 
-    assert.strictEqual(this.element.querySelector('.comparator-value').textContent.trim(), '"def"');
-    assert.notOk(this.element.querySelector('input[type="text"].comparator-value'));
+    assert.dom(find('.comparator-value')).hasText('"def"');
+    assert.notOk(find('input[type="text"].comparator-value'));
     assert.strictEqual(this.block.comparatorValue, 'def');
     assert.ok(this.editionValidityChangeSpy.calledOnce);
     assert.ok(this.editionValidityChangeSpy.calledWith(this.block, true));
@@ -204,8 +195,8 @@ module('Integration | Component | query-builder/condition-block', hooks => {
     assert.ok(this.editionEndSpy.notCalled);
     await triggerKeyEvent('.comparator-value', 'keydown', 'Escape');
 
-    assert.strictEqual(this.element.querySelector('.comparator-value').textContent.trim(), '"abc"');
-    assert.notOk(this.element.querySelector('input[type="text"].comparator-value'));
+    assert.dom(find('.comparator-value')).hasText('"abc"');
+    assert.notOk(find('input[type="text"].comparator-value'));
     assert.strictEqual(this.block.comparatorValue, 'abc');
     assert.ok(this.editionValidityChangeSpy.calledOnce);
     assert.ok(this.editionValidityChangeSpy.calledWith(this.block, true));
@@ -243,12 +234,12 @@ module('Integration | Component | query-builder/condition-block', hooks => {
             />`);
             await click('.comparator-value');
 
-            assert.dom(this.element.querySelector('input[type="text"].comparator-value'))
+            assert.dom(find('input[type="text"].comparator-value'))
               .doesNotHaveClass('is-invalid');
 
             await fillIn('.comparator-value', incorrectValue);
 
-            assert.dom(this.element.querySelector('input[type="text"].comparator-value'))
+            assert.dom(find('input[type="text"].comparator-value'))
               .hasClass('is-invalid');
           }
         );
@@ -271,7 +262,7 @@ module('Integration | Component | query-builder/condition-block', hooks => {
             await fillIn('.comparator-value', incorrectValue);
             await blur('.comparator-value');
 
-            assert.ok(this.element.querySelector('input[type="text"].comparator-value'));
+            assert.ok(find('input[type="text"].comparator-value'));
             assert.strictEqual(this.block.comparatorValue, initialValue);
             assert.ok(this.editionValidityChangeSpy.calledOnce);
             assert.ok(this.editionValidityChangeSpy.calledWith(this.block, false));

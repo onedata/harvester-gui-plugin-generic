@@ -1,6 +1,6 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from '../../helpers';
-import { render, click } from '@ember/test-helpers';
+import { render, click, find, findAll } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
 import QueryResults from 'harvester-gui-plugin-generic/utils/query-results';
 import { selectChoose } from '../../helpers/ember-power-select';
@@ -8,7 +8,7 @@ import { all as allFulfilled, resolve, Promise } from 'rsvp';
 import sinon from 'sinon';
 import EsIndex from 'harvester-gui-plugin-generic/utils/es-index';
 
-module('Integration | Component | query-results', hooks => {
+module('Integration | Component | query-results', (hooks) => {
   setupRenderingTest(hooks);
 
   hooks.beforeEach(function () {
@@ -76,7 +76,7 @@ module('Integration | Component | query-results', hooks => {
   test('renders results', async function (assert) {
     await render(hbs `<QueryResults @queryResultsPromise={{this.queryResultsPromise}}/>`);
 
-    const results = this.element.querySelectorAll('.query-results-result');
+    const results = findAll('.query-results-result');
     assert.strictEqual(results.length, 2);
     assert.contains(results[0].textContent, 'anotherText');
     assert.contains(results[1].textContent, 'someText2');
@@ -89,7 +89,7 @@ module('Integration | Component | query-results', hooks => {
 
       await render(hbs `<QueryResults @queryResultsPromise={{this.queryResultsPromise}}/>`);
 
-      assert.dom(this.element.querySelector('.query-results-placeholder')).hasClass('mode-loading');
+      assert.dom(find('.query-results-placeholder')).hasClass('mode-loading');
     }
   );
 
@@ -103,7 +103,7 @@ module('Integration | Component | query-results', hooks => {
 
       await render(hbs `<QueryResults @queryResultsPromise={{this.queryResultsPromise}}/>`);
 
-      assert.dom(this.element.querySelector('.query-results-placeholder')).hasClass('mode-empty');
+      assert.dom(find('.query-results-placeholder')).hasClass('mode-empty');
     }
   );
 
@@ -122,9 +122,9 @@ module('Integration | Component | query-results', hooks => {
     )[1];
     await click(firstBranchLastCheckbox);
 
-    const resultSamples = this.element.querySelectorAll('.result-sample');
-    assert.strictEqual(resultSamples[0].textContent.trim(), 'No match.');
-    assert.strictEqual(resultSamples[1].textContent.trim(), 'a: [{bb: false}]');
+    const resultSamples = findAll('.result-sample');
+    assert.dom(resultSamples[0]).hasText('No match.');
+    assert.dom(resultSamples[1]).hasText('a: [{bb: false}]');
   });
 
   test('does not notify about changed filtered properties on init',
@@ -173,7 +173,7 @@ module('Integration | Component | query-results', hooks => {
 
       await render(hbs `<QueryResults @queryResultsPromise={{this.queryResultsPromise}}/>`);
 
-      assert.notOk(this.element.querySelector('.query-results-pagination'));
+      assert.notOk(find('.query-results-pagination'));
     }
   );
 
@@ -182,7 +182,7 @@ module('Integration | Component | query-results', hooks => {
       await render(hbs `<QueryResults @queryResultsPromise={{this.queryResultsPromise}}/>`);
 
       assert.strictEqual(
-        this.element.querySelectorAll('.query-results-pagination').length,
+        findAll('.query-results-pagination').length,
         2
       );
     }
@@ -211,10 +211,10 @@ module('Integration | Component | query-results', hooks => {
           @pageSize={{25}}
         />`);
 
-        const pageSize = this.element.querySelectorAll(
+        const pageSize = findAll(
           '.query-results-pagination .page-size-selector .ember-power-select-selected-item'
         )[index];
-        assert.strictEqual(pageSize.textContent.trim(), '25');
+        assert.dom(pageSize).hasText('25');
       }
     );
 
@@ -226,10 +226,10 @@ module('Integration | Component | query-results', hooks => {
           @pageSize={{10}}
         />`);
 
-        const pagesCount = this.element.querySelectorAll(
+        const pagesCount = findAll(
           '.query-results-pagination .pages-count'
         )[index];
-        assert.strictEqual(pagesCount.textContent.trim(), '1');
+        assert.dom(pagesCount).hasText('1');
       }
     );
 
@@ -242,10 +242,10 @@ module('Integration | Component | query-results', hooks => {
           @pageSize={{10}}
         />`);
 
-        const pagesCount = this.element.querySelectorAll(
+        const pagesCount = findAll(
           '.query-results-pagination .pages-count'
         )[index];
-        assert.strictEqual(pagesCount.textContent.trim(), '5');
+        assert.dom(pagesCount).hasText('5');
       }
     );
 
@@ -260,7 +260,7 @@ module('Integration | Component | query-results', hooks => {
           @pageSize={{10}}
           @onPageChange={{this.changeSpy}}
         />`);
-        const nextBtn = this.element.querySelectorAll(
+        const nextBtn = findAll(
           '.query-results-pagination .next-page'
         )[index];
         await click(nextBtn);
@@ -280,7 +280,7 @@ module('Integration | Component | query-results', hooks => {
           @pageSize={{10}}
           @onPageSizeChange={{this.changeSpy}}
         />`);
-        const pageSizeSelector = this.element.querySelectorAll(
+        const pageSizeSelector = findAll(
           '.query-results-pagination .page-size-selector'
         )[index];
         await selectChoose(pageSizeSelector, '50');
@@ -300,12 +300,12 @@ module('Integration | Component | query-results', hooks => {
         @sortDirection="asc"
       />`);
 
-      assert.strictEqual(this.element.querySelector(
+      assert.dom(find(
         '.property-selector .ember-power-select-selected-item'
-      ).textContent.trim(), 'a.b');
-      assert.strictEqual(this.element.querySelector(
+      )).hasText('a.b');
+      assert.dom(find(
         '.direction-selector .ember-power-select-selected-item'
-      ).textContent.trim(), 'asc');
+      )).hasText('asc');
     }
   );
 

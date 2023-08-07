@@ -5,7 +5,7 @@ import sinon from 'sinon';
 import { settled } from '@ember/test-helpers';
 import { resolve } from 'rsvp';
 
-module('Unit | Utility | query-results', hooks => {
+module('Unit | Utility | query-results', (hooks) => {
   hooks.beforeEach(function () {
     this.rawQueryResults = {
       hits: {
@@ -54,7 +54,7 @@ module('Unit | Utility | query-results', hooks => {
     results.results.forEach((result, index) => {
       assert.ok(result instanceof QueryResult);
       assert.strictEqual(result.rawObject, this.rawQueryResults.hits.hits[index]);
-      assert.notOk(result.fileBrowserUrl);
+      assert.strictEqual(result.fileBrowserUrl, '');
     });
     await settled();
     assert.strictEqual(results.results[0].fileBrowserUrl, 'file123url');

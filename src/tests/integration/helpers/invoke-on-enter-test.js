@@ -4,7 +4,7 @@ import { render, triggerKeyEvent } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
 import sinon from 'sinon';
 
-module('Integration | Helper | invoke-on-enter', hooks => {
+module('Integration | Helper | invoke-on-enter', (hooks) => {
   setupRenderingTest(hooks);
 
   test('invokes action once on enter press', async function (assert) {

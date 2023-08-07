@@ -1,6 +1,6 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from '../../../../helpers';
-import { render, click, fillIn } from '@ember/test-helpers';
+import { render, click, fillIn, find, findAll } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
 import sinon from 'sinon';
 import moment from 'moment';
@@ -151,7 +151,7 @@ const comparatorsTestData = [{
 
 module(
   'Integration | Component | query-builder/block-selector/condition-selector',
-  hooks => {
+  (hooks) => {
     setupRenderingTest(hooks);
 
     hooks.beforeEach(function () {
@@ -209,10 +209,10 @@ module(
       await clickTrigger('.property-selector');
 
       const indexProperties = this.indexProperties;
-      const options = this.element.querySelectorAll('.ember-power-select-option');
+      const options = findAll('.ember-power-select-option');
       assert.strictEqual(options.length, indexProperties.length);
       indexProperties.mapBy('path').forEach((path, index) =>
-        assert.strictEqual(options[index].textContent.trim(), path)
+        assert.dom(options[index]).hasText(path)
       );
     });
 
@@ -224,9 +224,9 @@ module(
       await clickTrigger('.property-selector');
       await typeInSearch('bool');
 
-      const options = this.element.querySelectorAll('.ember-power-select-option');
+      const options = findAll('.ember-power-select-option');
       assert.strictEqual(options.length, 1);
-      assert.strictEqual(options[0].textContent.trim(), 'boolProp');
+      assert.dom(options[0]).hasText('boolProp');
     });
 
     test('hides "Add" button when no property is selected', async function (assert) {
@@ -235,7 +235,7 @@ module(
         @indexProperties={{this.indexProperties}}
       />`);
 
-      assert.notOk(this.element.querySelector('.accept-condition'));
+      assert.notOk(find('.accept-condition'));
     });
 
     test('does not show comparator selector on init', async function (assert) {
@@ -244,7 +244,7 @@ module(
         @indexProperties={{this.indexProperties}}
       />`);
 
-      assert.notOk(this.element.querySelector('.comparator-selector'));
+      assert.notOk(find('.comparator-selector'));
     });
 
     test('shows comparator selector when property is selected', async function (assert) {
@@ -254,7 +254,7 @@ module(
       />`);
       await selectChoose('.property-selector', 'boolProp');
 
-      assert.ok(this.element.querySelector('.comparator-selector'));
+      assert.ok(find('.comparator-selector'));
     });
 
     comparatorsTestData.forEach(({
@@ -274,22 +274,17 @@ module(
         if (comparators.length > 1) {
           await clickTrigger('.comparator-selector');
 
-          const options = this.element.querySelectorAll('.ember-power-select-option');
+          const options = findAll('.ember-power-select-option');
           assert.strictEqual(options.length, comparators.length);
           comparators.forEach(({ comparator }, index) =>
-            assert.strictEqual(
-              options[index].textContent.trim(),
-              comparatorTranslations[comparator]
-            )
+            assert.dom(options[index]).hasText(comparatorTranslations[comparator])
           );
-          assert.strictEqual(this.element.querySelector(
+          assert.dom(find(
             '.comparator-selector .ember-power-select-selected-item'
-          ).textContent.trim(), comparatorTranslations[defaultComparator]);
+          )).hasText(comparatorTranslations[defaultComparator]);
         } else {
-          assert.strictEqual(
-            this.element.querySelector('.comparator-selector').textContent.trim(),
-            comparatorTranslations[comparators[0].comparator]
-          );
+          assert.dom(find('.comparator-selector'))
+            .hasText(comparatorTranslations[comparators[0].comparator]);
         }
       });
 
@@ -344,7 +339,7 @@ module(
             />`);
             await selectChoose('.property-selector', propertyName);
 
-            const comparatorValueNode = this.element.querySelector('.comparator-value');
+            const comparatorValueNode = find('.comparator-value');
             const comparatorValue = comparatorValueNode.value !== undefined ?
               comparatorValueNode.value : comparatorValueNode.textContent.trim();
             assert.strictEqual(comparatorValue, defaultComparatorVisibleValue);
@@ -361,7 +356,7 @@ module(
 
             await selectChoose('.property-selector', propertyName);
 
-            const addBtn = this.element.querySelector('.accept-condition');
+            const addBtn = find('.accept-condition');
             if (isAddEnabledForDefaults) {
               assert.dom(addBtn).doesNotHaveAttribute('disabled');
             } else {
@@ -385,7 +380,7 @@ module(
           await selectChoose('.comparator-selector', symbol);
           await fillIn('.comparator-value', 'xyz');
 
-          assert.dom(this.element.querySelector('.accept-condition')).hasAttribute('disabled');
+          assert.dom(find('.accept-condition')).hasAttribute('disabled');
         }
       );
     });
@@ -402,7 +397,7 @@ module(
           await selectChoose('.comparator-selector', symbol);
           await click('.include-time');
 
-          assert.dom(this.element.querySelector('.comparator-value')).hasValue('2020-05-04 00:00:00');
+          assert.dom(find('.comparator-value')).hasValue('2020-05-04 00:00:00');
         }
       );
     });
@@ -419,7 +414,7 @@ module(
 
         await selectChoose('.property-selector', 'space');
 
-        assert.dom(this.element.querySelector('.accept-condition')).hasAttribute('disabled');
+        assert.dom(find('.accept-condition')).hasAttribute('disabled');
       }
     );
   }

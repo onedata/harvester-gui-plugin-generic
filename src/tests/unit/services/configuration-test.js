@@ -2,7 +2,7 @@ import { module, test } from 'qunit';
 import { setupTest } from '../../helpers';
 import sinon from 'sinon';
 
-module('Unit | Service | configuration', hooks => {
+module('Unit | Service | configuration', (hooks) => {
   setupTest(hooks);
 
   hooks.beforeEach(function () {
@@ -15,7 +15,7 @@ module('Unit | Service | configuration', hooks => {
 
   test('has null configuration property on init', function (assert) {
     const service = this.owner.lookup('service:configuration');
-    assert.notOk(service.configuration);
+    assert.strictEqual(service.configuration, null);
   });
 
   test('fills in configuration property after reloadConfiguration() call',
@@ -36,7 +36,7 @@ module('Unit | Service | configuration', hooks => {
       // Set to sth non-null to check if reload failure will clear it out
       service.configuration = 'config';
       return service.reloadConfiguration()
-        .then(() => assert.notOk(service.configuration));
+        .then(() => assert.strictEqual(service.configuration, null));
     }
   );
 });

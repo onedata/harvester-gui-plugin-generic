@@ -1,11 +1,11 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from '../../../helpers';
-import { render, click, fillIn, triggerKeyEvent } from '@ember/test-helpers';
+import { render, click, fillIn, triggerKeyEvent, find, findAll } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
 import { clickTrigger, selectChoose } from '../../../helpers/ember-power-select';
 import sinon from 'sinon';
 
-module('Integration | Component | query-results/pagination', hooks => {
+module('Integration | Component | query-results/pagination', (hooks) => {
   setupRenderingTest(hooks);
 
   test('renders correct number of pages', async function (assert) {
@@ -14,7 +14,7 @@ module('Integration | Component | query-results/pagination', hooks => {
       @pageSize={{10}}
     />`);
 
-    assert.strictEqual(this.element.querySelector('.pages-count').textContent.trim(), '13');
+    assert.dom(find('.pages-count')).hasText('13');
   });
 
   test('shows active page number', async function (assert) {
@@ -24,7 +24,7 @@ module('Integration | Component | query-results/pagination', hooks => {
       @activePageNumber={{2}}
     />`);
 
-    assert.dom(this.element.querySelector('.active-page-number')).hasValue('2');
+    assert.dom(find('.active-page-number')).hasValue('2');
   });
 
   test('notifies about "go to first" page change', async function (assert) {
@@ -92,8 +92,8 @@ module('Integration | Component | query-results/pagination', hooks => {
         @activePageNumber={{1}}
       />`);
 
-      assert.dom(this.element.querySelector('.first-page')).hasAttribute('disabled');
-      assert.dom(this.element.querySelector('.prev-page')).hasAttribute('disabled');
+      assert.dom(find('.first-page')).hasAttribute('disabled');
+      assert.dom(find('.prev-page')).hasAttribute('disabled');
     }
   );
 
@@ -106,8 +106,8 @@ module('Integration | Component | query-results/pagination', hooks => {
         @activePageNumber={{2}}
       />`);
 
-      assert.dom(this.element.querySelector('.first-page')).doesNotHaveAttribute('disabled');
-      assert.dom(this.element.querySelector('.prev-page')).doesNotHaveAttribute('disabled');
+      assert.dom(find('.first-page')).doesNotHaveAttribute('disabled');
+      assert.dom(find('.prev-page')).doesNotHaveAttribute('disabled');
     }
   );
 
@@ -120,8 +120,8 @@ module('Integration | Component | query-results/pagination', hooks => {
         @activePageNumber={{13}}
       />`);
 
-      assert.dom(this.element.querySelector('.next-page')).hasAttribute('disabled');
-      assert.dom(this.element.querySelector('.last-page')).hasAttribute('disabled');
+      assert.dom(find('.next-page')).hasAttribute('disabled');
+      assert.dom(find('.last-page')).hasAttribute('disabled');
     }
   );
 
@@ -134,8 +134,8 @@ module('Integration | Component | query-results/pagination', hooks => {
         @activePageNumber={{12}}
       />`);
 
-      assert.dom(this.element.querySelector('.next-page')).doesNotHaveAttribute('disabled');
-      assert.dom(this.element.querySelector('.last-page')).doesNotHaveAttribute('disabled');
+      assert.dom(find('.next-page')).doesNotHaveAttribute('disabled');
+      assert.dom(find('.last-page')).doesNotHaveAttribute('disabled');
     }
   );
 
@@ -168,11 +168,11 @@ module('Integration | Component | query-results/pagination', hooks => {
     async function (assert) {
       await render(hbs `<QueryResults::Pagination @pageSize={{10}}/>`);
       await clickTrigger('.query-results-pagination');
-      const options = this.element.querySelectorAll('.ember-power-select-option');
+      const options = findAll('.ember-power-select-option');
 
       assert.strictEqual(options.length, 4);
       [10, 25, 50, 100].forEach((pageSize, index) =>
-        assert.strictEqual(options[index].textContent.trim(), String(pageSize))
+        assert.dom(options[index]).hasText(String(pageSize))
       );
     }
   );
@@ -181,9 +181,9 @@ module('Integration | Component | query-results/pagination', hooks => {
     async function (assert) {
       await render(hbs `<QueryResults::Pagination @pageSize={{50}}/>`);
 
-      assert.strictEqual(this.element.querySelector(
+      assert.dom(find(
         '.page-size-selector .ember-power-select-selected-item'
-      ).textContent.trim(), '50');
+      )).hasText('50');
     }
   );
 

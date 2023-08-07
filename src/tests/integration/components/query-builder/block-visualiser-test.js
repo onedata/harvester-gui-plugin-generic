@@ -1,6 +1,6 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from '../../../helpers';
-import { render } from '@ember/test-helpers';
+import { render, find } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
 import AndOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/and-operator-query-block';
 import OrOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/or-operator-query-block';
@@ -14,7 +14,7 @@ const operatorBlockClasses = {
   not: NotOperatorQueryBlock,
 };
 
-module('Integration | Component | query-builder/block-visualiser', hooks => {
+module('Integration | Component | query-builder/block-visualiser', (hooks) => {
   setupRenderingTest(hooks);
 
   hooks.beforeEach(function () {
@@ -32,7 +32,7 @@ module('Integration | Component | query-builder/block-visualiser', hooks => {
           @valuesBuilder={{this.valuesBuilder}}
         />`);
 
-        assert.ok(this.element.querySelector(
+        assert.ok(find(
           `.query-builder-operator-block.${operatorName}-operator-block`
         ));
       }
@@ -49,7 +49,7 @@ module('Integration | Component | query-builder/block-visualiser', hooks => {
         @valuesBuilder={{this.valuesBuilder}}
       />`);
 
-      assert.ok(this.element.querySelector('.query-builder-condition-block'));
+      assert.ok(find('.query-builder-condition-block'));
     }
   );
 });

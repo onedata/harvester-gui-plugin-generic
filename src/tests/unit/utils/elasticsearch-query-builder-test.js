@@ -420,7 +420,8 @@ module('Unit | Utility | elasticsearch-query-builder', () => {
 
   test('allows to specify custom sorting', function (assert) {
     const esQueryBuilder = new ElasticsearchQueryBuilder();
-    esQueryBuilder.sortProperty = new EsIndexProperty(new EsIndexProperty(null, 'x'), 'y');
+    esQueryBuilder.sortProperty =
+      new EsIndexProperty(new EsIndexProperty(null, 'x'), 'y');
     esQueryBuilder.sortDirection = 'asc';
 
     const result = esQueryBuilder.buildQuery();

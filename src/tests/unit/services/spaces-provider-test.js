@@ -3,7 +3,7 @@ import { setupTest } from '../../helpers';
 import sinon from 'sinon';
 import { resolve } from 'rsvp';
 
-module('Unit | Service | spaces-provider', hooks => {
+module('Unit | Service | spaces-provider', (hooks) => {
   setupTest(hooks);
 
   hooks.beforeEach(function () {

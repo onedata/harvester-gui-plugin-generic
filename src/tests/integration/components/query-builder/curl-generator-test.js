@@ -1,6 +1,6 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from '../../../helpers';
-import { render, click, settled } from '@ember/test-helpers';
+import { render, click, settled, find } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
 import sinon from 'sinon';
 import { Promise } from 'rsvp';
@@ -8,28 +8,28 @@ import { set } from '@ember/object';
 import RootOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/root-operator-query-block';
 import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/condition-query-block';
 
-module('Integration | Component | query-builder/curl-generator', hooks => {
+module('Integration | Component | query-builder/curl-generator', (hooks) => {
   setupRenderingTest(hooks);
 
   test('renders trigger button', async function (assert) {
     await render(hbs `<QueryBuilder::CurlGenerator />`);
 
-    const trigger = this.element.querySelector('.generate-query-request');
+    const trigger = find('.generate-query-request');
     assert.ok(trigger);
-    assert.strictEqual(trigger.textContent.trim(), '{ REST API }');
+    assert.dom(trigger).hasText('{ REST API }');
   });
 
   test('has hidden modal on init', async function (assert) {
     await render(hbs `<QueryBuilder::CurlGenerator />`);
 
-    assert.notOk(this.element.querySelector('.curl-generator-modal.show'));
+    assert.notOk(find('.curl-generator-modal.show'));
   });
 
   test('opens modal on trigger click', async function (assert) {
     await render(hbs `<QueryBuilder::CurlGenerator />`);
     await click('.generate-query-request');
 
-    assert.ok(this.element.querySelector('.curl-generator-modal.show'));
+    assert.ok(find('.curl-generator-modal.show'));
   });
 
   test('allows to close modal', async function (assert) {
@@ -37,7 +37,7 @@ module('Integration | Component | query-builder/curl-generator', hooks => {
     await click('.generate-query-request');
     await click('.modal');
 
-    assert.notOk(this.element.querySelector('.curl-generator-modal.show'));
+    assert.notOk(find('.curl-generator-modal.show'));
   });
 
   test('allows to reopen modal', async function (assert) {
@@ -46,7 +46,7 @@ module('Integration | Component | query-builder/curl-generator', hooks => {
     await click('.modal');
     await click('.generate-query-request');
 
-    assert.ok(this.element.querySelector('.curl-generator-modal.show'));
+    assert.ok(find('.curl-generator-modal.show'));
   });
 
   test(
@@ -89,9 +89,9 @@ module('Integration | Component | query-builder/curl-generator', hooks => {
     await settled();
 
     const errorContainer =
-      this.element.querySelector('.curl-generator-modal .error-container');
+      find('.curl-generator-modal .error-container');
     assert.ok(errorContainer);
-    assert.strictEqual(errorContainer.querySelector('.details-json').textContent.trim(), '"err"');
+    assert.dom(errorContainer.querySelector('.details-json')).hasText('"err"');
   });
 
   [{

@@ -5,7 +5,7 @@ import sinon from 'sinon';
 module('Unit | Utility | query-builder/operator-query-block', () => {
   test('has empty "operator" and "operands" fields on init', function (assert) {
     const block = new OperatorQueryBlock();
-    assert.notOk(block.operator);
+    assert.strictEqual(block.operator, null);
     assert.ok(Array.isArray(block.operands));
     assert.strictEqual(block.operands.length, 0);
   });

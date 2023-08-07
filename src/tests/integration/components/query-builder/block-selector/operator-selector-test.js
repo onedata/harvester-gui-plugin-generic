@@ -1,6 +1,6 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from '../../../../helpers';
-import { render, click } from '@ember/test-helpers';
+import { render, click, find, findAll } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
 import sinon from 'sinon';
 
@@ -9,7 +9,7 @@ const defaultVisibleOperatorsList = allowedOperatorsList.without('none');
 
 module(
   'Integration | Component | query-builder/block-selector/operator-selector',
-  hooks => {
+  (hooks) => {
     setupRenderingTest(hooks);
 
     hooks.beforeEach(function () {
@@ -21,7 +21,7 @@ module(
       async function (assert) {
         await render(hbs `<QueryBuilder::BlockSelector::OperatorSelector/>`);
 
-        const operators = this.element.querySelectorAll('.operator-selector .operator');
+        const operators = findAll('.operator-selector .operator');
         assert.strictEqual(operators.length, 3);
         defaultVisibleOperatorsList.forEach((operatorName, index) =>
           checkOperatorButton(assert, operators[index], operatorName)
@@ -36,7 +36,7 @@ module(
           @operators={{this.allOperators}}
         />`);
 
-        const operators = this.element.querySelectorAll('.operator-selector .operator');
+        const operators = findAll('.operator-selector .operator');
         assert.strictEqual(operators.length, 4);
         allowedOperatorsList.forEach((operatorName, index) =>
           checkOperatorButton(assert, operators[index], operatorName)
@@ -70,7 +70,7 @@ module(
           @operators={{array "and" "or"}}
         />`);
 
-        const operators = this.element.querySelectorAll('.operator-selector .operator');
+        const operators = findAll('.operator-selector .operator');
         assert.strictEqual(operators.length, 2);
         ['and', 'or'].forEach((operatorName, index) =>
           checkOperatorButton(assert, operators[index], operatorName)
@@ -85,7 +85,7 @@ module(
           @operators={{array "and" "xor"}}
         />`);
 
-        const operators = this.element.querySelectorAll('.operator-selector .operator');
+        const operators = findAll('.operator-selector .operator');
         assert.strictEqual(operators.length, 1);
         checkOperatorButton(assert, operators[0], 'and');
       }
@@ -96,7 +96,7 @@ module(
       async function (assert) {
         await render(hbs `<QueryBuilder::BlockSelector::OperatorSelector/>`);
 
-        assert.notOk(this.element.querySelector(
+        assert.notOk(find(
           '.operator-selector .operator[disabled]'
         ));
       }
@@ -110,10 +110,10 @@ module(
           @disabledOperators={{array "and" "or"}}
         />`);
 
-        assert.strictEqual(this.element.querySelectorAll(
+        assert.strictEqual(findAll(
           '.operator-selector .operator[disabled]'
         ).length, 2);
-        ['not', 'none'].forEach(operatorName => assert.dom(this.element.querySelector(
+        ['not', 'none'].forEach(operatorName => assert.dom(find(
           `.operator-selector .operator-${operatorName}`
         )).doesNotHaveAttribute('disabled'));
       }
@@ -122,6 +122,6 @@ module(
 );
 
 function checkOperatorButton(assert, buttonNode, operatorName) {
-  assert.strictEqual(buttonNode.textContent.trim(), operatorName);
+  assert.dom(buttonNode).hasText(operatorName);
   assert.dom(buttonNode).hasClass(`operator-${operatorName}`);
 }

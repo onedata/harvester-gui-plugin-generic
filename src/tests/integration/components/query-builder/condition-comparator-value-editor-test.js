@@ -1,6 +1,6 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from '../../../helpers';
-import { render, click, fillIn, blur, triggerKeyEvent } from '@ember/test-helpers';
+import { render, click, fillIn, blur, triggerKeyEvent, find, findAll } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
 import sinon from 'sinon';
 import { clickTrigger, selectChoose } from '../../../helpers/ember-power-select';
@@ -20,7 +20,7 @@ const spaces = [{
 }];
 
 module('Integration | Component | query-builder/condition-comparator-value-editor',
-  hooks => {
+  (hooks) => {
     setupRenderingTest(hooks);
 
     hooks.beforeEach(function () {
@@ -87,10 +87,7 @@ module('Integration | Component | query-builder/condition-comparator-value-edito
               @value={{this.value}}
             />`);
 
-            assert.strictEqual(
-              this.element.querySelector('.comparator-value').textContent.trim(),
-              viewValue
-            );
+            assert.dom(find('.comparator-value')).hasText(viewValue);
           }
         );
       });
@@ -138,7 +135,7 @@ module('Integration | Component | query-builder/condition-comparator-value-edito
               @comparator={{this.comparator}}
             />`);
 
-            assert.ok(this.element.querySelector('input[type="text"].comparator-value'));
+            assert.ok(find('input[type="text"].comparator-value'));
           }
         );
 
@@ -190,10 +187,10 @@ module('Integration | Component | query-builder/condition-comparator-value-edito
             await clickTrigger('.comparator-value');
 
             const optionsNodes =
-              this.element.querySelectorAll('.ember-power-select-option');
+              findAll('.ember-power-select-option');
             assert.strictEqual(optionsNodes.length, options.length);
             options.forEach((option, index) =>
-              assert.strictEqual(optionsNodes[index].textContent.trim(), option)
+              assert.dom(optionsNodes[index]).hasText(option)
             );
           }
         );
@@ -238,9 +235,9 @@ module('Integration | Component | query-builder/condition-comparator-value-edito
               @value={{this.value}}
             />`);
 
-            assert.dom(this.element.querySelector('.comparator-value')).hasValue('2020-05-04');
-            assert.ok(this.element.querySelector('.flatpickr-calendar'));
-            assert.notOk(this.element.querySelector('.flatpickr-time.hasSeconds'));
+            assert.dom(find('.comparator-value')).hasValue('2020-05-04');
+            assert.ok(find('.flatpickr-calendar'));
+            assert.notOk(find('.flatpickr-time.hasSeconds'));
           }
         );
 
@@ -272,8 +269,8 @@ module('Integration | Component | query-builder/condition-comparator-value-edito
               datetime: sinon.match.date,
               timeEnabled: true,
             }));
-            assert.dom(this.element.querySelector('.comparator-value')).hasValue('2020-05-04 12:00:00');
-            assert.ok(this.element.querySelector('.flatpickr-time.hasSeconds'));
+            assert.dom(find('.comparator-value')).hasValue('2020-05-04 12:00:00');
+            assert.ok(find('.flatpickr-time.hasSeconds'));
           }
         );
 
@@ -306,8 +303,10 @@ module('Integration | Component | query-builder/condition-comparator-value-edito
               datetime: sinon.match.date,
               timeEnabled: true,
             }));
-            assert.strictEqual(moment(changeSpy.lastCall.args[0].datetime).format('YYYY-MM-DD HH:mm:ss'),
-              '2020-01-02 13:10:15');
+            assert.strictEqual(
+              moment(changeSpy.lastCall.args[0].datetime).format('YYYY-MM-DD HH:mm:ss'),
+              '2020-01-02 13:10:15'
+            );
           }
         );
       });
@@ -336,7 +335,7 @@ module('Integration | Component | query-builder/condition-comparator-value-edito
             />`);
 
             assert.strictEqual(
-              this.element.querySelector('.comparator-value'),
+              find('.comparator-value'),
               document.activeElement
             );
           }
@@ -354,7 +353,7 @@ module('Integration | Component | query-builder/condition-comparator-value-edito
               @value="abc"
             />`);
 
-            assert.dom(this.element.querySelector('.comparator-value')).hasValue('abc');
+            assert.dom(find('.comparator-value')).hasValue('abc');
           }
         );
 
@@ -480,7 +479,7 @@ module('Integration | Component | query-builder/condition-comparator-value-edito
               @value="abc"
             />`);
 
-            assert.dom(this.element.querySelector('.comparator-value'))
+            assert.dom(find('.comparator-value'))
               .doesNotHaveClass('is-invalid');
           }
         );
@@ -498,7 +497,7 @@ module('Integration | Component | query-builder/condition-comparator-value-edito
               @value="abc"
             />`);
 
-            assert.dom(this.element.querySelector('.comparator-value')).hasClass('is-invalid');
+            assert.dom(find('.comparator-value')).hasClass('is-invalid');
           }
         );
       });
@@ -544,7 +543,7 @@ module('Integration | Component | query-builder/condition-comparator-value-edito
             />`);
 
             assert.strictEqual(
-              this.element.querySelector('.comparator-value'),
+              find('.comparator-value'),
               document.activeElement
             );
           }
@@ -562,9 +561,8 @@ module('Integration | Component | query-builder/condition-comparator-value-edito
               @value={{this.value}}
             />`);
 
-            assert.strictEqual(this.element.querySelector(
-              '.comparator-value .ember-power-select-selected-item'
-            ).textContent.trim(), initialTriggerValue);
+            assert.dom(find('.comparator-value .ember-power-select-selected-item'))
+              .hasText(initialTriggerValue);
           }
         );
 
@@ -580,7 +578,7 @@ module('Integration | Component | query-builder/condition-comparator-value-edito
               @value={{this.value}}
             />`);
 
-            const options = this.element.querySelectorAll('.ember-power-select-option');
+            const options = findAll('.ember-power-select-option');
             assert.strictEqual(options.length, optionsCount);
           }
         );
@@ -648,8 +646,8 @@ module('Integration | Component | query-builder/condition-comparator-value-edito
             @value={{this.value}}
           />`);
 
-          assert.dom(this.element.querySelector('.comparator-value')).hasValue('2020-05-04 12:00:00');
-          assert.dom(this.element.querySelector('.include-time')).hasClass('active');
+          assert.dom(find('.comparator-value')).hasValue('2020-05-04 12:00:00');
+          assert.dom(find('.include-time')).hasClass('active');
           assert.true(isFlatpickrOpen());
         }
       );
@@ -709,7 +707,7 @@ module('Integration | Component | query-builder/condition-comparator-value-edito
             await click('.include-time');
 
             assert.true(isFlatpickrOpen());
-            assert.ok(this.element.querySelector('.flatpickr-time.hasSeconds'));
+            assert.ok(find('.flatpickr-time.hasSeconds'));
             assert.ok(finishEditSpy.notCalled);
             assert.ok(valueChangeStub.calledWith(sinon.match({
               datetime: sinon.match.date,
@@ -749,8 +747,10 @@ module('Integration | Component | query-builder/condition-comparator-value-edito
               datetime: sinon.match.date,
               timeEnabled: false,
             })));
-            assert.strictEqual(moment(valueChangeSpy.lastCall.args[0].datetime).format('YYYY-MM-DD'),
-              '2020-01-02');
+            assert.strictEqual(
+              moment(valueChangeSpy.lastCall.args[0].datetime).format('YYYY-MM-DD'),
+              '2020-01-02'
+            );
           }
         );
       });

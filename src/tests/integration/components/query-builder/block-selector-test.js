@@ -1,6 +1,6 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from '../../../helpers';
-import { render, click } from '@ember/test-helpers';
+import { render, click, find, findAll } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
 import sinon from 'sinon';
 import AndOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/and-operator-query-block';
@@ -21,10 +21,10 @@ const operatorBlockClasses = {
   root: RootOperatorQueryBlock,
 };
 
-module('Integration | Component | query-builder/block-selector', hooks => {
+module('Integration | Component | query-builder/block-selector', (hooks) => {
   setupRenderingTest(hooks);
 
-  module('in "create" mode', hooks => {
+  module('in "create" mode', (hooks) => {
     hooks.beforeEach(function () {
       this.setProperties({
         valuesBuilder: new QueryValueComponentsBuilder([]),
@@ -46,11 +46,11 @@ module('Integration | Component | query-builder/block-selector', hooks => {
           @valuesBuilder={{this.valuesBuilder}}
         />`);
 
-        const operators = this.element.querySelectorAll('.operator-selector .operator');
+        const operators = findAll('.operator-selector .operator');
         assert.strictEqual(operators.length, 3);
         operatorsList.forEach((operatorName, index) => {
           const operator = operators[index];
-          assert.strictEqual(operator.textContent.trim(), operatorName);
+          assert.dom(operator).hasText(operatorName);
         });
       }
     );
@@ -86,10 +86,10 @@ module('Integration | Component | query-builder/block-selector', hooks => {
       await clickTrigger('.property-selector');
 
       const indexProperties = this.indexProperties;
-      const options = this.element.querySelectorAll('.ember-power-select-option');
+      const options = findAll('.ember-power-select-option');
       assert.strictEqual(options.length, indexProperties.length);
       indexProperties.mapBy('path').forEach((path, index) =>
-        assert.strictEqual(options[index].textContent.trim(), path)
+        assert.dom(options[index]).hasText(path)
       );
     });
 
@@ -127,7 +127,7 @@ module('Integration | Component | query-builder/block-selector', hooks => {
           @hideConditionCreation={{true}}
         />`);
 
-        assert.notOk(this.element.querySelector('.condition-selector'));
+        assert.notOk(find('.condition-selector'));
       }
     );
 
@@ -137,12 +137,12 @@ module('Integration | Component | query-builder/block-selector', hooks => {
         @valuesBuilder={{this.valuesBuilder}}
       />`);
 
-      assert.notOk(this.element.querySelector('.surround-section'));
-      assert.notOk(this.element.querySelector('.change-to-section'));
+      assert.notOk(find('.surround-section'));
+      assert.notOk(find('.change-to-section'));
     });
   });
 
-  module('in "edit" mode', hooks => {
+  module('in "edit" mode', (hooks) => {
     hooks.beforeEach(function () {
       this.set('editBlock', new NotOperatorQueryBlock());
     });
@@ -152,13 +152,13 @@ module('Integration | Component | query-builder/block-selector', hooks => {
       async function (assert) {
         await render(hbs `<QueryBuilder::BlockSelector @mode="edit"/>`);
 
-        const operators = this.element.querySelectorAll(
+        const operators = findAll(
           '.surround-section .operator-selector .operator'
         );
         assert.strictEqual(operators.length, 3);
         operatorsList.forEach((operatorName, index) => {
           const operator = operators[index];
-          assert.strictEqual(operator.textContent.trim(), operatorName);
+          assert.dom(operator).hasText(operatorName);
         });
       }
     );
@@ -197,13 +197,13 @@ module('Integration | Component | query-builder/block-selector', hooks => {
           @editParentBlock={{this.parentBlock}}
         />`);
 
-        const operators = this.element.querySelectorAll(
+        const operators = findAll(
           '.change-to-section .operator-selector .operator'
         );
         assert.strictEqual(operators.length, 4);
         [...operatorsList, 'none'].forEach((operatorName, index) => {
           const operator = operators[index];
-          assert.strictEqual(operator.textContent.trim(), operatorName);
+          assert.dom(operator).hasText(operatorName);
         });
       }
     );
@@ -218,7 +218,7 @@ module('Integration | Component | query-builder/block-selector', hooks => {
           @editBlock={{this.editBlock}}
         />`);
 
-        assert.notOk(this.element.querySelector('.change-to-section'));
+        assert.notOk(find('.change-to-section'));
       }
     );
 
@@ -247,9 +247,9 @@ module('Integration | Component | query-builder/block-selector', hooks => {
             />`);
 
             assert.dom(
-              this.element.querySelector(`.change-to-section .operator-${operatorName}`)
+              find(`.change-to-section .operator-${operatorName}`)
             ).hasAttribute('disabled');
-            assert.strictEqual(this.element.querySelectorAll(
+            assert.strictEqual(findAll(
               '.change-to-section .operator:not([disabled])'
             ).length, 2);
           }
@@ -278,12 +278,12 @@ module('Integration | Component | query-builder/block-selector', hooks => {
             operatorName,
             'not',
           ].forEach(disabledOperator => {
-            assert.dom(this.element.querySelector(
+            assert.dom(find(
               `.change-to-section .operator-${disabledOperator}`
             )).hasAttribute('disabled');
           });
 
-          assert.strictEqual(this.element.querySelectorAll(
+          assert.strictEqual(findAll(
             '.change-to-section .operator:not([disabled])'
           ).length, 1);
         }
@@ -386,7 +386,7 @@ module('Integration | Component | query-builder/block-selector', hooks => {
             />`);
 
             const noneOperatorBtn =
-              this.element.querySelector('.change-to-section .operator-none');
+              find('.change-to-section .operator-none');
             if (notAllowed) {
               assert.notOk(noneOperatorBtn);
             } else {
@@ -408,8 +408,8 @@ module('Integration | Component | query-builder/block-selector', hooks => {
         @editBlock={{this.editBlock}}
       />`);
 
-      assert.notOk(this.element.querySelector('.add-operator-section'));
-      assert.notOk(this.element.querySelector('.condition-section'));
+      assert.notOk(find('.add-operator-section'));
+      assert.notOk(find('.condition-section'));
     });
   });
 });

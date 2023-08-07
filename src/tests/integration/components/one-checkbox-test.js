@@ -1,22 +1,22 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from '../../helpers';
-import { render, click } from '@ember/test-helpers';
+import { render, click, find, findAll } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
 import sinon from 'sinon';
 
-module('Integration | Component | one-checkbox', hooks => {
+module('Integration | Component | one-checkbox', (hooks) => {
   setupRenderingTest(hooks);
 
   test('has class "one-checkbox"', async function (assert) {
     await render(hbs `<OneCheckbox />`);
 
-    assert.strictEqual(this.element.querySelectorAll('.one-checkbox').length, 1);
+    assert.strictEqual(findAll('.one-checkbox').length, 1);
   });
 
   test('shows value "true"', async function (assert) {
     await render(hbs `<OneCheckbox @value={{true}}/>`);
 
-    const checkboxNode = this.element.querySelector('.one-checkbox');
+    const checkboxNode = find('.one-checkbox');
     assert.dom(checkboxNode).hasClass('checked');
     assert.dom(checkboxNode.querySelector('.fa-icon')).hasClass('fa-check');
   });
@@ -24,7 +24,7 @@ module('Integration | Component | one-checkbox', hooks => {
   test('shows value "false"', async function (assert) {
     await render(hbs `<OneCheckbox @value={{false}}/>`);
 
-    const checkboxNode = this.element.querySelector('.one-checkbox');
+    const checkboxNode = find('.one-checkbox');
     assert.dom(checkboxNode).hasClass('unchecked');
     assert.notOk(checkboxNode.querySelector('.fa-icon'));
   });
@@ -32,7 +32,7 @@ module('Integration | Component | one-checkbox', hooks => {
   test('shows value "indeterminate"', async function (assert) {
     await render(hbs `<OneCheckbox @value="indeterminate"/>`);
 
-    const checkboxNode = this.element.querySelector('.one-checkbox');
+    const checkboxNode = find('.one-checkbox');
     assert.dom(checkboxNode).hasClass('indeterminate');
     assert.dom(checkboxNode.querySelector('.fa-icon')).hasClass('fa-circle');
   });
@@ -40,21 +40,21 @@ module('Integration | Component | one-checkbox', hooks => {
   test('is enabled by default', async function (assert) {
     await render(hbs `<OneCheckbox />`);
 
-    const checkboxNode = this.element.querySelector('.one-checkbox');
+    const checkboxNode = find('.one-checkbox');
     assert.dom(checkboxNode).doesNotHaveClass('disabled');
   });
 
   test('can be disabled', async function (assert) {
     await render(hbs `<OneCheckbox @disabled={{true}}/>`);
 
-    const checkboxNode = this.element.querySelector('.one-checkbox');
+    const checkboxNode = find('.one-checkbox');
     assert.dom(checkboxNode).hasClass('disabled');
   });
 
   test('has customizable input id', async function (assert) {
     await render(hbs `<OneCheckbox @inputId="my-id"/>`);
 
-    const inputNode = this.element.querySelector('.one-checkbox input');
+    const inputNode = find('.one-checkbox input');
     assert.dom(inputNode).hasAttribute('id', 'my-id');
   });
 

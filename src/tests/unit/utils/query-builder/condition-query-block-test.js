@@ -7,9 +7,9 @@ module('Unit | Utility | query-builder/condition-query-block', () => {
     'has empty "property", "comparator" and "comparatorValue" fields on init',
     function (assert) {
       const block = new ConditionQueryBlock();
-      assert.notOk(block.property);
-      assert.notOk(block.comparator);
-      assert.notOk(block.comparatorValue);
+      assert.strictEqual(block.property, null);
+      assert.strictEqual(block.comparator, null);
+      assert.strictEqual(block.comparatorValue, null);
     }
   );
 

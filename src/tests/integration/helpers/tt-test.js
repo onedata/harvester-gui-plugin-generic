@@ -4,7 +4,7 @@ import { render } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
 import sinon from 'sinon';
 
-module('Integration | Helper | tt', hooks => {
+module('Integration | Helper | tt', (hooks) => {
   setupRenderingTest(hooks);
 
   test('renders', async function (assert) {
@@ -15,6 +15,6 @@ module('Integration | Helper | tt', hooks => {
 
     await render(hbs `{{tt this.context "mytranslation"}}`);
 
-    assert.strictEqual(this.element.textContent.trim(), 'my translation');
+    assert.dom(this.element).hasText('my translation');
   });
 });

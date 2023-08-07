@@ -140,7 +140,9 @@ export default class QueryResultsResultComponent extends Component {
           const stringifiedSubvalue =
             this.visualiseJsonValue(filteredSubproperties, data[key]);
           if (stringifiedSubvalue) {
-            resultObjEntries.push(`<strong>${_.escape(key)}</strong>: ${stringifiedSubvalue}`);
+            resultObjEntries.push(
+              `<strong>${_.escape(key)}</strong>: ${stringifiedSubvalue}`
+            );
           }
         }
       }
