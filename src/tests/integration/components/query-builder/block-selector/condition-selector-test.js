@@ -1,10 +1,8 @@
-import { expect } from 'chai';
-import { describe, it, beforeEach, afterEach } from 'mocha';
-import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
-import hbs from 'htmlbars-inline-precompile';
+import { module, test } from 'qunit';
+import { setupRenderingTest } from '../../../../helpers';
+import { render, click, fillIn, find, findAll } from '@ember/test-helpers';
+import { hbs } from 'ember-cli-htmlbars';
 import sinon from 'sinon';
-import { click, fillIn } from '@ember/test-helpers';
 import moment from 'moment';
 import SpacesProvider from 'harvester-gui-plugin-generic/services/spaces-provider';
 import { typeInSearch, clickTrigger, selectChoose } from '../../../../helpers/ember-power-select';
@@ -115,9 +113,10 @@ const comparatorsTestData = [{
       datetime: sinon.match.date,
       timeEnabled: true,
     }),
-    extraNotifiedInputCheck: spy => expect(
-      moment(spy.lastCall.args[2].datetime).format('YYYY-MM-DD HH:mm:ss')
-    ).to.equal('2020-01-02 13:10:15'),
+    extraNotifiedInputCheck: (assert, spy) => assert.strictEqual(
+      moment(spy.lastCall.args[2].datetime).format('YYYY-MM-DD HH:mm:ss'),
+      '2020-01-02 13:10:15'
+    ),
   })),
   defaultComparator: 'date.eq',
   defaultComparatorVisibleValue: '2020-05-04',
@@ -150,12 +149,12 @@ const comparatorsTestData = [{
   isAddEnabledForDefaults: false,
 }];
 
-describe(
+module(
   'Integration | Component | query-builder/block-selector/condition-selector',
-  function () {
-    setupRenderingTest();
+  (hooks) => {
+    setupRenderingTest(hooks);
 
-    beforeEach(function () {
+    hooks.beforeEach(function () {
       sinon.stub(SpacesProvider.prototype, 'reloadSpaces').callsFake(function () {
         this.spaces = spaces;
       });
@@ -194,7 +193,7 @@ describe(
       });
     });
 
-    afterEach(function () {
+    hooks.afterEach(function () {
       fakeClock.restore();
 
       if (SpacesProvider.prototype.reloadSpaces.restore) {
@@ -202,7 +201,7 @@ describe(
       }
     });
 
-    it('lists index properties in dropdown', async function () {
+    test('lists index properties in dropdown', async function (assert) {
       await render(hbs `<QueryBuilder::BlockSelector::ConditionSelector
         @valuesBuilder={{this.valuesBuilder}}
         @indexProperties={{this.indexProperties}}
@@ -210,14 +209,14 @@ describe(
       await clickTrigger('.property-selector');
 
       const indexProperties = this.indexProperties;
-      const options = this.element.querySelectorAll('.ember-power-select-option');
-      expect(options).to.have.length(indexProperties.length);
+      const options = findAll('.ember-power-select-option');
+      assert.strictEqual(options.length, indexProperties.length);
       indexProperties.mapBy('path').forEach((path, index) =>
-        expect(options[index].textContent.trim()).to.equal(path)
+        assert.dom(options[index]).hasText(path)
       );
     });
 
-    it('filters index properties in dropdown', async function () {
+    test('filters index properties in dropdown', async function (assert) {
       await render(hbs `<QueryBuilder::BlockSelector::ConditionSelector
         @valuesBuilder={{this.valuesBuilder}}
         @indexProperties={{this.indexProperties}}
@@ -225,37 +224,37 @@ describe(
       await clickTrigger('.property-selector');
       await typeInSearch('bool');
 
-      const options = this.element.querySelectorAll('.ember-power-select-option');
-      expect(options).to.have.length(1);
-      expect(options[0].textContent.trim()).to.equal('boolProp');
+      const options = findAll('.ember-power-select-option');
+      assert.strictEqual(options.length, 1);
+      assert.dom(options[0]).hasText('boolProp');
     });
 
-    it('hides "Add" button when no property is selected', async function () {
+    test('hides "Add" button when no property is selected', async function (assert) {
       await render(hbs `<QueryBuilder::BlockSelector::ConditionSelector
         @valuesBuilder={{this.valuesBuilder}}
         @indexProperties={{this.indexProperties}}
       />`);
 
-      expect(this.element.querySelector('.accept-condition')).to.not.exist;
+      assert.notOk(find('.accept-condition'));
     });
 
-    it('does not show comparator selector on init', async function () {
+    test('does not show comparator selector on init', async function (assert) {
       await render(hbs `<QueryBuilder::BlockSelector::ConditionSelector
         @valuesBuilder={{this.valuesBuilder}}
         @indexProperties={{this.indexProperties}}
       />`);
 
-      expect(this.element.querySelector('.comparator-selector')).to.not.exist;
+      assert.notOk(find('.comparator-selector'));
     });
 
-    it('shows comparator selector when property is selected', async function () {
+    test('shows comparator selector when property is selected', async function (assert) {
       await render(hbs `<QueryBuilder::BlockSelector::ConditionSelector
         @valuesBuilder={{this.valuesBuilder}}
         @indexProperties={{this.indexProperties}}
       />`);
       await selectChoose('.property-selector', 'boolProp');
 
-      expect(this.element.querySelector('.comparator-selector')).to.exist;
+      assert.ok(find('.comparator-selector'));
     });
 
     comparatorsTestData.forEach(({
@@ -266,7 +265,7 @@ describe(
       defaultComparatorVisibleValue,
       isAddEnabledForDefaults,
     }) => {
-      it(`shows comparators for ${propertyType} property`, async function () {
+      test(`shows comparators for ${propertyType} property`, async function (assert) {
         await render(hbs `<QueryBuilder::BlockSelector::ConditionSelector
           @valuesBuilder={{this.valuesBuilder}}
           @indexProperties={{this.indexProperties}}
@@ -275,18 +274,17 @@ describe(
         if (comparators.length > 1) {
           await clickTrigger('.comparator-selector');
 
-          const options = this.element.querySelectorAll('.ember-power-select-option');
-          expect(options).to.have.length(comparators.length);
+          const options = findAll('.ember-power-select-option');
+          assert.strictEqual(options.length, comparators.length);
           comparators.forEach(({ comparator }, index) =>
-            expect(options[index].textContent.trim())
-            .to.equal(comparatorTranslations[comparator])
+            assert.dom(options[index]).hasText(comparatorTranslations[comparator])
           );
-          expect(this.element.querySelector(
+          assert.dom(find(
             '.comparator-selector .ember-power-select-selected-item'
-          ).textContent.trim()).to.equal(comparatorTranslations[defaultComparator]);
+          )).hasText(comparatorTranslations[defaultComparator]);
         } else {
-          expect(this.element.querySelector('.comparator-selector').textContent.trim())
-            .to.equal(comparatorTranslations[comparators[0].comparator]);
+          assert.dom(find('.comparator-selector'))
+            .hasText(comparatorTranslations[comparators[0].comparator]);
         }
       });
 
@@ -298,9 +296,9 @@ describe(
       }) => {
         const [propertyType, comparatorType] = comparator.split('.');
 
-        it(
+        test(
           `calls "onConditionSelected" callback, when ${propertyType} property "${comparatorType}" condition has been accepted`,
-          async function () {
+          async function (assert) {
             const selectedSpy = this.set('selectedSpy', sinon.spy());
 
             await render(hbs `<QueryBuilder::BlockSelector::ConditionSelector
@@ -319,37 +317,38 @@ describe(
             await inputValueCallback();
             await click('.accept-condition');
 
-            expect(selectedSpy).to.be.calledOnce.and.to.be.calledWith(
+            assert.ok(selectedSpy.calledOnce);
+            assert.ok(selectedSpy.calledWith(
               sinon.match.has('path', propertyName),
               comparator,
               notifiedInputValue
-            );
+            ));
 
             if (extraNotifiedInputCheck) {
-              extraNotifiedInputCheck(selectedSpy);
+              extraNotifiedInputCheck(assert, selectedSpy);
             }
           }
         );
 
-        it(
+        test(
           `sets default comparator value for "${comparatorType}" comparator for ${propertyType} property`,
-          async function () {
+          async function (assert) {
             await render(hbs `<QueryBuilder::BlockSelector::ConditionSelector
               @valuesBuilder={{this.valuesBuilder}}
               @indexProperties={{this.indexProperties}}
             />`);
             await selectChoose('.property-selector', propertyName);
 
-            const comparatorValueNode = this.element.querySelector('.comparator-value');
+            const comparatorValueNode = find('.comparator-value');
             const comparatorValue = comparatorValueNode.value !== undefined ?
               comparatorValueNode.value : comparatorValueNode.textContent.trim();
-            expect(comparatorValue).to.equal(defaultComparatorVisibleValue);
+            assert.strictEqual(comparatorValue, defaultComparatorVisibleValue);
           }
         );
 
-        it(
+        test(
           `${isAddEnabledForDefaults ? 'does not block' : 'blocks'} "Add" button when ${propertyType} property "${comparatorType}" condition has default comparator value`,
-          async function () {
+          async function (assert) {
             await render(hbs `<QueryBuilder::BlockSelector::ConditionSelector
               @valuesBuilder={{this.valuesBuilder}}
               @indexProperties={{this.indexProperties}}
@@ -357,11 +356,11 @@ describe(
 
             await selectChoose('.property-selector', propertyName);
 
-            const addBtn = this.element.querySelector('.accept-condition');
+            const addBtn = find('.accept-condition');
             if (isAddEnabledForDefaults) {
-              expect(addBtn).to.not.have.attr('disabled');
+              assert.dom(addBtn).doesNotHaveAttribute('disabled');
             } else {
-              expect(addBtn).to.have.attr('disabled');
+              assert.dom(addBtn).hasAttribute('disabled');
             }
           }
         );
@@ -369,9 +368,9 @@ describe(
     });
 
     numberComparators.forEach(({ operator, symbol }) => {
-      it(
+      test(
         `blocks "Add" button when number property "${operator}" condition has a non-number condition value`,
-        async function () {
+        async function (assert) {
           await render(hbs `<QueryBuilder::BlockSelector::ConditionSelector
             @valuesBuilder={{this.valuesBuilder}}
             @indexProperties={{this.indexProperties}}
@@ -381,15 +380,15 @@ describe(
           await selectChoose('.comparator-selector', symbol);
           await fillIn('.comparator-value', 'xyz');
 
-          expect(this.element.querySelector('.accept-condition')).to.have.attr('disabled');
+          assert.dom(find('.accept-condition')).hasAttribute('disabled');
         }
       );
     });
 
     dateComparators.forEach(({ operator, symbol }) => {
-      it(
+      test(
         `sets default comparator value for "${operator}" comparator for date property (time enabled)`,
-        async function () {
+        async function (assert) {
           await render(hbs `<QueryBuilder::BlockSelector::ConditionSelector
             @valuesBuilder={{this.valuesBuilder}}
             @indexProperties={{this.indexProperties}}
@@ -398,15 +397,14 @@ describe(
           await selectChoose('.comparator-selector', symbol);
           await click('.include-time');
 
-          expect(this.element.querySelector('.comparator-value'))
-            .to.have.value('2020-05-04 00:00:00');
+          assert.dom(find('.comparator-value')).hasValue('2020-05-04 00:00:00');
         }
       );
     });
 
-    it(
+    test(
       'blocks "Add" button when space property "is" condition has empty condition value',
-      async function () {
+      async function (assert) {
         // simulate no space to choose
         this.spaces.clear();
         await render(hbs `<QueryBuilder::BlockSelector::ConditionSelector
@@ -416,7 +414,7 @@ describe(
 
         await selectChoose('.property-selector', 'space');
 
-        expect(this.element.querySelector('.accept-condition')).to.have.attr('disabled');
+        assert.dom(find('.accept-condition')).hasAttribute('disabled');
       }
     );
   }

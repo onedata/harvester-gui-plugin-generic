@@ -1,5 +1,4 @@
-import { expect } from 'chai';
-import { describe, it } from 'mocha';
+import { module, test } from 'qunit';
 import ElasticsearchQueryBuilder from 'harvester-gui-plugin-generic/utils/elasticsearch-query-builder';
 import AndOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/and-operator-query-block';
 import OrOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/or-operator-query-block';
@@ -185,7 +184,7 @@ function fullQuery(conditionQuery) {
   return query;
 }
 
-describe('Unit | Utility | elasticsearch-query-builder', function () {
+module('Unit | Utility | elasticsearch-query-builder', () => {
   checkBlockConversion({
     name: 'boolean "is" condition',
     block: exampleBooleanConditionBlock,
@@ -337,48 +336,50 @@ describe('Unit | Utility | elasticsearch-query-builder', function () {
     expectedQuery: exampleOrOperatorQuery,
   });
 
-  it('constructs complete query for nested operators example', function () {
+  test('constructs complete query for nested operators example', function (assert) {
     const esQueryBuilder = new ElasticsearchQueryBuilder();
     esQueryBuilder.mainQueryBlock = exampleNestedOperatorsBlock;
 
     const result = esQueryBuilder.buildQuery();
-    expect(result).to.deep.equal(fullQuery(exampleNestedOperatorsQuery));
+    assert.deepEqual(result, fullQuery(exampleNestedOperatorsQuery));
   });
 
-  it('constructs complete query when no query conditions are available', function () {
-    const esQueryBuilder = new ElasticsearchQueryBuilder();
+  test('constructs complete query when no query conditions are available',
+    function (assert) {
+      const esQueryBuilder = new ElasticsearchQueryBuilder();
 
-    const result = esQueryBuilder.buildQuery();
-    expect(result).to.deep.equal(fullQuery());
-  });
+      const result = esQueryBuilder.buildQuery();
+      assert.deepEqual(result, fullQuery());
+    }
+  );
 
-  it(
+  test(
     'translates null visibleContent field value to null _source query spec',
-    function () {
+    function (assert) {
       const esQueryBuilder = new ElasticsearchQueryBuilder();
       esQueryBuilder.mainQueryBlock = exampleNestedOperatorsBlock;
       esQueryBuilder.visibleContent = null;
 
       const result = esQueryBuilder.buildQuery();
-      expect(result).to.deep.equal(fullQuery(exampleNestedOperatorsQuery));
+      assert.deepEqual(result, fullQuery(exampleNestedOperatorsQuery));
     }
   );
 
-  it(
+  test(
     'translates empty visibleContent field value to null _source query spec',
-    function () {
+    function (assert) {
       const esQueryBuilder = new ElasticsearchQueryBuilder();
       esQueryBuilder.mainQueryBlock = exampleNestedOperatorsBlock;
       esQueryBuilder.visibleContent = {};
 
       const result = esQueryBuilder.buildQuery();
-      expect(result).to.deep.equal(fullQuery(exampleNestedOperatorsQuery));
+      assert.deepEqual(result, fullQuery(exampleNestedOperatorsQuery));
     }
   );
 
-  it(
-    'translates empty visibleContent field value to null _source query spec',
-    function () {
+  test(
+    'translates non-empty visibleContent field value to non-empty _source query spec',
+    function (assert) {
       const esQueryBuilder = new ElasticsearchQueryBuilder();
       esQueryBuilder.mainQueryBlock = exampleNestedOperatorsBlock;
       esQueryBuilder.visibleContent = {
@@ -392,7 +393,7 @@ describe('Unit | Utility | elasticsearch-query-builder', function () {
       };
 
       const result = esQueryBuilder.buildQuery();
-      expect(result).to.deep.equal(Object.assign(
+      assert.deepEqual(result, Object.assign(
         fullQuery(exampleNestedOperatorsQuery), {
           _source: [
             'a',
@@ -403,13 +404,13 @@ describe('Unit | Utility | elasticsearch-query-builder', function () {
     }
   );
 
-  it('allows to create query with a custom range of results', function () {
+  test('allows to create query with a custom range of results', function (assert) {
     const esQueryBuilder = new ElasticsearchQueryBuilder();
     esQueryBuilder.resultsFrom = 50;
     esQueryBuilder.resultsSize = 25;
 
     const result = esQueryBuilder.buildQuery();
-    expect(result).to.deep.equal(Object.assign(
+    assert.deepEqual(result, Object.assign(
       fullQuery(), {
         from: 50,
         size: 25,
@@ -417,13 +418,14 @@ describe('Unit | Utility | elasticsearch-query-builder', function () {
     ));
   });
 
-  it('allows to specify custom sorting', function () {
+  test('allows to specify custom sorting', function (assert) {
     const esQueryBuilder = new ElasticsearchQueryBuilder();
-    esQueryBuilder.sortProperty = new EsIndexProperty(new EsIndexProperty(null, 'x'), 'y');
+    esQueryBuilder.sortProperty =
+      new EsIndexProperty(new EsIndexProperty(null, 'x'), 'y');
     esQueryBuilder.sortDirection = 'asc';
 
     const result = esQueryBuilder.buildQuery();
-    expect(result).to.deep.equal(Object.assign(
+    assert.deepEqual(result, Object.assign(
       fullQuery(), {
         sort: [{
           'x.y': 'asc',
@@ -434,11 +436,11 @@ describe('Unit | Utility | elasticsearch-query-builder', function () {
 });
 
 function checkBlockConversion({ name, block, expectedQuery }) {
-  it(`converts ${name}`, function () {
+  test(`converts ${name}`, function (assert) {
     const esQueryBuilder = new ElasticsearchQueryBuilder();
     esQueryBuilder.mainQueryBlock = block;
     const result = esQueryBuilder.buildQuery();
 
-    expect(result).to.deep.equal(fullQuery(expectedQuery));
+    assert.deepEqual(result, fullQuery(expectedQuery));
   });
 }

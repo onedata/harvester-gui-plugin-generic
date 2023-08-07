@@ -1,36 +1,35 @@
-import { expect } from 'chai';
-import { describe, it } from 'mocha';
+import { module, test } from 'qunit';
 import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/condition-query-block';
 import EsIndexProperty from 'harvester-gui-plugin-generic/utils/es-index-property';
 
-describe('Unit | Utility | query-builder/condition-query-block', function () {
-  it(
+module('Unit | Utility | query-builder/condition-query-block', () => {
+  test(
     'has empty "property", "comparator" and "comparatorValue" fields on init',
-    function () {
+    function (assert) {
       const block = new ConditionQueryBlock();
-      expect(block.property).to.be.null;
-      expect(block.comparator).to.be.null;
-      expect(block.comparatorValue).to.be.null;
+      assert.strictEqual(block.property, null);
+      assert.strictEqual(block.comparator, null);
+      assert.strictEqual(block.comparatorValue, null);
     }
   );
 
-  it('has "renderer" static field set to "condition-block"', function () {
-    expect(ConditionQueryBlock.renderer).to.equal('condition-block');
+  test('has "renderer" static field set to "condition-block"', function (assert) {
+    assert.strictEqual(ConditionQueryBlock.renderer, 'condition-block');
   });
 
-  it('has "level" field set to 1', function () {
+  test('has "level" field set to 1', function (assert) {
     const block = new ConditionQueryBlock();
-    expect(block.level).to.equal(1);
+    assert.strictEqual(block.level, 1);
   });
 
-  it('can be cloned', function () {
+  test('can be cloned', function (assert) {
     const indexProperty = new EsIndexProperty(null, 'prop', { type: 'text' });
     const block = new ConditionQueryBlock(indexProperty, 'text.contains', 'test');
     const clonedBlock = block.clone();
 
-    expect(clonedBlock).to.not.equal(block);
-    expect(clonedBlock.property).to.equal(indexProperty);
-    expect(clonedBlock.comparator).to.equal(block.comparator);
-    expect(clonedBlock.comparatorValue).to.equal(block.comparatorValue);
+    assert.notStrictEqual(clonedBlock, block);
+    assert.strictEqual(clonedBlock.property, indexProperty);
+    assert.strictEqual(clonedBlock.comparator, block.comparator);
+    assert.strictEqual(clonedBlock.comparatorValue, block.comparatorValue);
   });
 });

@@ -1,24 +1,23 @@
-import { expect } from 'chai';
-import { describe, it } from 'mocha';
+import { module, test } from 'qunit';
 import OrOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/or-operator-query-block';
 import sinon from 'sinon';
 
-describe('Unit | Utility | query-builder/or-operator-query-block', function () {
-  it('has "operator" equal to "or"', function () {
+module('Unit | Utility | query-builder/or-operator-query-block', () => {
+  test('has "operator" equal to "or"', function (assert) {
     const block = new OrOperatorQueryBlock();
-    expect(block.operator).to.equal('or');
+    assert.strictEqual(block.operator, 'or');
   });
 
-  it('can be cloned', function () {
+  test('can be cloned', function (assert) {
     const block = new OrOperatorQueryBlock();
     block.operands.pushObject({
       clone: sinon.stub().returns('operandClone'),
     });
     const clonedBlock = block.clone();
 
-    expect(clonedBlock).to.not.equal(block);
-    expect(clonedBlock).to.be.an.instanceOf(OrOperatorQueryBlock);
-    expect(clonedBlock.operands).to.have.length(1);
-    expect(clonedBlock.operands[0]).to.equal('operandClone');
+    assert.notStrictEqual(clonedBlock, block);
+    assert.ok(clonedBlock instanceof OrOperatorQueryBlock);
+    assert.strictEqual(clonedBlock.operands.length, 1);
+    assert.strictEqual(clonedBlock.operands[0], 'operandClone');
   });
 });

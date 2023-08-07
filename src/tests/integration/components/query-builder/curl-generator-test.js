@@ -1,70 +1,68 @@
-import { expect } from 'chai';
-import { describe, it } from 'mocha';
-import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
-import hbs from 'htmlbars-inline-precompile';
-import { click, settled } from '@ember/test-helpers';
+import { module, test } from 'qunit';
+import { setupRenderingTest } from '../../../helpers';
+import { render, click, settled, find } from '@ember/test-helpers';
+import { hbs } from 'ember-cli-htmlbars';
 import sinon from 'sinon';
 import { Promise } from 'rsvp';
 import { set } from '@ember/object';
 import RootOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/root-operator-query-block';
 import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/condition-query-block';
 
-describe('Integration | Component | query-builder/curl-generator', function () {
-  setupRenderingTest();
+module('Integration | Component | query-builder/curl-generator', (hooks) => {
+  setupRenderingTest(hooks);
 
-  it('renders trigger button', async function () {
+  test('renders trigger button', async function (assert) {
     await render(hbs `<QueryBuilder::CurlGenerator />`);
 
-    const trigger = this.element.querySelector('.generate-query-request');
-    expect(trigger).to.exist;
-    expect(trigger.textContent.trim()).to.equal('{ REST API }');
+    const trigger = find('.generate-query-request');
+    assert.ok(trigger);
+    assert.dom(trigger).hasText('{ REST API }');
   });
 
-  it('has hidden modal on init', async function () {
+  test('has hidden modal on init', async function (assert) {
     await render(hbs `<QueryBuilder::CurlGenerator />`);
 
-    expect(this.element.querySelector('.curl-generator-modal.show')).to.not.exist;
+    assert.notOk(find('.curl-generator-modal.show'));
   });
 
-  it('opens modal on trigger click', async function () {
-    await render(hbs `<QueryBuilder::CurlGenerator />`);
-    await click('.generate-query-request');
-
-    expect(this.element.querySelector('.curl-generator-modal.show')).to.exist;
-  });
-
-  it('allows to close modal', async function () {
+  test('opens modal on trigger click', async function (assert) {
     await render(hbs `<QueryBuilder::CurlGenerator />`);
     await click('.generate-query-request');
-    await click('.modal');
 
-    expect(this.element.querySelector('.curl-generator-modal.show')).to.not.exist;
+    assert.ok(find('.curl-generator-modal.show'));
   });
 
-  it('allows to reopen modal', async function () {
+  test('allows to close modal', async function (assert) {
     await render(hbs `<QueryBuilder::CurlGenerator />`);
     await click('.generate-query-request');
     await click('.modal');
-    await click('.generate-query-request');
 
-    expect(this.element.querySelector('.curl-generator-modal.show')).to.exist;
+    assert.notOk(find('.curl-generator-modal.show'));
   });
 
-  it(
+  test('allows to reopen modal', async function (assert) {
+    await render(hbs `<QueryBuilder::CurlGenerator />`);
+    await click('.generate-query-request');
+    await click('.modal');
+    await click('.generate-query-request');
+
+    assert.ok(find('.curl-generator-modal.show'));
+  });
+
+  test(
     'does not load CURL request before trigger click',
-    async function () {
+    async function (assert) {
       const generateCurlStub = this.set('generateCurlStub', sinon.stub());
 
       await render(hbs `<QueryBuilder::CurlGenerator
         @onGenerateCurl={{this.generateCurlStub}}
       />`);
 
-      expect(generateCurlStub).to.not.be.called;
+      assert.ok(generateCurlStub.notCalled);
     }
   );
 
-  it('shows spinner when CURL request is being loaded', async function () {
+  test('shows spinner when CURL request is being loaded', async function (assert) {
     this.set('generateCurlStub', () => new Promise(() => {}));
 
     await render(hbs `<QueryBuilder::CurlGenerator
@@ -72,11 +70,11 @@ describe('Integration | Component | query-builder/curl-generator', function () {
     />`);
     await click('.generate-query-request');
 
-    expect(document.querySelector('.curl-generator-modal textarea')).to.not.exist;
-    expect(document.querySelector('.curl-generator-modal .spinner')).to.exist;
+    assert.notOk(document.querySelector('.curl-generator-modal textarea'));
+    assert.ok(document.querySelector('.curl-generator-modal .spinner'));
   });
 
-  it('shows error when getting CURL request failed', async function () {
+  test('shows error when getting CURL request failed', async function (assert) {
     let rejectPromise;
     this.set(
       'generateCurlStub',
@@ -91,10 +89,9 @@ describe('Integration | Component | query-builder/curl-generator', function () {
     await settled();
 
     const errorContainer =
-      this.element.querySelector('.curl-generator-modal .error-container');
-    expect(errorContainer).to.exist;
-    expect(errorContainer.querySelector('.details-json').textContent.trim())
-      .to.equal('"err"');
+      find('.curl-generator-modal .error-container');
+    assert.ok(errorContainer);
+    assert.dom(errorContainer.querySelector('.details-json')).hasText('"err"');
   });
 
   [{
@@ -129,7 +126,7 @@ describe('Integration | Component | query-builder/curl-generator', function () {
     },
     descriptionSuffix: ' with custom sort',
   }].forEach(({ additionalAttrs, additionalAttrsInQuery, descriptionSuffix }) => {
-    it(`shows CURL request${descriptionSuffix}`, async function () {
+    test(`shows CURL request${descriptionSuffix}`, async function (assert) {
       const rootQueryBlock = new RootOperatorQueryBlock();
       rootQueryBlock.operands.pushObject(
         new ConditionQueryBlock({ path: 'a.b' }, 'boolean.is', 'true')
@@ -148,8 +145,8 @@ describe('Integration | Component | query-builder/curl-generator', function () {
       />`);
       await click('.generate-query-request');
 
-      expect(generateCurlStub).to.be.calledOnce;
-      expect(generateCurlStub.lastCall.args[0]).to.deep.equal(Object.assign({
+      assert.ok(generateCurlStub.calledOnce);
+      assert.deepEqual(generateCurlStub.lastCall.args[0], Object.assign({
         from: 0,
         size: 10,
         sort: [{
@@ -168,15 +165,14 @@ describe('Integration | Component | query-builder/curl-generator', function () {
         },
       }, additionalAttrsInQuery));
 
-      expect(document.querySelector('.curl-generator-modal .spinner')).to.not.exist;
-      expect(document.querySelector('.curl-generator-modal textarea'))
-        .to.have.value('curl!');
+      assert.notOk(document.querySelector('.curl-generator-modal .spinner'));
+      assert.dom('.curl-generator-modal textarea').hasValue('curl!');
     });
   });
 
   ['private', null].forEach((viewMode) => {
-    it(`shows access token information when viewMode is ${JSON.stringify(viewMode)}`,
-      async function () {
+    test(`shows access token information when viewMode is ${JSON.stringify(viewMode)}`,
+      async function (assert) {
         set(this.owner.lookup('service:view-parameters'), 'viewMode', viewMode);
         this.set('generateCurlStub', sinon.stub().resolves('curl!'));
         await render(hbs`<QueryBuilder::CurlGenerator
@@ -185,14 +181,13 @@ describe('Integration | Component | query-builder/curl-generator', function () {
 
         await click('.generate-query-request');
 
-        expect(document.querySelector('.curl-generator-modal .access-token-info'))
-          .to.exist;
+        assert.ok(document.querySelector('.curl-generator-modal .access-token-info'));
       }
     );
   });
 
-  it('does not show access token information when viewMode is "public"',
-    async function () {
+  test('does not show access token information when viewMode is "public"',
+    async function (assert) {
       set(this.owner.lookup('service:view-parameters'), 'viewMode', 'public');
       this.set('generateCurlStub', sinon.stub().resolves('curl!'));
       await render(hbs`<QueryBuilder::CurlGenerator
@@ -201,8 +196,7 @@ describe('Integration | Component | query-builder/curl-generator', function () {
 
       await click('.generate-query-request');
 
-      expect(document.querySelector('.curl-generator-modal .access-token-info'))
-        .to.not.exist;
+      assert.notOk(document.querySelector('.curl-generator-modal .access-token-info'));
     }
   );
 });

@@ -1,14 +1,13 @@
-import { expect } from 'chai';
-import { describe, it } from 'mocha';
-import { setupRenderingTest } from 'ember-mocha';
+import { module, test } from 'qunit';
+import { setupRenderingTest } from '../../helpers';
 import { render } from '@ember/test-helpers';
-import hbs from 'htmlbars-inline-precompile';
+import { hbs } from 'ember-cli-htmlbars';
 import sinon from 'sinon';
 
-describe('Integration | Helper | tt', function () {
-  setupRenderingTest();
+module('Integration | Helper | tt', (hooks) => {
+  setupRenderingTest(hooks);
 
-  it('renders', async function () {
+  test('renders', async function (assert) {
     this.context = { intlPrefix: 'a.b' };
     sinon.stub(this.owner.lookup('service:intl'), 't')
       .withArgs('a.b.mytranslation', sinon.match({}))
@@ -16,6 +15,6 @@ describe('Integration | Helper | tt', function () {
 
     await render(hbs `{{tt this.context "mytranslation"}}`);
 
-    expect(this.element.textContent.trim()).to.equal('my translation');
+    assert.dom(this.element).hasText('my translation');
   });
 });

@@ -1,13 +1,12 @@
-import { expect } from 'chai';
-import { describe, it, beforeEach } from 'mocha';
-import { setupTest } from 'ember-mocha';
+import { module, test } from 'qunit';
+import { setupTest } from '../../helpers';
 import sinon from 'sinon';
 import { resolve } from 'rsvp';
 
-describe('Unit | Service | spaces-provider', function () {
-  setupTest();
+module('Unit | Service | spaces-provider', (hooks) => {
+  setupTest(hooks);
 
-  beforeEach(function () {
+  hooks.beforeEach(function () {
     const spacesData = {
       fromElasticsearch: [],
       fromOnezone: [],
@@ -39,16 +38,19 @@ describe('Unit | Service | spaces-provider', function () {
     });
   });
 
-  it('provides spaces from Onezone', function () {
+  test('provides spaces from Onezone', function (assert) {
     this.spacesData.fromOnezone = [this.space1, this.space2];
 
     const spacesProvider = this.owner.lookup('service:spaces-provider');
     return spacesProvider.reloadSpaces().then(() => {
-      expect(spacesProvider.spaces).to.deep.equal([this.space1, this.space2]);
+      assert.deepEqual(
+        spacesProvider.spaces.map((s) => jsonifySpace(s)),
+        [this.space1, this.space2]
+      );
     });
   });
 
-  it('provides spaces from Elasticsearch', function () {
+  test('provides spaces from Elasticsearch', function (assert) {
     this.spacesData.fromElasticsearch = {
       aggregations: {
         spaceIds: {
@@ -68,7 +70,7 @@ describe('Unit | Service | spaces-provider', function () {
 
     const spacesProvider = this.owner.lookup('service:spaces-provider');
     return spacesProvider.reloadSpaces().then(() => {
-      expect(spacesProvider.spaces).to.deep.equal([{
+      assert.deepEqual(spacesProvider.spaces.map((s) => jsonifySpace(s)), [{
         id: 'space1Id',
         name: 'ID: space1Id',
       }, {
@@ -78,8 +80,8 @@ describe('Unit | Service | spaces-provider', function () {
         id: 'space3Id',
         name: 'ID: space3Id',
       }]);
-      expect(this.dataRequestStub).to.be.calledOnce;
-      expect(this.dataRequestStub.lastCall.args[0]).to.deep.equal({
+      assert.ok(this.dataRequestStub.calledOnce);
+      assert.deepEqual(this.dataRequestStub.lastCall.args[0], {
         method: 'post',
         indexName: 'generic-index',
         path: '_search',
@@ -88,7 +90,7 @@ describe('Unit | Service | spaces-provider', function () {
     });
   });
 
-  it('merges spaces from Onezone and Elasticsearch', function () {
+  test('merges spaces from Onezone and Elasticsearch', function (assert) {
     this.spacesData.fromOnezone = [this.space2, this.space1];
     this.spacesData.fromElasticsearch = {
       aggregations: {
@@ -106,7 +108,7 @@ describe('Unit | Service | spaces-provider', function () {
 
     const spacesProvider = this.owner.lookup('service:spaces-provider');
     return spacesProvider.reloadSpaces().then(() => {
-      expect(spacesProvider.spaces).to.deep.equal([{
+      assert.deepEqual(spacesProvider.spaces.map((s) => jsonifySpace(s)), [{
         id: 'space1Id',
         name: 'space1',
       }, {
@@ -119,3 +121,7 @@ describe('Unit | Service | spaces-provider', function () {
     });
   });
 });
+
+function jsonifySpace(space) {
+  return { id: space.id, name: space.name };
+}

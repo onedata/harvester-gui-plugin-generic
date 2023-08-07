@@ -1,5 +1,4 @@
-import { expect } from 'chai';
-import { describe, it, beforeEach, afterEach } from 'mocha';
+import { module, test } from 'qunit';
 import QueryValueComponentsBuilder from 'harvester-gui-plugin-generic/utils/query-value-components-builder';
 import sinon from 'sinon';
 import moment from 'moment';
@@ -40,13 +39,13 @@ const dateInvalidValues = [
   undefined,
 ];
 
-describe('Unit | Utility | query-value-components-builder', function () {
-  beforeEach(function () {
+module('Unit | Utility | query-value-components-builder', (hooks) => {
+  hooks.beforeEach(function () {
     this.builder = new QueryValueComponentsBuilder(spaces);
     this.clock = sinon.useFakeTimers(fakeNow.valueOf());
   });
 
-  afterEach(function () {
+  hooks.afterEach(function () {
     this.clock.restore();
   });
 
@@ -134,28 +133,30 @@ describe('Unit | Utility | query-value-components-builder', function () {
 });
 
 function checkPossibleComparators(propertyType, expectedComparators) {
-  it(
+  test(
     `returns a list of possible comparators for ${propertyType} property type`,
-    function () {
+    function (assert) {
       const comparators = this.builder.getComparatorsFor(propertyType);
 
-      expect(comparators).to.deep.equal(expectedComparators);
+      assert.deepEqual(comparators, expectedComparators);
     }
   );
 }
 
 function checkDefaultValue(comparator, expectedValue, expectedValueDesc) {
-  it(
+  test(
     `returns ${expectedValueDesc || JSON.stringify(expectedValue)} as a default value for ${comparator} comparator`,
-    function () {
+    function (assert) {
       const defaultValue = this.builder.getDefaultValueFor(comparator);
 
       if (comparator.startsWith('date.')) {
-        expect(defaultValue.timeEnabled).to.equal(expectedValue.timeEnabled);
-        expect(defaultValue.datetime.valueOf())
-          .to.equal(expectedValue.datetime.valueOf());
+        assert.strictEqual(defaultValue.timeEnabled, expectedValue.timeEnabled);
+        assert.strictEqual(
+          defaultValue.datetime.valueOf(),
+          expectedValue.datetime.valueOf()
+        );
       } else {
-        expect(defaultValue).to.equal(expectedValue);
+        assert.strictEqual(defaultValue, expectedValue);
       }
     }
   );
@@ -164,12 +165,12 @@ function checkDefaultValue(comparator, expectedValue, expectedValueDesc) {
 function checkValidator(comparator, validValues, invalidValues) {
   if (validValues?.length) {
     validValues.forEach(validValue => {
-      it(
+      test(
         `returns validator for ${comparator} comparator, which recognises ${JSON.stringify(validValue)} as valid`,
-        function () {
+        function (assert) {
           const validator = this.builder.getValidatorFor(comparator);
 
-          expect(validator(validValue)).to.be.true;
+          assert.true(validator(validValue));
         }
       );
     });
@@ -177,12 +178,12 @@ function checkValidator(comparator, validValues, invalidValues) {
 
   if (invalidValues?.length) {
     invalidValues.forEach(invalidValue => {
-      it(
+      test(
         `returns validator for ${comparator} comparator, which recognises ${JSON.stringify(invalidValue)} as invalid`,
-        function () {
+        function (assert) {
           const validator = this.builder.getValidatorFor(comparator);
 
-          expect(validator(invalidValue)).to.be.false;
+          assert.false(validator(invalidValue));
         }
       );
     });
@@ -190,9 +191,9 @@ function checkValidator(comparator, validValues, invalidValues) {
 }
 
 function checkEditor(comparator, expectedComponent, expectedEditorParams = {}) {
-  it(
+  test(
     `returns ${expectedComponent} as an editor component and correct editor params for ${comparator} comparator`,
-    function () {
+    function (assert) {
       const {
         component,
         params: {
@@ -201,20 +202,20 @@ function checkEditor(comparator, expectedComponent, expectedEditorParams = {}) {
         },
       } = this.builder.getEditorFor(comparator);
 
-      expect(component).to.equal(expectedComponent);
-      expect(initiallyFocused).to.be.false;
-      expect(editorParams).to.deep.equal(expectedEditorParams);
+      assert.strictEqual(component, expectedComponent);
+      assert.false(initiallyFocused);
+      assert.deepEqual(editorParams, expectedEditorParams);
     }
   );
 }
 
 function checkPresenter(comparator, expectedComponent) {
-  it(
+  test(
     `returns ${expectedComponent} as an presenter component for ${comparator} comparator`,
-    function () {
+    function (assert) {
       const component = this.builder.getPresenterFor(comparator);
 
-      expect(component).to.equal(expectedComponent);
+      assert.strictEqual(component, expectedComponent);
     }
   );
 }

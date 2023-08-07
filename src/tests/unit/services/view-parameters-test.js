@@ -1,12 +1,11 @@
-import { expect } from 'chai';
-import { describe, it, beforeEach } from 'mocha';
-import { setupTest } from 'ember-mocha';
+import { module, test } from 'qunit';
+import { setupTest } from '../../helpers';
 import sinon from 'sinon';
 
-describe('Unit | Service | view-parameters', function () {
-  setupTest();
+module('Unit | Service | view-parameters', (hooks) => {
+  setupTest(hooks);
 
-  beforeEach(function () {
+  hooks.beforeEach(function () {
     const viewModeRequestStub = sinon.stub().resolves('public');
     sinon.stub(this.owner.lookup('service:app-proxy'), 'viewModeRequest')
       .get(() => viewModeRequestStub);
@@ -14,27 +13,27 @@ describe('Unit | Service | view-parameters', function () {
     this.set('viewModeRequestStub', viewModeRequestStub);
   });
 
-  it('has null viewMode property on init', function () {
+  test('has null viewMode property on init', function (assert) {
     const service = this.owner.lookup('service:view-parameters');
-    expect(service.viewMode).to.be.null;
+    assert.strictEqual(service.viewMode, null);
   });
 
-  it('fills in configuration property after reloadViewMode() call', function () {
+  test('fills in configuration property after reloadViewMode() call', function (assert) {
     const service = this.owner.lookup('service:view-parameters');
 
     return service.reloadViewMode()
-      .then(() => expect(service.viewMode).to.equal('public'));
+      .then(() => assert.strictEqual(service.viewMode, 'public'));
   });
 
-  it('sets configuration property to null after failure of reloadViewMode() call',
-    function () {
+  test('sets configuration property to null after failure of reloadViewMode() call',
+    function (assert) {
       this.viewModeRequestStub.rejects('error');
       const service = this.owner.lookup('service:view-parameters');
 
       // Set to sth non-null to check if reload failure will clear it out
       service.viewMode = 'public';
       return service.reloadViewMode()
-        .then(() => expect(service.viewMode).to.be.null);
+        .then(() => assert.strictEqual(service.viewMode, null));
     }
   );
 });

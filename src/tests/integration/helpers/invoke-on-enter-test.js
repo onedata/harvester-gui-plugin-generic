@@ -1,15 +1,13 @@
-import { expect } from 'chai';
-import { describe, it } from 'mocha';
-import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
-import hbs from 'htmlbars-inline-precompile';
+import { module, test } from 'qunit';
+import { setupRenderingTest } from '../../helpers';
+import { render, triggerKeyEvent } from '@ember/test-helpers';
+import { hbs } from 'ember-cli-htmlbars';
 import sinon from 'sinon';
-import { triggerKeyEvent } from '@ember/test-helpers';
 
-describe('Integration | Helper | invoke-on-enter', function () {
-  setupRenderingTest();
+module('Integration | Helper | invoke-on-enter', (hooks) => {
+  setupRenderingTest(hooks);
 
-  it('invokes action once on enter press', async function () {
+  test('invokes action once on enter press', async function (assert) {
     const spy = sinon.spy();
     this.set('myAction', spy);
 
@@ -21,7 +19,7 @@ describe('Integration | Helper | invoke-on-enter', function () {
     `);
     await triggerKeyEvent('#invoke-on-enter-input', 'keydown', 'Enter');
 
-    expect(spy).to.be.calledOnce;
-    expect(spy).to.be.calledWith(1, 2, 3);
+    assert.ok(spy.calledOnce);
+    assert.ok(spy.calledWith(1, 2, 3));
   });
 });

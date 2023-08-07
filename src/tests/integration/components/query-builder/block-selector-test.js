@@ -1,10 +1,8 @@
-import { expect } from 'chai';
-import { describe, context, it, beforeEach } from 'mocha';
-import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
-import hbs from 'htmlbars-inline-precompile';
+import { module, test } from 'qunit';
+import { setupRenderingTest } from '../../../helpers';
+import { render, click, find, findAll } from '@ember/test-helpers';
+import { hbs } from 'ember-cli-htmlbars';
 import sinon from 'sinon';
-import { click } from '@ember/test-helpers';
 import AndOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/and-operator-query-block';
 import OrOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/or-operator-query-block';
 import NotOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/not-operator-query-block';
@@ -23,11 +21,11 @@ const operatorBlockClasses = {
   root: RootOperatorQueryBlock,
 };
 
-describe('Integration | Component | query-builder/block-selector', function () {
-  setupRenderingTest();
+module('Integration | Component | query-builder/block-selector', (hooks) => {
+  setupRenderingTest(hooks);
 
-  context('in "create" mode', function () {
-    beforeEach(function () {
+  module('in "create" mode', (hooks) => {
+    hooks.beforeEach(function () {
       this.setProperties({
         valuesBuilder: new QueryValueComponentsBuilder([]),
         indexProperties: [{
@@ -40,28 +38,28 @@ describe('Integration | Component | query-builder/block-selector', function () {
       });
     });
 
-    it(
+    test(
       `renders operators ${operatorsList.map(s => s.toUpperCase()).join(', ')}`,
-      async function () {
+      async function (assert) {
         await render(hbs `<QueryBuilder::BlockSelector
           @mode="create"
           @valuesBuilder={{this.valuesBuilder}}
         />`);
 
-        const operators = this.element.querySelectorAll('.operator-selector .operator');
-        expect(operators).to.have.length(3);
+        const operators = findAll('.operator-selector .operator');
+        assert.strictEqual(operators.length, 3);
         operatorsList.forEach((operatorName, index) => {
           const operator = operators[index];
-          expect(operator.textContent.trim()).to.equal(operatorName);
+          assert.dom(operator).hasText(operatorName);
         });
       }
     );
 
     operatorsList.forEach(operatorName => {
       const operatorNameUpper = operatorName.toUpperCase();
-      it(
+      test(
         `calls "onBlockAdd" callback, when ${operatorNameUpper} operator has been clicked`,
-        async function () {
+        async function (assert) {
           const addSpy = this.set('addSpy', sinon.spy());
 
           await render(hbs `<QueryBuilder::BlockSelector
@@ -69,16 +67,17 @@ describe('Integration | Component | query-builder/block-selector', function () {
             @valuesBuilder={{this.valuesBuilder}}
             @onBlockAdd={{this.addSpy}}
           />`);
-          expect(addSpy).to.not.be.called;
+          assert.ok(addSpy.notCalled);
           await click(`.operator-${operatorName}`);
 
           const blockMatcher = sinon.match.instanceOf(operatorBlockClasses[operatorName]);
-          expect(addSpy).to.be.calledOnce.and.to.be.calledWith(blockMatcher);
+          assert.ok(addSpy.calledOnce);
+          assert.ok(addSpy.calledWith(blockMatcher));
         }
       );
     });
 
-    it('lists index properties in dropdown', async function () {
+    test('lists index properties in dropdown', async function (assert) {
       await render(hbs `<QueryBuilder::BlockSelector
         @mode="create"
         @valuesBuilder={{this.valuesBuilder}}
@@ -87,16 +86,16 @@ describe('Integration | Component | query-builder/block-selector', function () {
       await clickTrigger('.property-selector');
 
       const indexProperties = this.indexProperties;
-      const options = this.element.querySelectorAll('.ember-power-select-option');
-      expect(options).to.have.length(indexProperties.length);
+      const options = findAll('.ember-power-select-option');
+      assert.strictEqual(options.length, indexProperties.length);
       indexProperties.mapBy('path').forEach((path, index) =>
-        expect(options[index].textContent.trim()).to.equal(path)
+        assert.dom(options[index]).hasText(path)
       );
     });
 
-    it(
+    test(
       'calls "onBlockAdd" callback, when condition has been accepted',
-      async function () {
+      async function (assert) {
         const addSpy = this.set('addSpy', sinon.spy());
 
         await render(hbs `<QueryBuilder::BlockSelector
@@ -114,60 +113,61 @@ describe('Integration | Component | query-builder/block-selector', function () {
           .and(sinon.match.hasNested('property.path', 'boolProp'))
           .and(sinon.match.has('comparator', 'boolean.is'))
           .and(sinon.match.hasNested('comparatorValue', 'false'));
-        expect(addSpy).to.be.calledOnce.and.to.be.calledWith(blockMatcher);
+        assert.ok(addSpy.calledOnce);
+        assert.ok(addSpy.calledWith(blockMatcher));
       }
     );
 
-    it(
+    test(
       'does not render condition selector when "hideConditionCreation" is true',
-      async function () {
+      async function (assert) {
         await render(hbs `<QueryBuilder::BlockSelector
           @mode="create"
           @valuesBuilder={{this.valuesBuilder}}
           @hideConditionCreation={{true}}
         />`);
 
-        expect(this.element.querySelector('.condition-selector')).to.not.exist;
+        assert.notOk(find('.condition-selector'));
       }
     );
 
-    it('does not render edit-specific sections', async function () {
+    test('does not render edit-specific sections', async function (assert) {
       await render(hbs `<QueryBuilder::BlockSelector
         @mode="create"
         @valuesBuilder={{this.valuesBuilder}}
       />`);
 
-      expect(this.element.querySelector('.surround-section')).to.not.exist;
-      expect(this.element.querySelector('.change-to-section')).to.not.exist;
+      assert.notOk(find('.surround-section'));
+      assert.notOk(find('.change-to-section'));
     });
   });
 
-  context('in "edit" mode', function () {
-    beforeEach(function () {
+  module('in "edit" mode', (hooks) => {
+    hooks.beforeEach(function () {
       this.set('editBlock', new NotOperatorQueryBlock());
     });
 
-    it(
+    test(
       `renders operators ${operatorsList.map(s => s.toUpperCase()).join(', ')} in "surround" section`,
-      async function () {
+      async function (assert) {
         await render(hbs `<QueryBuilder::BlockSelector @mode="edit"/>`);
 
-        const operators = this.element.querySelectorAll(
+        const operators = findAll(
           '.surround-section .operator-selector .operator'
         );
-        expect(operators).to.have.length(3);
+        assert.strictEqual(operators.length, 3);
         operatorsList.forEach((operatorName, index) => {
           const operator = operators[index];
-          expect(operator.textContent.trim()).to.equal(operatorName);
+          assert.dom(operator).hasText(operatorName);
         });
       }
     );
 
     operatorsList.forEach(operatorName => {
       const operatorNameUpper = operatorName.toUpperCase();
-      it(
+      test(
         `calls "onBlockReplace" callback, when ${operatorNameUpper} operator in "surround" section has been clicked`,
-        async function () {
+        async function (assert) {
           const editBlock = this.editBlock;
           const replaceSpy = this.set('replaceSpy', sinon.spy());
 
@@ -177,18 +177,19 @@ describe('Integration | Component | query-builder/block-selector', function () {
             @onBlockReplace={{this.replaceSpy}}
           />`);
 
-          expect(replaceSpy).to.not.be.called;
+          assert.ok(replaceSpy.notCalled);
           await click(`.surround-section .operator-${operatorName}`);
           const blockMatcher = sinon.match.instanceOf(operatorBlockClasses[operatorName])
             .and(sinon.match.has('operands', [editBlock]));
-          expect(replaceSpy).to.be.calledOnce.and.to.be.calledWith([blockMatcher]);
+          assert.ok(replaceSpy.calledOnce);
+          assert.ok(replaceSpy.calledWith([blockMatcher]));
         }
       );
     });
 
-    it(
+    test(
       'renders four operators: AND, OR, NOT and NONE in "change to" section',
-      async function () {
+      async function (assert) {
         this.set('parentBlock', new AndOperatorQueryBlock());
         await render(hbs `<QueryBuilder::BlockSelector
           @mode="edit"
@@ -196,20 +197,20 @@ describe('Integration | Component | query-builder/block-selector', function () {
           @editParentBlock={{this.parentBlock}}
         />`);
 
-        const operators = this.element.querySelectorAll(
+        const operators = findAll(
           '.change-to-section .operator-selector .operator'
         );
-        expect(operators).to.have.length(4);
+        assert.strictEqual(operators.length, 4);
         [...operatorsList, 'none'].forEach((operatorName, index) => {
           const operator = operators[index];
-          expect(operator.textContent.trim()).to.equal(operatorName);
+          assert.dom(operator).hasText(operatorName);
         });
       }
     );
 
-    it(
+    test(
       'does not render operators in "change to" section when block is not an operator',
-      async function () {
+      async function (assert) {
         this.set('editBlock', new ConditionQueryBlock());
 
         await render(hbs `<QueryBuilder::BlockSelector
@@ -217,7 +218,7 @@ describe('Integration | Component | query-builder/block-selector', function () {
           @editBlock={{this.editBlock}}
         />`);
 
-        expect(this.element.querySelector('.change-to-section')).to.not.exist;
+        assert.notOk(find('.change-to-section'));
       }
     );
 
@@ -234,9 +235,9 @@ describe('Integration | Component | query-builder/block-selector', function () {
         },
         descriptionSuffix: 'with single condition',
       }].forEach(({ beforeFunc, descriptionSuffix }) => {
-        it(
+        test(
           `blocks "change to" ${operatorUpper} when editing ${operatorUpper} operator ${descriptionSuffix}`,
-          async function () {
+          async function (assert) {
             this.set('editBlock', new operatorBlockClasses[operatorName]());
             beforeFunc(this);
 
@@ -245,12 +246,12 @@ describe('Integration | Component | query-builder/block-selector', function () {
               @editBlock={{this.editBlock}}
             />`);
 
-            expect(
-              this.element.querySelector(`.change-to-section .operator-${operatorName}`)
-            ).to.have.attr('disabled');
-            expect(
-              this.element.querySelectorAll('.change-to-section .operator:not([disabled])')
-            ).to.have.length(2);
+            assert.dom(
+              find(`.change-to-section .operator-${operatorName}`)
+            ).hasAttribute('disabled');
+            assert.strictEqual(findAll(
+              '.change-to-section .operator:not([disabled])'
+            ).length, 2);
           }
         );
       });
@@ -258,9 +259,9 @@ describe('Integration | Component | query-builder/block-selector', function () {
 
     multiOperandOperatorsList.forEach(operatorName => {
       const operatorUpper = operatorName.toUpperCase();
-      it(
+      test(
         `blocks "change to" ${operatorUpper} and NOT when editing ${operatorUpper} operator with two conditions`,
-        async function () {
+        async function (assert) {
           const editBlock = this.set(
             'editBlock',
             new operatorBlockClasses[operatorName]()
@@ -277,14 +278,14 @@ describe('Integration | Component | query-builder/block-selector', function () {
             operatorName,
             'not',
           ].forEach(disabledOperator => {
-            expect(this.element.querySelector(
+            assert.dom(find(
               `.change-to-section .operator-${disabledOperator}`
-            )).to.have.attr('disabled');
+            )).hasAttribute('disabled');
           });
 
-          expect(
-            this.element.querySelectorAll('.change-to-section .operator:not([disabled])')
-          ).to.have.length(1);
+          assert.strictEqual(findAll(
+            '.change-to-section .operator:not([disabled])'
+          ).length, 1);
         }
       );
     });
@@ -293,9 +294,9 @@ describe('Integration | Component | query-builder/block-selector', function () {
       const sourceOperatorNameUpper = sourceOperatorName.toUpperCase();
       operatorsList.without(sourceOperatorName).forEach(destinationOperatorName => {
         const destinationOperatorNameUpper = destinationOperatorName.toUpperCase();
-        it(
+        test(
           `changes ${sourceOperatorNameUpper} operator with single condition to ${destinationOperatorNameUpper} operator`,
-          async function () {
+          async function (assert) {
             const editBlock = this.set(
               'editBlock',
               new operatorBlockClasses[sourceOperatorName]()
@@ -314,7 +315,8 @@ describe('Integration | Component | query-builder/block-selector', function () {
             const blockMatcher = sinon.match
               .instanceOf(operatorBlockClasses[destinationOperatorName])
               .and(sinon.match.has('operands', [conditionBlock]));
-            expect(replaceSpy).to.be.calledOnce.and.to.be.calledWith([blockMatcher]);
+            assert.ok(replaceSpy.calledOnce);
+            assert.ok(replaceSpy.calledWith([blockMatcher]));
           }
         );
       });
@@ -358,7 +360,7 @@ describe('Integration | Component | query-builder/block-selector', function () {
               `${notAllowed ? 'does not allow to extract' : 'extracts'} ${nestedBlockCount} nested elements in ${sourceOperatorNameUpper} operator to ${parentOperatorNameUpper} parent operator using "change to" "NONE"`;
           }
 
-          it(description, async function () {
+          test(description, async function (assert) {
             const {
               editBlock,
               parentBlock,
@@ -384,30 +386,30 @@ describe('Integration | Component | query-builder/block-selector', function () {
             />`);
 
             const noneOperatorBtn =
-              this.element.querySelector('.change-to-section .operator-none');
+              find('.change-to-section .operator-none');
             if (notAllowed) {
-              expect(noneOperatorBtn).to.not.exist;
-              return;
+              assert.notOk(noneOperatorBtn);
             } else {
-              expect(noneOperatorBtn).to.not.have.attr('disabled');
+              assert.dom(noneOperatorBtn).doesNotHaveAttribute('disabled');
+
+              await click(noneOperatorBtn);
+
+              assert.ok(replaceSpy.calledOnce);
+              assert.ok(replaceSpy.calledWith(nestedOperands));
             }
-
-            await click(noneOperatorBtn);
-
-            expect(replaceSpy).to.be.calledOnce.and.to.be.calledWith(nestedOperands);
           });
         });
       });
     });
 
-    it('does not render create-specific sections', async function () {
+    test('does not render create-specific sections', async function (assert) {
       await render(hbs `<QueryBuilder::BlockSelector
         @mode="edit"
         @editBlock={{this.editBlock}}
       />`);
 
-      expect(this.element.querySelector('.add-operator-section')).to.not.exist;
-      expect(this.element.querySelector('.condition-section')).to.not.exist;
+      assert.notOk(find('.add-operator-section'));
+      assert.notOk(find('.condition-section'));
     });
   });
 });

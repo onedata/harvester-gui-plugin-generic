@@ -21,6 +21,7 @@ module.exports = {
   extends: [
     'eslint:recommended',
     'plugin:ember/recommended',
+    'plugin:qunit/recommended',
   ],
   env: {
     browser: true,
@@ -92,6 +93,9 @@ module.exports = {
     'promise/no-callback-in-promise': 'off', // default: warn
     'promise/avoid-new': 'off', // default: warn
     'promise/no-return-in-finally': 'error',
+    // Disabled as tests dynamically generated from specs often have conditional
+    // statements.
+    'qunit/no-conditional-assertions': 'off',
   },
   overrides: [
     // node files

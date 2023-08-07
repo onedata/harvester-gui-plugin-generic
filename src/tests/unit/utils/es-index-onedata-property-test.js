@@ -1,13 +1,12 @@
-import { expect } from 'chai';
-import { describe, it } from 'mocha';
+import { module, test } from 'qunit';
 import EsIndexOnedataProperty from 'harvester-gui-plugin-generic/utils/es-index-onedata-property';
 
-describe('Unit | Utility | es-index-onedata-property', function () {
-  it('handles spaceId property', function () {
+module('Unit | Utility | es-index-onedata-property', () => {
+  test('handles spaceId property', function (assert) {
     const property = new EsIndexOnedataProperty(null, '__onedata.space');
-    expect(property.name).to.equal('__onedata.space');
-    expect(property.type).to.equal('space');
-    expect(property.isField).to.equal(false);
-    expect(property.path).to.equal('space');
+    assert.strictEqual(property.name, '__onedata.space');
+    assert.strictEqual(property.type, 'space');
+    assert.false(property.isField);
+    assert.strictEqual(property.path, 'space');
   });
 });

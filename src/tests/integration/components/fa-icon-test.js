@@ -1,32 +1,32 @@
-import { expect } from 'chai';
-import { describe, it } from 'mocha';
-import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
-import hbs from 'htmlbars-inline-precompile';
+import { module, test } from 'qunit';
+import { setupRenderingTest } from '../../helpers';
+import { render, find } from '@ember/test-helpers';
+import { hbs } from 'ember-cli-htmlbars';
 
-describe('Integration | Component | fa-icon', function() {
-  setupRenderingTest();
+module('Integration | Component | fa-icon', (hooks) => {
+  setupRenderingTest(hooks);
 
-  it('renders icon using "span" tag with "fa-icon" class', async function () {
+  test('renders icon using "span" tag with "fa-icon" class', async function (assert) {
     await render(hbs`<FaIcon @icon="plus" />`);
 
-    const iconNode = this.element.querySelector('span.fa-icon');
-    expect(iconNode).to.exist;
-    expect(iconNode).to.have.class('fas').and.to.have.class('fa-plus');
+    const iconNode = find('span.fa-icon');
+    assert.ok(iconNode);
+    assert.dom(iconNode).hasClass('fas');
+    assert.dom(iconNode).hasClass('fa-plus');
   });
 
-  it('does not include size class by default', async function () {
+  test('does not include size class by default', async function (assert) {
     await render(hbs`<FaIcon @icon="plus" />`);
 
-    const iconNode = this.element.querySelector('.fa-icon');
+    const iconNode = find('.fa-icon');
     // 3 default classes - see previous test
-    expect(iconNode.classList.length).to.equal(3);
+    assert.strictEqual(iconNode.classList.length, 3);
   });
 
-  it('includes size class when specified', async function () {
+  test('includes size class when specified', async function (assert) {
     await render(hbs`<FaIcon @icon="plus" @size="lg" />`);
 
-    const iconNode = this.element.querySelector('.fa-icon');
-    expect(iconNode).to.have.class('fa-lg');
+    const iconNode = find('.fa-icon');
+    assert.dom(iconNode).hasClass('fa-lg');
   });
 });

@@ -1,16 +1,14 @@
-import { expect } from 'chai';
-import { describe, it, beforeEach } from 'mocha';
-import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
-import hbs from 'htmlbars-inline-precompile';
+import { module, test } from 'qunit';
+import { setupRenderingTest } from '../../../helpers';
+import { render, click, find, findAll } from '@ember/test-helpers';
+import { hbs } from 'ember-cli-htmlbars';
 import QueryResult from 'harvester-gui-plugin-generic/utils/query-result';
-import { click } from '@ember/test-helpers';
 import { resolve } from 'rsvp';
 
-describe('Integration | Component | query-results/result', function () {
-  setupRenderingTest();
+module('Integration | Component | query-results/result', (hooks) => {
+  setupRenderingTest(hooks);
 
-  beforeEach(function () {
+  hooks.beforeEach(function () {
     this.set('queryResult', new QueryResult({
       _id: 'file123',
       _source: {
@@ -54,42 +52,42 @@ describe('Integration | Component | query-results/result', function () {
     }));
   });
 
-  it('has class "query-results-result" and is a <li> element', async function () {
+  test('has class "query-results-result" and is a <li> element', async function (assert) {
     await render(hbs `<QueryResults::Result />`);
 
-    expect(this.element.querySelector('li.query-results-result')).to.exist;
+    assert.ok(find('li.query-results-result'));
   });
 
-  it('shows "Go to file" link with file name included', async function () {
+  test('shows "Go to file" link with file name included', async function (assert) {
     await render(hbs `<QueryResults::Result @queryResult={{this.queryResult}}/>`);
 
-    const linkNode = this.element.querySelector('.go-to-file-link');
-    expect(linkNode).to.exist;
-    expect(linkNode.textContent.trim()).to.equal('Go to source file "abc.txt"');
-    expect(linkNode).to.have.attr('href', 'fileUrl');
+    const linkNode = find('.go-to-file-link');
+    assert.ok(linkNode);
+    assert.dom(linkNode).hasText('Go to source file "abc.txt"');
+    assert.dom(linkNode).hasAttribute('href', 'fileUrl');
   });
 
-  it(
+  test(
     'shows "Go to file" link without file name, when name is not available',
-    async function () {
+    async function (assert) {
       this.queryResult.fileName = undefined;
 
       await render(hbs `<QueryResults::Result @queryResult={{this.queryResult}}/>`);
 
-      const linkNode = this.element.querySelector('.go-to-file-link');
-      expect(linkNode).to.exist;
-      expect(linkNode.textContent.trim()).to.equal('Go to source file');
-      expect(linkNode).to.have.attr('href', 'fileUrl');
+      const linkNode = find('.go-to-file-link');
+      assert.ok(linkNode);
+      assert.dom(linkNode).hasText('Go to source file');
+      assert.dom(linkNode).hasAttribute('href', 'fileUrl');
     }
   );
 
-  it('has copy button with file id', async function () {
+  test('has copy button with file id', async function (assert) {
     await render(hbs `<QueryResults::Result @queryResult={{this.queryResult}}/>`);
 
-    const copyBtn = this.element.querySelector('.copy-file-id');
-    expect(copyBtn).to.exist;
-    expect(copyBtn.textContent.trim()).to.equal('File ID');
-    expect(copyBtn).to.have.attr('data-clipboard-text', 'file123');
+    const copyBtn = find('.copy-file-id');
+    assert.ok(copyBtn);
+    assert.dom(copyBtn).hasText('File ID');
+    assert.dom(copyBtn).hasAttribute('data-clipboard-text', 'file123');
   });
 
   [{
@@ -177,46 +175,43 @@ describe('Integration | Component | query-results/result', function () {
     },
     json: 'No match.',
   }].forEach(({ description, filteredProperties, json }) => {
-    it(description, async function () {
+    test(description, async function (assert) {
       this.set('filteredProperties', filteredProperties);
       await render(hbs `<QueryResults::Result
         @queryResult={{this.queryResult}}
         @filteredProperties={{this.filteredProperties}}
       />`);
 
-      expect(this.element.querySelector('.result-sample').textContent.trim())
-        .to.equal(json);
+      assert.dom(find('.result-sample')).hasText(json);
     });
   });
 
-  it('is collapsed on init', async function () {
+  test('is collapsed on init', async function (assert) {
     await render(hbs `<QueryResults::Result
       @queryResult={{this.queryResult}}
     />`);
 
-    expect(this.element.querySelector('.result-representations-collapse'))
-      .to.not.have.class('show');
+    assert.dom(find('.result-representations-collapse')).doesNotHaveClass('show');
   });
 
-  it('expands on header click', async function () {
+  test('expands on header click', async function (assert) {
     await render(hbs `<QueryResults::Result
       @queryResult={{this.queryResult}}
     />`);
     await click('.result-heading');
 
-    expect(this.element.querySelector('.result-representations-collapse'))
-      .to.have.class('show');
+    assert.dom(find('.result-representations-collapse')).hasClass('show');
   });
 
-  it('has "table" tab active by default', async function () {
+  test('has "table" tab active by default', async function (assert) {
     await render(hbs `<QueryResults::Result
       @queryResult={{this.queryResult}}
     />`);
 
-    expect(this.element.querySelector('.tab-pane.active .properties-table')).to.exist;
+    assert.ok(find('.tab-pane.active .properties-table'));
   });
 
-  it('shows data in table', async function () {
+  test('shows data in table', async function (assert) {
     await render(hbs `<QueryResults::Result
       @queryResult={{this.queryResult}}
     />`);
@@ -246,22 +241,20 @@ describe('Integration | Component | query-results/result', function () {
       key: '__onedata.fileName',
       value: '"abc.txt"',
     }];
-    const properties = this.element.querySelectorAll('.properties-table .property');
-    expect(properties).to.have.length(expectedProperties.length);
+    const properties = findAll('.properties-table .property');
+    assert.strictEqual(properties.length, expectedProperties.length);
     expectedProperties.forEach(({ key, value }, index) => {
-      expect(properties[index].querySelector('.property-name').textContent.trim())
-        .to.equal(key);
-      expect(properties[index].querySelector('.property-value').textContent.trim())
-        .to.equal(value);
+      assert.dom(properties[index].querySelector('.property-name')).hasText(key);
+      assert.dom(properties[index].querySelector('.property-value')).hasText(value);
     });
   });
 
-  it('shows raw JSON in textarea', async function () {
+  test('shows raw JSON in textarea', async function (assert) {
     await render(hbs `<QueryResults::Result
       @queryResult={{this.queryResult}}
     />`);
 
-    expect(this.element.querySelector('.json-textarea').textContent.trim())
-      .to.equal(JSON.stringify(this.queryResult.source, null, 2));
+    assert.dom(find('.json-textarea'))
+      .hasText(JSON.stringify(this.queryResult.source, null, 2));
   });
 });

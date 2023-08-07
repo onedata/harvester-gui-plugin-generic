@@ -1,20 +1,18 @@
-import { expect } from 'chai';
-import { describe, it, beforeEach } from 'mocha';
-import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
-import hbs from 'htmlbars-inline-precompile';
+import { module, test } from 'qunit';
+import { setupRenderingTest } from '../../helpers';
+import { render, click, fillIn, triggerKeyEvent, find, findAll } from '@ember/test-helpers';
+import { hbs } from 'ember-cli-htmlbars';
 import sinon from 'sinon';
-import { click, fillIn, triggerKeyEvent } from '@ember/test-helpers';
 import { selectChoose, clickTrigger } from '../../helpers/ember-power-select';
 import RootOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/root-operator-query-block';
 import ConditionQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/condition-query-block';
 import EsIndex from 'harvester-gui-plugin-generic/utils/es-index';
 import QueryValueComponentsBuilder from 'harvester-gui-plugin-generic/utils/query-value-components-builder';
 
-describe('Integration | Component | query-builder', function () {
-  setupRenderingTest();
+module('Integration | Component | query-builder', (hooks) => {
+  setupRenderingTest(hooks);
 
-  beforeEach(function () {
+  hooks.beforeEach(function () {
     this.index = new EsIndex({
       mappings: {
         properties: {
@@ -48,28 +46,30 @@ describe('Integration | Component | query-builder', function () {
     this.valuesBuilder = new QueryValueComponentsBuilder([]);
   });
 
-  it('has class "query-builder', async function () {
+  test('has class "query-builder', async function (assert) {
     await render(hbs `<QueryBuilder @valuesBuilder={{this.valuesBuilder}} />`);
 
-    expect(this.element.querySelector('.query-builder'));
+    assert.ok(find('.query-builder'));
   });
 
-  it('filters list of available index properties to supported ones', async function () {
-    await render(hbs `<QueryBuilder
-      @index={{this.index}}
-      @valuesBuilder={{this.valuesBuilder}}
-    />`);
-    await click('.query-builder-block-adder');
-    await clickTrigger('.property-selector');
+  test('filters list of available index properties to supported ones',
+    async function (assert) {
+      await render(hbs `<QueryBuilder
+        @index={{this.index}}
+        @valuesBuilder={{this.valuesBuilder}}
+      />`);
+      await click('.query-builder-block-adder');
+      await clickTrigger('.property-selector');
 
-    const options = this.element.querySelectorAll('.ember-power-select-option');
-    expect(options).to.have.length(5);
-    ['any property', 'space', 'a.b', 'c', 'c.d'].forEach((propertyPath, index) =>
-      expect(options[index].textContent.trim()).to.equal(propertyPath)
-    );
-  });
+      const options = findAll('.ember-power-select-option');
+      assert.strictEqual(options.length, 5);
+      ['any property', 'space', 'a.b', 'c', 'c.d'].forEach((propertyPath, index) =>
+        assert.dom(options[index]).hasText(propertyPath)
+      );
+    }
+  );
 
-  it('calls "onPerformQuery" after submit button press', async function () {
+  test('calls "onPerformQuery" after submit button press', async function (assert) {
     this.submitSpy = sinon.spy();
 
     await render(hbs `<QueryBuilder
@@ -84,12 +84,13 @@ describe('Integration | Component | query-builder', function () {
 
     const queryMatcher = sinon.match.instanceOf(RootOperatorQueryBlock)
       .and(sinon.match.has('operands', [sinon.match.instanceOf(ConditionQueryBlock)]));
-    expect(this.submitSpy).to.be.calledOnce.and.be.calledWith(queryMatcher);
+    assert.ok(this.submitSpy.calledOnce);
+    assert.ok(this.submitSpy.calledWith(queryMatcher));
   });
 
-  it(
+  test(
     'does not disable submit button when edited condition has valid value',
-    async function () {
+    async function (assert) {
       await render(hbs `<QueryBuilder
         @index={{this.index}}
         @valuesBuilder={{this.valuesBuilder}}
@@ -101,28 +102,30 @@ describe('Integration | Component | query-builder', function () {
       await click('.query-builder-condition-block .comparator-value');
       await fillIn('.query-builder-condition-block .comparator-value', 'def');
 
-      expect(this.element.querySelector('.submit-query')).to.not.have.attr('disabled');
+      assert.dom(find('.submit-query')).doesNotHaveAttribute('disabled');
     }
   );
 
-  it('disables submit button when edited condition has invalid value', async function () {
-    await render(hbs `<QueryBuilder
-      @index={{this.index}}
-      @valuesBuilder={{this.valuesBuilder}}
-    />`);
-    await click('.query-builder-block-adder');
-    await selectChoose('.property-selector', 'c.d');
-    await fillIn('.block-adder-body .comparator-value', 'abc');
-    await click('.accept-condition');
-    await click('.query-builder-condition-block .comparator-value');
-    await fillIn('.query-builder-condition-block .comparator-value', '');
+  test('disables submit button when edited condition has invalid value',
+    async function (assert) {
+      await render(hbs `<QueryBuilder
+        @index={{this.index}}
+        @valuesBuilder={{this.valuesBuilder}}
+      />`);
+      await click('.query-builder-block-adder');
+      await selectChoose('.property-selector', 'c.d');
+      await fillIn('.block-adder-body .comparator-value', 'abc');
+      await click('.accept-condition');
+      await click('.query-builder-condition-block .comparator-value');
+      await fillIn('.query-builder-condition-block .comparator-value', '');
 
-    expect(this.element.querySelector('.submit-query')).to.have.attr('disabled');
-  });
+      assert.dom(find('.submit-query')).hasAttribute('disabled');
+    }
+  );
 
-  it(
+  test(
     'enables submit button when edited condition had invalid value and then the edition was cancelled',
-    async function () {
+    async function (assert) {
       await render(hbs `<QueryBuilder
         @index={{this.index}}
         @valuesBuilder={{this.valuesBuilder}}
@@ -135,13 +138,13 @@ describe('Integration | Component | query-builder', function () {
       await fillIn('.query-builder-condition-block .comparator-value', '');
       await triggerKeyEvent('.comparator-value', 'keydown', 'Escape');
 
-      expect(this.element.querySelector('.submit-query')).to.not.have.attr('disabled');
+      assert.dom(find('.submit-query')).doesNotHaveAttribute('disabled');
     }
   );
 
-  it(
+  test(
     'enables submit button when edited condition had invalid value and then the condition was deleted',
-    async function () {
+    async function (assert) {
       await render(hbs `<QueryBuilder
         @index={{this.index}}
         @valuesBuilder={{this.valuesBuilder}}
@@ -154,13 +157,13 @@ describe('Integration | Component | query-builder', function () {
       await fillIn('.query-builder-condition-block .comparator-value', '');
       await click('.remove-block');
 
-      expect(this.element.querySelector('.submit-query')).to.not.have.attr('disabled');
+      assert.dom(find('.submit-query')).doesNotHaveAttribute('disabled');
     }
   );
 
-  it(
+  test(
     'enables submit button when edited condition had invalid value and then the containing operator was deleted',
-    async function () {
+    async function (assert) {
       await render(hbs `<QueryBuilder
         @index={{this.index}}
         @valuesBuilder={{this.valuesBuilder}}
@@ -175,13 +178,13 @@ describe('Integration | Component | query-builder', function () {
       await fillIn('.query-builder-condition-block .comparator-value', '');
       await click('.not-operator-block > .remove-block');
 
-      expect(this.element.querySelector('.submit-query')).to.not.have.attr('disabled');
+      assert.dom(find('.submit-query')).doesNotHaveAttribute('disabled');
     }
   );
 
-  it(
+  test(
     'shows CURL request content on "generate request" button click',
-    async function () {
+    async function (assert) {
       this.generateCurlStub = sinon.stub().resolves('curl!');
       this.filteredProperties = {
         a: {
@@ -205,8 +208,8 @@ describe('Integration | Component | query-builder', function () {
       await click('.accept-condition');
       await click('.generate-query-request');
 
-      expect(this.generateCurlStub).to.be.calledOnce;
-      expect(this.generateCurlStub.lastCall.args[0]).to.deep.equal({
+      assert.ok(this.generateCurlStub.calledOnce);
+      assert.deepEqual(this.generateCurlStub.lastCall.args[0], {
         from: 0,
         size: 10,
         sort: [{
@@ -228,8 +231,7 @@ describe('Integration | Component | query-builder', function () {
           'c',
         ],
       });
-      expect(document.querySelector('.curl-generator-modal textarea'))
-        .to.have.value('curl!');
+      assert.dom('.curl-generator-modal textarea').hasValue('curl!');
     }
   );
 });
