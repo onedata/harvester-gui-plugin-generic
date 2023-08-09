@@ -88,7 +88,7 @@ module('Integration | Component | query-builder/block-selector', (hooks) => {
       const indexProperties = this.indexProperties;
       const options = findAll('.ember-power-select-option');
       assert.strictEqual(options.length, indexProperties.length);
-      indexProperties.mapBy('path').forEach((path, index) =>
+      indexProperties.forEach(({ path }, index) =>
         assert.dom(options[index]).hasText(path)
       );
     });
@@ -180,7 +180,10 @@ module('Integration | Component | query-builder/block-selector', (hooks) => {
           assert.ok(replaceSpy.notCalled);
           await click(`.surround-section .operator-${operatorName}`);
           const blockMatcher = sinon.match.instanceOf(operatorBlockClasses[operatorName])
-            .and(sinon.match.has('operands', [editBlock]));
+            .and(
+              sinon.match((val) =>
+                sinon.match.array.deepEquals([editBlock]).test(val.operands.toArray()))
+            );
           assert.ok(replaceSpy.calledOnce);
           assert.ok(replaceSpy.calledWith([blockMatcher]));
         }
@@ -292,34 +295,40 @@ module('Integration | Component | query-builder/block-selector', (hooks) => {
 
     operatorsList.forEach(sourceOperatorName => {
       const sourceOperatorNameUpper = sourceOperatorName.toUpperCase();
-      operatorsList.without(sourceOperatorName).forEach(destinationOperatorName => {
-        const destinationOperatorNameUpper = destinationOperatorName.toUpperCase();
-        test(
-          `changes ${sourceOperatorNameUpper} operator with single condition to ${destinationOperatorNameUpper} operator`,
-          async function (assert) {
-            const editBlock = this.set(
-              'editBlock',
-              new operatorBlockClasses[sourceOperatorName]()
-            );
-            const conditionBlock = new ConditionQueryBlock();
-            editBlock.operands.pushObject(conditionBlock);
-            const replaceSpy = this.set('replaceSpy', sinon.spy());
+      operatorsList
+        .filter((operator) => operator !== sourceOperatorName)
+        .forEach(destinationOperatorName => {
+          const destinationOperatorNameUpper = destinationOperatorName.toUpperCase();
+          test(
+            `changes ${sourceOperatorNameUpper} operator with single condition to ${destinationOperatorNameUpper} operator`,
+            async function (assert) {
+              const editBlock = this.set(
+                'editBlock',
+                new operatorBlockClasses[sourceOperatorName]()
+              );
+              const conditionBlock = new ConditionQueryBlock();
+              editBlock.operands.pushObject(conditionBlock);
+              const replaceSpy = this.set('replaceSpy', sinon.spy());
 
-            await render(hbs `<QueryBuilder::BlockSelector
-              @mode="edit"
-              @editBlock={{this.editBlock}}
-              @onBlockReplace={{this.replaceSpy}}
-            />`);
-            await click(`.change-to-section .operator-${destinationOperatorName}`);
+              await render(hbs `<QueryBuilder::BlockSelector
+                @mode="edit"
+                @editBlock={{this.editBlock}}
+                @onBlockReplace={{this.replaceSpy}}
+              />`);
+              await click(`.change-to-section .operator-${destinationOperatorName}`);
 
-            const blockMatcher = sinon.match
-              .instanceOf(operatorBlockClasses[destinationOperatorName])
-              .and(sinon.match.has('operands', [conditionBlock]));
-            assert.ok(replaceSpy.calledOnce);
-            assert.ok(replaceSpy.calledWith([blockMatcher]));
-          }
-        );
-      });
+              const blockMatcher = sinon.match
+                .instanceOf(operatorBlockClasses[destinationOperatorName])
+                .and(
+                  sinon.match((val) =>
+                    sinon.match.array.deepEquals([conditionBlock])
+                    .test(val.operands.toArray()))
+                );
+              assert.ok(replaceSpy.calledOnce);
+              assert.ok(replaceSpy.calledWith([blockMatcher]));
+            }
+          );
+        });
 
       // Test scenario: create parentOperator with nested editOperator. Then add
       // `nestedBlockCount` NOT operators to editOperator. Then try to use "change to"

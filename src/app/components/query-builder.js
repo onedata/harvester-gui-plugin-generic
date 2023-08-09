@@ -10,6 +10,7 @@
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
+import _ from 'lodash';
 import RootOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/root-operator-query-block';
 import OperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/operator-query-block';
 
@@ -64,12 +65,14 @@ export default class QueryBuilderComponent extends Component {
    * @type {Array<Utils.EsIndexProperty>}
    */
   get indexProperties() {
-    const allProperties =
+    const allProperties = _.sortBy(
       (this.args.index ? this.args.index.getFlattenedProperties() : [])
-      .filter(property => this.isSupportedProperty(property))
-      .sortBy('path');
+      .filter(property => this.isSupportedProperty(property)),
+      ['path']
+    );
 
-    const specialProperties = allProperties.rejectBy('isRealProperty');
+    const specialProperties = allProperties
+      .filter(({ isRealProperty }) => !isRealProperty);
     const ordinaryProperties = allProperties
       .filter(prop => prop.isRealProperty && !prop.path.startsWith('_'));
     const internalProperties = allProperties
@@ -82,7 +85,8 @@ export default class QueryBuilderComponent extends Component {
    * @type {boolean}
    */
   get hasInvalidCondition() {
-    return [...this.editedConditions.values()].mapBy('isValid').some(isValid => !isValid);
+    return [...this.editedConditions.values()].map(({ isValid }) => isValid)
+      .some(isValid => !isValid);
   }
 
   @action

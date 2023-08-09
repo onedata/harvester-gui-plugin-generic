@@ -124,7 +124,10 @@ module('Integration | Component | query-builder/block-settings', (hooks) => {
       await waitUntil(() => !find('.block-settings-body'));
 
       const blockMatcher = sinon.match.instanceOf(AndOperatorQueryBlock)
-        .and(sinon.match.has('operands', [this.queryBlock]));
+        .and(
+          sinon.match((val) =>
+            sinon.match.array.deepEquals([this.queryBlock]).test(val.operands.toArray()))
+        );
       assert.ok(this.replaceSpy.calledOnce);
       assert.ok(this.replaceSpy.calledWith([blockMatcher]));
       assert.ok(this.closeSpy.calledOnce);
@@ -152,7 +155,10 @@ module('Integration | Component | query-builder/block-settings', (hooks) => {
       await waitUntil(() => !find('.block-settings-body'));
 
       const blockMatcher = sinon.match.instanceOf(AndOperatorQueryBlock)
-        .and(sinon.match.has('operands', [condition]));
+        .and(
+          sinon.match((val) =>
+            sinon.match.array.deepEquals([condition]).test(val.operands.toArray()))
+        );
       assert.ok(this.replaceSpy.calledOnce);
       assert.ok(this.replaceSpy.calledWith([blockMatcher]));
       assert.ok(this.closeSpy.calledOnce);

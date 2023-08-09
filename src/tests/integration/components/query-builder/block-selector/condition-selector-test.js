@@ -4,7 +4,6 @@ import { render, click, fillIn, find, findAll } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
 import sinon from 'sinon';
 import moment from 'moment';
-import SpacesProvider from 'harvester-gui-plugin-generic/services/spaces-provider';
 import { typeInSearch, clickTrigger, selectChoose } from '../../../../helpers/ember-power-select';
 import { setFlatpickrDate } from 'ember-flatpickr/test-support/helpers';
 import QueryValueComponentsBuilder from 'harvester-gui-plugin-generic/utils/query-value-components-builder';
@@ -39,7 +38,7 @@ numberComparators.forEach(({ operator, symbol }) => {
   comparatorTranslations[`date.${operator}`] = symbol;
 });
 
-const spaces = [{
+const spacesExample = [{
   id: 'space1Id',
   name: 'space1',
 }, {
@@ -129,7 +128,7 @@ const comparatorsTestData = [{
     inputValueCallback: async function () {
       await selectChoose('.comparator-value', 'space2');
     },
-    notifiedInputValue: spaces[1],
+    notifiedInputValue: spacesExample[1],
   }],
   defaultComparator: 'space.is',
   defaultComparatorVisibleValue: 'space1',
@@ -155,11 +154,7 @@ module(
     setupRenderingTest(hooks);
 
     hooks.beforeEach(function () {
-      sinon.stub(SpacesProvider.prototype, 'reloadSpaces').callsFake(function () {
-        this.spaces = spaces;
-      });
-      this.owner.lookup('service:spaces-provider').reloadSpaces();
-
+      const spaces = [...spacesExample];
       this.setProperties({
         spaces,
         indexProperties: [{
@@ -195,10 +190,6 @@ module(
 
     hooks.afterEach(function () {
       fakeClock.restore();
-
-      if (SpacesProvider.prototype.reloadSpaces.restore) {
-        SpacesProvider.prototype.reloadSpaces.restore();
-      }
     });
 
     test('lists index properties in dropdown', async function (assert) {
@@ -211,7 +202,7 @@ module(
       const indexProperties = this.indexProperties;
       const options = findAll('.ember-power-select-option');
       assert.strictEqual(options.length, indexProperties.length);
-      indexProperties.mapBy('path').forEach((path, index) =>
+      indexProperties.forEach(({ path }, index) =>
         assert.dom(options[index]).hasText(path)
       );
     });
@@ -406,14 +397,13 @@ module(
       'blocks "Add" button when space property "is" condition has empty condition value',
       async function (assert) {
         // simulate no space to choose
-        this.spaces.clear();
+        this.spaces.splice(0, this.spaces.length);
         await render(hbs `<QueryBuilder::BlockSelector::ConditionSelector
           @valuesBuilder={{this.valuesBuilder}}
           @indexProperties={{this.indexProperties}}
         />`);
 
         await selectChoose('.property-selector', 'space');
-
         assert.dom(find('.accept-condition')).hasAttribute('disabled');
       }
     );

@@ -5,7 +5,8 @@ import { hbs } from 'ember-cli-htmlbars';
 import sinon from 'sinon';
 
 const allowedOperatorsList = ['and', 'or', 'not', 'none'];
-const defaultVisibleOperatorsList = allowedOperatorsList.without('none');
+const defaultVisibleOperatorsList = allowedOperatorsList
+  .filter((operator) => operator !== 'none');
 
 module(
   'Integration | Component | query-builder/block-selector/operator-selector',

@@ -339,7 +339,7 @@ export default class ElasticsearchQueryBuilder {
       }
     }
 
-    return readyKeys.without('');
+    return readyKeys.filter((operator) => operator);
   }
 
   /**

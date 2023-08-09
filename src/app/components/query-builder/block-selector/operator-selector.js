@@ -48,11 +48,11 @@ extends Component {
   get operators() {
     let operators = this.args.operators ?
       this.args.operators.filter(operator => this.validOperators.includes(operator)) :
-      this.validOperators.without('none');
+      this.validOperators.filter((operator) => operator !== 'none');
 
     // Do not show NONE operator, if it is disabled.
     if (this.disabledOperators.includes('none')) {
-      operators = operators.without('none');
+      operators = operators.filter((operator) => operator !== 'none');
     }
 
     return operators;
