@@ -4,17 +4,18 @@ module.exports = {
   root: true,
   parser: '@babel/eslint-parser',
   parserOptions: {
+    requireConfigFile: false,
     ecmaVersion: 2021,
     sourceType: 'module',
     babelOptions: {
       plugins: [
-        ['@babel/plugin-proposal-decorators', { decoratorsBeforeExport: true }], ,
+        ['@babel/plugin-proposal-decorators', { decoratorsBeforeExport: true }],
       ],
     },
   },
   plugins: [
     'ember',
-    'node',
+    'n',
     'promise',
   ],
   extends: [

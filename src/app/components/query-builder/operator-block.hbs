@@ -3,15 +3,15 @@
     {{#if (and @queryBlock.operator (not-eq @queryBlock.operator "root"))}}
       <div class="block-label block-prefix-label">{{tt this (concat "operators." @queryBlock.operator)}}</div>
     {{/if}}
-    {{#if @queryBlock.operands.firstObject}}
+    {{#if (get @queryBlock.operands "0")}}
       <QueryBuilder::BlockVisualiser
         @parentQueryBlock={{@queryBlock}}
-        @queryBlock={{@queryBlock.operands.firstObject}}
+        @queryBlock={{get @queryBlock.operands "0"}}
         @valuesBuilder={{@valuesBuilder}}
         @indexProperties={{@indexProperties}}
         @level={{this.nestedBlocksLevel}}
-        @onBlockReplace={{fn this.replaceBlock @queryBlock.operands.firstObject}}
-        @onBlockRemove={{fn this.removeBlock @queryBlock.operands.firstObject}}
+        @onBlockReplace={{fn this.replaceBlock (get @queryBlock.operands "0")}}
+        @onBlockRemove={{fn this.removeBlock (get @queryBlock.operands "0")}}
         @onConditionEditionStart={{@onConditionEditionStart}}
         @onConditionEditionEnd={{@onConditionEditionEnd}}
         @onConditionEditionValidityChange={{@onConditionEditionValidityChange}}

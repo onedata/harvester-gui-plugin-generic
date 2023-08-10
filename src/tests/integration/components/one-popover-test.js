@@ -82,7 +82,10 @@ module('Integration | Component | one-popover', (hooks) => {
   });
 
   test('is still visible after click inside popover', async function (assert) {
-    this.set('popoverContent', htmlSafe('<button class="inside"></button>'));
+    this.set(
+      'popoverContent',
+      htmlSafe('<button class="inside" type="button"></button>')
+    );
     await renderPopover();
 
     await click('.btn');
@@ -92,9 +95,9 @@ module('Integration | Component | one-popover', (hooks) => {
   });
 
   test('can be hidden using yielded "hide" action', async function (assert) {
-    await render(hbs`<button class="btn">
+    await render(hbs`<button class="btn" type="button">
       <OnePopover as |popover|>
-        <button class="inside" {{on "click" popover.hide}}></button>
+        <button class="inside" type="button" {{on "click" popover.hide}}></button>
       </OnePopover>
     </button>`);
 
@@ -385,7 +388,7 @@ module('Integration | Component | one-popover', (hooks) => {
 });
 
 async function renderPopover() {
-  await render(hbs`<button class="btn">
+  await render(hbs`<button class="btn" type="button">
     <OnePopover
       @trigger={{this.trigger}}
       @isOpen={{this.isOpen}}

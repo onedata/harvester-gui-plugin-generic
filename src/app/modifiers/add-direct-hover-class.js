@@ -6,69 +6,35 @@
  *
  * @module modifiers/add-direct-hover-class
  * @author Michał Borzęcki
- * @copyright (C) 2020 ACK CYFRONET AGH
+ * @copyright (C) 2020-2023 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import Modifier from 'ember-modifier';
-import { registerDestructor } from '@ember/destroyable';
-import { action } from '@ember/object';
+import { modifier } from 'ember-modifier';
 
-export default class AddDirectHoverClassModifier extends Modifier {
-  areListenersInstalled = false;
-  elementRef = null;
+export default modifier((element, positional, { className }) => {
+  const effectiveClassName = className || 'is-directly-hovered';
 
-  /**
-   * @type {String}
-   */
-  get className() {
-    return this.args.named.className || 'is-directly-hovered';
-  }
-
-  constructor() {
-    super(...arguments);
-    registerDestructor(this, (instance) => instance.cleanup());
-  }
-
-  /**
-   * @override
-   */
-  modify(element) {
-    if (!this.areListenersInstalled) {
-      this.elementRef = element;
-      element.addEventListener('mouseleave', this.onMouseLeave);
-      element.addEventListener('mousemove', this.onMouseMove);
-      this.areListenersInstalled = true;
+  const changeHoverState = (newState) => {
+    if (element.classList.contains(effectiveClassName) !== newState) {
+      element.classList.toggle(effectiveClassName, newState);
     }
-  }
-
-  cleanup() {
-    if (this.areListenersInstalled) {
-      this.elementRef?.removeEventListener('mouseleave', this.onMouseLeave);
-      this.elementRef?.removeEventListener('mousemove', this.onMouseMove);
-      this.areListenersInstalled = false;
-    }
-  }
-
-  @action
-  onMouseLeave() {
-    this.changeHoverState(false);
-  }
-
-  @action
-  onMouseMove() {
+  };
+  const onMouseMove = () => {
     const containsHoveredElement =
-      Boolean(this.elementRef.querySelector(`.${this.className}`));
-    this.changeHoverState(!containsHoveredElement);
-  }
+      Boolean(element.querySelector(`.${effectiveClassName}`));
+    changeHoverState(!containsHoveredElement);
+  };
+  const onMouseLeave = () => {
+    changeHoverState(false);
+  };
 
-  /**
-   * Changes hovered state and adds classes to the element.
-   * @param {boolean} newState
-   */
-  changeHoverState(newState) {
-    if (this.elementRef.classList.contains(this.className) !== newState) {
-      this.elementRef.classList.toggle(this.className, newState);
-    }
-  }
-}
+  element.addEventListener('mousemove', onMouseMove);
+  element.addEventListener('mouseleave', onMouseLeave);
+
+  return () => {
+    element.removeEventListener('mousemove', onMouseMove);
+    element.removeEventListener('mouseleave', onMouseLeave);
+    changeHoverState(false);
+  };
+});

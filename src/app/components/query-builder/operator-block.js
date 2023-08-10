@@ -9,6 +9,7 @@
 
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
+import { A } from '@ember/array';
 import OperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/operator-query-block';
 import RootOperatorQueryBlock from 'harvester-gui-plugin-generic/utils/query-builder/root-operator-query-block';
 
@@ -70,7 +71,7 @@ export default class QueryBuilderOperatorBlockComponent extends Component {
       // When root block has an operand, then next operator additions should surround
       // existing operand. Adding next conditions to the root block is not allowed.
       if (queryBlock instanceof OperatorQueryBlock) {
-        queryBlock.operands = [this.queryBlock.operands[0]];
+        queryBlock.operands = A([this.queryBlock.operands[0]]);
         this.replaceBlock(this.queryBlock.operands[0], [queryBlock]);
       }
     } else {

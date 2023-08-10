@@ -1,3 +1,7 @@
+[data-tippy-root] {
+  z-index: $zindex-popover !important;
+}
+
 .tippy-content {
   padding: 0;
 }

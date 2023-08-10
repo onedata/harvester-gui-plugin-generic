@@ -4,64 +4,33 @@
  *
  * @module modifiers/on-hover
  * @author Michał Borzęcki
- * @copyright (C) 2020 ACK CYFRONET AGH
+ * @copyright (C) 2020-2023 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import Modifier from 'ember-modifier';
-import { registerDestructor } from '@ember/destroyable';
-import { action } from '@ember/object';
+import { modifier } from 'ember-modifier';
 
-export default class AddDirectHoverClassModifier extends Modifier {
-  areListenersInstalled = false;
-  isHovered = false;
-  elementRef = null;
+export default modifier((element, [onChange]) => {
+  let isHovered = false;
 
-  /**
-   * @type {String}
-   */
-  get onChange() {
-    return this.args.positional[0] || (() => {});
-  }
-
-  constructor() {
-    super(...arguments);
-    registerDestructor(this, (instance) => instance.cleanup());
-  }
-
-  /**
-   * @override
-   */
-  modify(element) {
-    if (!this.areListenersInstalled) {
-      this.elementRef = element;
-      element.addEventListener('mouseleave', this.onMouseLeave);
-      element.addEventListener('mouseenter', this.onMouseEnter);
-      this.areListenersInstalled = true;
+  const onMouseEnter = () => {
+    if (!isHovered) {
+      isHovered = true;
+      onChange?.(isHovered);
     }
-  }
-
-  cleanup() {
-    if (this.areListenersInstalled) {
-      this.elementRef?.removeEventListener('mouseleave', this.onMouseLeave);
-      this.elementRef?.removeEventListener('mouseenter', this.onMouseEnter);
-      this.areListenersInstalled = false;
+  };
+  const onMouseLeave = () => {
+    if (isHovered) {
+      isHovered = false;
+      onChange?.(isHovered);
     }
-  }
+  };
 
-  @action
-  onMouseLeave() {
-    if (this.isHovered) {
-      this.isHovered = false;
-      this.onChange(false);
-    }
-  }
+  element.addEventListener('mouseenter', onMouseEnter);
+  element.addEventListener('mouseleave', onMouseLeave);
 
-  @action
-  onMouseEnter() {
-    if (!this.isHovered) {
-      this.isHovered = true;
-      this.onChange(true);
-    }
-  }
-}
+  return () => {
+    element.removeEventListener('mouseenter', onMouseEnter);
+    element.removeEventListener('mouseleave', onMouseLeave);
+  };
+});
