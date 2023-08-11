@@ -40,7 +40,7 @@ export default class OperatorQueryBlock extends QueryBlock {
     if (!this.operands.length) {
       return 1;
     } else {
-      return Math.max(...this.operands.mapBy('level')) + 1;
+      return Math.max(...this.operands.map(({ level }) => level)) + 1;
     }
   }
 

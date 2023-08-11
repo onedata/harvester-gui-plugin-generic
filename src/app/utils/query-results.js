@@ -78,7 +78,7 @@ export default class QueryResults {
    * @returns {Object}
    */
   getPropertiesTree() {
-    const rawResults = this.results.mapBy('source').compact();
+    const rawResults = this.results.map(({ source }) => source).filter(Boolean);
     const propertiesTree = {};
 
     for (const rawResult of rawResults) {

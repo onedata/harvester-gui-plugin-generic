@@ -15,6 +15,7 @@
 import Service, { inject as service } from '@ember/service';
 import { all as allFulfilled } from 'rsvp';
 import { tracked } from '@glimmer/tracking';
+import _ from 'lodash';
 import Space from 'harvester-gui-plugin-generic/utils/space';
 
 export default class SpacesProviderService extends Service {
@@ -36,13 +37,13 @@ export default class SpacesProviderService extends Service {
         this.fetchElasticsearchSpaces(),
       ])
       .then(([onezoneSpaces, elasticsearchSpaces]) => {
-        const spaceIdsWithNames = new Set(onezoneSpaces.mapBy('id'));
-        const spacesWithoutNames = elasticsearchSpaces.filter(({ id }) =>
-          !spaceIdsWithNames.has(id)
+        const spaceIdsWithName = new Set(onezoneSpaces.map(({ id }) => id));
+        const spacesWithFallbackName = elasticsearchSpaces.filter(({ id }) =>
+          !spaceIdsWithName.has(id)
         );
         this.spaces = [
-          ...onezoneSpaces.sortBy('name'),
-          ...spacesWithoutNames.sortBy('name'),
+          ..._.sortBy(onezoneSpaces, ['name']),
+          ..._.sortBy(spacesWithFallbackName, ['name']),
         ];
       });
   }

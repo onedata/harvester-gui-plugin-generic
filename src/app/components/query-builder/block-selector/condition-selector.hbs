@@ -32,7 +32,7 @@
           </PowerSelect>
         {{else}}
           <span class="comparator-selector">
-            {{tt this (concat "comparators." this.comparators.[0])}}
+            {{tt this (concat "comparators." (get this.comparators "0"))}}
           </span>
         {{/if}}
       </div>

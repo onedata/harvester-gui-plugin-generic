@@ -105,7 +105,7 @@ export default class QueryResultsFilteredPropertiesSelectorComponent extends Com
    * @type {number}
    */
   get selectedPropertiesCount() {
-    return this.flatModel.filterBy('isChecked').length;
+    return this.flatModel.filter(({ isChecked }) => isChecked).length;
   }
 
   @action
@@ -187,7 +187,7 @@ export default class QueryResultsFilteredPropertiesSelectorComponent extends Com
         const propertiesSubtree = propertiesSubtreeQueue.pop();
 
         for (const key of Object.keys(propertiesSubtree).sort()) {
-          const oldModelNode = oldModelChildrenTarget.findBy('name', key);
+          const oldModelNode = oldModelChildrenTarget.find(({ name }) => name === key);
           const oldModelChildren = oldModelNode ? oldModelNode.children : [];
 
           const newModelNode = new TreeNode();
@@ -223,7 +223,8 @@ export default class QueryResultsFilteredPropertiesSelectorComponent extends Com
         const filteredPropertiesNodeKeys = Object.keys(filteredPropertiesNode);
         if (filteredPropertiesNodeKeys.length && modelNode.children.length) {
           for (const nodeKey of filteredPropertiesNodeKeys) {
-            const modelNodeForNodeKey = modelNode.children.findBy('name', nodeKey);
+            const modelNodeForNodeKey = modelNode.children
+              .find(({ name }) => name === nodeKey);
             if (modelNodeForNodeKey) {
               filteredPropertiesQueue.push(filteredPropertiesNode[nodeKey]);
               modelQueue.push(modelNodeForNodeKey);
@@ -255,8 +256,9 @@ export default class QueryResultsFilteredPropertiesSelectorComponent extends Com
     const children = node.children || [];
     if (children.length > 0) {
       children.forEach(subnode => this.fixTreeSelectionState(subnode));
-      const childrenCheckedState = children.mapBy('isChecked');
-      const childrenIndeterminateState = children.mapBy('isIndeterminate');
+      const childrenCheckedState = children.map(({ isChecked }) => isChecked);
+      const childrenIndeterminateState = children
+        .map(({ isIndeterminate }) => isIndeterminate);
       const isChecked = !childrenCheckedState.includes(false);
       const isIndeterminate = !isChecked && (
         childrenCheckedState.includes(true) || childrenIndeterminateState.includes(true)

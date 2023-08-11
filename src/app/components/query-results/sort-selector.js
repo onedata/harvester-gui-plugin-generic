@@ -8,6 +8,7 @@
  */
 
 import Component from '@glimmer/component';
+import _ from 'lodash';
 import { action } from '@ember/object';
 import { inject as service } from '@ember/service';
 import { htmlSafe } from '@ember/template';
@@ -38,11 +39,10 @@ export default class QueryResultsSortSelectorComponent extends Component {
    * @type {Array<Utils.EsIndexProperty>}
    */
   get indexProperties() {
-    const properties = !this.index ? [] : this.index.getFlattenedProperties()
+    const properties = !this.index ? [] : _.sortBy(this.index.getFlattenedProperties()
       .filter(property =>
         property.isRealProperty && allowedPropertyTypes.includes(property.type)
-      )
-      .sortBy('path');
+      ), ['path']);
     // empty object means default elasticsearch sort order, which corresponds to the '_score'
     // value
     return [{}, ...properties];
@@ -91,7 +91,8 @@ export default class QueryResultsSortSelectorComponent extends Component {
    */
   get propertySelectorStyle() {
     const ems = Math.min(Math.max(
-      ...this.indexProperties.filterBy('path').map(({ path }) => path.length * 0.8), 8
+      ...this.indexProperties.filter(({ path }) => path)
+      .map(({ path }) => path.length * 0.8), 8
     ), 25);
     return htmlSafe(`width: ${ems}em`);
   }
