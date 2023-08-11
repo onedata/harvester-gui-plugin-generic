@@ -37,13 +37,13 @@ export default class SpacesProviderService extends Service {
         this.fetchElasticsearchSpaces(),
       ])
       .then(([onezoneSpaces, elasticsearchSpaces]) => {
-        const spaceIdsWithNames = new Set(onezoneSpaces.map(({ id }) => id));
-        const spacesWithoutNames = elasticsearchSpaces.filter(({ id }) =>
-          !spaceIdsWithNames.has(id)
+        const spaceIdsWithName = new Set(onezoneSpaces.map(({ id }) => id));
+        const spacesWithFallbackName = elasticsearchSpaces.filter(({ id }) =>
+          !spaceIdsWithName.has(id)
         );
         this.spaces = [
           ..._.sortBy(onezoneSpaces, ['name']),
-          ..._.sortBy(spacesWithoutNames, ['name']),
+          ..._.sortBy(spacesWithFallbackName, ['name']),
         ];
       });
   }

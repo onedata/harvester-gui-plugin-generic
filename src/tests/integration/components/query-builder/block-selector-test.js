@@ -181,6 +181,7 @@ module('Integration | Component | query-builder/block-selector', (hooks) => {
           await click(`.surround-section .operator-${operatorName}`);
           const blockMatcher = sinon.match.instanceOf(operatorBlockClasses[operatorName])
             .and(
+              // Matching Ember Array
               sinon.match((val) =>
                 sinon.match.array.deepEquals([editBlock]).test(val.operands.toArray()))
             );
@@ -320,6 +321,7 @@ module('Integration | Component | query-builder/block-selector', (hooks) => {
               const blockMatcher = sinon.match
                 .instanceOf(operatorBlockClasses[destinationOperatorName])
                 .and(
+                  // Matching Ember Array
                   sinon.match((val) =>
                     sinon.match.array.deepEquals([conditionBlock])
                     .test(val.operands.toArray()))

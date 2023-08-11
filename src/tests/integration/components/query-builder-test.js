@@ -84,6 +84,7 @@ module('Integration | Component | query-builder', (hooks) => {
 
     const queryMatcher = sinon.match.instanceOf(RootOperatorQueryBlock)
       .and(
+        // Matching Ember Array
         sinon.match((val) =>
           val.operands.length === 1 && val.operands[0] instanceof ConditionQueryBlock
         )

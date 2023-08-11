@@ -125,6 +125,7 @@ module('Integration | Component | query-builder/block-settings', (hooks) => {
 
       const blockMatcher = sinon.match.instanceOf(AndOperatorQueryBlock)
         .and(
+          // Matching Ember Array
           sinon.match((val) =>
             sinon.match.array.deepEquals([this.queryBlock]).test(val.operands.toArray()))
         );
@@ -156,6 +157,7 @@ module('Integration | Component | query-builder/block-settings', (hooks) => {
 
       const blockMatcher = sinon.match.instanceOf(AndOperatorQueryBlock)
         .and(
+          // Matching Ember Array
           sinon.match((val) =>
             sinon.match.array.deepEquals([condition]).test(val.operands.toArray()))
         );
