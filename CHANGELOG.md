@@ -4,6 +4,7 @@
 CHANGELOG
 ---------
 
+- **VFS-11448** Upgraded Node.js version to v18.
 - **VFS-11108** Upgraded Ember to version 4.12.
 - **VFS-11109** Migrated tests to QUnit framework.
 
