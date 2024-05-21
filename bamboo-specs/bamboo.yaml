@@ -83,7 +83,7 @@ Fetch dependencies:
 
         ln -s ./bamboos/docker/docker_build.py docker_build.py
         ln -s ./bamboos/make.py make.py
-
+        # test
         cat > dockers.config <<EOF
         {
             "builder": "onedata/gui_builder:v21"
