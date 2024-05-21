@@ -4,6 +4,8 @@
 CHANGELOG
 ---------
 
+- **VFS-11681** Updated builder docker image
+
 ### 1.2.0:
 
 - **VFS-9822** Upgraded Ember to version 4.4.
